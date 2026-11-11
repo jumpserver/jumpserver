@@ -474,6 +474,35 @@ class WorkflowTests(TestCase):
         self.assertEqual(self.request(ApprovalTaskViewSet, 'approve', self.alice, task.pk).status_code, 200)
         self.assertEqual(self.request(ApprovalTaskViewSet, 'approve', self.alice, task.pk).status_code, 409)
 
+    def test_instance_details_identify_the_used_workflow_version_and_role_sources(self):
+        workflow = self.create_workflow(approvers={'type': 'role', 'value': [str(self.role.pk)]})
+        instance = self.start(workflow)
+        publish_workflow(workflow, approval_definition([], approvers={'type': 'org_admin'}), expected_version=1)
+        response = self.request(WorkflowInstanceViewSet, 'retrieve', self.applicant, instance.pk, method='get')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['workflow_name'], workflow.name)
+        self.assertEqual(response.data['version_number'], 1)
+        self.assertEqual(response.data['approver_role_names'], {str(self.role.pk): self.role.name})
+        approval = next(node for node in response.data['nodes'] if node['type'] == 'approval')
+        self.assertEqual(approval['config']['approvers'], {'type': 'role', 'value': [str(self.role.pk)]})
+
+    def test_instance_details_translate_builtin_roles_and_support_non_role_sources(self):
+        admin = BuiltinRole.system_admin.get_role()
+        RoleBinding.objects_raw.bulk_create([
+            RoleBinding(user=self.alice, role=admin, scope='system'),
+        ])
+        workflow = self.create_workflow(approvers={'type': 'role', 'value': [str(admin.pk), str(self.role.pk)]})
+        instance = self.start(workflow)
+        with override('zh'):
+            response = self.request(WorkflowInstanceViewSet, 'retrieve', self.applicant, instance.pk, method='get')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['approver_role_names'], {
+            str(admin.pk): '系统管理员', str(self.role.pk): self.role.name,
+        })
+        instance = self.start()
+        response = self.request(WorkflowInstanceViewSet, 'retrieve', self.applicant, instance.pk, method='get')
+        self.assertEqual(response.data['approver_role_names'], {})
+
     def test_empty_cc_nodes_publish_and_advance_without_recipients_or_notifications(self):
         from tickets.workflow.business import deliver_event
 

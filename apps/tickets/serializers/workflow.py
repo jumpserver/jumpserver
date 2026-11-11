@@ -5,6 +5,7 @@ from rest_framework import serializers
 
 from orgs.models import Organization
 from orgs.utils import current_org, tmp_to_root_org
+from rbac.models import Role
 from tickets.models import Workflow, WorkflowVersion, WorkflowInstance, WorkflowNodeInstance, ApprovalTask, WorkflowEvent
 from tickets.workflow.definition import validate_definition
 from tickets.workflow.errors import WorkflowConflict
@@ -154,8 +155,19 @@ class WorkflowInstanceSerializer(serializers.ModelSerializer):
 
 
 class WorkflowInstanceDetailSerializer(WorkflowInstanceSerializer):
+    workflow_name = serializers.CharField(source='version.workflow.display_name', read_only=True)
+    approver_role_names = serializers.SerializerMethodField()
     nodes = WorkflowNodeInstanceSerializer(source='node_instances', many=True, read_only=True)
     resource_adjustment = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_approver_role_names(instance):
+        role_ids = set()
+        for run in instance.node_instances.all():
+            approvers = run.node.config.get('approvers', {})
+            if approvers.get('type') == 'role':
+                role_ids.update(approvers['value'])
+        return {str(role.pk): str(role.display_name) for role in Role.objects.filter(pk__in=role_ids)}
 
     def get_resource_adjustment(self, instance):
         from tickets.workflow.resources import adjustment_status
@@ -163,7 +175,9 @@ class WorkflowInstanceDetailSerializer(WorkflowInstanceSerializer):
         return adjustment_status(instance, request.user if request else None)
 
     class Meta(WorkflowInstanceSerializer.Meta):
-        fields = WorkflowInstanceSerializer.Meta.fields + ['context', 'nodes', 'resource_adjustment']
+        fields = WorkflowInstanceSerializer.Meta.fields + [
+            'workflow_name', 'approver_role_names', 'context', 'nodes', 'resource_adjustment',
+        ]
         read_only_fields = fields
 
 
