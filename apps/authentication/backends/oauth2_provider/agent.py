@@ -1,23 +1,19 @@
 """OAuth policy for explicitly registered, public Agent clients."""
 from urllib.parse import urlsplit
 
-from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.auth.decorators import login_not_required
 from django.db import transaction
-from django.http import JsonResponse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.cache import never_cache
 from oauth2_provider.http import OAuth2ResponseRedirect
 from oauth2_provider.models import get_application_model, get_refresh_token_model
 from oauthlib.oauth2 import InvalidScopeError, InvalidRequestError, InvalidGrantError
 from oauthlib.oauth2.rfc6749.errors import CustomOAuth2Error
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
-from terminal.agent_service import ALL_AGENT_ORGANIZATIONS, agent_token_authority, check_agent_scope
+from terminal.agent_service import ALL_AGENT_ORGANIZATIONS, check_agent_scope
 from terminal.models import AgentApplication, AgentOAuthBinding
 from authentication.services.agent_clients import user_agent_client_limit_reached, user_agent_client_limit_message
 from .agent_forms import AgentAllowForm
@@ -163,7 +159,7 @@ class AgentOAuth2Validator(ClientOAuth2Validator):
 
     def validate_bearer_token(self, token, scopes, request):
         # Agent tokens are resource capabilities, never general Core API logins.
-        # Dedicated introspection/subject endpoints validate them directly. Only
+        # Component introspection validates them directly. Only
         # component-authenticated introspection issues execution capabilities.
         access_token = self._load_access_token(token) if token else None
         if access_token and SCOPE in access_token.scope.split():
@@ -217,30 +213,6 @@ class AgentAwareAuthorizationView(ClientAuthorizationView):
         return super().redirect(redirect_to, application)
 
 
-@method_decorator(login_not_required, name='dispatch')
-@method_decorator(never_cache, name='dispatch')
-class AgentIdentityView(View):
-    """Return only the token's subject; cookies never authenticate this endpoint."""
-    http_method_names = ['get', 'head', 'options']
-
-    def get(self, request):
-        if not settings.MCP_ENABLED:
-            return JsonResponse({'error': 'not_found'}, status=404)
-        authorization = request.headers.get('Authorization', '').split()
-        resource = request.GET.get('resource')
-        try:
-            if (len(authorization) != 2 or authorization[0].lower() != 'bearer'
-                    or set(request.GET) != {'resource'} or len(request.GET.getlist('resource')) != 1
-                    or resource != settings.MCP_PUBLIC_URL):
-                raise PermissionDenied()
-            token, _, _ = agent_token_authority(authorization[1], resource)
-        except (PermissionDenied, ValidationError):
-            response = JsonResponse({'error': 'invalid_token'}, status=401)
-            response['WWW-Authenticate'] = 'Bearer'
-            return response
-        return JsonResponse({'sub': str(token.user_id)})
-
-
 class AgentAuthorizationServerView(OAuthAuthorizationServerView):
     def get_base_url(self, request):
         from common.utils.mcp import get_mcp_authorization_server
@@ -262,7 +234,6 @@ class AgentAuthorizationServerView(OAuthAuthorizationServerView):
             'authorization_endpoint': base + reverse('authentication:oauth2-provider:authorize'),
             'token_endpoint': base + reverse('authentication:oauth2-provider:token'),
             'revocation_endpoint': base + reverse('authentication:oauth2-provider:revoke-token'),
-            'agent_identity_endpoint': base + reverse('authentication:oauth2-provider:agent-identity'),
             'response_types_supported': ['code'],
             'grant_types_supported': ['authorization_code', 'refresh_token'],
             'scopes_supported': [SCOPE],

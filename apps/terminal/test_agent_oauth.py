@@ -14,7 +14,7 @@ from django.utils.translation import override
 from oauth2_provider.models import get_application_model, get_access_token_model, get_grant_model, get_refresh_token_model
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
-from authentication.backends.oauth2_provider.agent import AgentAwareAuthorizationView, AgentAuthorizationServerView, AgentIdentityView
+from authentication.backends.oauth2_provider.agent import AgentAwareAuthorizationView, AgentAuthorizationServerView
 from authentication.backends.oauth2_provider.client_views import ClientTokenView, ClientRevokeTokenView
 from authentication.models.client_login_session import ClientLoginSession
 from common.sessions.cache import SessionStore
@@ -121,19 +121,11 @@ class AgentOAuthOrganizationTests(TestCase):
             'capabilities': {'version': 1, 'protocols': {'ssh': 'shell'}}, **extra,
         })
 
-    def identity(self, result, resource=None):
-        from django.urls import reverse
-
-        with self.settings(MCP_ENABLED=True, MCP_PUBLIC_URL=self.resource, MCP_DCR_ENABLED=False):
-            return self.client.get(reverse('authentication:oauth2-provider:agent-identity'),
-                                   {'resource': resource or self.resource},
-                                   HTTP_AUTHORIZATION='Bearer ' + result['access_token'])
-
     def test_external_mcp_registration_tokens_and_introspection_need_no_identity_lookup(self):
         with self.settings(MCP_ENABLED=True, MCP_DCR_ENABLED=True, MCP_PUBLIC_URL=self.resource,
                            SITE_URL='http://jumpserver.example'):
             metadata = AgentAuthorizationServerView().get_metadata(self.factory.get('/metadata'))
-            self.assertIn('agent_identity_endpoint', metadata)
+            self.assertNotIn('agent_identity_endpoint', metadata)
             response = self.client.post(urlsplit(metadata['registration_endpoint']).path, json.dumps({
                 'client_name': 'External MCP client', 'redirect_uris': ['http://127.0.0.1/callback'],
                 'token_endpoint_auth_method': 'none', 'grant_types': ['authorization_code', 'refresh_token'],
@@ -161,33 +153,16 @@ class AgentOAuthOrganizationTests(TestCase):
             self.assertEqual(principal['scopes'], [service.SCOPE])
             self.assertFalse(ClientLoginSession.objects.filter(user=self.user).exists())
 
-    def test_agent_identity_returns_only_the_bearer_subject_without_general_api_access(self):
+    def test_agent_token_cannot_authenticate_general_core_api(self):
         from oauthlib.common import Request as OAuthRequest
         from authentication.backends.oauth2_provider.agent import AgentOAuth2Validator
-        from django.urls import resolve, reverse
-
         result = self.issued()
-        response = self.identity(result)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(json.loads(response.content), {'sub': str(self.user.id)})
-        self.assertIn('no-store', response['Cache-Control'])
+        self.assertNotIn('sub', result)
         self.assertFalse(AgentOAuth2Validator().validate_bearer_token(
             result['access_token'], [], OAuthRequest('http://localhost/api/v1/users/profile/'),
         ))
-        view = resolve(reverse('authentication:oauth2-provider:agent-identity')).func
-        self.assertFalse(view.login_required)
-        request = self.factory.get('/identity/', {'resource': self.resource})
-        request.user = self.user
-        with self.settings(MCP_ENABLED=True, MCP_PUBLIC_URL=self.resource):
-            self.assertEqual(view(request).status_code, 401)
-            self.assertEqual(view(self.factory.post('/identity/')).status_code, 405)
-        with self.settings(MCP_ENABLED=False):
-            self.assertEqual(view(request).status_code, 404)
-        with self.settings(SITE_URL='https://jumpserver.example'):
-            metadata = AgentAuthorizationServerView().get_metadata(self.factory.get('/metadata'))
-        self.assertTrue(metadata['agent_identity_endpoint'].endswith(reverse('authentication:oauth2-provider:agent-identity')))
 
-    def test_agent_identity_rechecks_resource_scope_expiry_revocation_binding_and_user(self):
+    def test_introspection_rechecks_resource_scope_expiry_revocation_binding_and_user(self):
         for invalid in ('resource', 'scope', 'expired', 'revoked', 'disabled', 'unbound', 'inactive_user'):
             with self.subTest(invalid=invalid):
                 AgentApplication.objects.filter(application=self.app).update(is_active=True)
@@ -206,9 +181,9 @@ class AgentOAuthOrganizationTests(TestCase):
                     AgentOAuthBinding.objects.filter(application=self.app).delete()
                 elif invalid == 'inactive_user':
                     User.objects.filter(pk=self.user.pk).update(is_active=False)
-                response = self.identity(result, self.resource + '/other' if invalid == 'resource' else None)
-                self.assertEqual(response.status_code, 401, response.content)
-                self.assertEqual(json.loads(response.content), {'error': 'invalid_token'})
+                resource = self.resource + '/other' if invalid == 'resource' else self.resource
+                with self.assertRaises(PermissionDenied):
+                    self.introspect(result, resource=resource)
 
     def remove_membership(self):
         self.second.members.through.objects_raw.filter(user=self.user, org_id=self.second.pk).delete()

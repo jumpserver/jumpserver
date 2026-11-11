@@ -126,7 +126,7 @@ def token_organization_binding(token, refresh=None):
 
 
 def agent_token_authority(raw, resource):
-    """The same live authority check serves component introspection and subject lookup."""
+    """Validate current MCP token authority for component introspection."""
     raw = text_field(raw, 'access_token', 8192)
     token = get_access_token_model().objects.select_related('user', 'application').filter(
         token_checksum=hashlib.sha256(raw.encode()).hexdigest(),
