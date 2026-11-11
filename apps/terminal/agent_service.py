@@ -34,7 +34,7 @@ SESSION_TTL = 7200
 RESULT_TTL = timedelta(minutes=15)
 FINAL_STATES = frozenset(('succeeded', 'failed', 'rejected', 'expired', 'cancelled', 'unknown'))
 ACTION_KINDS = frozenset(ACTION_POLICIES)
-# OAuth scope marker. Sessions always use a real organization;
+# Protocol scope marker. Sessions always use a real organization;
 # this marker never grants root-organization or administrative permissions.
 ALL_AGENT_ORGANIZATIONS = Organization.ROOT_ID
 
@@ -102,9 +102,7 @@ def check_agent_organization(user, org_id):
     return org_id
 
 
-def check_agent_scope(user, scope_org_id):
-    if str(scope_org_id) != ALL_AGENT_ORGANIZATIONS:
-        raise PermissionDenied('Invalid Agent organization scope')
+def check_agent_scope(user):
     if not available_agent_organizations(user).exists():
         raise PermissionDenied('No authorized organizations are available')
 
@@ -115,7 +113,7 @@ def authorized_agent_org_ids(user):
     ).values('agent_org_id')
 
 
-def token_organization_binding(token, refresh=None):
+def token_authorization_binding(token, refresh=None):
     bindings = AgentOAuthBinding.objects.filter(user_id=token.user_id, application_id=token.application_id)
     binding = bindings.filter(access_token=token).first()
     if binding:
@@ -138,19 +136,18 @@ def agent_token_authority(raw, resource):
     if not registration or registration.resource != resource or token.resource != [resource]:
         raise PermissionDenied('Token is not issued for this MCP resource', code='invalid_token')
     refresh = get_refresh_token_model().objects.filter(access_token=token).first()
-    binding = token_organization_binding(token, refresh)
-    if not binding:
-        raise PermissionDenied('OAuth authorization has no organization binding')
-    org_id = str(binding.org_id)
-    check_agent_scope(token.user, org_id)
+    if not token_authorization_binding(token, refresh):
+        raise PermissionDenied('OAuth authorization has no subject binding')
+    check_agent_scope(token.user)
     if refresh and refresh.revoked is not None:
         raise PermissionDenied('OAuth authorization revoked')
-    return token, refresh, org_id
+    return token, refresh
 
 
 def introspect(node, data):
     require_keys(data, ('access_token', 'resource', 'capabilities'), ('access_token', 'resource', 'capabilities'))
-    token, refresh, org_id = agent_token_authority(data['access_token'], data['resource'])
+    token, refresh = agent_token_authority(data['access_token'], data['resource'])
+    org_id = ALL_AGENT_ORGANIZATIONS
     resource = token.resource[0]
     payload = {
         'user_id': str(token.user_id), 'application_id': token.application_id,
@@ -175,7 +172,9 @@ def context_identity(node, value):
         if context['node_id'] != str(node.id) or context['expires'] <= timezone.now().timestamp():
             raise PermissionDenied('Execution context expired or belongs to another node')
         user = User.objects.get(pk=context['user_id'])
-        check_agent_scope(user, context['org_id'])
+        if context['org_id'] != ALL_AGENT_ORGANIZATIONS:
+            raise PermissionDenied('Invalid Agent organization scope')
+        check_agent_scope(user)
         context['capabilities'] = node_capabilities(context.get('capabilities'))
         if not AgentApplication.objects.filter(
             application_id=context['application_id'], resource=context['resource'], is_active=True,

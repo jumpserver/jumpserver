@@ -202,7 +202,7 @@ class AgentOAuthOrganizationTests(TestCase):
                 user=user, application=app, code=uuid.uuid4().hex, scope=service.SCOPE,
                 redirect_uri=app.redirect_uris, expires=timezone.now() + timedelta(minutes=5),
             )
-            AgentOAuthBinding.objects.create(user=user, application=app, org_id=service.ALL_AGENT_ORGANIZATIONS, grant=grant)
+            AgentOAuthBinding.objects.create(user=user, application=app, grant=grant)
             applications.append(app)
         return applications
 
@@ -343,7 +343,7 @@ class AgentOAuthOrganizationTests(TestCase):
         self.assertNotContains(response, 'name="organization"')
         code = self.code()
         binding = AgentOAuthBinding.objects.get(grant__code=code)
-        self.assertEqual(str(binding.org_id), service.ALL_AGENT_ORGANIZATIONS)
+        self.assertEqual((binding.user_id, binding.application_id), (self.user.pk, self.app.pk))
         self.assertIsNotNone(AgentApplication.objects.get(application=self.app).date_authorized)
 
     def test_all_organization_consent_rotation_and_current_membership(self):
@@ -488,8 +488,9 @@ class AgentOAuthOrganizationTests(TestCase):
         result = json.loads(response.content)
         self.assertEqual(self.introspect(result)['org_id'], service.ALL_AGENT_ORGANIZATIONS)
         get_access_token_model().objects.filter(token_checksum=hashlib.sha256(result['access_token'].encode()).hexdigest()).delete()
-        self.assertEqual(str(AgentOAuthBinding.objects.get(refresh_family=refresh.token_family).org_id), service.ALL_AGENT_ORGANIZATIONS)
-        # The provider rejects orphan refresh tokens; the authorization's org still survives.
+        binding = AgentOAuthBinding.objects.get(refresh_family=refresh.token_family)
+        self.assertEqual((binding.user_id, binding.application_id), (self.user.pk, self.app.pk))
+        # The provider rejects orphan refresh tokens; the subject binding still survives.
         response = self.token_request({'grant_type': 'refresh_token', 'refresh_token': result['refresh_token'],
                                        'client_id': self.app.client_id})
         self.assertEqual(response.status_code, 400)

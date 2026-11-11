@@ -50,7 +50,15 @@ is required.
 
 Deploy the Core feature and apply normal database migrations before enabling
 MCP access. The single Agent migration, `terminal.0018_agent_mcp`, creates
-execution records, audit evidence and OAuth organization bindings together.
+execution records, audit evidence and OAuth subject bindings together. Bindings
+store the authorizing user and client; authorized organizations are resolved from
+current user permissions on each request, without a stored organization scope.
+
+Pre-release test databases that applied an earlier `0018` containing
+`terminal_agentoauthbinding.org_id` must synchronize that schema before running
+the updated code. Revoke any earlier single-organization authorizations before
+dropping the column, requiring fresh consent for all available organizations.
+Editing an applied migration does not remove the old column.
 
 In Lina, open **System Settings > AI Assistant > MCP**. AI Assistant and MCP use
 separate permission checks and save requests. Old MCP settings links redirect

@@ -13,7 +13,7 @@ from oauthlib.oauth2 import InvalidScopeError, InvalidRequestError, InvalidGrant
 from oauthlib.oauth2.rfc6749.errors import CustomOAuth2Error
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
-from terminal.agent_service import ALL_AGENT_ORGANIZATIONS, check_agent_scope
+from terminal.agent_service import check_agent_scope
 from terminal.models import AgentApplication, AgentOAuthBinding
 from authentication.services.agent_clients import user_agent_client_limit_reached, user_agent_client_limit_message
 from .agent_forms import AgentAllowForm
@@ -59,7 +59,7 @@ class AgentOAuth2Validator(ClientOAuth2Validator):
                 raise CustomOAuth2Error(error='invalid_target', request=request)
             request.resource = resources
             try:
-                check_agent_scope(request.user, ALL_AGENT_ORGANIZATIONS)
+                check_agent_scope(request.user)
             except (PermissionDenied, ValidationError):
                 raise InvalidRequestError(description='No authorized organizations are available', request=request)
             with transaction.atomic():
@@ -80,7 +80,7 @@ class AgentOAuth2Validator(ClientOAuth2Validator):
                     raise InvalidRequestError(description=user_agent_client_limit_message(), request=request)
                 grant = self._create_authorization_code(request, code)
                 AgentOAuthBinding.objects.create(
-                    user=request.user, application=request.client, org_id=ALL_AGENT_ORGANIZATIONS, grant=grant,
+                    user=request.user, application=request.client, grant=grant,
                 )
                 if registration.date_authorized is None:
                     registration.date_authorized = timezone.now()
@@ -88,7 +88,7 @@ class AgentOAuth2Validator(ClientOAuth2Validator):
             return
         return super().save_authorization_code(client_id, code, request, *args, **kwargs)
 
-    def organization_binding(self, request):
+    def authorization_binding(self, request):
         bindings = AgentOAuthBinding.objects.filter(user=request.user, application=request.client)
         if request.grant_type == 'authorization_code':
             return bindings.filter(grant__code=request.code).first()
@@ -97,28 +97,28 @@ class AgentOAuth2Validator(ClientOAuth2Validator):
             return bindings.filter(refresh_family=refresh.token_family).first()
         return None
 
-    def valid_organization_binding(self, request):
+    def valid_authorization_binding(self, request):
         registration = self.registration(request.client)
         if not registration:
             return True
         if not registration.is_active or not request.user or not request.user.is_valid:
             return False
-        binding = self.organization_binding(request)
+        binding = self.authorization_binding(request)
         if not binding:
             return False
         try:
-            check_agent_scope(request.user, binding.org_id)
+            check_agent_scope(request.user)
         except (PermissionDenied, ValidationError):
             return False
         return True
 
     def validate_code(self, client_id, code, client, request, *args, **kwargs):
         return (super().validate_code(client_id, code, client, request, *args, **kwargs)
-                and self.valid_organization_binding(request))
+                and self.valid_authorization_binding(request))
 
     def validate_refresh_token(self, refresh_token, client, request, *args, **kwargs):
         return (super().validate_refresh_token(refresh_token, client, request, *args, **kwargs)
-                and self.valid_organization_binding(request))
+                and self.valid_authorization_binding(request))
 
     def _save_bearer_token(self, token, request, *args, **kwargs):
         # The provider wraps this hook in the same transaction as token rotation.
@@ -128,9 +128,9 @@ class AgentOAuth2Validator(ClientOAuth2Validator):
             application = get_application_model().objects.select_for_update().filter(pk=request.client.pk).first()
             if application is None or self.registration(application) is None:
                 raise InvalidGrantError(request=request)
-        if not self.valid_organization_binding(request):
+        if not self.valid_authorization_binding(request):
             raise InvalidGrantError(request=request)
-        binding = self.organization_binding(request) if self.registration(request.client) else None
+        binding = self.authorization_binding(request) if self.registration(request.client) else None
         result = super()._save_bearer_token(token, request, *args, **kwargs)
         if binding:
             access = self._load_access_token(token['access_token'])
@@ -143,11 +143,10 @@ class AgentOAuth2Validator(ClientOAuth2Validator):
             for subject in subjects:
                 saved, _ = AgentOAuthBinding.objects.get_or_create(
                     **subject, defaults={
-                        'user': request.user, 'application': request.client, 'org_id': binding.org_id,
+                        'user': request.user, 'application': request.client,
                     },
                 )
-                if (saved.org_id != binding.org_id or saved.user_id != request.user.pk
-                        or saved.application_id != request.client.pk):
+                if saved.user_id != request.user.pk or saved.application_id != request.client.pk:
                     raise InvalidGrantError(request=request)
         return result
 

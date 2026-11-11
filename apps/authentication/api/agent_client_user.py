@@ -21,7 +21,7 @@ from common.drf.filters import SearchFilter
 from common.permissions import IsValidUser
 from common.utils import get_request_ip
 from orgs.models import Organization
-from terminal.agent_service import ALL_AGENT_ORGANIZATIONS, available_agent_organizations
+from terminal.agent_service import available_agent_organizations
 from terminal.models import AgentApplication, AgentOAuthBinding
 
 __all__ = ['UserAgentClientViewSet']
@@ -52,7 +52,7 @@ class UserAgentClientSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
     def get_all_organizations(self, obj):
-        return any(str(binding.org_id) == ALL_AGENT_ORGANIZATIONS for binding in self.live_bindings(obj))
+        return bool(self.live_bindings(obj))
 
     @staticmethod
     def live_bindings(obj):

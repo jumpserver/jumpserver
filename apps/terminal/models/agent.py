@@ -18,10 +18,9 @@ class AgentApplication(models.Model):
 
 
 class AgentOAuthBinding(models.Model):
-    """OAuth organization scope; ROOT denotes the user's available organizations."""
+    """Bind OAuth subjects to their authorizing user and client."""
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     application = models.ForeignKey('oauth2_provider.Application', on_delete=models.CASCADE)
-    org_id = models.UUIDField()
     grant = models.OneToOneField(
         'oauth2_provider.Grant', null=True, on_delete=models.CASCADE,
     )

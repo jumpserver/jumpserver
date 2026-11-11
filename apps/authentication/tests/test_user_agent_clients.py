@@ -22,7 +22,6 @@ from authentication.backends.oauth2_provider.agent import AgentOAuth2Validator
 from authentication.models.client_login_session import ClientLoginSession
 from orgs.utils import tmp_to_org, tmp_to_root_org
 from rbac.models import Role
-from terminal.agent_service import ALL_AGENT_ORGANIZATIONS
 from terminal.models import AgentApplication, AgentOAuthBinding, AgentSession, AgentAction, AgentEvent, Terminal
 from users.models import User
 
@@ -66,7 +65,7 @@ class UserAgentClientTests(TestCase):
             token_family=uuid.uuid4(), resource=[self.registration.resource],
         )
         for subject in ({'access_token': access}, {'refresh_family': refresh.token_family}):
-            AgentOAuthBinding.objects.create(user=user, application=self.application, org_id=ALL_AGENT_ORGANIZATIONS, **subject)
+            AgentOAuthBinding.objects.create(user=user, application=self.application, **subject)
         return access, refresh
 
     def request(self, method='get', path=None, user=None):
@@ -256,7 +255,7 @@ class UserAgentClientTests(TestCase):
             (get_refresh_token_model(), {'token': uuid.uuid4().hex, 'token_family': uuid.uuid4()}),
             (get_grant_model(), {'code': uuid.uuid4().hex, 'expires': expires, 'redirect_uri': 'http://127.0.0.1/callback'}),
             (get_id_token_model(), {'expires': expires}),
-            (AgentOAuthBinding, {'org_id': self.second.pk, 'refresh_family': uuid.uuid4()}),
+            (AgentOAuthBinding, {'refresh_family': uuid.uuid4()}),
         )
         for model, fields in cases:
             with self.subTest(model=model.__name__):
@@ -296,7 +295,7 @@ class UserAgentClientConcurrencyTests(TransactionTestCase):
                     user=owner, application=app, code=uuid.uuid4().hex,
                     expires=timezone.now() + timedelta(minutes=5), redirect_uri=app.redirect_uris,
                 )
-                AgentOAuthBinding.objects.create(user=owner, application=app, grant=grant, org_id=ALL_AGENT_ORGANIZATIONS)
+                AgentOAuthBinding.objects.create(user=owner, application=app, grant=grant)
             applications.append(app)
         start = Barrier(2)
 
@@ -338,7 +337,7 @@ class UserAgentClientConcurrencyTests(TransactionTestCase):
             user=owner, application=application, token=uuid.uuid4().hex,
             scope='agent:access', expires=timezone.now() + timedelta(minutes=5),
         )
-        AgentOAuthBinding.objects.create(user=owner, application=application, access_token=access, org_id=ALL_AGENT_ORGANIZATIONS)
+        AgentOAuthBinding.objects.create(user=owner, application=application, access_token=access)
         started = Event()
 
         def revoke():

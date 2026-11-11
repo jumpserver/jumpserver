@@ -20,16 +20,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterField(
-            model_name='session',
-            name='login_from',
-            field=models.CharField(choices=[('ST', 'SSH Terminal'), ('RT', 'RDP Terminal'), ('WT', 'Web Terminal'), ('DT', 'DB Terminal'), ('VT', 'VNC Terminal'), ('AG', 'Agent')], default='ST', max_length=2, verbose_name='Login from'),
-        ),
-        migrations.AlterField(
-            model_name='sessionjoinrecord',
-            name='login_from',
-            field=models.CharField(choices=[('ST', 'SSH Terminal'), ('RT', 'RDP Terminal'), ('WT', 'Web Terminal'), ('DT', 'DB Terminal'), ('VT', 'VNC Terminal'), ('AG', 'Agent')], default='WT', max_length=2, verbose_name='Login from'),
-        ),
         migrations.CreateModel(
             name='AgentApplication',
             fields=[
@@ -126,7 +116,6 @@ class Migration(migrations.Migration):
             name='AgentOAuthBinding',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('org_id', models.UUIDField()),
                 ('refresh_family', models.UUIDField(null=True, unique=True)),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
                 ('application', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.OAUTH2_PROVIDER_APPLICATION_MODEL)),

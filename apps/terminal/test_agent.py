@@ -42,8 +42,7 @@ class AgentActionLockTests(TransactionTestCase):
             AgentApplication.objects.create(application=app, resource=resource)
             token = get_access_token_model().objects.create(user=user, application=app, token=uuid.uuid4().hex,
                 scope=service.SCOPE, resource=[resource], expires=timezone.now() + timedelta(minutes=5))
-            AgentOAuthBinding.objects.create(user=user, application=app, access_token=token,
-                org_id=service.ALL_AGENT_ORGANIZATIONS)
+            AgentOAuthBinding.objects.create(user=user, application=app, access_token=token)
             session = AgentSession.objects.create(user=user, application=app, terminal=node, oauth_token=token,
                 resource=resource, idempotency_key='connection', request_hash='0' * 64,
                 date_expires=token.expires)
@@ -136,7 +135,7 @@ class AgentBoundaryTests(TestCase):
             token=uuid.uuid4().hex, token_family=uuid.uuid4(), resource=[self.resource],
         )
         for subject in ({'access_token': self.token}, {'refresh_family': self.refresh.token_family}):
-            AgentOAuthBinding.objects.create(user=self.user, application=self.app, org_id=service.ALL_AGENT_ORGANIZATIONS, **subject)
+            AgentOAuthBinding.objects.create(user=self.user, application=self.app, **subject)
         self.session = AgentSession.objects.create(
             user=self.user, application=self.app, terminal=self.node, oauth_token=self.token,
             oauth_family=self.refresh.token_family, resource=self.resource, idempotency_key='connection',
@@ -378,7 +377,10 @@ class AgentBoundaryTests(TestCase):
             service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource + '/other', 'capabilities': self.capabilities})
         with self.assertRaises(Http404):
             service.owned_session(self.other_node, self.session.id, service.session_capability(self.session), check=False)
-        AgentOAuthBinding.objects.filter(user=self.user).update(org_id=self.org.pk)
+        invalid_context = {**context, 'org_id': str(self.org.pk)}
+        with self.assertRaises(PermissionDenied):
+            service.context_identity(self.node, signing.dumps(invalid_context, salt=service.CONTEXT_SALT))
+        AgentOAuthBinding.objects.filter(user=self.user).update(user=self.auditor)
         with self.assertRaises(PermissionDenied):
             service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource, 'capabilities': self.capabilities})
 
@@ -736,7 +738,7 @@ class AgentBoundaryTests(TestCase):
             expires=timezone.now() + timedelta(minutes=1), redirect_uri='http://127.0.0.1:45678/callback',
             scope=service.SCOPE, code_challenge=challenge, code_challenge_method='S256', resource=[self.resource],
         )
-        AgentOAuthBinding.objects.create(user=self.user, application=self.app, org_id=service.ALL_AGENT_ORGANIZATIONS, grant=grant)
+        AgentOAuthBinding.objects.create(user=self.user, application=self.app, grant=grant)
         body = {'grant_type': 'authorization_code', 'code': grant.code, 'client_id': self.app.client_id,
                 'redirect_uri': grant.redirect_uri, 'resource': self.resource, 'code_verifier': 'b' * 64}
         factory = RequestFactory()
