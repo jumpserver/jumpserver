@@ -61,6 +61,8 @@ class NativeClient(TextChoices):
                 Protocol.mongodb: [cls.db_client, cls.db_guide],
                 Protocol.oracle: [cls.db_client, cls.db_guide],
                 Protocol.dameng: [cls.db_client, cls.db_guide],
+                Protocol.db2: [cls.db_client, cls.db_guide],
+                Protocol.clickhouse: [cls.db_client, cls.db_guide],
             })
         return clients
 
@@ -200,6 +202,7 @@ class ConnectMethodUtil:
                     Protocol.oracle, Protocol.mariadb,
                     Protocol.redis, Protocol.sqlserver,
                     Protocol.mongodb, Protocol.dameng,
+                    Protocol.db2, Protocol.clickhouse,
                 ],
                 'match': 'map'
             },
