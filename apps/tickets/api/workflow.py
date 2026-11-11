@@ -87,6 +87,8 @@ class WorkflowInstanceViewSet(viewsets.ReadOnlyModelViewSet):
         qs = WorkflowInstance.objects.select_related('version__workflow').prefetch_related(
             'node_instances__node', 'node_instances__tasks',
         )
+        if self.action == 'retrieve':
+            qs = qs.prefetch_related('version__nodes', 'version__edges')
         if not current_org.is_root():
             qs = qs.filter(org_id=str(current_org.id))
         if not (self.request.user.has_perm('tickets.view_workflowinstance') or

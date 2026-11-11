@@ -10,6 +10,7 @@ from tickets.models import Workflow, WorkflowVersion, WorkflowInstance, Workflow
 from tickets.workflow.definition import validate_definition
 from tickets.workflow.errors import WorkflowConflict
 from tickets.workflow.publication import publish_workflow
+from tickets.workflow.preview import upcoming_nodes
 from tickets.plugins import ticket_plugins
 
 
@@ -158,16 +159,21 @@ class WorkflowInstanceDetailSerializer(WorkflowInstanceSerializer):
     workflow_name = serializers.CharField(source='version.workflow.display_name', read_only=True)
     approver_role_names = serializers.SerializerMethodField()
     nodes = WorkflowNodeInstanceSerializer(source='node_instances', many=True, read_only=True)
+    upcoming_nodes = serializers.SerializerMethodField()
     resource_adjustment = serializers.SerializerMethodField()
 
     @staticmethod
     def get_approver_role_names(instance):
         role_ids = set()
-        for run in instance.node_instances.all():
-            approvers = run.node.config.get('approvers', {})
+        for node in instance.version.nodes.all():
+            approvers = node.config.get('approvers', {})
             if approvers.get('type') == 'role':
                 role_ids.update(approvers['value'])
         return {str(role.pk): str(role.display_name) for role in Role.objects.filter(pk__in=role_ids)}
+
+    @staticmethod
+    def get_upcoming_nodes(instance):
+        return upcoming_nodes(instance)
 
     def get_resource_adjustment(self, instance):
         from tickets.workflow.resources import adjustment_status
@@ -176,7 +182,7 @@ class WorkflowInstanceDetailSerializer(WorkflowInstanceSerializer):
 
     class Meta(WorkflowInstanceSerializer.Meta):
         fields = WorkflowInstanceSerializer.Meta.fields + [
-            'workflow_name', 'approver_role_names', 'context', 'nodes', 'resource_adjustment',
+            'workflow_name', 'approver_role_names', 'context', 'nodes', 'upcoming_nodes', 'resource_adjustment',
         ]
         read_only_fields = fields
 
