@@ -609,14 +609,50 @@ class WorkflowBusinessTests(TestCase):
         self.engine.approve(self.task(instance), self.alice)
         self.assertEqual(AssetPermission.objects.get(pk=ticket.pk).accounts, ['root'])
 
+    def test_specified_accounts_select_the_matching_username_branch(self):
+        from accounts.models import Account
+        definition = approval_definition([self.alice], levels=2)
+        definition['nodes'].insert(1, {'id': 'username', 'type': 'condition', 'config': {
+            'field': 'account.username', 'operator': 'eq', 'value': 'root2',
+        }})
+        definition['edges'] = [['start', 'username'], ['username:true', 'approval_0'],
+                               ['username:false', 'approval_1'], ['approval_0', 'end'], ['approval_1', 'end']]
+        workflow = self.workflow(definition=definition)
+        for username, branch in (('root', 'approval_1'), ('root2', 'approval_0')):
+            with self.subTest(username=username):
+                Account.objects.create(asset=self.asset, name=username, username=username)
+                ticket = self.ticket(workflow)
+                ticket.request_data['apply_accounts'] = ['@SPEC', username]
+                ticket.save(update_fields=['request_data'])
+                instance = submit_ticket(ticket)
+                self.assertEqual([account['username'] for account in instance.context['accounts']], [username])
+                self.assertEqual(instance.context['request']['account_selectors'], [username])
+                task = self.task(instance)
+                self.assertEqual(task.node_instance.node.key, branch)
+                self.engine.approve(task, self.alice)
+                self.assertEqual(AssetPermission.objects.get(pk=ticket.pk).accounts, [username])
+                ticket.refresh_from_db()
+                self.assertEqual(ticket.request_data['apply_accounts'], ['@SPEC', username])
+
+    def test_specified_account_marker_requires_an_actual_account(self):
+        ticket = self.ticket()
+        ticket.request_data['apply_accounts'] = ['@SPEC']
+        ticket.save(update_fields=['request_data'])
+        with self.assertRaises(WorkflowConfigurationError):
+            submit_ticket(ticket)
+        self.assertFalse(WorkflowInstance.objects.filter(ticket=ticket).exists())
+
     def test_manual_username_cannot_skip_username_policy(self):
         from tickets.workflow.conditions import evaluate_condition
-        ticket = self.ticket()
-        ticket.request_data['apply_accounts'] = ['@INPUT']
-        ticket.save(update_fields=['request_data'])
-        instance = submit_ticket(ticket)
-        with self.assertRaises(WorkflowConfigurationError):
-            evaluate_condition({'field': 'account.username', 'operator': 'eq', 'value': 'root'}, instance.context)
+        for selectors in (['@INPUT'], ['@SPEC', 'root', '@INPUT']):
+            with self.subTest(selectors=selectors):
+                ticket = self.ticket()
+                ticket.request_data['apply_accounts'] = selectors
+                ticket.save(update_fields=['request_data'])
+                instance = submit_ticket(ticket)
+                self.assertIn({'selector': '@INPUT', 'username': None}, instance.context['accounts'])
+                with self.assertRaises(WorkflowConfigurationError):
+                    evaluate_condition({'field': 'account.username', 'operator': 'eq', 'value': 'root'}, instance.context)
 
     @override_settings(CACHES={'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'}})
     def test_login_exemption_starts_only_after_final_commit(self):
