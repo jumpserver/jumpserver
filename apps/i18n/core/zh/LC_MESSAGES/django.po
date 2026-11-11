@@ -18388,6 +18388,11 @@ msgstr "审批策略必须为 any（或签）、all（会签）或 quorum（指�
 msgid "Quorum requires a positive approval count up to 1000."
 msgstr "指定审批人数必须为 1 至 1000 的整数。"
 
+#: tickets/workflow/definition.py:57
+#, python-brace-format
+msgid "Select at least {required} approvers; currently {count} selected."
+msgstr "至少选择 {required} 名审批人，当前已选择 {count} 名。"
+
 #: tickets/workflow/definition.py:55
 msgid "Only quorum accepts a required approval count."
 msgstr "只有指定人数审批策略可以设置所需审批人数。"
