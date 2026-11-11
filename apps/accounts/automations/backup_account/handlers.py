@@ -1,6 +1,6 @@
 import os
 import time
-from collections import defaultdict, OrderedDict
+from collections import defaultdict
 
 from django.conf import settings
 from django.db.models import F
@@ -29,12 +29,13 @@ class RecipientsNotFound(Exception):
 
 class BaseAccountHandler:
     @classmethod
-    def unpack_data(cls, serializer_data, data=None):
+    def unpack_data(cls, serializer_data, serializer, data=None):
         if data is None:
             data = {}
         for k, v in serializer_data.items():
-            if isinstance(v, OrderedDict):
-                cls.unpack_data(v, data)
+            field = serializer.fields.get(k)
+            if isinstance(field, serializers.Serializer) and isinstance(v, dict):
+                cls.unpack_data(v, field, data)
             else:
                 if isinstance(v, dict):
                     v = v.get('label')
@@ -65,18 +66,18 @@ class BaseAccountHandler:
         return header_fields
 
     @classmethod
-    def create_row(cls, data, header_fields):
-        data = cls.unpack_data(data)
+    def create_row(cls, data, header_fields, serializer):
+        data = cls.unpack_data(data, serializer)
         row_dict = {}
         for field, header_name in header_fields.items():
             row_dict[header_name] = str(data.get(field, field))
         return row_dict
 
     @classmethod
-    def add_rows(cls, data, header_fields, sheet):
+    def add_rows(cls, data, header_fields, sheet, serializer):
         data_map = defaultdict(list)
         for i in data:
-            row = cls.create_row(i, header_fields)
+            row = cls.create_row(i, header_fields, serializer)
             if sheet not in data_map:
                 data_map[sheet].append(list(row.keys()))
             data_map[sheet].append(list(row.values()))
@@ -118,7 +119,8 @@ class AssetAccountHandler(BaseAccountHandler):
             for j in i['children']:
                 type_dict[j['value']] = j['display_name']
 
-        header_fields = cls.get_header_fields(AccountSecretSerializer(accounts.first()))
+        serializer = AccountSecretSerializer(accounts.first())
+        header_fields = cls.get_header_fields(serializer)
         account_type_map = defaultdict(list)
         for account in accounts:
             account_type_map[account.type].append(account)
@@ -128,7 +130,7 @@ class AssetAccountHandler(BaseAccountHandler):
             sheet_name = type_dict.get(tp, tp)
             data = AccountSecretSerializer(_accounts, many=True).data
             cls.handler_secret(data, section)
-            data_map.update(cls.add_rows(data, header_fields, sheet_name))
+            data_map.update(cls.add_rows(data, header_fields, sheet_name, serializer))
         number_of_backup_accounts = _('Number of backup accounts')
         print('\033[33m- {}: {}\033[0m'.format(number_of_backup_accounts, accounts.count()))
         return data_map
