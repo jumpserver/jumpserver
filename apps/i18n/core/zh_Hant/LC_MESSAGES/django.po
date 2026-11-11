@@ -18241,3 +18241,12 @@ msgstr "未知的流程上下文字段：{field}。"
 #: tickets/workflow/definition.py:61
 msgid "Timeout must be whole minutes between 1 and 525600, or 0 for no deadline."
 msgstr "超時時間必須為 1 至 525600 的整分鐘數，0 表示不超時。"
+
+msgid "Agent initiated"
+msgstr "Agent 發起"
+
+msgid "User operation"
+msgstr "使用者操作"
+
+msgid "Operation type"
+msgstr "操作類型"

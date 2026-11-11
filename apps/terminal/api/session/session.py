@@ -37,7 +37,7 @@ from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import tmp_to_root_org, tmp_to_org
 from rbac.permissions import RBACPermission
 from terminal import serializers
-from terminal.const import TerminalType
+from terminal.const import TerminalType, LoginFrom
 from terminal.models import Session
 from terminal.permissions import IsSessionAssignee
 from terminal.reporting import SessionReportExporter
@@ -66,6 +66,10 @@ class MySessionAPIView(generics.ListAPIView):
 
 
 class SessionFilterSet(BaseFilterSet):
+    category = filters.ChoiceFilter(
+        choices=[('agent', gettext_lazy('Agent')), ('user', gettext_lazy('User operation'))],
+        method='filter_category', label=gettext_lazy('Operation type'),
+    )
     user = filters.CharFilter(
         lookup_expr='iexact', label=gettext_lazy('User name')
     )
@@ -83,8 +87,12 @@ class SessionFilterSet(BaseFilterSet):
         model = Session
         fields = [
             "user", "user_id", "asset", "asset_id", "account", "remote_addr",
-            "protocol", "is_finished", 'login_from', 'terminal'
+            "protocol", "is_finished", 'login_from', 'terminal', 'category'
         ]
+
+    @staticmethod
+    def filter_category(queryset, name, value):
+        return queryset.filter(login_from=LoginFrom.AG) if value == 'agent' else queryset.exclude(login_from=LoginFrom.AG)
 
     @staticmethod
     def filter_terminal(queryset, name, value):

@@ -20473,3 +20473,12 @@ msgid ""
 "outside this organization): {assets}. Set valid owners on the asset edit "
 "page."
 msgstr "以下资产的负责人不可用（未启用、已过期、已删除或不属于当前组织）：{assets}。请在资产编辑页面设置有效负责人。"
+
+msgid "Agent initiated"
+msgstr "Agent 发起"
+
+msgid "User operation"
+msgstr "用户操作"
+
+msgid "Operation type"
+msgstr "操作类型"

@@ -246,15 +246,25 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
             action = AgentAction.objects.select_for_update().filter(interactive_token_id=token_id).first()
             if action:
                 check_handoff_authority(action.session)
-                if action.status not in ('dispatching', 'awaiting_input') or action.cancel_requested:
+                pending = action.status in ('dispatching', 'awaiting_input')
+                # The terminal's file panel opens its own SFTP connection with
+                # the same token. It must not consume or replace the handoff.
+                file_connection = instance.protocol == 'sftp' and action.interactive_token.protocol == 'ssh'
+                completed_files = (
+                    file_connection and action.status == 'succeeded' and action.interactive_session_id
+                    and not action.interactive_session.is_finished
+                    and action.interactive_session.terminal_id == instance.terminal_id
+                )
+                if (not pending and not completed_files) or action.cancel_requested:
                     raise serializers.ValidationError({'token_id': _('Agent terminal handoff is no longer available.')})
                 self.get_connection_reason(token_id, validated_data, user, asset, verify_account=True)
-                instance.login_from = LoginFrom.AG
+                instance.login_from = LoginFrom.AH
                 instance.save(update_fields=['login_from'])
-                action.interactive_session = instance
-                action.status, action.date_finished = 'succeeded', timezone.now()
-                action.result = {'terminal_session_id': str(instance.id), 'handoff_completed': True}
-                action.save(update_fields=['interactive_session', 'status', 'date_finished', 'result'])
+                if not file_connection:
+                    action.interactive_session = instance
+                    action.status, action.date_finished = 'succeeded', timezone.now()
+                    action.result = {'terminal_session_id': str(instance.id), 'handoff_completed': True}
+                    action.save(update_fields=['interactive_session', 'status', 'date_finished', 'result'])
         return instance
 
     def update(self, instance, validated_data):

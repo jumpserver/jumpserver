@@ -1272,17 +1272,30 @@ class AgentBoundaryTests(TestCase):
         from authentication.services.connection_token import get_connection_token_secret
         secret = get_connection_token_secret(self.action.interactive_token, ConnectionTokenSecretSerializer)
         self.assertEqual(secret['account']['su_from']['username'], 'login')
-        terminal = SessionSerializer().create({
+        connection = {
             'user_id': str(self.user.id), 'asset_id': str(asset.id), 'account_id': str(account.id),
             'account': 'root(root)', 'protocol': 'ssh', 'terminal': self.node, 'org_id': str(self.org.id),
             'token_id': str(self.action.interactive_token_id),
-        })
+        }
+        first_files = SessionSerializer().create({**connection, 'protocol': 'sftp'})
+        self.assertEqual(first_files.login_from, 'AH')
+        self.action.refresh_from_db()
+        self.assertIsNone(self.action.interactive_session_id)
+        self.assertEqual(self.action.status, 'awaiting_input')
+        terminal = SessionSerializer().create(connection.copy())
         self.action.refresh_from_db()
         self.assertEqual(self.action.status, 'succeeded')
         self.assertEqual(self.action.interactive_session_id, terminal.id)
-        self.assertEqual(terminal.login_from, 'AG')
-        self.assertEqual(terminal.get_login_from_display(), 'Agent')
+        self.assertEqual(terminal.login_from, 'AH')
+        self.assertEqual(terminal.get_login_from_display(), 'Agent initiated')
         self.assertEqual(SessionSerializer().fields['login_from'].run_validation('AG'), 'AG')
+        files = SessionSerializer().create({**connection, 'protocol': 'sftp'})
+        self.assertEqual(files.login_from, 'AH')
+        self.action.refresh_from_db()
+        self.assertEqual(self.action.interactive_session_id, terminal.id)
+        from django.db import transaction
+        with self.assertRaises(ValidationError), transaction.atomic():
+            SessionSerializer().create(connection.copy())
         web_terminal = SessionSerializer().create({
             'user_id': str(self.user.id), 'asset_id': str(asset.id), 'account_id': str(account.id),
             'account': 'root(root)', 'protocol': 'ssh', 'terminal': self.node, 'org_id': str(self.org.id),

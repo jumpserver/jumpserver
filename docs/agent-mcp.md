@@ -397,6 +397,27 @@ pause, resume and termination.
 
 ## Audit, limits and recovery
 
+Terminal source `AG` identifies automatic Agent execution. `AH` identifies an
+Agent-initiated human terminal: its actual terminal and file-panel SFTP connections
+appear with ordinary user sessions, labeled "Agent initiated". The initiating
+`open_terminal` action remains in Agent audit. Its SFTP side connection does not
+complete the handoff or replace the interactive terminal reference.
+Before updating the pre-release test environment, obsolete completed Agent audit
+records can be removed while retaining active sessions. If retaining older human
+terminals, reclassify `AG` to `AH` using exact `AgentAction.interactive_session`
+references; do not infer origins from usernames, asset names or timestamps.
+
+File Transfer keeps the existing all-records view and adds an Agent transfer tab.
+The existing FTP audit API accepts `category=agent`, `user` or `unknown`; category
+filtering precedes pagination and export. Sources are read from the existing
+terminal session in one indexed batch per displayed/exported page, matching both
+session ID and organization. Missing or malformed references remain unknown.
+No FTP log fields or indexes are added; after the source session is removed, its
+file logs may remain but their source becomes unknown. Large-history filtering
+still needs deployment-specific query-plan checks because FTP logs lack a session
+index. Agent session details reuse `?session=<terminal-session-id>` to show FTP
+audit and retained downloads, independently requiring `audits.view_ftplog`.
+
 Lina provides Agent sessions under Session Records and Agent actions under
 Command Records. JSON routes remain under `/api/v1/terminal/agent/audit/`.
 Session and action evidence require `terminal.view_agentsession` and

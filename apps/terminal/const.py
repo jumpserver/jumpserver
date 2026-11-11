@@ -120,6 +120,7 @@ class LoginFrom(TextChoices):
     DT = 'DT', 'DB Terminal'
     VT = 'VT', 'VNC Terminal'
     AG = 'AG', 'Agent'
+    AH = 'AH', _('Agent initiated')
 
     @classmethod
     def as_dict(cls):

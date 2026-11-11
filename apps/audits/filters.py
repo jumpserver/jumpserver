@@ -18,6 +18,7 @@ from .models import (
     FTPLog, JobLog, OperateLog,
     PasswordChangeLog, UserLoginLog, UserSession,
 )
+from .ftp import FTP_CATEGORY_CHOICES, filter_ftp_category
 
 __all__ = ['CurrentOrgMembersFilter']
 
@@ -105,6 +106,7 @@ class ClientUserSessionFilterSet(UserSessionFilterSet):
 
 
 class FTPLogFilterSet(BaseFilterSet):
+    category = drf_filters.ChoiceFilter(choices=FTP_CATEGORY_CHOICES, method='filter_category', label=_('Operation type'))
     user = drf_filters.CharFilter(
         lookup_expr='iexact', label=_('User name')
     )
@@ -121,11 +123,15 @@ class FTPLogFilterSet(BaseFilterSet):
         lookup_expr='exact', label=_('Session ID')
     )
 
+    @staticmethod
+    def filter_category(queryset, name, value):
+        return filter_ftp_category(queryset, value)
+
     class Meta:
         model = FTPLog
         fields = [
             'id', 'user', 'asset', 'account', 'filename', 'remote_addr',
-            'operate', 'is_success', 'session',
+            'operate', 'is_success', 'session', 'category',
         ]
         fields_operator = {
             'session': ('exact', 'in'),
