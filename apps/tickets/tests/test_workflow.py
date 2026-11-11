@@ -106,6 +106,32 @@ class WorkflowDefinitionTests(SimpleTestCase):
             with self.subTest(seconds=seconds), self.assertRaises(WorkflowConfigurationError):
                 validate_definition(definition)
 
+    def test_quorum_counts_unique_specified_users(self):
+        user = User(id=uuid4())
+        for users in ([user], [user, user]):
+            with self.subTest(users=users), override('en'), self.assertRaisesMessage(
+                    WorkflowConfigurationError, 'Select at least 2 approvers; currently 1 selected.'):
+                validate_definition(approval_definition(users, strategy='quorum', required=2))
+        definition = approval_definition([user], strategy='quorum', required=2)
+        definition['nodes'][1]['config']['approvers']['value'] = str(user.pk)
+        with self.assertRaises(WorkflowConfigurationError):
+            validate_definition(definition)
+        definition = validate_definition(approval_definition(
+            [user, User(id=uuid4())], strategy='quorum', required=2,
+        ))
+        self.assertEqual(definition['nodes'][1]['config']['required'], 2)
+
+    def test_quorum_does_not_count_dynamic_resolver_ids_as_users(self):
+        for kind in ('user_group', 'role', 'org_admin', 'asset_owner'):
+            approvers = {'type': kind}
+            if kind in ('user_group', 'role'):
+                approvers['value'] = [str(uuid4())]
+            with self.subTest(kind=kind):
+                definition = validate_definition(approval_definition(
+                    [], approvers=approvers, strategy='quorum', required=2,
+                ))
+                self.assertEqual(definition['nodes'][1]['config']['required'], 2)
+
     def test_rejects_disconnected_cycle_and_missing_condition_branch(self):
         graph = deepcopy(self.definition)
         for key in ('a', 'b'):
@@ -313,7 +339,8 @@ class WorkflowTests(TestCase):
     def test_missing_approvers_and_impossible_quorum_fail_closed_with_audit(self):
         for config in [
             {'approvers': {'type': 'user', 'value': [str(self.outsider.pk)]}},
-            {'strategy': 'quorum', 'required': 3},
+            {'strategy': 'quorum', 'required': 2,
+             'approvers': {'type': 'user', 'value': [str(self.alice.pk), str(self.applicant.pk)]}},
             {'approvers': {'type': 'asset_owner'}},
             {'approvers': {'type': 'org_admin'}},
             {'approvers': {'type': 'user', 'value': [str(self.applicant.pk)]}},
@@ -642,6 +669,21 @@ class WorkflowTests(TestCase):
             self.assertEqual(self.request(WorkflowViewSet, 'publish', self.alice, workflow.pk, data).status_code, 409)
             data['expected_version'] = 1
             self.assertEqual(self.request(WorkflowViewSet, 'publish', self.alice, workflow.pk, data).status_code, 201)
+
+    def test_publish_rejects_impossible_quorum_without_creating_version(self):
+        workflow = self.create_workflow()
+        original_version = workflow.active_version_id
+        for users in ([self.alice], [self.alice, self.alice]):
+            data = {'expected_version': 1, 'definition': approval_definition(users, strategy='quorum', required=2)}
+            with self.subTest(users=users), override('en'), patch.object(User, 'has_perms', return_value=True):
+                response = self.request(WorkflowViewSet, 'publish', self.alice, workflow.pk, data)
+                self.assertEqual(response.status_code, 400)
+                self.assertEqual(response.data, {
+                    'definition': ['Select at least 2 approvers; currently 1 selected.'],
+                })
+        workflow.refresh_from_db()
+        self.assertEqual(workflow.active_version_id, original_version)
+        self.assertEqual(workflow.versions.count(), 1)
 
     def test_publish_unknown_condition_field_reports_full_path_without_creating_version(self):
         workflow = self.create_workflow()

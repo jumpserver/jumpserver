@@ -51,6 +51,11 @@ def validate_approval(config):
     if strategy == 'quorum':
         if type(config.get('required')) is not int or not 1 <= config['required'] <= 1000:
             raise WorkflowConfigurationError(gettext('Quorum requires a positive approval count up to 1000.'))
+        approvers = config['approvers']
+        if approvers['type'] == 'user' and config['required'] > len(approvers['value']):
+            raise WorkflowConfigurationError(gettext(
+                'Select at least {required} approvers; currently {count} selected.'
+            ).format(required=config['required'], count=len(approvers['value'])))
     elif 'required' in config:
         raise WorkflowConfigurationError(gettext('Only quorum accepts a required approval count.'))
     for key, default in [('allow_transfer', False), ('allow_add_approver', False), ('exclude_applicant', True)]:
