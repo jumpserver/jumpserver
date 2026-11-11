@@ -156,11 +156,43 @@ class FileTransferExecutionTests(TestCase):
     def test_connection_acl_and_explicit_exclusions_block_execution(self):
         from perms.const import ActionChoices
         ticket, _ = self.request_ticket()
-        with patch('ops.models.job.match_rejected_login_asset_acl', return_value=(self.asset, object())):
-            self.assertEqual(self.action(ticket).status_code, 403)
+        rule = SimpleNamespace(name='Block file transfers', id=UUID(int=1))
+        with patch('ops.models.job.match_rejected_login_asset_acl',
+                   return_value=(self.asset, SimpleNamespace(rules=(rule,)))):
+            response = self.action(ticket)
+            self.assertEqual(response.status_code, 403)
+            self.assertIn(f'{rule.name} ({rule.id})', str(response.data['detail']))
         self.grant(accounts=['!root'], actions=ActionChoices.upload)
         self.assertEqual(self.action(ticket).status_code, 403)
         self.assertFalse(TicketTransferExecution.objects.exists())
+
+    def test_acl_denials_identify_all_matching_rules_only_for_the_applicant(self):
+        from acls.models import LoginAssetACL
+        from acls.models.login_asset_acl import LoginAssetPolicy
+        from django.utils.translation import override
+
+        rules = (LoginAssetACL(name='Matched allow rule', action='accept'),
+                 LoginAssetACL(name='Require MFA', action='accept', mfa_enabled=True))
+        policy = LoginAssetPolicy(rules)
+        for direction in ('upload', 'download'):
+            with self.subTest(direction=direction):
+                ticket, _ = self.request_ticket(direction=direction)
+                with patch('ops.models.job.match_rejected_login_asset_acl', return_value=(self.asset, policy)), \
+                        patch('tickets.plugins.file_transfer.actions.dispatch') as dispatch, override('zh-hans'):
+                    response = self.action(ticket)
+                    self.assertEqual(response.status_code, 403)
+                    for rule in rules:
+                        self.assertIn(f'{rule.name} ({rule.id})', str(response.data['detail']))
+                    response = self.action(ticket, 'download_transfer_file', method='get')
+                    self.assertEqual(response.status_code, 403)
+                    self.assertIn(str(rules[1].id), str(response.data['detail']))
+                    response = self.action(ticket, user=self.alice)
+                    self.assertEqual(response.status_code, 403)
+                    for rule in rules:
+                        self.assertNotIn(str(rule.id), str(response.data))
+                        self.assertNotIn(rule.name, str(response.data))
+                    dispatch.assert_not_called()
+                self.assertFalse(TicketTransferExecution.objects.filter(ticket=ticket).exists())
 
     def test_download_uses_approved_paths_and_preserves_partial_results(self):
         ticket, _ = self.request_ticket(direction='download', paths=['/tmp/hello.txt', '/tmp/missing.txt'])
