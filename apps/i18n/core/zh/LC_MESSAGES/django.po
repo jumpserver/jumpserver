@@ -18206,6 +18206,13 @@ msgid ""
 "A configured approver is inactive, missing, or outside the organization."
 msgstr "配置的审批人未启用、不存在或不属于此组织。"
 
+#: tickets/workflow/approvers.py
+#, python-brace-format
+msgid ""
+"Approval {level} has no eligible approvers after excluding the applicant or authorized users. "
+"Adjust the approvers or select another workflow."
+msgstr "第 {level} 级审批排除申请人或授权用户后，无可用审批人。请调整审批人配置或选择其他流程。"
+
 #: tickets/workflow/approvers.py:85
 msgid "An approval node must resolve between 1 and 1000 eligible approvers."
 msgstr "审批节点需要匹配 1 至 1000 名符合条件的审批人。"
