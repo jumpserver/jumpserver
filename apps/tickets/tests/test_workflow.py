@@ -503,6 +503,69 @@ class WorkflowTests(TestCase):
         response = self.request(WorkflowInstanceViewSet, 'retrieve', self.applicant, instance.pk, method='get')
         self.assertEqual(response.data['approver_role_names'], {})
 
+    def test_instance_preview_shows_remaining_levels_from_the_bound_version(self):
+        definition = approval_definition([self.alice], levels=3)
+        definition['nodes'][2]['config']['approvers'] = {'type': 'role', 'value': [str(self.role.pk)]}
+        workflow = self.create_workflow(definition)
+        instance = self.start(workflow)
+        publish_workflow(workflow, approval_definition([self.bob]), expected_version=1)
+        response = self.request(WorkflowInstanceViewSet, 'retrieve', self.applicant, instance.pk, method='get')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['version_number'], 1)
+        self.assertEqual([(n['key'], n['state']) for n in response.data['upcoming_nodes']], [
+            ('approval_1', 'not_started'), ('approval_2', 'not_started'), ('end', 'not_started'),
+        ])
+        self.assertEqual(response.data['approver_role_names'], {str(self.role.pk): self.role.name})
+        self.assertEqual(instance.node_instances.count(), 2)
+        self.assertEqual(ApprovalTask.objects.filter(node_instance__instance=instance).count(), 1)
+        self.engine.approve(self.task(instance, self.alice), self.alice)
+        response = self.request(WorkflowInstanceViewSet, 'retrieve', self.applicant, instance.pk, method='get')
+        self.assertEqual([n['key'] for n in response.data['upcoming_nodes']], ['approval_2', 'end'])
+        self.assertEqual([n['key'] for n in response.data['nodes']], ['start', 'approval_0', 'approval_1'])
+
+    def test_instance_preview_distinguishes_undecided_branches_and_shared_successors(self):
+        definition = approval_definition([self.alice], levels=4)
+        definition['nodes'].insert(2, {'id': 'condition', 'type': 'condition', 'config': {
+            'field': 'asset.labels.env', 'operator': 'eq', 'value': 'prod',
+        }})
+        definition['edges'] = [
+            ['start', 'approval_0'], ['approval_0', 'condition'],
+            ['condition:true', 'approval_1'], ['condition:false', 'approval_2'],
+            ['approval_1', 'approval_3'], ['approval_2', 'approval_3'], ['approval_3', 'end'],
+        ]
+        instance = self.start(self.create_workflow(definition), {'assets': [{'labels': {'env': 'prod'}}]})
+        response = self.request(WorkflowInstanceViewSet, 'retrieve', self.applicant, instance.pk, method='get')
+        self.assertEqual({n['key']: n['state'] for n in response.data['upcoming_nodes']}, {
+            'condition': 'not_started', 'approval_1': 'branch_pending', 'approval_2': 'branch_pending',
+            'approval_3': 'not_started', 'end': 'not_started',
+        })
+        self.assertFalse(instance.events.filter(type='condition.evaluated').exists())
+        self.engine.approve(self.task(instance, self.alice), self.alice)
+        response = self.request(WorkflowInstanceViewSet, 'retrieve', self.applicant, instance.pk, method='get')
+        self.assertEqual({n['key']: n['state'] for n in response.data['upcoming_nodes']}, {
+            'approval_2': 'skipped', 'approval_3': 'not_started', 'end': 'not_started',
+        })
+        self.assertEqual(instance.node_instances.filter(node__key='approval_2').count(), 0)
+
+    def test_instance_preview_stops_after_rejection_without_changing_skipped_records(self):
+        instance = self.start(self.create_workflow(approval_definition([self.alice], levels=2)))
+        self.engine.reject(self.task(instance, self.alice), self.alice)
+        response = self.request(WorkflowInstanceViewSet, 'retrieve', self.applicant, instance.pk, method='get')
+        self.assertEqual(response.data['upcoming_nodes'], [])
+        self.assertEqual({n['key'] for n in response.data['nodes'] if n['state'] == 'skipped'}, {'approval_1', 'end'})
+
+    def test_instance_preview_keeps_history_when_the_graph_is_restarted(self):
+        instance = self.start(self.create_workflow(approval_definition([self.alice], levels=2)))
+        self.engine.approve(self.task(instance, self.alice), self.alice)
+        self.engine._close_pending(instance)
+        instance.node_instances.filter(state='running').update(state='cancelled', date_finished=timezone.now())
+        self.engine._execute(instance, instance.version.nodes.get(type='start'))
+        response = self.request(WorkflowInstanceViewSet, 'retrieve', self.applicant, instance.pk, method='get')
+        self.assertEqual([n['key'] for n in response.data['nodes']], [
+            'start', 'approval_0', 'approval_1', 'start', 'approval_0',
+        ])
+        self.assertEqual([n['key'] for n in response.data['upcoming_nodes']], ['approval_1', 'end'])
+
     def test_empty_cc_nodes_publish_and_advance_without_recipients_or_notifications(self):
         from tickets.workflow.business import deliver_event
 
