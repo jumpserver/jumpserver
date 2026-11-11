@@ -3,6 +3,7 @@ from unittest.mock import Mock, patch
 
 from django.test import SimpleTestCase, override_settings
 
+from authentication.api.connection_token import RDPFileClientProtocolURLMixin
 from assets.const import Protocol
 from terminal.connect_methods import ConnectMethodUtil, NativeClient
 from terminal.models import Endpoint
@@ -56,14 +57,14 @@ class NativeDatabaseConnectMethodTests(SimpleTestCase):
     @patch('terminal.connect_methods.AppletMethod.get_methods', return_value={})
     @patch('terminal.connect_methods.VirtualAppMethod.get_methods', return_value={})
     def test_native_launch_payload_uses_proxy_endpoint_token_and_asset_database(self, *_):
-        from authentication.api.connection_token import RDPFileClientProtocolURLMixin
-
         ConnectMethodUtil.refresh_methods()
         self.addCleanup(ConnectMethodUtil.refresh_methods)
         view = RDPFileClientProtocolURLMixin()
         view.request = Mock()
         view.get_token_account_display = lambda _: 'db-account'
-        view.get_smart_endpoint = Mock(return_value=Endpoint(host='gateway.example.com', magnus_port=15525))
+        view.get_smart_endpoint = Mock(return_value=Endpoint(
+            host='gateway.example.com', magnus_port=15525,
+        ))
         for protocol in (Protocol.db2, Protocol.clickhouse):
             asset = SimpleNamespace(
                 id='asset-id', category='database', type=protocol, name='test',
@@ -75,7 +76,10 @@ class NativeDatabaseConnectMethodTests(SimpleTestCase):
             )
             with self.subTest(protocol=protocol), patch(
                 'authentication.api.connection_token.get_request_os', return_value='windows',
-            ), patch('authentication.api.connection_token.build_absolute_uri', return_value='https://gateway.example.com/'):
+            ), patch(
+                'authentication.api.connection_token.build_absolute_uri',
+                return_value='https://gateway.example.com/',
+            ):
                 data = view.get_client_protocol_data(token)
                 self.assertEqual(data['protocol'], protocol)
                 self.assertEqual(data['endpoint'], {'host': 'gateway.example.com', 'port': 15525})
