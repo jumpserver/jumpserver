@@ -44,7 +44,8 @@ def snapshot_accounts(selectors, assets, applicant, org_id):
     concrete username fail closed instead of treating an unknown account as safe.
     No credential-bearing field is loaded from the account table.
     """
-    selectors = list(dict.fromkeys(selectors))
+    # @SPEC selects the UI mode; it does not represent an account.
+    selectors = [value for value in dict.fromkeys(selectors) if value != AliasAccount.SPEC]
     with tmp_to_org(org_id):
         accounts = Account.objects.filter(asset__in=assets).values('id', 'asset_id', 'username', 'secret_type')
         if AliasAccount.ALL not in selectors:
