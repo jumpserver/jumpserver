@@ -1,6 +1,6 @@
 import os
 import time
-from collections import defaultdict, OrderedDict
+from collections import defaultdict
 
 from django.conf import settings
 from django.db.models import F
@@ -28,21 +28,6 @@ class RecipientsNotFound(Exception):
 
 class BaseAccountHandler:
     @classmethod
-    def unpack_data(cls, serializer_data, data=None):
-        if data is None:
-            data = {}
-        for k, v in serializer_data.items():
-            if isinstance(v, OrderedDict):
-                cls.unpack_data(v, data)
-            else:
-                if isinstance(v, dict):
-                    v = v.get('label')
-                elif v is None:
-                    v = ''
-                data[k] = v
-        return data
-
-    @classmethod
     def get_header_fields(cls, serializer: serializers.Serializer):
         try:
             exclude_backup_fields = getattr(serializer, 'Meta').exclude_backup_fields
@@ -58,17 +43,22 @@ class BaseAccountHandler:
             v = serializer.fields[field]
             if isinstance(v, serializers.Serializer):
                 _fields = cls.get_header_fields(v)
-                header_fields.update(_fields)
+                for name, label in _fields.items():
+                    header_fields[f'{field}.{name}'] = f'{v.label} {label}'
             else:
                 header_fields[field] = str(v.label)
         return header_fields
 
     @classmethod
     def create_row(cls, data, header_fields):
-        data = cls.unpack_data(data)
         row_dict = {}
         for field, header_name in header_fields.items():
-            row_dict[header_name] = str(data.get(field, field))
+            value = data
+            for name in field.split('.'):
+                value = value.get(name) if isinstance(value, dict) else None
+            if isinstance(value, dict):
+                value = value.get('label')
+            row_dict[header_name] = '' if value is None else str(value)
         return row_dict
 
     @classmethod
