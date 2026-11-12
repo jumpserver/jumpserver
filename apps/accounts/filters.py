@@ -186,6 +186,10 @@ class AccountFilterSet(UUIDFilterMixin, BaseFilterSet):
         method="filter_integrationapplication",
         label=_("Integration application ID")
     )
+    integrationapplications = drf_filters.CharFilter(
+        method="filter_integrationapplications",
+        label=_("Integration application IDs")
+    )
     long_time_no_change_secret = drf_filters.BooleanFilter(
         method="filter_long_time", label=_("Long time no secret change")
     )
@@ -204,7 +208,7 @@ class AccountFilterSet(UUIDFilterMixin, BaseFilterSet):
             "privileged", "is_active",
             "secret_type", "category", "type", "platform",
             "secret_reset", "source", "source_id", "follow_template",
-            "has_secret", "risk", "integrationapplication",
+            "has_secret", "risk", "integrationapplication", "integrationapplications",
             "latest_discovery", "latest_accessed", "latest_updated",
             "latest_secret_changed", "latest_secret_change_failed",
             "long_time_no_change_secret", "long_time_no_login",
@@ -257,6 +261,20 @@ class AccountFilterSet(UUIDFilterMixin, BaseFilterSet):
         if not integrationapplication:
             return IntegrationApplication.objects.none()
         return queryset & integrationapplication.get_accounts()
+
+    @staticmethod
+    def filter_integrationapplications(queryset, name, value):
+        # Rotation accounts must be authorized by every selected application.
+        try:
+            ids = {uuid.UUID(item.strip()) for item in value.split(',')}
+        except ValueError:
+            return queryset.none()
+        applications = list(IntegrationApplication.objects.filter(pk__in=ids))
+        if not ids or len(applications) != len(ids):
+            return queryset.none()
+        for application in applications:
+            queryset = queryset.filter(pk__in=application.get_accounts().values('pk'))
+        return queryset
 
     @staticmethod
     def filter_latest(queryset, name, value):
