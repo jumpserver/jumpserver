@@ -477,8 +477,7 @@ REDIS_CACHE_DEFAULT = {
 REDIS_CACHE_SESSION = dict(REDIS_CACHE_DEFAULT)
 REDIS_CACHE_SESSION['LOCATION'] = REDIS_LOCATION_NO_DB.format(CONFIG.REDIS_DB_SESSION)
 
-# Subscriptions and blocking locks share the cache database, but need a
-# separate pool without a read timeout so normal idle waits remain valid.
+# Blocking locks need a separate pool without a read timeout so idle waits remain valid.
 REDIS_CACHE_BLOCKING = deepcopy(REDIS_CACHE_DEFAULT)
 REDIS_CACHE_BLOCKING['OPTIONS'].pop('SOCKET_TIMEOUT')
 REDIS_CACHE_BLOCKING['OPTIONS']['CONNECTION_FACTORY'] = (
@@ -487,10 +486,19 @@ REDIS_CACHE_BLOCKING['OPTIONS']['CONNECTION_FACTORY'] = (
     else 'common.redis.BlockingConnectionFactory'
 )
 
+# Long-lived subscriptions must not consume the connections needed for locks.
+REDIS_CACHE_PUBSUB = deepcopy(REDIS_CACHE_DEFAULT)
+REDIS_CACHE_PUBSUB['OPTIONS']['CONNECTION_FACTORY'] = (
+    'common.redis.PubSubSentinelConnectionFactory'
+    if REDIS_SENTINEL_SERVICE_NAME and REDIS_SENTINELS
+    else 'common.redis.PubSubConnectionFactory'
+)
+
 CACHES = {
     'default': REDIS_CACHE_DEFAULT,
     'session': REDIS_CACHE_SESSION,
     'blocking': REDIS_CACHE_BLOCKING,
+    'pubsub': REDIS_CACHE_PUBSUB,
 }
 SESSION_CACHE_ALIAS = "session"
 

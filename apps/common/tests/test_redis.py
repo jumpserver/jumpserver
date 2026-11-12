@@ -89,7 +89,7 @@ class RedisBlockingIntegrationTests(unittest.TestCase):
         ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         cls.addClassCleanup(cls.stop_server)
         cache_settings = deepcopy(settings.CACHES)
-        for alias in ('default', 'blocking'):
+        for alias in ('default', 'blocking', 'pubsub'):
             cache_settings[alias]['LOCATION'] = cls.url
             cache_settings[alias]['OPTIONS']['SOCKET_CONNECT_TIMEOUT'] = 0.3
         cache_settings['default']['OPTIONS']['SOCKET_TIMEOUT'] = 0.3
