@@ -18187,3 +18187,7 @@ msgstr "세션 정책"
 
 msgid "Log in again when the browser closes"
 msgstr "브라우저를 닫으면 다시 로그인"
+
+#: templates/redirect_confirm.html
+msgid "Return to the client to check the login result. You can close this page manually."
+msgstr "클라이언트로 돌아가 로그인 결과를 확인하세요. 이 페이지는 직접 닫아도 됩니다."

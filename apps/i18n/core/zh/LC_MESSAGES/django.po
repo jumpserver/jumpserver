@@ -20497,3 +20497,7 @@ msgstr "撤销登录申请失败，请重试。"
 #: authentication/serializers/connection_token.py
 msgid "Account preparation required"
 msgstr "需要准备账号"
+
+#: templates/redirect_confirm.html
+msgid "Return to the client to check the login result. You can close this page manually."
+msgstr "请返回客户端查看登录结果，可手动关闭此页面"

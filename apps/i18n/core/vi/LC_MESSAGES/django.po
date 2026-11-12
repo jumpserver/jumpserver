@@ -18375,3 +18375,7 @@ msgstr "Trường này không được để trống."
 
 msgid "String value too large."
 msgstr "Chuỗi quá dài."
+
+#: templates/redirect_confirm.html
+msgid "Return to the client to check the login result. You can close this page manually."
+msgstr "Quay lại ứng dụng khách để kiểm tra kết quả đăng nhập. Bạn có thể đóng trang này theo cách thủ công."

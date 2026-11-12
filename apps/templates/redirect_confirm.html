@@ -66,14 +66,45 @@
         }
 
         const targetUrl = '{{ target_url|escapejs }}';
+        {% trans 'Return to the client to check the login result. You can close this page manually.' as callback_close_hint %}
+        const callbackCloseHint = '{{ callback_close_hint|escapejs }}';
 
         let countdownTimer = null;
         let countdownSeconds = 30;
         let startedCountdown = false;
+        let callbackCloseTimer = null;
+
+        function isClientLoginCallback() {
+            if (!/^jms2:\/\/auth\/callback\/?(?:\?|$)/.test(targetUrl)) {
+                return false;
+            }
+            try {
+                const target = new URL(targetUrl);
+                return target.protocol === 'jms2:' && target.hostname === 'auth' &&
+                    !target.username && !target.password && !target.port &&
+                    ['/callback', '/callback/'].includes(target.pathname) &&
+                    !target.searchParams.has('error') &&
+                    ['code', 'state'].every((name) =>
+                        target.searchParams.getAll(name).length === 1 &&
+                        target.searchParams.get(name).trim()
+                    );
+            } catch (error) {
+                return false;
+            }
+        }
 
         function handleRedirect(event) {
             if (event) {
                 event.preventDefault();
+            }
+            if (isClientLoginCallback()) {
+                window.location.href = targetUrl;
+                document.getElementById('messages').textContent = callbackCloseHint;
+                if (callbackCloseTimer === null) {
+                    // Browsers may reject closing tabs opened outside web content.
+                    callbackCloseTimer = setTimeout(() => window.close(), 3000);
+                }
+                return;
             }
             setTimeout(() => {
                 if (targetUrl.startsWith('jms2://')) {

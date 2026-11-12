@@ -18602,3 +18602,7 @@ msgstr ""
 #: xpack/plugins/cloud/const.py
 msgid "Partial"
 msgstr "Partial"
+
+#: templates/redirect_confirm.html
+msgid "Return to the client to check the login result. You can close this page manually."
+msgstr "Return to the client to check the login result. You can close this page manually."

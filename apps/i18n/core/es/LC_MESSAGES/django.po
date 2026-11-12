@@ -18604,3 +18604,7 @@ msgstr "Política de sesión"
 
 msgid "Log in again when the browser closes"
 msgstr "Volver a iniciar sesión al cerrar el navegador"
+
+#: templates/redirect_confirm.html
+msgid "Return to the client to check the login result. You can close this page manually."
+msgstr "Vuelve al cliente para consultar el resultado del inicio de sesión. Puedes cerrar esta página manualmente."

@@ -18377,3 +18377,7 @@ msgstr "リソースの失敗とスキャンやタスクのエラーは別々に
 #: xpack/plugins/cloud/const.py
 msgid "Partial"
 msgstr "一部成功"
+
+#: templates/redirect_confirm.html
+msgid "Return to the client to check the login result. You can close this page manually."
+msgstr "クライアントに戻ってログイン結果を確認してください。このページは手動で閉じることができます。"
