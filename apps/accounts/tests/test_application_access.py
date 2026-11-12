@@ -87,9 +87,10 @@ class ApplicationAccessTests(CredentialTestCase):
         compile(data['config'], data['filename'], 'exec')
         compile(data['code'], 'application_example.py', 'exec')
         self.assertEqual(data['sdk_language'], 'python')
-        self.assertIn('http://testserver/api/v1/accounts/client-source/python/', data['install_command'])
+        self.assertIn('http://testserver/static/pam/', data['install_command'])
+        self.assertIn('.whl', data['install_command'])
         self.assertIn(
-            'python3 -m pip install --upgrade --force-reinstall ./jms-pam-clients/python',
+            'python3 -m pip install --upgrade --force-reinstall http://testserver/static/pam/',
             data['install_command'],
         )
         self.assertIn('instance_id=instance_id', data['code'])

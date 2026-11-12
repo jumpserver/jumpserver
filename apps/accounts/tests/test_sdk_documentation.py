@@ -3,7 +3,8 @@ from tempfile import TemporaryDirectory
 from types import SimpleNamespace
 from unittest.mock import patch
 
-from accounts.api.account.application import IntegrationApplicationViewSet, PAMClientSourceDownloadAPI
+from accounts.api.account.application import IntegrationApplicationViewSet, PAMClientSourceDownloadAPI, PythonSDKDownloadAPI
+from accounts.clients.distribution import client_version
 from accounts.credential_client.access import materials
 from accounts.credential_client.documentation import (
     DOCUMENTATION_LANGUAGES,
@@ -21,38 +22,60 @@ from rest_framework.test import APIRequestFactory
 class SDKDocumentationTests(SimpleTestCase):
     def test_wizard_installs_the_same_source_revision_as_managed_examples(self):
         for command in SDK_INSTALL_COMMANDS.values():
-            self.assertIn('/api/v1/accounts/client-source/', command)
-            self.assertNotIn('/releases/download/v1.0.2/', command)
+            self.assertIn(f'/static/pam/{client_version()}/', command)
+            self.assertNotIn('/releases/download/', command)
+        self.assertIn('.whl', SDK_INSTALL_COMMANDS['python'])
         application = SimpleNamespace(id='application', secret='secret', org_id='org')
         result = materials(application, {
             'type': 'agent', 'app_user': 'orders', 'install_path': '/opt/jumpserver-pam',
             'delivery_mode': 'json', 'systemd_unit': '', 'systemd_action': '',
             'store_scope': 'all', 'store_format': 'json',
         }, 'https://example.com')
-        self.assertIn('https://example.com/api/v1/accounts/client-source/agent/', result['install_command'])
-        self.assertIn('go -C ', result['install_command'])
-        self.assertIn('&&\ntar -xzf ', result['install_command'])
+        self.assertIn(f'https://example.com/static/pam/{client_version()}/', result['install_command'])
+        self.assertNotIn('go -C ', result['install_command'])
+        self.assertIn('sha256sum --check', result['install_command'])
+        self.assertIn('Darwin)', result['foreground_unix_command'])
+        self.assertIn('Get-FileHash', result['foreground_windows_command'])
 
     def test_source_bundles_include_installable_packages_and_agent_sdk_dependency(self):
         from io import BytesIO
         import tarfile
+        from accounts.credential_client.source import source_archive
         expected = {
             'python': ('python/setup.py', 'python/jms_pam/client.py'),
             'go': ('go/go.mod', 'go/client.go'),
             'java': ('java/pom.xml', 'java/src/main/java/org/jumpserver/pam/Client.java'),
-            'node': ('node/package.json', 'node/index.js', 'node/event-names.js'),
+            'node': ('node/package.json', 'node/index.js', 'node/event-dispatcher.js', 'node/hooks.js'),
             'agent': ('agent/go.mod', 'agent/cmd/pam-agent/main.go', 'go/go.mod', 'go/client.go'),
             'socket': ('socket/python_example.py', 'socket/README.en.md', 'socket/README.zh-hans.md'),
         }
         for language, paths in expected.items():
             request = APIRequestFactory().get(f'/api/v1/accounts/client-source/{language}/')
             response = PAMClientSourceDownloadAPI.as_view()(request, language=language)
-            self.assertEqual(response.status_code, 200)
-            with tarfile.open(fileobj=BytesIO(response.content)) as archive:
+            self.assertEqual(response.status_code, 302)
+            self.assertEqual(response['Location'], f'/static/pam/{client_version()}/jms-pam-{language}-source.tar.gz')
+            with tarfile.open(fileobj=BytesIO(source_archive(language))) as archive:
                 names = archive.getnames()
                 for path in paths:
                     self.assertIn(f'jms-pam-clients/{path}', names)
                 self.assertFalse(any('/.git' in name or '/node_modules/' in name or name.endswith('_test.go') for name in names))
+
+    @override_settings(STATIC_URL='/jumpserver/static/')
+    def test_downloads_use_configured_static_prefix_without_duplicating_endpoint_path(self):
+        from accounts.credential_client.artifacts import artifact_url
+        self.assertEqual(
+            artifact_url('pam-agent-linux-amd64', 'https://example.com/jumpserver'),
+            f'https://example.com/jumpserver/static/pam/{client_version()}/pam-agent-linux-amd64',
+        )
+        response = PythonSDKDownloadAPI.as_view()(APIRequestFactory().get('/python-sdk/'))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], f'/jumpserver/static/pam/{client_version()}/jms-pam-python.zip')
+
+    @override_settings(STATIC_URL='https://downloads.example.com/static/')
+    def test_documentation_supports_an_absolute_static_download_origin(self):
+        data = get_sdk_documentation('python', 'en')
+        self.assertIn(f'https://downloads.example.com/static/pam/{client_version()}/', data['readme'])
+        self.assertNotIn('jumpserver.example.comhttps:', data['readme'])
 
     def test_source_bundle_excludes_local_identity_files_and_symlinks(self):
         from io import BytesIO
@@ -139,7 +162,7 @@ class SDKDocumentationTests(SimpleTestCase):
                         self.assertIn('from jms_pam_config import client_options, instance_id', data['readme'])
                         self.assertIn('with Client(instance_id=instance_id', data['readme'])
                     elif language == 'curl':
-                        self.assertIn('/integration-applications/account-secret/', data['readme'])
+                        self.assertIn('/credential-client/credential/', data['readme'])
                     else:
                         self.assertNotIn('/integration-applications/account-secret/', data['readme'])
 
