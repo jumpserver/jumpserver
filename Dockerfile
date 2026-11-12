@@ -1,3 +1,17 @@
+FROM golang:1.26-trixie AS pam-go
+
+FROM python:3.14-slim-trixie AS stage-pam-build
+COPY --from=pam-go /usr/local/go /usr/local/go
+ENV PATH=/usr/local/go/bin:$PATH
+RUN pip install --no-cache-dir build setuptools wheel
+WORKDIR /src/pam-clients
+COPY apps/accounts/clients/ ./
+RUN test -f distribution.py && test -f agent/go.mod \
+    || (echo "Initialize PAM clients: git submodule update --init --recursive apps/accounts/clients" >&2; exit 1)
+RUN --mount=type=cache,target=/root/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    python distribution.py --output /out
+
 FROM jumpserver/core-base:20261110_074518 AS stage-build
 
 ARG VERSION
@@ -5,6 +19,7 @@ ARG VERSION
 WORKDIR /opt/jumpserver
 
 ADD . .
+COPY --from=stage-pam-build /out/ /opt/jumpserver/apps/static/pam/
 
 RUN test -f apps/accounts/clients/go/go.mod \
     || (echo "Initialize PAM clients: git submodule update --init --recursive apps/accounts/clients" >&2; exit 1)
