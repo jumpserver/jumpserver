@@ -20468,3 +20468,12 @@ msgid ""
 "outside this organization): {assets}. Set valid owners on the asset edit "
 "page."
 msgstr "以下资产的负责人不可用（未启用、已过期、已删除或不属于当前组织）：{assets}。请在资产编辑页面设置有效负责人。"
+
+#: authentication/views/login.py
+msgid "The login approval workflow is misconfigured. Unable to log in. Please contact your administrator."
+msgstr "登录复核流程配置异常，无法完成登录。请联系管理员检查审批流程。"
+
+#: tickets/workflow/publication.py
+#, python-brace-format
+msgid "Login confirmation cannot use organization administrators in node \"{node}\". Select specific users or a system role."
+msgstr "登录复核的「{node}」节点不能使用组织管理员，请选择指定用户或系统角色。"

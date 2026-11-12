@@ -25,7 +25,8 @@ from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.edit import FormView
 
 from common.const import Language
-from common.utils import FlashMessageUtil, safe_next_url
+from common.utils import FlashMessageUtil, safe_next_url, get_logger
+from tickets.workflow.errors import WorkflowConfigurationError
 from users.utils import (
     redirect_user_first_login_or_index
 )
@@ -38,6 +39,8 @@ __all__ = [
     'UserLoginView', 'UserLogoutView',
     'UserLoginGuardView', 'UserLoginWaitConfirmView',
 ]
+
+logger = get_logger(__name__)
 
 
 class UserLoginContextMixin:
@@ -295,6 +298,16 @@ class UserLoginGuardView(mixins.AuthMixin, RedirectView):
             return self.format_redirect_url(self.login_mfa_url)
         except errors.LoginConfirmBaseError:
             return self.format_redirect_url(self.login_confirm_url)
+        except WorkflowConfigurationError as exc:
+            logger.warning('Unable to start login approval for user %s: %s', user.pk, exc)
+            message = _('The login approval workflow is misconfigured. Unable to log in. Please contact your administrator.')
+            auth_logout(self.request)
+            self.send_auth_signal(success=False, username=user.username, reason=message)
+            return FlashMessageUtil.gen_message_url({
+                'title': _('Login confirm'), 'error': message,
+                'redirect_url': reverse('authentication:login') + '?admin=1',
+                'confirm_button': _('Login'), 'auto_redirect': False,
+            })
         except errors.MFAUnsetError as e:
             return e.url
         except errors.PasswordTooSimple as e:

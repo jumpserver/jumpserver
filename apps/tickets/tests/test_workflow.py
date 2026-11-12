@@ -670,6 +670,23 @@ class WorkflowTests(TestCase):
             data['expected_version'] = 1
             self.assertEqual(self.request(WorkflowViewSet, 'publish', self.alice, workflow.pk, data).status_code, 201)
 
+    def test_login_publication_rejects_org_admin_without_restricting_other_global_flows(self):
+        definition = approval_definition([], approvers={'type': 'org_admin'})
+        with tmp_to_root_org():
+            workflow = Workflow.objects.create(name='Global login', type='login_confirm', org_id=Organization.ROOT_ID)
+            with override('en'), patch.object(User, 'has_perms', return_value=True):
+                response = self.request(WorkflowViewSet, 'publish', self.alice, workflow.pk, {
+                    'expected_version': 0, 'definition': definition,
+                })
+            self.assertEqual(response.status_code, 400)
+            self.assertIn('cannot use organization administrators', str(response.data))
+            self.assertFalse(workflow.versions.exists())
+            workflow.refresh_from_db()
+            self.assertIsNone(workflow.active_version_id)
+            other = Workflow.objects.create(name='Global assets', type='apply_asset', org_id=Organization.ROOT_ID)
+            publish_workflow(other, definition)
+            self.assertEqual(other.versions.count(), 1)
+
     def test_publish_rejects_impossible_quorum_without_creating_version(self):
         workflow = self.create_workflow()
         original_version = workflow.active_version_id
