@@ -1,5 +1,6 @@
 from datetime import timedelta
 from types import SimpleNamespace
+from unittest.mock import patch
 from uuid import uuid4
 
 from django.db import transaction
@@ -21,6 +22,7 @@ from tickets.tests import test_plugins
 from tickets.tests.test_workflow import approval_definition
 from tickets.workflow.business import submit_ticket
 from tickets.workflow.resources import adjustment_status, resource_availability
+from users.models import User
 
 
 @override_settings(TICKET_APPLY_ASSET_SCOPE='permed_valid')
@@ -40,6 +42,7 @@ class ResourceAdjustmentTests(TestCase):
                                                         content_type__app_label__in=['assets', 'accounts']))
         RoleBinding.objects_raw.create(user=user, role=role, org=org, scope='org')
         user.expire_rbac_perms_cache()
+        return role
 
     def resources(self, ticket_type='view_secret'):
         if ticket_type == 'view_secret':
@@ -136,6 +139,44 @@ class ResourceAdjustmentTests(TestCase):
         self.assertFalse(TicketSecretAccess.objects.filter(ticket=ticket).exists())
         self.assertEqual(self.call(task, {'expected_revision': 0, 'reason': 'Too late',
                                           'resources': self.resources()}).status_code, 409)
+
+    def test_resource_options_reuse_permissions_within_and_across_requests(self):
+        self.grant_query()
+        ticket, instance = self.deferred('apply_asset')
+        task = self.task(instance)
+        with patch.object(User, 'get_all_permissions', autospec=True, side_effect=User.get_all_permissions) as calculate:
+            for resource, expected in (('node', self.node), ('asset', self.asset)):
+                response = self.call(task, {'resource': resource}, operation='resource_options')
+                self.assertEqual(response.status_code, 200, response.data)
+                self.assertIn(expected.pk, {row['id'] for row in response.data})
+                calculate.assert_called_once_with(self.alice)
+        reviewer = User.objects.get(pk=self.alice.pk)
+        with patch.object(reviewer, 'get_all_permissions', side_effect=AssertionError('Permissions were recomputed')):
+            response = self.call(task, {'resource': 'node'}, user=reviewer, operation='resource_options')
+        self.assertEqual(response.status_code, 200, response.data)
+
+    def test_resource_options_do_not_reuse_another_organizations_permissions(self):
+        self.grant_query(org=self.other_org)
+        ticket, instance = self.deferred('apply_asset')
+        task = self.task(instance)
+        with tmp_to_org(self.other_org):
+            self.assertIn('assets.view_asset', self.alice.perms)
+        with tmp_to_root_org():
+            for resource in ('asset', 'node'):
+                response = self.call(task, {'resource': resource}, operation='resource_options')
+                self.assertEqual(response.status_code, 403, response.data)
+
+    def test_resource_options_recheck_revoked_node_permission(self):
+        role = self.grant_query()
+        ticket, instance = self.deferred('apply_asset')
+        task = self.task(instance)
+        response = self.call(task, {'resource': 'node'}, operation='resource_options')
+        self.assertEqual(response.status_code, 200, response.data)
+        role.permissions.remove(Permission.objects.get(codename='view_node', content_type__app_label='assets'))
+        for resource, status in (('asset', 200), ('node', 403)):
+            reviewer = User.objects.get(pk=self.alice.pk)
+            response = self.call(task, {'resource': resource}, user=reviewer, operation='resource_options')
+            self.assertEqual(response.status_code, status, response.data)
 
     def test_adjustment_rejects_foreign_accounts_identity_changes_and_stale_saves(self):
         self.create_account()
