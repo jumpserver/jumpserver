@@ -4,6 +4,7 @@ from channels.generic.websocket import JsonWebsocketConsumer
 
 from common.db.utils import safe_db_connection
 from common.utils import get_logger
+from common.websocket import SubscriptionWebsocketMixin
 from .signal_handlers import new_site_msg_chan
 from .site_msg import SiteMessageUtil
 from .models.site_msg import SiteMessage
@@ -11,8 +12,7 @@ from .models.site_msg import SiteMessage
 logger = get_logger(__name__)
 
 
-class SiteMsgWebsocket(JsonWebsocketConsumer):
-    sub = None
+class SiteMsgWebsocket(SubscriptionWebsocketMixin, JsonWebsocketConsumer):
     refresh_every_seconds = 10
 
     @property
@@ -23,7 +23,7 @@ class SiteMsgWebsocket(JsonWebsocketConsumer):
         user = self.scope["user"]
         if user.is_authenticated:
             self.accept()
-            self.sub = self.watch_recv_new_site_msg()
+            self.register_subscription(self.watch_recv_new_site_msg())
         else:
             self.close()
 
@@ -76,8 +76,3 @@ class SiteMsgWebsocket(JsonWebsocketConsumer):
                 ws.send_site_msg()
 
         return new_site_msg_chan.subscribe(handle_new_site_msg_recv)
-
-    def disconnect(self, code):
-        if not self.sub:
-            return
-        self.sub.unsubscribe()
