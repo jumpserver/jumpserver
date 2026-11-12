@@ -4,12 +4,13 @@ from unittest.mock import patch
 from uuid import uuid4
 
 from django.db import transaction
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.utils import timezone
 from rest_framework.test import APIRequestFactory, force_authenticate
+from rest_framework.permissions import IsAuthenticated
 
 from accounts.models import Account
-from assets.models import Asset, Protocol
+from assets.models import Asset, Platform, Protocol
 from authentication.models import ConnectionToken
 from orgs.utils import tmp_to_org
 from perms.const import ActionChoices
@@ -17,6 +18,7 @@ from perms.models import AssetPermission
 from perms.utils.asset_perm import PermAssetDetailUtil
 from perms.utils.permission import AssetPermissionUtil
 from tickets.api.plugin import TicketTypeViewSet
+from tickets.api.perms import ApplyAssetsViewSet
 from tickets.plugins import get_ticket_plugin
 from tickets.serializers.ticket.ticket import TicketSerializer
 from tickets.tests import test_plugins as helpers
@@ -174,6 +176,56 @@ class FileTransferTests(TestCase):
             other = Asset.objects.create(name='Other org', address='192.0.2.20', platform=self.platform)
         data = self.payload('file_transfer', asset=str(other.pk), accounts=['root'], direction='upload', paths=['/tmp'])
         self.assertFalse(self.serializer(data).is_valid())
+
+    def asset_suggestions(self, **params):
+        request = APIRequestFactory().get('/', params)
+        force_authenticate(request, self.applicant)
+        response = ApplyAssetsViewSet.as_view(
+            {'get': 'match'}, permission_classes=[IsAuthenticated], suggestion_limit=100,
+        )(request)
+        self.assertEqual(response.status_code, 200, response.data)
+        return [str(item['id']) for item in response.data]
+
+    @override_settings(TICKET_APPLY_ASSET_SCOPE='all')
+    def test_transfer_asset_suggestions_match_supported_platform_protocol_pairs(self):
+        expected = [str(self.asset.pk)]
+        for name, category, kind, protocols, active, supported in [
+            ('Linux SFTP', 'host', 'linux', ['ssh', 'sftp'], True, True),
+            ('SFTP only', 'host', 'linux', ['sftp'], True, True),
+            ('Windows WinRM', 'host', 'windows', ['rdp', 'winrm'], True, True),
+            ('Windows RDP', 'host', 'windows', ['rdp'], True, False),
+            ('Windows SSH', 'host', 'windows', ['ssh'], True, False),
+            ('Linux WinRM', 'host', 'linux', ['winrm'], True, False),
+            ('MariaDB', 'database', 'mariadb', ['mysql', 'ssh'], True, False),
+            ('Disabled Linux', 'host', 'linux', ['ssh'], False, False),
+            ('No protocol', 'host', 'linux', [], True, False),
+        ]:
+            platform = Platform.objects.create(name=f'Transfer test {name}', category=category, type=kind)
+            asset = Asset.objects.create(name=name, address='192.0.2.30', platform=platform, is_active=active)
+            for protocol in protocols:
+                Protocol.objects.create(asset=asset, name=protocol, port=22)
+            if supported:
+                expected.append(str(asset.pk))
+        self.assertCountEqual(self.asset_suggestions(ticket_type='file_transfer'), expected)
+        self.assertEqual(self.asset_suggestions(ticket_type='file_transfer', search='MariaDB'), [])
+        for ticket_type in ('', 'view_secret', 'change_secret'):
+            self.assertEqual(len(self.asset_suggestions(ticket_type=ticket_type, search='MariaDB')), 1)
+
+    def test_transfer_asset_suggestions_preserve_organization_and_permission_scope(self):
+        other = Asset.objects.create(name='Not granted', address='192.0.2.31', platform=self.platform)
+        Protocol.objects.create(asset=other, name='ssh', port=22)
+        with tmp_to_org(self.other_org):
+            outside = Asset.objects.create(name='Outside organization', address='192.0.2.32', platform=self.platform)
+            Protocol.objects.create(asset=outside, name='ssh', port=22)
+        for scope, expected in [('all', [str(self.asset.pk), str(other.pk)]),
+                                ('permed', [str(self.asset.pk)]), ('permed_valid', [str(self.asset.pk)])]:
+            with self.subTest(scope=scope), override_settings(TICKET_APPLY_ASSET_SCOPE=scope):
+                self.assertCountEqual(self.asset_suggestions(ticket_type='file_transfer'), expected)
+        self.base.date_expired = timezone.now() - timedelta(seconds=1)
+        self.base.save(update_fields=['date_expired'])
+        for scope, expected in [('permed', [str(self.asset.pk)]), ('permed_valid', [])]:
+            with self.subTest(scope=scope, expired=True), override_settings(TICKET_APPLY_ASSET_SCOPE=scope):
+                self.assertCountEqual(self.asset_suggestions(ticket_type='file_transfer'), expected)
 
     def test_validation_rejects_missing_access_and_forged_execution_parameters(self):
         for changes in ({'accounts': ['unknown']}, {'duration': 0}, {'duration': 86401},

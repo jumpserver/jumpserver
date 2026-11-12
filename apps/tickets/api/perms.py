@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.db.models import Q
 
 from assets.models import Asset, Node
 from assets.serializers.asset.common import MiniAssetSerializer
@@ -28,6 +29,11 @@ class ApplyAssetsViewSet(OrgReadonlyModelViewSet, SuggestionMixin):
             queryset = self.get_assets()
         else:
             queryset = super().get_queryset()
+        if self.request.query_params.get('ticket_type') == 'file_transfer':
+            queryset = queryset.filter(is_active=True, platform__category='host').filter(
+                Q(platform__type='linux', protocols__name__in=('ssh', 'sftp')) |
+                Q(platform__type='windows', protocols__name='winrm')
+            ).distinct()
         return queryset
 
     def get_assets(self, with_expired=False):
