@@ -89,6 +89,41 @@ class WorkflowBusinessTests(TestCase):
     def task(self, instance, user=None):
         return ApprovalTask.objects.get(node_instance__instance=instance, assignee=user or self.alice, state='pending')
 
+    def test_generated_acl_workflow_names_are_localized_without_changing_identity(self):
+        from tickets.serializers.ticket import TicketSerializer
+        from tickets.serializers.workflow import WorkflowSerializer, WorkflowInstanceDetailSerializer
+        from tickets.workflow.business import get_system_workflow
+        from tickets.workflow.composition import compose_workflows
+
+        workflows = []
+        for ticket_type, label in [('login_confirm', '登录复核'), ('login_asset_confirm', '登录资产复核'),
+                                   ('command_confirm', '命令复核')]:
+            org_id = Organization.ROOT_ID if ticket_type == 'login_confirm' else self.org.id
+            workflow = get_system_workflow(org_id, ticket_type, [self.alice])
+            with override('en'):
+                english = str(workflow.get_type_display())
+            workflows.append((workflow, label, english))
+        combined = compose_workflows(
+            [workflows[1][0], self.workflow('login_asset_confirm')], self.org.id, 'login_asset_confirm',
+        )
+        workflows.append((combined, '组合审批流程', 'Combined approval workflow'))
+        for workflow, chinese, english in workflows:
+            raw_name = workflow.name
+            for language, expected in [('zh', chinese), ('en', english)]:
+                with self.subTest(name=raw_name, language=language), override(language):
+                    self.assertEqual(str(workflow), expected)
+                    data = WorkflowSerializer(workflow).data
+                    self.assertEqual(data['display_name'], expected)
+                    self.assertEqual(data['name'], raw_name)
+                    field = TicketSerializer().fields['workflow']
+                    self.assertEqual(field.to_representation(workflow)['name'], expected)
+                    field = WorkflowInstanceDetailSerializer().fields['workflow_name']
+                    instance = SimpleNamespace(version=workflow.active_version)
+                    self.assertEqual(field.to_representation(field.get_attribute(instance)), expected)
+            with tmp_to_root_org():
+                workflow.refresh_from_db()
+            self.assertEqual(workflow.name, raw_name)
+
     def test_asset_grant_uses_snapshot_and_only_final_approval(self):
         ticket = self.ticket(self.workflow(levels=2))
         instance = submit_ticket(ticket)

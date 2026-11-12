@@ -18634,6 +18634,10 @@ msgstr "域名称"
 msgid "Legacy ticket approval"
 msgstr "历史工单审批"
 
+#: tickets/models/workflow.py:46
+msgid "Combined approval workflow"
+msgstr "组合审批流程"
+
 msgid "Client idle lock (minute)"
 msgstr "空闲锁屏 (分)"
 

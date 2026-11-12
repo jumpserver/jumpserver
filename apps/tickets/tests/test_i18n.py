@@ -29,6 +29,12 @@ class TicketTranslationTests(SimpleTestCase):
             workflow.created_by = 'System'
             workflow.name = 'Operations approval'
             self.assertEqual(workflow.display_name, 'Operations approval')
+            for name in ['ACL apply_asset 1234', 'ACL combined 1234']:
+                workflow.name = name
+                self.assertEqual(workflow.display_name, name)
+            workflow.is_system = True
+            workflow.name = 'Operations approval'
+            self.assertEqual(workflow.display_name, 'Operations approval')
 
     def test_generated_node_names_remain_localized_when_a_version_is_copied(self):
         workflow = Workflow(created_by='Legacy ticket import', is_system=True)

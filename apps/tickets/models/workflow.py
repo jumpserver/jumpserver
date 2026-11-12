@@ -41,6 +41,11 @@ class Workflow(JMSOrgBaseModel):
     def display_name(self):
         if self.is_system and self.created_by == 'Legacy ticket import':
             return _('Legacy ticket approval')
+        if self.is_system:
+            if self.name.startswith('ACL combined '):
+                return _('Combined approval workflow')
+            if self.name.startswith(f'ACL {self.type} '):
+                return self.get_type_display()
         if self.created_by in ('System', 'Legacy workflow import'):
             with override(None):
                 source_name = str(self.get_type_display())
