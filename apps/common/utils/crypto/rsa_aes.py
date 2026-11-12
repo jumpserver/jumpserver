@@ -192,8 +192,12 @@ class RsaAesCryptoSuite(BaseCryptoSuite):
         if len(cipher_decoded) == 127:
             hex_fixed = '00' + cipher_decoded.hex()
             cipher_decoded = base64.b16decode(hex_fixed.upper())
-        message = cipher.decrypt(cipher_decoded, b'error').decode()
-        return message
+        sentinel = b'error'
+        message = cipher.decrypt(cipher_decoded, sentinel)
+        if message == sentinel:
+            # Wrong key pair: never hand the sentinel back as if it were the key
+            raise ValueError('RSA decryption failed')
+        return message.decode()
     
     def hash(self, msg):
         return Hasher.hash(Hasher, msg)
