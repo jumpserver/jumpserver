@@ -2,6 +2,7 @@ from contextlib import contextmanager
 
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _, override
 
 from common.db.models import JMSBaseModel
@@ -41,6 +42,11 @@ class Workflow(JMSOrgBaseModel):
     def display_name(self):
         if self.is_system and self.created_by == 'Legacy ticket import':
             return _('Legacy ticket approval')
+        if self.is_system:
+            if self.name.startswith('ACL combined '):
+                return _('Combined approval workflow')
+            if self.name.startswith(f'ACL {self.type} '):
+                return self.get_type_display()
         if self.created_by in ('System', 'Legacy workflow import'):
             with override(None):
                 source_name = str(self.get_type_display())
@@ -51,6 +57,13 @@ class Workflow(JMSOrgBaseModel):
         return self.name
 
     def node_display_name(self, node):
+        if self.is_system and node.type == 'approval' and node.name == 'Review':
+            if self.name.startswith(f'ACL {self.type} ') and node.key == 'review':
+                return _('Review')
+            if self.name.startswith('ACL combined '):
+                source = self._combined_source_nodes.get(node.key)
+                if source:
+                    return source.version.workflow.node_display_name(source)
         # Generated labels remain defaults when a workflow version is copied.
         if self.created_by in ('System', 'Legacy workflow import', 'Legacy ticket import'):
             labels = {'start': _('Start'), 'end': _('End'), 'approval': _('Approval'), 'cc': _('CC users')}
@@ -60,6 +73,17 @@ class Workflow(JMSOrgBaseModel):
             if node.type == 'approval' and node.name.startswith('Approval ') and level.isdecimal():
                 return _('Approval {level}').format(level=level)
         return node.name
+
+    @cached_property
+    def _combined_source_nodes(self):
+        source_ids = self.migration_notes.get('source_versions', [])
+        versions = WorkflowVersion.objects.filter(pk__in=source_ids).select_related('workflow').prefetch_related('nodes')
+        # Composition keys follow source version order, then source node key order.
+        return {
+            f'p{source_ids.index(str(version.pk))}_{offset}': node
+            for version in versions
+            for offset, node in enumerate(sorted(version.nodes.all(), key=lambda item: item.key))
+        }
 
     @classmethod
     def get_org_related_flows(cls, org_id):
