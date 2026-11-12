@@ -20493,3 +20493,7 @@ msgstr "登录复核流程仅支持在全局组织中配置。"
 
 msgid "Unable to cancel the login request. Please try again."
 msgstr "撤销登录申请失败，请重试。"
+
+#: authentication/serializers/connection_token.py
+msgid "Account preparation required"
+msgstr "需要准备账号"
