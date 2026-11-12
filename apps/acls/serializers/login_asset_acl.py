@@ -38,7 +38,7 @@ class LoginAssetACLSerializer(WorkflowACLSerializerMixin, BaseSerializer, BulkOr
 
     class Meta(BaseSerializer.Meta):
         model = LoginAssetACL
-        fields = BaseSerializer.Meta.fields + ['rules', 'review_duration', 'workflow', 'recipients', *LoginAssetACL.CONTROL_FIELDS]
+        fields = BaseSerializer.Meta.fields + ['rules', 'review_duration', 'workflow', 'workflow_name', 'recipients', *LoginAssetACL.CONTROL_FIELDS]
         extra_kwargs = {
             **BaseSerializer.Meta.extra_kwargs,
             'priority': {

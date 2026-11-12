@@ -10,18 +10,61 @@ from django.core.cache import cache
 from django.db import transaction
 from django.db.backends.sqlite3.base import DatabaseWrapper
 from django.test import SimpleTestCase, override_settings
+from django.utils.translation import override
 
 from accounts.const import AliasAccount
 from acls.api.login_asset_check import LoginAssetCheckAPI
 from acls.models import LoginAssetACL
 from acls.models.login_asset_acl import LoginAssetPolicy
 from acls.serializers.login_asset_acl import LoginAssetACLSerializer
+from acls.serializers.command_acl import CommandFilterACLSerializer, CommandFilterACLListSerializer
+from acls.serializers.login_acl import LoginACLSerializer
 from authentication.api.connection_token import ConnectionTokenViewSet
 from common.exceptions import JMSException
 from tickets.const import TicketState
-from tickets.models import Ticket
+from tickets.models import Ticket, Workflow
 from tickets.serializers.ticket import TicketSerializer
 from rest_framework.exceptions import PermissionDenied
+
+
+class ACLWorkflowDisplayTests(SimpleTestCase):
+    serializers = (
+        LoginAssetACLSerializer, CommandFilterACLSerializer,
+        CommandFilterACLListSerializer, LoginACLSerializer,
+    )
+
+    def serialize_workflow(self, serializer_class, workflow):
+        instance = serializer_class.Meta.model(workflow=workflow)
+        serializer = serializer_class(instance)
+        # Isolate workflow fields from unrelated rule relations.
+        for name in list(serializer.fields):
+            if name not in ('workflow', 'workflow_name'):
+                serializer.fields.pop(name)
+        self.assertTrue(serializer.fields['workflow_name'].read_only)
+        return serializer.data
+
+    def test_workflow_name_preserves_custom_names_and_uuid_contract(self):
+        workflow = Workflow(name='Operations approval', type='command_confirm', enabled=False)
+        for serializer_class in self.serializers:
+            with self.subTest(serializer=serializer_class.__name__), override('zh'):
+                self.assertEqual(self.serialize_workflow(serializer_class, workflow), {
+                    'workflow': str(workflow.pk), 'workflow_name': 'Operations approval',
+                })
+
+    def test_default_workflow_name_uses_request_language(self):
+        workflow = Workflow(name='Login confirm', type='login_confirm', created_by='System')
+        for serializer_class in self.serializers:
+            for language, expected in [('zh', '登录复核'), ('en', 'Login review')]:
+                with self.subTest(serializer=serializer_class.__name__, language=language), override(language):
+                    self.assertEqual(self.serialize_workflow(serializer_class, workflow)['workflow_name'], expected)
+        self.assertEqual(workflow.name, 'Login confirm')
+
+    def test_legacy_rule_without_workflow_remains_supported(self):
+        for serializer_class in self.serializers:
+            with self.subTest(serializer=serializer_class.__name__):
+                self.assertEqual(self.serialize_workflow(serializer_class, None), {
+                    'workflow': None, 'workflow_name': '',
+                })
 
 
 @override_settings(CACHES={'default': {
