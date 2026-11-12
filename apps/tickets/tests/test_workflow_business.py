@@ -657,10 +657,43 @@ class WorkflowBusinessTests(TestCase):
         with patch('tickets.notifications.TicketUpdatedToCcUserMessage.publish_async') as notify:
             deliver_event(cc_event.pk)
             notify.assert_called_once()
+        cc_event.data.pop('added_recipients')
+        cc_event.save(update_fields=['data'])
+        with patch('tickets.notifications.TicketUpdatedToCcUserMessage.publish_async') as notify:
+            deliver_event(cc_event.pk)
+            notify.assert_called_once()
         allowed = self.api_request(WorkflowInstanceViewSet, 'retrieve', self.carol, pk=instance.pk)
         self.assertEqual(allowed.status_code, 200, allowed.data)
         denied = self.api_request(ApprovalTaskViewSet, 'approve', self.carol, pk=self.task(instance).pk, method='post')
         self.assertEqual(denied.status_code, 404)
+
+    def test_repeated_cc_recipients_are_displayed_without_duplicate_notifications(self):
+        from tickets.workflow.business import deliver_event
+
+        definition = approval_definition([self.alice])
+        recipients = [[self.carol], [self.carol], [self.carol, self.bob]]
+        definition['nodes'].extend([
+            {'id': f'cc_{index}', 'type': 'cc', 'config': {'users': [str(user.pk) for user in users]}}
+            for index, users in enumerate(recipients)
+        ])
+        definition['edges'] = [['start', 'cc_0'], ['cc_0', 'cc_1'], ['cc_1', 'cc_2'],
+                               ['cc_2', 'approval_0'], ['approval_0', 'end']]
+        instance = submit_ticket(self.ticket(self.workflow(definition=definition)))
+        response = self.api_request(WorkflowInstanceViewSet, 'retrieve', self.applicant, pk=instance.pk)
+        self.assertEqual(response.status_code, 200, response.data)
+        nodes = [node for node in response.data['nodes'] if node['type'] == 'cc']
+        self.assertEqual(len(nodes), len(recipients))
+        for node, users, added in zip(nodes, recipients, [[self.carol], [], [self.bob]]):
+            with self.subTest(node=node['key']):
+                self.assertEqual({item['id'] for item in node['result']['recipients']},
+                                 {str(user.pk) for user in users})
+                event = instance.events.get(type='cc.added', node_instance__node__key=node['key'])
+                self.assertEqual(event.data['recipients'], node['result']['recipients'])
+                with patch('tickets.notifications.TicketUpdatedToCcUserMessage') as notify:
+                    deliver_event(event.pk)
+                    self.assertEqual([call.args[0] for call in notify.call_args_list], added)
+                    self.assertEqual(notify.return_value.publish_async.call_count, len(added))
+        self.assertEqual(set(instance.ticket.cc_users.all()), {self.carol, self.bob})
 
     def test_reassignment_candidates_and_decisions_are_scoped(self):
         ticket = self.ticket(self.workflow(allow_transfer=True))
