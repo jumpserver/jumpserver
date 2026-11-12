@@ -687,6 +687,24 @@ class WorkflowTests(TestCase):
             publish_workflow(other, definition)
             self.assertEqual(other.versions.count(), 1)
 
+    def test_login_publication_rejects_asset_owners_without_restricting_asset_flows(self):
+        definition = approval_definition([], approvers={'type': 'asset_owner'})
+        workflow = Workflow.objects.create(name='Login with asset owner', type='login_confirm')
+        with override('en'), patch.object(User, 'has_perms', return_value=True):
+            response = self.request(WorkflowViewSet, 'publish', self.alice, workflow.pk, {
+                'expected_version': 0, 'definition': definition,
+            })
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('cannot use asset owners', str(response.data))
+        self.assertFalse(workflow.versions.exists())
+        workflow.refresh_from_db()
+        self.assertIsNone(workflow.active_version_id)
+        for ticket_type in ('apply_asset', 'login_asset_confirm'):
+            with self.subTest(ticket_type=ticket_type):
+                other = Workflow.objects.create(name=ticket_type, type=ticket_type)
+                publish_workflow(other, definition)
+                self.assertEqual(other.versions.count(), 1)
+
     def test_publish_rejects_impossible_quorum_without_creating_version(self):
         workflow = self.create_workflow()
         original_version = workflow.active_version_id
