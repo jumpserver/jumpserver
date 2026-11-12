@@ -40,14 +40,38 @@ jobs:
           tag: ${{ steps.get_version.outputs.TAG }}
       - name: Upload Quick Start Script
         id: upload-release-quick-start-shell
-        uses: actions/upload-release-asset@v1
+        shell: bash
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-          asset_path: ./quick_start.sh
-          asset_name: quick_start.sh
-          asset_content_type: application/text
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_ID: ${{ steps.create_release.outputs.id }}
+          RELEASE_UPLOAD_URL: ${{ steps.create_release.outputs.upload_url }}
+        run: |
+          if [[ -z "$RELEASE_ID" || -z "$RELEASE_UPLOAD_URL" ]]; then
+            echo "::error::Release Drafter did not return a release ID and upload URL"
+            exit 1
+          fi
+
+          upload_url=${RELEASE_UPLOAD_URL%%\{*}
+          if upload_error=$(gh api --method POST --silent \
+            -H 'Content-Type: application/text' --input quick_start.sh \
+            "${upload_url}?name=quick_start.sh" 2>&1); then
+            exit 0
+          fi
+
+          # A rerun or a lost upload response can leave the correct asset in place.
+          release_api="$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/releases"
+          if asset_id=$(gh api --paginate "$release_api/$RELEASE_ID/assets" \
+            --jq '.[] | select(.name == "quick_start.sh" and .state == "uploaded") | .id') &&
+            [[ -n "$asset_id" ]] &&
+            gh api -H 'Accept: application/octet-stream' "$release_api/assets/$asset_id" |
+              cmp -s quick_start.sh -; then
+            echo "The release already contains the same quick_start.sh"
+            exit 0
+          fi
+
+          printf '%s\n' "$upload_error" >&2
+          echo "::error::Could not upload quick_start.sh or verify an identical existing asset"
+          exit 1
 
   build-and-release:
     needs: create-realese
