@@ -10,6 +10,7 @@ from accounts.api.account.credential import (
     CredentialClientInstanceViewSet,
     CredentialClientViewSet,
 )
+from accounts.api.automations.change_secret import ChangeSecretAutomationViewSet
 from accounts.clients.python.jms_pam import Client
 from accounts.clients.python.jms_pam._auth import HTTPSignatureAuth
 from accounts.clients.python.jms_pam import Client
@@ -17,6 +18,7 @@ from accounts.clients.python.jms_pam.client import CLIENT_PATH
 from accounts.const import ChangeSecretRecordStatusChoice
 from accounts.credential_client.manager import CredentialClientManager
 from accounts.credential_rotation import CredentialRotationManager
+from accounts.credential_rotation.execution import execute
 from accounts.models import (
     Account,
     ApplicationAudit,
@@ -34,6 +36,7 @@ from accounts.serializers import (
     CredentialFetchSerializer,
 )
 from accounts.tests.base import CredentialTestCase
+from assets.models import Asset
 from authentication.backends.drf import (
     CredentialAgentAuthentication,
     ServiceAuthentication,
@@ -54,7 +57,6 @@ from rest_framework.test import APIRequestFactory, force_authenticate
 
 class CredentialRotationTestCase(CredentialTestCase):
     def execute_bound_change(self):
-        from accounts.credential_rotation.execution import execute
         from accounts.models import ChangeSecretAutomation
         rotation = self.credential.rotation_records.first()
         account = rotation.change_account
@@ -164,7 +166,13 @@ class CredentialRotationTestCase(CredentialTestCase):
             application=self.application, instance_id='order-node-1',
         ).update(date_last_seen=timezone.now())
 
-    def test_accounts_alternate_across_two_rotations(self):
+    @override_settings(XPACK_LICENSE_IS_VALID=True)
+    def test_accounts_alternate_across_two_cross_asset_rotations(self):
+        self.backup.asset = Asset.objects.create(
+            name='credential-test-second-pg', address='127.0.0.2', platform=self.platform,
+        )
+        self.backup.save(update_fields=['asset'])
+        create_task = ChangeSecretAutomationViewSet.as_view({'post': 'create'})
         self.fetch_and_confirm(self.primary)
         for source, target in ((self.primary, self.backup), (self.backup, self.primary)):
             response = self.credential_action('start_rotation')
@@ -174,13 +182,25 @@ class CredentialRotationTestCase(CredentialTestCase):
             self.assertEqual(self.credential_action('check_usage').status_code, 409)
             self.fetch_and_confirm(target)
             self.assertEqual(self.credential_action('check_usage').status_code, 200)
-            self.assertEqual(self.credential_action('change_secret').status_code, 200)
+            response = self.credential_action('change_secret')
+            self.assertEqual(response.status_code, 200, response.data)
 
             rotation = self.credential.rotation_records.first()
             self.assertEqual(rotation.source_account_id, source.id)
             self.assertEqual(rotation.target_account_id, target.id)
             self.assertEqual(rotation.change_account_id, source.id)
-            execution = self.execute_bound_change()
+            rotation_info = response.data['rotation']
+            account = rotation_info['change_account']
+            self.assertEqual(account['asset_id'], str(source.asset_id))
+            task = create_task(self.request('post', '/api/v1/accounts/change-secret-automations/', {
+                'name': f'PAM test change {rotation.id}', 'rotation_id': rotation_info['id'],
+                'assets': [account['asset_id']], 'accounts': [account['username']],
+                'secret_type': account['secret_type'], 'secret_strategy': 'random',
+                'password_rules': {'length': 36}, 'is_periodic': False, 'check_conn_after_change': True,
+            }))
+            self.assertEqual(task.status_code, 201, task.data)
+            execution = execute(rotation.id)
+            self.assertEqual(execution.snapshot['assets'], [str(source.asset_id)])
             execution.status = 'success'
             execution.date_finished = timezone.now()
             execution.save()
@@ -191,7 +211,7 @@ class CredentialRotationTestCase(CredentialTestCase):
             ChangeSecretRecord.objects.create(
                 execution=execution,
                 account=source,
-                asset=self.asset,
+                asset=source.asset,
                 account_version=rotation.change_account_version_at_start,
                 new_secret=source.secret,
                 status=ChangeSecretRecordStatusChoice.success,

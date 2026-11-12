@@ -95,15 +95,15 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
         from accounts.credential_rotation.participants import build
         return build(instance)['rotation_phase']
 
-    account = ObjectRelatedField(
+    account = SubscribedAccountField(
         queryset=Account.objects, attrs=('id', 'name', 'username', 'secret_type'),
         label=_('Account'), required=False, allow_null=True
     )
-    alternate_account = ObjectRelatedField(
+    alternate_account = SubscribedAccountField(
         queryset=Account.objects, attrs=('id', 'name', 'username'),
         label=_('Alternate account'), required=False, allow_null=True
     )
-    active_account = ObjectRelatedField(
+    active_account = SubscribedAccountField(
         read_only=True, attrs=('id', 'name', 'username'),
         label=_('Active account')
     )
@@ -144,7 +144,7 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
     @classmethod
     def setup_eager_loading(cls, queryset):
         return queryset.select_related(
-            'account__asset__platform', 'alternate_account', 'active_account', 'change_execution'
+            'account__asset__platform', 'alternate_account__asset', 'active_account__asset', 'change_execution'
         ).prefetch_related(
             'applications',
             Prefetch('subscription_accounts', queryset=Account.objects.select_related('asset')),
@@ -271,8 +271,6 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
             return attrs
         if account.id == alternate.id:
             raise serializers.ValidationError(_('The initial and alternate accounts must be different.'))
-        if account.asset_id != alternate.asset_id:
-            raise serializers.ValidationError(_('The initial and alternate accounts must belong to the same asset.'))
         if account.org_id != alternate.org_id:
             raise serializers.ValidationError(_('The initial and alternate accounts must belong to the same organization.'))
         if account.secret_type != alternate.secret_type:
@@ -385,7 +383,7 @@ class ApplicationCredentialListSerializer(ApplicationCredentialSerializer):
         # Keep the list payload bounded: count the scope and fetch at most three
         # accounts per policy. Application counts use the batch helper.
         return queryset.select_related(
-            'account__asset__platform', 'alternate_account', 'active_account',
+            'account__asset__platform', 'alternate_account__asset', 'active_account__asset',
         ).prefetch_related(
             Prefetch(
                 'subscription_accounts',

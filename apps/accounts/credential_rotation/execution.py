@@ -208,6 +208,7 @@ def execution_info(credential):
         'id': str(rotation.id),
         'change_account': {
             'id': str(rotation.change_account_id),
+            'asset_id': str(rotation.change_account.asset_id),
             'name': rotation.change_account.name,
             'username': rotation.change_account.username,
             'secret_type': rotation.change_account.secret_type,
