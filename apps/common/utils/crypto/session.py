@@ -21,7 +21,7 @@ class SessionDecryptError(ValueError):
 
 
 def split_envelope(value):
-    """ Return [key_cipher, password_cipher], or None when value is plain text """
+    """Return [key_cipher, password_cipher], or None when value is plain text."""
     if ENCRYPTED_SEPARATOR in value:
         cipher = value.split(ENCRYPTED_SEPARATOR)
     elif LEGACY_ENVELOPE_PATTERN.match(value):
@@ -35,7 +35,8 @@ def split_envelope(value):
 
 
 def decrypt_session_password(value, strict=False):
-    """
+    """Decrypt a value the browser encrypted with the session key pair.
+
     strict=False keeps the historical behaviour: a value that cannot be
     decrypted is returned unchanged (API clients send plain text).
 
