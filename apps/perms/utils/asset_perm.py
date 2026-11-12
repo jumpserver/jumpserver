@@ -110,7 +110,7 @@ class PermAssetAccountsBatchUtil:
         return asset_protocols
 
     @staticmethod
-    def get_asset_account_usernames(asset_ids):
+    def get_asset_account_usernames(asset_ids, query=None):
         source_asset_ids = set(asset_ids)
         source_targets = defaultdict(set)
         for asset_id in asset_ids:
@@ -129,7 +129,10 @@ class PermAssetAccountsBatchUtil:
         accounts = Account.objects.filter(
             asset_id__in=source_asset_ids,
             is_active=True,
-        ).values_list('asset_id', 'username')
+        )
+        if query:
+            accounts = accounts.filter(username__icontains=query)
+        accounts = accounts.values_list('asset_id', 'username')
         for source_asset_id, username in accounts:
             for target_asset_id in source_targets[source_asset_id]:
                 asset_usernames[target_asset_id].append(username)
@@ -213,7 +216,7 @@ class PermAssetAccountsBatchUtil:
         ]
 
     def get_permitted_account_usernames(
-        self, assets, action_required, protocols_required=None,
+        self, assets, action_required, protocols_required=None, query=None,
     ):
         asset_ids = [asset.id for asset in assets]
         if not asset_ids:
@@ -255,7 +258,9 @@ class PermAssetAccountsBatchUtil:
         context = PermAssetAccountsBatchContext(
             permissions_by_id=permissions_by_id,
             asset_protocols=self.get_asset_protocols(asset_ids),
-            asset_usernames=self.get_asset_account_usernames(asset_ids),
+            asset_usernames=self.get_asset_account_usernames(
+                asset_ids, query=query,
+            ),
             required_protocols=set(protocols_required or []),
             action_required=action_required,
         )

@@ -73,12 +73,12 @@ class UsernameHintsPermissionTest(TestCase):
             permission.assets.add(asset)
         return permission
 
-    def get_hints(self, asset, action=None):
+    def get_hints(self, asset, action=None, query=''):
         assets = asset if isinstance(asset, list) else [asset]
         data = {
             'nodes': [],
             'assets': [str(item.id) for item in assets],
-            'query': '',
+            'query': query,
         }
         if action:
             data['action'] = action
@@ -164,6 +164,20 @@ class UsernameHintsPermissionTest(TestCase):
         hints = self.get_hints(asset)
 
         self.assertEqual(hints, [{'username': 'connect-user', 'total': 1}])
+
+    def test_hints_filter_accounts_by_query(self):
+        asset = self.create_asset('query-filter-asset')
+        self.create_account(asset, 'matching-user')
+        self.create_account(asset, 'other-user')
+        self.grant(
+            asset,
+            '@ALL',
+            ActionChoices.upload.value,
+        )
+
+        hints = self.get_hints(asset, action='upload', query='matching')
+
+        self.assertEqual(hints, [{'username': 'matching-user', 'total': 1}])
 
     def test_query_count_does_not_grow_per_selected_asset(self):
         small_asset = self.create_asset('query-small')
