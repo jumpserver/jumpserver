@@ -166,6 +166,71 @@ class WorkflowBusinessTests(TestCase):
         self.assertEqual(ticket.state, 'approved')
         self.assertFalse(ticket.ticket_steps.exists())
 
+    def test_custom_global_login_workflow_supports_users_and_system_roles(self):
+        from rbac.builtin import BuiltinRole
+        from rbac.models import Role, RoleBinding
+
+        role, _ = Role.objects.get_or_create(id=BuiltinRole.system_admin.id,
+                                             defaults={'name': 'SystemAdmin', 'scope': 'system'})
+        RoleBinding.objects_raw.create(user=self.alice, role=role, scope='system')
+        for approvers in ({'type': 'user', 'value': [str(self.alice.pk)]},
+                          {'type': 'role', 'value': [str(role.pk)]}):
+            with self.subTest(approvers=approvers), tmp_to_root_org():
+                workflow = Workflow.objects.create(name=str(uuid4()), type='login_confirm',
+                                                    org_id=Organization.ROOT_ID, enabled=True)
+                publish_workflow(workflow, approval_definition([], approvers=approvers))
+                acl = LoginACL.objects.create(name=str(uuid4()), action='review', workflow=workflow)
+                ticket = acl.create_confirm_ticket(None, self.applicant)
+                instance = WorkflowInstance.objects.get(ticket=ticket)
+                self.assertEqual(instance.state, 'running')
+                self.engine.approve(self.task(instance), self.alice)
+                ticket.refresh_from_db()
+                self.assertEqual(ticket.state, 'approved')
+
+    def test_invalid_login_workflow_shows_error_and_clears_login_state(self):
+        import time
+        from django.conf import settings
+        from django.contrib.auth import SESSION_KEY
+        from django.urls import reverse
+        from authentication.views.login import UserLoginGuardView
+
+        with tmp_to_root_org():
+            # Represent an invalid login workflow published before resolver validation.
+            workflow = Workflow.objects.create(name='Existing invalid login', type='general',
+                                                org_id=Organization.ROOT_ID, enabled=True)
+            publish_workflow(workflow, approval_definition([], approvers={'type': 'org_admin'}))
+            workflow.type = 'login_confirm'
+            workflow.save(update_fields=['type'])
+        acl = LoginACL.objects.create(name='Invalid login approval', action='review', workflow=workflow,
+                                      users={'type': 'ids', 'ids': [str(self.applicant.pk)]})
+        for authenticated in (False, True):
+            with self.subTest(authenticated=authenticated):
+                if authenticated:
+                    self.client.force_login(self.applicant)
+                session = self.client.session
+                session.update({'auth_password': 1, 'user_id': str(self.applicant.pk),
+                                'auth_password_expired_at': time.time() + 600,
+                                'auth_backend': settings.AUTH_BACKEND_MODEL, 'auth_confirm_required': '1',
+                                'auth_acl_id': str(acl.pk)})
+                session.save()
+                with patch.object(UserLoginGuardView, 'send_auth_signal') as signal:
+                    response = self.client.get(reverse('authentication:login-guard'))
+                self.assertEqual(response.status_code, 302)
+                self.assertTrue(response.url.startswith(reverse('common:flash-message') + '?code='))
+                self.assertFalse(signal.call_args.kwargs['success'])
+                self.assertEqual(signal.call_args.kwargs['username'], self.applicant.username)
+                page = self.client.get(response.url)
+                self.assertEqual(page.status_code, 200)
+                self.assertTrue(page.context['error'])
+                self.assertFalse(page.context['auto_redirect'])
+                self.assertEqual(page.context['redirect_url'], reverse('authentication:login') + '?admin=1')
+                for key in (SESSION_KEY, 'auth_password', 'auth_confirm_required', 'auth_ticket_id', 'auth_acl_id'):
+                    self.assertNotIn(key, self.client.session)
+                self.assertRedirects(self.client.get(reverse('authentication:login-guard')),
+                                     reverse('authentication:login'), fetch_redirect_response=False)
+                with tmp_to_root_org():
+                    self.assertFalse(Ticket.objects.filter(workflow=workflow).exists())
+
     def test_login_poll_after_guard_preserves_authenticated_session(self):
         import time
         from django.conf import settings
@@ -609,14 +674,50 @@ class WorkflowBusinessTests(TestCase):
         self.engine.approve(self.task(instance), self.alice)
         self.assertEqual(AssetPermission.objects.get(pk=ticket.pk).accounts, ['root'])
 
+    def test_specified_accounts_select_the_matching_username_branch(self):
+        from accounts.models import Account
+        definition = approval_definition([self.alice], levels=2)
+        definition['nodes'].insert(1, {'id': 'username', 'type': 'condition', 'config': {
+            'field': 'account.username', 'operator': 'eq', 'value': 'root2',
+        }})
+        definition['edges'] = [['start', 'username'], ['username:true', 'approval_0'],
+                               ['username:false', 'approval_1'], ['approval_0', 'end'], ['approval_1', 'end']]
+        workflow = self.workflow(definition=definition)
+        for username, branch in (('root', 'approval_1'), ('root2', 'approval_0')):
+            with self.subTest(username=username):
+                Account.objects.create(asset=self.asset, name=username, username=username)
+                ticket = self.ticket(workflow)
+                ticket.request_data['apply_accounts'] = ['@SPEC', username]
+                ticket.save(update_fields=['request_data'])
+                instance = submit_ticket(ticket)
+                self.assertEqual([account['username'] for account in instance.context['accounts']], [username])
+                self.assertEqual(instance.context['request']['account_selectors'], [username])
+                task = self.task(instance)
+                self.assertEqual(task.node_instance.node.key, branch)
+                self.engine.approve(task, self.alice)
+                self.assertEqual(AssetPermission.objects.get(pk=ticket.pk).accounts, [username])
+                ticket.refresh_from_db()
+                self.assertEqual(ticket.request_data['apply_accounts'], ['@SPEC', username])
+
+    def test_specified_account_marker_requires_an_actual_account(self):
+        ticket = self.ticket()
+        ticket.request_data['apply_accounts'] = ['@SPEC']
+        ticket.save(update_fields=['request_data'])
+        with self.assertRaises(WorkflowConfigurationError):
+            submit_ticket(ticket)
+        self.assertFalse(WorkflowInstance.objects.filter(ticket=ticket).exists())
+
     def test_manual_username_cannot_skip_username_policy(self):
         from tickets.workflow.conditions import evaluate_condition
-        ticket = self.ticket()
-        ticket.request_data['apply_accounts'] = ['@INPUT']
-        ticket.save(update_fields=['request_data'])
-        instance = submit_ticket(ticket)
-        with self.assertRaises(WorkflowConfigurationError):
-            evaluate_condition({'field': 'account.username', 'operator': 'eq', 'value': 'root'}, instance.context)
+        for selectors in (['@INPUT'], ['@SPEC', 'root', '@INPUT']):
+            with self.subTest(selectors=selectors):
+                ticket = self.ticket()
+                ticket.request_data['apply_accounts'] = selectors
+                ticket.save(update_fields=['request_data'])
+                instance = submit_ticket(ticket)
+                self.assertIn({'selector': '@INPUT', 'username': None}, instance.context['accounts'])
+                with self.assertRaises(WorkflowConfigurationError):
+                    evaluate_condition({'field': 'account.username', 'operator': 'eq', 'value': 'root'}, instance.context)
 
     @override_settings(CACHES={'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'}})
     def test_login_exemption_starts_only_after_final_commit(self):

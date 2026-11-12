@@ -224,7 +224,7 @@ class Protocol(ChoicesMixin, models.TextChoices):
                 }
             },
             cls.db2: {
-                'port': 5000,
+                'port': 50000,
                 'required': True,
                 'secret_types': ['password'],
                 'xpack': True,

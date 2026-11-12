@@ -318,9 +318,11 @@ class TicketPluginTests(TestCase):
         self.assertFalse(serializer.is_valid())
 
     def test_system_types_and_forged_applicant_cannot_use_self_service(self):
+        data = self.payload()
         for ticket_type in ('login_confirm', 'login_asset_confirm', 'command_confirm', 'general'):
-            serializer = self.serializer(self.payload(ticket_type))
+            serializer = self.serializer({**data, 'type': ticket_type})
             self.assertFalse(serializer.is_valid())
+            self.assertIn('type', serializer.errors)
         self.create_account()
         data = self.payload(asset=str(self.asset.pk), accounts=['root'])
         serializer = self.serializer({**data, 'applicant': str(self.bob.pk)})
@@ -723,6 +725,29 @@ class TicketPluginTests(TestCase):
         data['workflow_id'] = str(admin_flow.pk)
         allowed = self.serializer(data)
         self.assertTrue(allowed.is_valid(), allowed.errors)
+
+    def test_delegated_request_reports_excluded_approvers_without_creating_ticket(self):
+        self.grant_delegation()
+        for approvers in ([self.applicant], [self.bob], [self.applicant, self.bob]):
+            with self.subTest(approvers=approvers), override('zh'):
+                definition = approval_definition(approvers, levels=2, exclude_applicant=False)
+                definition['nodes'][2]['config']['approvers'] = {'type': 'org_admin'}
+                data = self.payload(
+                    'apply_asset', apply_users=[str(self.bob.pk)], apply_assets=[str(self.asset.pk)],
+                    apply_accounts=['root'], apply_actions=['connect'],
+                    apply_date_start=timezone.now().isoformat(),
+                    apply_date_expired=(timezone.now() + timedelta(hours=1)).isoformat(),
+                )
+                data['workflow_id'] = str(self.workflow(definition=definition).pk)
+                count = Ticket.objects.count()
+                request = APIRequestFactory().post('/api/v1/tickets/tickets/open/', data, format='json')
+                force_authenticate(request, self.applicant)
+                with transaction.atomic(), patch('rbac.permissions.RBACPermission.has_permission', return_value=True):
+                    response = TicketViewSet.as_view({'post': 'open'})(request)
+                self.assertEqual(response.status_code, 400, response.data)
+                self.assertEqual(str(response.data[0]),
+                                 '第 1 级审批排除申请人或授权用户后，无可用审批人。请调整审批人配置或选择其他流程。')
+                self.assertEqual(Ticket.objects.count(), count)
 
     @override_settings(TICKET_APPLY_ASSET_SCOPE='all', XPACK_LICENSE_IS_VALID=True,
                        CHANGE_AUTH_PLAN_SECURE_MODE_ENABLED=False)

@@ -191,7 +191,7 @@ class PlaybookCallback(DefaultCallback):
         self.ansible_log.flush()
 
     def event_handler(self, data, **kwargs):
-        self.write_ansible_output(data.get('stdout'))
+        self.write_ansible_output(self.format_task_output(data))
         return super().event_handler(data, **kwargs)
 
     def close(self):
@@ -252,6 +252,7 @@ class BaseManager:
         self.result = defaultdict(list)
         self.duration = 0
         self.status = Status.success
+        self._verification_pending_only = False
 
     def get_assets_group_by_platform(self):
         return self.execution.all_assets_group_by_platform()
@@ -311,9 +312,12 @@ class BaseManager:
         result.append(_("Failed: %(count)s") % {'count': failed})
         if total is not None:
             result.append(_("Total: %(count)s") % {'count': total})
+        execution_failed = (
+            self.status == Status.failed and not self._verification_pending_only
+        )
         final_level = (
             'error'
-            if failed or self.status in (Status.failed, Status.error)
+            if failed or self.status == Status.error or execution_failed
             else 'progress'
             if unverified or self.status == Status.canceled
             else 'success'
@@ -1005,12 +1009,19 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
 
     def post_run(self):
         try:
-            if self.status not in (Status.canceled, Status.error) and any(
-                    self.summary.get(key, 0) > 0
-                    for key in (
-                        "fail_assets", "fail_accounts",
-                        "unverified_accounts",
-                    )
+            has_failed_results = any(
+                self.summary.get(key, 0) > 0
+                for key in ("fail_assets", "fail_accounts")
+            )
+            has_unverified_results = self.summary.get("unverified_accounts", 0) > 0
+            # Pending verification must still block success, but should not
+            # color the summary as an execution failure. Preserve real errors.
+            self._verification_pending_only = (
+                self.status == Status.success
+                and has_unverified_results and not has_failed_results
+            )
+            if self.status not in (Status.canceled, Status.error) and (
+                has_failed_results or has_unverified_results
             ):
                 self.status = Status.failed
             super().post_run()

@@ -106,6 +106,32 @@ class WorkflowDefinitionTests(SimpleTestCase):
             with self.subTest(seconds=seconds), self.assertRaises(WorkflowConfigurationError):
                 validate_definition(definition)
 
+    def test_quorum_counts_unique_specified_users(self):
+        user = User(id=uuid4())
+        for users in ([user], [user, user]):
+            with self.subTest(users=users), override('en'), self.assertRaisesMessage(
+                    WorkflowConfigurationError, 'Select at least 2 approvers; currently 1 selected.'):
+                validate_definition(approval_definition(users, strategy='quorum', required=2))
+        definition = approval_definition([user], strategy='quorum', required=2)
+        definition['nodes'][1]['config']['approvers']['value'] = str(user.pk)
+        with self.assertRaises(WorkflowConfigurationError):
+            validate_definition(definition)
+        definition = validate_definition(approval_definition(
+            [user, User(id=uuid4())], strategy='quorum', required=2,
+        ))
+        self.assertEqual(definition['nodes'][1]['config']['required'], 2)
+
+    def test_quorum_does_not_count_dynamic_resolver_ids_as_users(self):
+        for kind in ('user_group', 'role', 'org_admin', 'asset_owner'):
+            approvers = {'type': kind}
+            if kind in ('user_group', 'role'):
+                approvers['value'] = [str(uuid4())]
+            with self.subTest(kind=kind):
+                definition = validate_definition(approval_definition(
+                    [], approvers=approvers, strategy='quorum', required=2,
+                ))
+                self.assertEqual(definition['nodes'][1]['config']['required'], 2)
+
     def test_rejects_disconnected_cycle_and_missing_condition_branch(self):
         graph = deepcopy(self.definition)
         for key in ('a', 'b'):
@@ -313,7 +339,8 @@ class WorkflowTests(TestCase):
     def test_missing_approvers_and_impossible_quorum_fail_closed_with_audit(self):
         for config in [
             {'approvers': {'type': 'user', 'value': [str(self.outsider.pk)]}},
-            {'strategy': 'quorum', 'required': 3},
+            {'strategy': 'quorum', 'required': 2,
+             'approvers': {'type': 'user', 'value': [str(self.alice.pk), str(self.applicant.pk)]}},
             {'approvers': {'type': 'asset_owner'}},
             {'approvers': {'type': 'org_admin'}},
             {'approvers': {'type': 'user', 'value': [str(self.applicant.pk)]}},
@@ -338,6 +365,28 @@ class WorkflowTests(TestCase):
         self.assertEqual(instance.state, 'running')
         self.assertEqual(set(ApprovalTask.objects.filter(node_instance__instance=instance)
                              .values_list('assignee_id', flat=True)), {self.alice.pk})
+
+    def test_empty_approver_group_is_not_reported_as_an_exclusion(self):
+        group = UserGroup.objects.create(name='Empty reviewers')
+        with override('en'):
+            instance = self.start(approvers={'type': 'user_group', 'value': [str(group.pk)]})
+        self.assertEqual(instance.state, 'error')
+        self.assertEqual(instance.events.get(type='workflow.error').data['detail'],
+                         'An approval node must resolve between 1 and 1000 eligible approvers.')
+
+    def test_excluded_approver_error_identifies_the_current_approval_level(self):
+        definition = approval_definition([self.alice], levels=2)
+        definition['nodes'][2]['config']['approvers']['value'] = [str(self.applicant.pk)]
+        with override('en'):
+            instance = self.start(self.create_workflow(definition))
+            task = self.task(instance, self.alice)
+            self.assertEqual(self.engine.approve(task, self.alice).state, 'error')
+        self.assertEqual(instance.events.get(type='workflow.error').data['detail'],
+                         'Approval 2 has no eligible approvers after excluding the applicant or authorized users. '
+                         'Adjust the approvers or select another workflow.')
+        task.refresh_from_db()
+        self.assertEqual(task.state, 'approved')
+        self.assertFalse(ApprovalTask.objects.filter(node_instance__instance=instance, state='pending').exists())
 
     def test_asset_owner_errors_identify_the_asset_and_fail_closed(self):
         cases = [
@@ -474,6 +523,98 @@ class WorkflowTests(TestCase):
         self.assertEqual(self.request(ApprovalTaskViewSet, 'approve', self.alice, task.pk).status_code, 200)
         self.assertEqual(self.request(ApprovalTaskViewSet, 'approve', self.alice, task.pk).status_code, 409)
 
+    def test_instance_details_identify_the_used_workflow_version_and_role_sources(self):
+        workflow = self.create_workflow(approvers={'type': 'role', 'value': [str(self.role.pk)]})
+        instance = self.start(workflow)
+        publish_workflow(workflow, approval_definition([], approvers={'type': 'org_admin'}), expected_version=1)
+        response = self.request(WorkflowInstanceViewSet, 'retrieve', self.applicant, instance.pk, method='get')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['workflow_name'], workflow.name)
+        self.assertEqual(response.data['version_number'], 1)
+        self.assertEqual(response.data['approver_role_names'], {str(self.role.pk): self.role.name})
+        approval = next(node for node in response.data['nodes'] if node['type'] == 'approval')
+        self.assertEqual(approval['config']['approvers'], {'type': 'role', 'value': [str(self.role.pk)]})
+
+    def test_instance_details_translate_builtin_roles_and_support_non_role_sources(self):
+        admin = BuiltinRole.system_admin.get_role()
+        RoleBinding.objects_raw.bulk_create([
+            RoleBinding(user=self.alice, role=admin, scope='system'),
+        ])
+        workflow = self.create_workflow(approvers={'type': 'role', 'value': [str(admin.pk), str(self.role.pk)]})
+        instance = self.start(workflow)
+        with override('zh'):
+            response = self.request(WorkflowInstanceViewSet, 'retrieve', self.applicant, instance.pk, method='get')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['approver_role_names'], {
+            str(admin.pk): '系统管理员', str(self.role.pk): self.role.name,
+        })
+        instance = self.start()
+        response = self.request(WorkflowInstanceViewSet, 'retrieve', self.applicant, instance.pk, method='get')
+        self.assertEqual(response.data['approver_role_names'], {})
+
+    def test_instance_preview_shows_remaining_levels_from_the_bound_version(self):
+        definition = approval_definition([self.alice], levels=3)
+        definition['nodes'][2]['config']['approvers'] = {'type': 'role', 'value': [str(self.role.pk)]}
+        workflow = self.create_workflow(definition)
+        instance = self.start(workflow)
+        publish_workflow(workflow, approval_definition([self.bob]), expected_version=1)
+        response = self.request(WorkflowInstanceViewSet, 'retrieve', self.applicant, instance.pk, method='get')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['version_number'], 1)
+        self.assertEqual([(n['key'], n['state']) for n in response.data['upcoming_nodes']], [
+            ('approval_1', 'not_started'), ('approval_2', 'not_started'), ('end', 'not_started'),
+        ])
+        self.assertEqual(response.data['approver_role_names'], {str(self.role.pk): self.role.name})
+        self.assertEqual(instance.node_instances.count(), 2)
+        self.assertEqual(ApprovalTask.objects.filter(node_instance__instance=instance).count(), 1)
+        self.engine.approve(self.task(instance, self.alice), self.alice)
+        response = self.request(WorkflowInstanceViewSet, 'retrieve', self.applicant, instance.pk, method='get')
+        self.assertEqual([n['key'] for n in response.data['upcoming_nodes']], ['approval_2', 'end'])
+        self.assertEqual([n['key'] for n in response.data['nodes']], ['start', 'approval_0', 'approval_1'])
+
+    def test_instance_preview_distinguishes_undecided_branches_and_shared_successors(self):
+        definition = approval_definition([self.alice], levels=4)
+        definition['nodes'].insert(2, {'id': 'condition', 'type': 'condition', 'config': {
+            'field': 'asset.labels.env', 'operator': 'eq', 'value': 'prod',
+        }})
+        definition['edges'] = [
+            ['start', 'approval_0'], ['approval_0', 'condition'],
+            ['condition:true', 'approval_1'], ['condition:false', 'approval_2'],
+            ['approval_1', 'approval_3'], ['approval_2', 'approval_3'], ['approval_3', 'end'],
+        ]
+        instance = self.start(self.create_workflow(definition), {'assets': [{'labels': {'env': 'prod'}}]})
+        response = self.request(WorkflowInstanceViewSet, 'retrieve', self.applicant, instance.pk, method='get')
+        self.assertEqual({n['key']: n['state'] for n in response.data['upcoming_nodes']}, {
+            'condition': 'not_started', 'approval_1': 'branch_pending', 'approval_2': 'branch_pending',
+            'approval_3': 'not_started', 'end': 'not_started',
+        })
+        self.assertFalse(instance.events.filter(type='condition.evaluated').exists())
+        self.engine.approve(self.task(instance, self.alice), self.alice)
+        response = self.request(WorkflowInstanceViewSet, 'retrieve', self.applicant, instance.pk, method='get')
+        self.assertEqual({n['key']: n['state'] for n in response.data['upcoming_nodes']}, {
+            'approval_2': 'skipped', 'approval_3': 'not_started', 'end': 'not_started',
+        })
+        self.assertEqual(instance.node_instances.filter(node__key='approval_2').count(), 0)
+
+    def test_instance_preview_stops_after_rejection_without_changing_skipped_records(self):
+        instance = self.start(self.create_workflow(approval_definition([self.alice], levels=2)))
+        self.engine.reject(self.task(instance, self.alice), self.alice)
+        response = self.request(WorkflowInstanceViewSet, 'retrieve', self.applicant, instance.pk, method='get')
+        self.assertEqual(response.data['upcoming_nodes'], [])
+        self.assertEqual({n['key'] for n in response.data['nodes'] if n['state'] == 'skipped'}, {'approval_1', 'end'})
+
+    def test_instance_preview_keeps_history_when_the_graph_is_restarted(self):
+        instance = self.start(self.create_workflow(approval_definition([self.alice], levels=2)))
+        self.engine.approve(self.task(instance, self.alice), self.alice)
+        self.engine._close_pending(instance)
+        instance.node_instances.filter(state='running').update(state='cancelled', date_finished=timezone.now())
+        self.engine._execute(instance, instance.version.nodes.get(type='start'))
+        response = self.request(WorkflowInstanceViewSet, 'retrieve', self.applicant, instance.pk, method='get')
+        self.assertEqual([n['key'] for n in response.data['nodes']], [
+            'start', 'approval_0', 'approval_1', 'start', 'approval_0',
+        ])
+        self.assertEqual([n['key'] for n in response.data['upcoming_nodes']], ['approval_1', 'end'])
+
     def test_empty_cc_nodes_publish_and_advance_without_recipients_or_notifications(self):
         from tickets.workflow.business import deliver_event
 
@@ -528,6 +669,57 @@ class WorkflowTests(TestCase):
             self.assertEqual(self.request(WorkflowViewSet, 'publish', self.alice, workflow.pk, data).status_code, 409)
             data['expected_version'] = 1
             self.assertEqual(self.request(WorkflowViewSet, 'publish', self.alice, workflow.pk, data).status_code, 201)
+
+    def test_login_publication_rejects_org_admin_without_restricting_other_global_flows(self):
+        definition = approval_definition([], approvers={'type': 'org_admin'})
+        with tmp_to_root_org():
+            workflow = Workflow.objects.create(name='Global login', type='login_confirm', org_id=Organization.ROOT_ID)
+            with override('en'), patch.object(User, 'has_perms', return_value=True):
+                response = self.request(WorkflowViewSet, 'publish', self.alice, workflow.pk, {
+                    'expected_version': 0, 'definition': definition,
+                })
+            self.assertEqual(response.status_code, 400)
+            self.assertIn('cannot use organization administrators', str(response.data))
+            self.assertFalse(workflow.versions.exists())
+            workflow.refresh_from_db()
+            self.assertIsNone(workflow.active_version_id)
+            other = Workflow.objects.create(name='Global assets', type='apply_asset', org_id=Organization.ROOT_ID)
+            publish_workflow(other, definition)
+            self.assertEqual(other.versions.count(), 1)
+
+    def test_login_publication_rejects_asset_owners_without_restricting_asset_flows(self):
+        definition = approval_definition([], approvers={'type': 'asset_owner'})
+        with tmp_to_root_org(), override('en'), patch.object(User, 'has_perms', return_value=True):
+            workflow = Workflow.objects.create(name='Login with asset owner', type='login_confirm',
+                                               org_id=Organization.ROOT_ID)
+            response = self.request(WorkflowViewSet, 'publish', self.alice, workflow.pk, {
+                'expected_version': 0, 'definition': definition,
+            })
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('cannot use asset owners', str(response.data))
+        self.assertFalse(workflow.versions.exists())
+        workflow.refresh_from_db()
+        self.assertIsNone(workflow.active_version_id)
+        for ticket_type in ('apply_asset', 'login_asset_confirm'):
+            with self.subTest(ticket_type=ticket_type):
+                other = Workflow.objects.create(name=ticket_type, type=ticket_type)
+                publish_workflow(other, definition)
+                self.assertEqual(other.versions.count(), 1)
+
+    def test_publish_rejects_impossible_quorum_without_creating_version(self):
+        workflow = self.create_workflow()
+        original_version = workflow.active_version_id
+        for users in ([self.alice], [self.alice, self.alice]):
+            data = {'expected_version': 1, 'definition': approval_definition(users, strategy='quorum', required=2)}
+            with self.subTest(users=users), override('en'), patch.object(User, 'has_perms', return_value=True):
+                response = self.request(WorkflowViewSet, 'publish', self.alice, workflow.pk, data)
+                self.assertEqual(response.status_code, 400)
+                self.assertEqual(response.data, {
+                    'definition': ['Select at least 2 approvers; currently 1 selected.'],
+                })
+        workflow.refresh_from_db()
+        self.assertEqual(workflow.active_version_id, original_version)
+        self.assertEqual(workflow.versions.count(), 1)
 
     def test_publish_unknown_condition_field_reports_full_path_without_creating_version(self):
         workflow = self.create_workflow()

@@ -69,12 +69,10 @@ def check(credential):
     accounts = [credential.account, credential.alternate_account]
     if any(a is None for a in accounts):
         raise JMSException(_('The rotation account configuration is incomplete.'))
-    if len(accounts) == 2 and (
-        accounts[0].id == accounts[1].id
-        or accounts[0].asset_id != accounts[1].asset_id
-        or accounts[0].secret_type != accounts[1].secret_type
-    ):
-        raise JMSException(_('The initial and alternate accounts must be different and use the same asset and secret type.'))
+    if accounts[0].id == accounts[1].id:
+        raise JMSException(_('The initial and alternate accounts must be different.'))
+    if accounts[0].secret_type != accounts[1].secret_type:
+        raise JMSException(_('The initial and alternate accounts must use the same secret type.'))
     check_ownership(credential, accounts)
     check_secret_reset(credential.active_account)
     for account in accounts:

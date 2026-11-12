@@ -75,9 +75,10 @@ def validate_context(ticket, *, approved=False, user=None, remote_addr=None):
             not asset.protocols.filter(name=protocol, port=context['transfer_port']).exists()):
         raise PermissionDenied(gettext('The approved asset connection changed.'))
     if remote_addr is not None:
-        blocked_asset, _ = match_rejected_login_asset_acl(ticket.applicant, [asset], account.username, ip=remote_addr)
+        blocked_asset, acl = match_rejected_login_asset_acl(ticket.applicant, [asset], account.username, ip=remote_addr)
         if blocked_asset:
-            raise PermissionDenied(gettext('The connection is restricted by an access control rule.'))
+            rules = ', '.join(f'{rule.name} ({rule.id})' for rule in acl.rules)
+            raise PermissionDenied(f"{gettext('The connection is restricted by an access control rule.')} {rules}")
     # Preserve explicit action exclusions while granting only this operation.
     permissions = list(AssetPermissionUtil().get_permissions_for_user_asset(ticket.applicant, asset))
     permissions = [p for p in permissions if protocol in p.protocols or 'all' in p.protocols]

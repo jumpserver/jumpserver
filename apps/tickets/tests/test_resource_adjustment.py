@@ -5,6 +5,7 @@ from uuid import uuid4
 from django.db import transaction
 from django.test import TestCase, override_settings
 from django.utils import timezone
+from django.utils.translation import override
 from rest_framework.test import APIRequestFactory, force_authenticate
 
 from accounts.models import Account
@@ -240,6 +241,22 @@ class ResourceAdjustmentTests(TestCase):
                 self.assertEqual(instance.node_instances.count(), node_count)
                 self.assertEqual(task.state, 'pending')
                 self.assertFalse(AssetPermission.objects.filter(pk=ticket.pk).exists())
+
+    def test_excluded_owner_reports_first_approval_after_restart(self):
+        self.grant_query()
+        ticket, instance = self.owner_request('apply_asset')
+        task = self.task(instance)
+        before_context = instance.context
+        Asset.objects.filter(pk=self.asset.pk).update(owner=self.applicant)
+        with override('zh'):
+            response = self.save(instance)
+        self.assertEqual(response.status_code, 400, response.data)
+        self.assertEqual(str(response.data[0]),
+                         '第 1 级审批排除申请人或授权用户后，无可用审批人。请调整审批人配置或选择其他流程。')
+        instance.refresh_from_db()
+        task.refresh_from_db()
+        self.assertEqual(instance.context, before_context)
+        self.assertEqual(task.state, 'pending')
 
     def test_unchanged_asset_owners_preserve_transfer_added_approver_and_deadline(self):
         self.create_account()

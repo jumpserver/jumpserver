@@ -1,6 +1,7 @@
 from contextlib import contextmanager
 from datetime import timedelta
 import hashlib
+from uuid import uuid4
 
 from django.conf import settings
 from django.core import signing
@@ -15,6 +16,8 @@ from oauth2_provider.models import (
 )
 from rest_framework.exceptions import AuthenticationFailed, PermissionDenied
 
+from common.utils import get_log_keep_day
+from common.utils.connection import get_redis_client
 from common.utils.lock import DistributedLock
 from authentication.models.client_login_session import ClientLoginSession
 
@@ -27,6 +30,7 @@ POLICY_FIELDS = (
 CLIENT_ACCESS_TOKEN_EXPIRE_SECONDS = 60 * 60
 CLIENT_SESSION_RECEIPT_SALT = 'authentication.client-login-session-receipt'
 CLIENT_LOGIN_POLICY_CACHE_KEY = 'client-login-policy:v1'
+CLIENT_LOCK_VERSION_TTL = 24 * 60 * 60
 
 
 class ClientSessionExpired(AuthenticationFailed):
@@ -256,6 +260,31 @@ def validate_access_token(token, *, mutate=False):
     return session
 
 
+@contextmanager
+def client_session_control(token):
+    """Keep validation and the complete state change under the same locks."""
+    with client_policy_lock(), transaction.atomic():
+        yield validate_access_token(token, mutate=True)
+
+
+def client_lock_version(session, *, create=False, rotate=False):
+    """Caller holds client_session_control; cache loss must invalidate old unlocks."""
+    # Read from the primary: a lagging Redis replica could accept an old version.
+    client = get_redis_client()
+    key = cache.make_key(f'client-session-lock:{session.pk}')
+    version = None if rotate else client.get(key)
+    if version is None and (create or rotate):
+        version = uuid4().hex
+        client.set(key, version, ex=CLIENT_LOCK_VERSION_TTL)
+    return version.decode('ascii') if isinstance(version, bytes) else version
+
+
+def clear_client_lock_version(session):
+    # Invalidate before the DB commit. A rollback can require a retry, never reuse
+    # an old unlock. Redis failures must not allow the DB unlock to proceed.
+    get_redis_client().delete(cache.make_key(f'client-session-lock:{session.pk}'))
+
+
 def validate_refresh_token_session(refresh):
     if not is_client_application(refresh.application):
         return True
@@ -333,7 +362,7 @@ def revoke_client_authorizations(reason='policy_changed'):
 
 
 def clear_client_login_sessions():
-    """Keep terminated rows for 30 days and while OAuth credentials refer to them."""
+    """Keep terminated rows for the login-log retention period and while credentials refer to them."""
     from django.db.models import Exists, OuterRef, Q
 
     with client_policy_lock(), transaction.atomic():
@@ -368,4 +397,5 @@ def clear_client_login_sessions():
         ).filter(has_live_session=False)
         get_access_token_model().objects.filter(pk__in=obsolete.values('access_token_id')).delete()
         obsolete.delete()
-        sessions.filter(revoked_at__lt=timezone.now() - timedelta(days=30), has_refresh=False).delete()
+        days = get_log_keep_day('LOGIN_LOG_KEEP_DAYS')
+        sessions.filter(revoked_at__lt=timezone.now() - timedelta(days=days), has_refresh=False).delete()

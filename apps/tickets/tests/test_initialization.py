@@ -170,3 +170,21 @@ class WorkflowInitializationTests(TestCase):
         choices = Workflow.get_org_related_flows(self.org.pk).filter(type='general')
         self.assertEqual(set(choices.values_list('pk', flat=True)), {local.pk, other.pk})
         self.assertIn(inherited.pk, Workflow.get_org_related_flows(self.other_org.pk).values_list('pk', flat=True))
+
+    def test_login_defaults_are_global_even_when_initializing_a_specific_organization(self):
+        with tmp_to_root_org():
+            Workflow.objects.filter(type='login_confirm').update(type='general')
+        historical = Workflow.objects.create(type='login_confirm', name='Historical local login')
+        with patch.object(ticket_plugins, 'all', return_value=[get_ticket_plugin('login_confirm')]):
+            ensure_default_workflows(org_ids=[self.org.pk, self.other_org.pk])
+            ensure_default_workflows(org_ids=[self.other_org.pk])
+        with tmp_to_root_org():
+            defaults = Workflow.objects.filter(type='login_confirm').exclude(pk=historical.pk)
+            self.assertEqual(defaults.count(), 1)
+            workflow = defaults.get()
+            self.assertEqual(workflow.org_id, Organization.ROOT_ID)
+            self.assertTrue(workflow.enabled)
+            self.assertIsNotNone(workflow.active_version.published_at)
+            historical.refresh_from_db()
+            self.assertEqual(historical.org_id, self.org.pk)
+            self.assertIsNone(historical.active_version_id)

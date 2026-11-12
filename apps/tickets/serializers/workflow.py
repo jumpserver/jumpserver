@@ -5,10 +5,12 @@ from rest_framework import serializers
 
 from orgs.models import Organization
 from orgs.utils import current_org, tmp_to_root_org
+from rbac.models import Role
 from tickets.models import Workflow, WorkflowVersion, WorkflowInstance, WorkflowNodeInstance, ApprovalTask, WorkflowEvent
 from tickets.workflow.definition import validate_definition
 from tickets.workflow.errors import WorkflowConflict
 from tickets.workflow.publication import publish_workflow
+from tickets.workflow.preview import upcoming_nodes
 from tickets.plugins import ticket_plugins
 
 
@@ -42,8 +44,13 @@ class WorkflowSerializer(serializers.ModelSerializer):
         if attrs.get('enabled') and (not self.instance or not self.instance.active_version_id):
             raise serializers.ValidationError({'enabled': gettext('Publish a version before enabling the workflow.')})
         org_id = self.instance.org_id if self.instance and current_org.is_root() else current_org.id
+        ticket_type = attrs.get('type', getattr(self.instance, 'type', ''))
+        if ticket_type == 'login_confirm' and org_id != Organization.ROOT_ID:
+            raise serializers.ValidationError({'type': gettext(
+                'Login confirmation workflows can only be configured in the global organization.'
+            )})
         qs = Workflow.objects.filter(org_id=org_id, name=attrs.get('name', getattr(self.instance, 'name', '')),
-                                     type=attrs.get('type', getattr(self.instance, 'type', '')))
+                                     type=ticket_type)
         if self.instance:
             qs = qs.exclude(pk=self.instance.pk)
         if qs.exists():
@@ -154,8 +161,24 @@ class WorkflowInstanceSerializer(serializers.ModelSerializer):
 
 
 class WorkflowInstanceDetailSerializer(WorkflowInstanceSerializer):
+    workflow_name = serializers.CharField(source='version.workflow.display_name', read_only=True)
+    approver_role_names = serializers.SerializerMethodField()
     nodes = WorkflowNodeInstanceSerializer(source='node_instances', many=True, read_only=True)
+    upcoming_nodes = serializers.SerializerMethodField()
     resource_adjustment = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_approver_role_names(instance):
+        role_ids = set()
+        for node in instance.version.nodes.all():
+            approvers = node.config.get('approvers', {})
+            if approvers.get('type') == 'role':
+                role_ids.update(approvers['value'])
+        return {str(role.pk): str(role.display_name) for role in Role.objects.filter(pk__in=role_ids)}
+
+    @staticmethod
+    def get_upcoming_nodes(instance):
+        return upcoming_nodes(instance)
 
     def get_resource_adjustment(self, instance):
         from tickets.workflow.resources import adjustment_status
@@ -163,7 +186,9 @@ class WorkflowInstanceDetailSerializer(WorkflowInstanceSerializer):
         return adjustment_status(instance, request.user if request else None)
 
     class Meta(WorkflowInstanceSerializer.Meta):
-        fields = WorkflowInstanceSerializer.Meta.fields + ['context', 'nodes', 'resource_adjustment']
+        fields = WorkflowInstanceSerializer.Meta.fields + [
+            'workflow_name', 'approver_role_names', 'context', 'nodes', 'upcoming_nodes', 'resource_adjustment',
+        ]
         read_only_fields = fields
 
 

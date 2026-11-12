@@ -18206,6 +18206,13 @@ msgid ""
 "A configured approver is inactive, missing, or outside the organization."
 msgstr "配置的审批人未启用、不存在或不属于此组织。"
 
+#: tickets/workflow/approvers.py
+#, python-brace-format
+msgid ""
+"Approval {level} has no eligible approvers after excluding the applicant or authorized users. "
+"Adjust the approvers or select another workflow."
+msgstr "第 {level} 级审批排除申请人或授权用户后，无可用审批人。请调整审批人配置或选择其他流程。"
+
 #: tickets/workflow/approvers.py:85
 msgid "An approval node must resolve between 1 and 1000 eligible approvers."
 msgstr "审批节点需要匹配 1 至 1000 名符合条件的审批人。"
@@ -18380,6 +18387,11 @@ msgstr "审批策略必须为 any（或签）、all（会签）或 quorum（指�
 #: tickets/workflow/definition.py:53
 msgid "Quorum requires a positive approval count up to 1000."
 msgstr "指定审批人数必须为 1 至 1000 的整数。"
+
+#: tickets/workflow/definition.py:57
+#, python-brace-format
+msgid "Select at least {required} approvers; currently {count} selected."
+msgstr "至少选择 {required} 名审批人，当前已选择 {count} 名。"
 
 #: tickets/workflow/definition.py:55
 msgid "Only quorum accepts a required approval count."
@@ -20482,3 +20494,21 @@ msgstr "用户操作"
 
 msgid "Operation type"
 msgstr "操作类型"
+
+#: authentication/views/login.py
+msgid "The login approval workflow is misconfigured. Unable to log in. Please contact your administrator."
+msgstr "登录复核流程配置异常，无法完成登录。请联系管理员检查审批流程。"
+
+#: tickets/workflow/publication.py
+#, python-brace-format
+msgid "Login confirmation cannot use organization administrators in node \"{node}\". Select specific users or a system role."
+msgstr "登录复核的「{node}」节点不能使用组织管理员，请选择指定用户或系统角色。"
+
+#: tickets/workflow/publication.py
+#, python-brace-format
+msgid "Login confirmation has no assets and cannot use asset owners in node \"{node}\". Select another approver source."
+msgstr "登录复核不涉及资产，「{node}」节点不能使用资产负责人，请选择其他审批人来源。"
+
+#: tickets/serializers/workflow.py tickets/workflow/publication.py
+msgid "Login confirmation workflows can only be configured in the global organization."
+msgstr "登录复核流程仅支持在全局组织中配置。"

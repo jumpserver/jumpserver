@@ -3,6 +3,7 @@ from django.db import transaction
 from django.db.models import Max
 from django.utils import timezone
 
+from orgs.models import Organization
 from tickets.models import Workflow, WorkflowVersion, WorkflowNode, WorkflowEdge
 from .approvers import available_users
 from .definition import validate_definition
@@ -13,6 +14,22 @@ from .errors import WorkflowConfigurationError, WorkflowConflict
 def publish_workflow(workflow, definition, *, actor=None, expected_version=None):
     definition = validate_definition(definition)
     workflow = Workflow.objects.select_for_update().get(pk=workflow.pk)
+    if workflow.type == 'login_confirm':
+        if workflow.org_id != Organization.ROOT_ID:
+            raise WorkflowConfigurationError(gettext(
+                'Login confirmation workflows can only be configured in the global organization.'
+            ))
+        for node in definition['nodes']:
+            if node['type'] == 'approval' and node['config']['approvers']['type'] == 'org_admin':
+                raise WorkflowConfigurationError(gettext(
+                    'Login confirmation cannot use organization administrators in node "{node}". '
+                    'Select specific users or a system role.'
+                ).format(node=node['name'] or node['id']))
+            if node['type'] == 'approval' and node['config']['approvers']['type'] == 'asset_owner':
+                raise WorkflowConfigurationError(gettext(
+                    'Login confirmation has no assets and cannot use asset owners in node "{node}". '
+                    'Select another approver source.'
+                ).format(node=node['name'] or node['id']))
     cc_user_ids = {user_id for node in definition['nodes'] if node['type'] == 'cc'
                    for user_id in node['config']['users']}
     if cc_user_ids:

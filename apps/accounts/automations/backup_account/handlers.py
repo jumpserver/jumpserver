@@ -1,6 +1,6 @@
 import os
 import time
-from collections import defaultdict, OrderedDict
+from collections import defaultdict
 
 from django.conf import settings
 from django.db.models import F
@@ -28,12 +28,13 @@ class RecipientsNotFound(Exception):
 
 class BaseAccountHandler:
     @classmethod
-    def unpack_data(cls, serializer_data, data=None):
+    def unpack_data(cls, serializer_data, serializer, data=None):
         if data is None:
             data = {}
         for k, v in serializer_data.items():
-            if isinstance(v, OrderedDict):
-                cls.unpack_data(v, data)
+            field = serializer.fields.get(k)
+            if isinstance(field, serializers.Serializer) and isinstance(v, dict):
+                cls.unpack_data(v, field, data)
             else:
                 if isinstance(v, dict):
                     v = v.get('label')
@@ -64,18 +65,18 @@ class BaseAccountHandler:
         return header_fields
 
     @classmethod
-    def create_row(cls, data, header_fields):
-        data = cls.unpack_data(data)
+    def create_row(cls, data, header_fields, serializer):
+        data = cls.unpack_data(data, serializer)
         row_dict = {}
         for field, header_name in header_fields.items():
             row_dict[header_name] = str(data.get(field, field))
         return row_dict
 
     @classmethod
-    def add_rows(cls, data, header_fields, sheet):
+    def add_rows(cls, data, header_fields, sheet, serializer):
         data_map = defaultdict(list)
         for i in data:
-            row = cls.create_row(i, header_fields)
+            row = cls.create_row(i, header_fields, serializer)
             if sheet not in data_map:
                 data_map[sheet].append(list(row.keys()))
             data_map[sheet].append(list(row.values()))
@@ -128,12 +129,13 @@ class AssetAccountHandler(BaseAccountHandler):
             last_pk = batch[-1].pk
             exported_count += len(batch)
             if header_fields is None:
-                header_fields = cls.get_header_fields(AccountSecretSerializer(batch[0]))
+                serializer = AccountSecretSerializer(batch[0])
+                header_fields = cls.get_header_fields(serializer)
             data = AccountSecretSerializer(batch, many=True).data
             cls.handler_secret(data, section)
             for account, item in zip(batch, data):
                 sheet_name = str(type_dict.get(account.type, account.type))
-                row = cls.create_row(item, header_fields)
+                row = cls.create_row(item, header_fields, serializer)
                 if sheet_name not in seen_sheets:
                     seen_sheets.add(sheet_name)
                     yield sheet_name, list(row.keys())
