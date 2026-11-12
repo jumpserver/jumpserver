@@ -124,6 +124,39 @@ class WorkflowBusinessTests(TestCase):
                 workflow.refresh_from_db()
             self.assertEqual(workflow.name, raw_name)
 
+    def test_combined_acl_review_labels_preserve_custom_review_nodes(self):
+        from tickets.serializers.workflow import WorkflowVersionSerializer, ApprovalTaskSerializer
+        from tickets.workflow.business import get_system_workflow
+        from tickets.workflow.composition import compose_workflows
+        from tickets.workflow.preview import upcoming_nodes
+
+        generated = get_system_workflow(self.org.id, 'login_asset_confirm', [self.alice])
+        custom = self.workflow('login_asset_confirm', definition=generated.active_version.as_definition())
+        combined = compose_workflows([custom, generated], self.org.id, 'login_asset_confirm')
+        version = combined.active_version
+        original = version.as_definition()
+        approvals = list(version.nodes.filter(type='approval').order_by('key'))
+        for language, expected in [('zh', ['Review', '审批']), ('en', ['Review', 'Approval'])]:
+            with self.subTest(language=language), override(language):
+                names = WorkflowVersionSerializer.get_node_names(version)
+                self.assertEqual([names[node.key] for node in approvals], expected)
+        ticket = Ticket.objects.create(
+            type='login_asset_confirm', title='Combined review labels', applicant=self.applicant, workflow=combined,
+            org_id=self.org.id,
+        )
+        instance = self.engine.start(ticket, combined, {})
+        with override('zh'):
+            self.assertEqual(ApprovalTaskSerializer(self.task(instance)).data['node_name'], 'Review')
+            preview = [node['name'] for node in upcoming_nodes(instance) if node['type'] == 'approval']
+            self.assertEqual(preview, ['审批'])
+            self.engine.approve(self.task(instance), self.alice)
+            self.assertEqual(ApprovalTaskSerializer(self.task(instance)).data['node_name'], '审批')
+            self.assertEqual([step['name'] for step in ticket.process_map], ['Review', '审批'])
+        version.refresh_from_db()
+        self.assertEqual(version.as_definition(), original)
+        self.assertEqual(custom.active_version.nodes.get(key='review').name, 'Review')
+        self.assertEqual(generated.active_version.nodes.get(key='review').name, 'Review')
+
     def test_asset_grant_uses_snapshot_and_only_final_approval(self):
         ticket = self.ticket(self.workflow(levels=2))
         instance = submit_ticket(ticket)

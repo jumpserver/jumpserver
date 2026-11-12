@@ -56,6 +56,22 @@ class TicketTranslationTests(SimpleTestCase):
             workflow.created_by = 'Administrator'
             self.assertEqual(workflow.node_display_name(node), 'Approval 2')
 
+    def test_acl_review_label_preserves_custom_node_names(self):
+        for kind in ['login_confirm', 'login_asset_confirm', 'command_confirm']:
+            workflow = Workflow(name=f'ACL {kind} 1234', type=kind, is_system=True)
+            version = WorkflowVersion(workflow=workflow, number=1)
+            node = WorkflowNode(version=version, key='review', type='approval', name='Review')
+            for language, expected in [('zh', '审批'), ('en', 'Approval')]:
+                with self.subTest(kind=kind, language=language), override(language):
+                    self.assertEqual(workflow.node_display_name(node), expected)
+                    self.assertEqual(node.name, 'Review')
+            with override('zh'):
+                node.name = 'Operations review'
+                self.assertEqual(workflow.node_display_name(node), 'Operations review')
+                node.name = 'Review'
+                workflow.is_system = False
+                self.assertEqual(workflow.node_display_name(node), 'Review')
+
     def test_validation_errors_follow_the_request_language(self):
         for language, expected in [('zh', '审批流程必须包含节点和连线。'),
                                    ('en', 'A workflow requires nodes and edges.')]:
