@@ -73,9 +73,9 @@ class ConnectionACLBatchInputSerializer(ConnectionACLInputSerializer):
 
 
 class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
-    account_preparation_required = serializers.SerializerMethodField()
+    account_preparation_required = serializers.SerializerMethodField(label=_('Account preparation required'))
     acl = serializers.SerializerMethodField()
-    is_active = serializers.SerializerMethodField()
+    is_active = serializers.SerializerMethodField(label=_('Active'))
     expire_time = serializers.IntegerField(read_only=True, label=_('Expired time'))
     input_secret = EncryptedField(
         label=_("Input secret"), max_length=40960, required=False, allow_blank=True

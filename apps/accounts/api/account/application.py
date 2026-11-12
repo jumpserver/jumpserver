@@ -1,10 +1,6 @@
-import os
-import zipfile
 from uuid import UUID
-from io import BytesIO
 
-from django.conf import settings
-from django.http import HttpResponse
+from django.http import HttpResponseRedirect
 from django.utils.translation import gettext_lazy as _, get_language
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError
@@ -272,23 +268,8 @@ class PythonSDKDownloadAPI(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, *args, **kwargs):
-        package_dir = os.path.join(settings.APPS_DIR, 'accounts', 'clients', 'python')
-        buffer = BytesIO()
-        with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as archive:
-            for root, dirs, files in os.walk(package_dir):
-                dirs[:] = [
-                    name for name in dirs
-                    if name not in ('__pycache__', '.ruff_cache', 'build', 'dist')
-                    and not name.endswith('.egg-info')
-                ]
-                for filename in files:
-                    if filename.endswith(('.pyc', '.pyo')):
-                        continue
-                    path = os.path.join(root, filename)
-                    archive.write(path, os.path.relpath(path, package_dir))
-        response = HttpResponse(buffer.getvalue(), content_type='application/zip')
-        response['Content-Disposition'] = 'attachment; filename="jms-pam-python.zip"'
-        return response
+        from accounts.credential_client.artifacts import artifact_url
+        return HttpResponseRedirect(artifact_url('jms-pam-python.zip'))
 
 
 class PAMClientSourceDownloadAPI(APIView):
@@ -296,8 +277,9 @@ class PAMClientSourceDownloadAPI(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, language, *args, **kwargs):
-        from accounts.credential_client.source import source_archive
-        response = HttpResponse(source_archive(language), content_type='application/gzip')
-        response['Content-Disposition'] = f'attachment; filename="jms-pam-{language}-source.tar.gz"'
-        response['Cache-Control'] = 'no-cache'
-        return response
+        from accounts.clients.distribution import SOURCE_FILES
+        from accounts.credential_client.artifacts import artifact_url
+        from rest_framework.exceptions import NotFound
+        if language not in SOURCE_FILES:
+            raise NotFound()
+        return HttpResponseRedirect(artifact_url(f'jms-pam-{language}-source.tar.gz'))

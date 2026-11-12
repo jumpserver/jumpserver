@@ -1,11 +1,19 @@
 from django_redis.pool import ConnectionFactory, SentinelConnectionFactory
 
 
-# django-redis caches pools by URL. A separate registry keeps the blocking
-# alias isolated even though it uses the same URL/database as the default cache.
+# django-redis caches pools by URL. Separate registries isolate long-lived
+# subscriptions and blocking locks even when they share the cache database.
 class BlockingConnectionFactory(ConnectionFactory):
     _pools = {}
 
 
 class BlockingSentinelConnectionFactory(SentinelConnectionFactory):
+    _pools = {}
+
+
+class PubSubConnectionFactory(ConnectionFactory):
+    _pools = {}
+
+
+class PubSubSentinelConnectionFactory(SentinelConnectionFactory):
     _pools = {}

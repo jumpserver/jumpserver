@@ -1,6 +1,7 @@
 from django.test import SimpleTestCase
 from django.utils.translation import gettext, override
 
+from orgs.models import Organization
 from ops.models import CeleryTask
 from ops.celery import app
 from tickets.models import Workflow, WorkflowVersion, WorkflowNode
@@ -12,6 +13,7 @@ from tickets.workflow.errors import WorkflowConfigurationError, WorkflowConflict
 class TicketTranslationTests(SimpleTestCase):
     def test_generated_workflow_name_is_localized_without_changing_its_identity(self):
         workflow = Workflow(name='Apply for asset', type='apply_asset', created_by='System')
+        workflow.org = Organization.root()
         with override('zh'):
             self.assertEqual(workflow.display_name, '申请资产')
             self.assertEqual(str(workflow), '申请资产')
@@ -27,6 +29,12 @@ class TicketTranslationTests(SimpleTestCase):
         with override('zh'):
             self.assertEqual(workflow.display_name, 'Apply for asset')
             workflow.created_by = 'System'
+            workflow.name = 'Operations approval'
+            self.assertEqual(workflow.display_name, 'Operations approval')
+            for name in ['ACL apply_asset 1234', 'ACL combined 1234']:
+                workflow.name = name
+                self.assertEqual(workflow.display_name, name)
+            workflow.is_system = True
             workflow.name = 'Operations approval'
             self.assertEqual(workflow.display_name, 'Operations approval')
 
@@ -49,6 +57,22 @@ class TicketTranslationTests(SimpleTestCase):
             version.number = 1
             workflow.created_by = 'Administrator'
             self.assertEqual(workflow.node_display_name(node), 'Approval 2')
+
+    def test_acl_review_label_preserves_custom_node_names(self):
+        for kind in ['login_confirm', 'login_asset_confirm', 'command_confirm']:
+            workflow = Workflow(name=f'ACL {kind} 1234', type=kind, is_system=True)
+            version = WorkflowVersion(workflow=workflow, number=1)
+            node = WorkflowNode(version=version, key='review', type='approval', name='Review')
+            for language, expected in [('zh', '审批'), ('en', 'Approval')]:
+                with self.subTest(kind=kind, language=language), override(language):
+                    self.assertEqual(workflow.node_display_name(node), expected)
+                    self.assertEqual(node.name, 'Review')
+            with override('zh'):
+                node.name = 'Operations review'
+                self.assertEqual(workflow.node_display_name(node), 'Operations review')
+                node.name = 'Review'
+                workflow.is_system = False
+                self.assertEqual(workflow.node_display_name(node), 'Review')
 
     def test_validation_errors_follow_the_request_language(self):
         for language, expected in [('zh', '审批流程必须包含节点和连线。'),

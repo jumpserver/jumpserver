@@ -12,3 +12,17 @@ apps/xpack/.git
 .venv/
 .env
 apps/accounts/clients/.git
+.test/
+config.yml
+config.yaml
+apps/static/pam/
+apps/accounts/clients/**/node_modules/
+apps/accounts/clients/**/target/
+apps/accounts/clients/**/build/
+apps/accounts/clients/**/dist/
+apps/accounts/clients/**/*.egg-info/
+apps/accounts/clients/**/__pycache__/
+apps/accounts/clients/**/jms_pam_config.py
+apps/accounts/clients/**/jms_pam_config.sh
+apps/accounts/clients/**/agent.json
+apps/accounts/clients/**/bootstrap.json

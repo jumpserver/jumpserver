@@ -2,7 +2,7 @@ from django.db import transaction
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from common.utils import get_logger, get_request_ip
+from common.utils import convert_html_to_text, get_logger, get_request_ip
 from common.utils.timezone import local_now_display
 from common.views.template import custom_render_to_string
 from jumpserver.utils import get_current_request
@@ -12,7 +12,7 @@ from notifications.notifications import SystemMessage, UserMessage
 logger = get_logger(__file__)
 
 CREDENTIAL_TYPE_LABELS = {
-    'passkey': _('Passkey'),
+    'passkey': 'Passkey',
     'ssh_key': _('SSH key'),
     'access_key': _('Access key'),
     'temp_token': _('Temporary password'),
@@ -143,7 +143,7 @@ class CredentialActivityDigestMessage(UserMessage):
         super().__init__(user)
         self.items = items
 
-    def get_html_msg(self):
+    def get_html_msg(self, *, compact_list=False):
         items = [{
             **item,
             'credential_type': str(CREDENTIAL_TYPE_LABELS[item['credential_type']]),
@@ -154,11 +154,19 @@ class CredentialActivityDigestMessage(UserMessage):
             'date_created': _display_time(item.get('date_created')),
             'date_last_used': _display_time(item.get('date_last_used')),
         } for item in self.items]
-        context = {'name': self.user.name, 'items': items}
+        context = {'name': self.user.name, 'items': items, 'compact_list': compact_list}
         return {
             'subject': str(self.subject),
             'message': custom_render_to_string(self.template_name, context),
         }
+
+    def get_markdown_msg(self):
+        return self.html_to_markdown(self.get_html_msg(compact_list=True))
+
+    def get_text_msg(self):
+        msg = self.get_html_msg(compact_list=True)
+        msg['message'] = convert_html_to_text(msg['message'])
+        return msg
 
 
 class DifferentCityLoginMessage(UserMessage):

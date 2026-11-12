@@ -44,6 +44,7 @@ data/*
 test.py
 .history/
 .test/
+/apps/static/pam/
 *.mo
 apps.iml
 *.db

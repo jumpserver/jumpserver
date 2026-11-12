@@ -148,8 +148,9 @@ class WorkflowEngine:
                 added = [user for user in users if user.pk not in existing]
                 if added:
                     instance.ticket.cc_users.add(*added)
-                run.result = {'recipients': [user_snapshot(user) for user in added]}
-                self._event(instance, 'cc.added', node=run, **run.result)
+                run.result = {'recipients': [user_snapshot(user) for user in users]}
+                self._event(instance, 'cc.added', node=run, **run.result,
+                            added_recipients=[user_snapshot(user) for user in added])
             self._complete_node(instance, run)
             if node.type == 'end':
                 self._finish(instance, InstanceState.approved)

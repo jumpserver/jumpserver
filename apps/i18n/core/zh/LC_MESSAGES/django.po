@@ -18634,6 +18634,10 @@ msgstr "域名称"
 msgid "Legacy ticket approval"
 msgstr "历史工单审批"
 
+#: tickets/models/workflow.py:46
+msgid "Combined approval workflow"
+msgstr "组合审批流程"
+
 msgid "Client idle lock (minute)"
 msgstr "空闲锁屏 (分)"
 
@@ -20512,3 +20516,10 @@ msgstr "登录复核不涉及资产，「{node}」节点不能使用资产负责
 #: tickets/serializers/workflow.py tickets/workflow/publication.py
 msgid "Login confirmation workflows can only be configured in the global organization."
 msgstr "登录复核流程仅支持在全局组织中配置。"
+
+msgid "Unable to cancel the login request. Please try again."
+msgstr "撤销登录申请失败，请重试。"
+
+#: authentication/serializers/connection_token.py
+msgid "Account preparation required"
+msgstr "需要准备账号"

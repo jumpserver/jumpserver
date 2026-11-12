@@ -7,7 +7,8 @@ from accounts.const import ApplicationEvent, AuditEvent
 from django.template.loader import render_to_string
 
 from .audit import record
-from .documentation import agent_build_command, sdk_install_commands, sdk_example
+from .documentation import sdk_install_commands, sdk_example
+from .artifacts import agent_download_command, windows_agent_download_command
 from .events import enqueue
 
 
@@ -95,7 +96,7 @@ def materials(application, params, endpoint):
             service['app_check'] = {'path': params['application_check'], 'confirm_on_success': True}
         bootstrap['services'] = [service]
     filename = 'pam-agent.json'
-    preparation = f'{agent_build_command(endpoint)} &&\nsudo install -m 0755 ./pam-agent /usr/local/bin/pam-agent'
+    preparation = f'{agent_download_command(endpoint)} &&\nsudo install -m 0755 ./pam-agent /usr/local/bin/pam-agent'
     installation = (
         f'chmod 0600 {filename} && '
         'sudo /usr/local/bin/pam-agent install '
@@ -106,12 +107,14 @@ def materials(application, params, endpoint):
         short_id = str(application.id).replace('-', '')[:12]
         directory = f'$HOME/.jms-pam-agent/{short_id}'
         foreground_unix = (
+            f'{agent_download_command(endpoint)} &&\n'
             f'# Initialize once\nchmod 0600 {filename}\n'
             f'./pam-agent init-local --bootstrap ./{filename} '
             f'--directory "{directory}"\n'
             f'# Start or restart\n./pam-agent run --local --config "{directory}/agent.json"'
         )
         foreground_windows = (
+            f'{windows_agent_download_command(endpoint)}\n'
             f"$agentDir = Join-Path $HOME '.jms-pam-agent\\{short_id}'\n"
             '# Initialize once\n'
             f".\\pam-agent.exe init-local --bootstrap (Join-Path $PWD '{filename}') "

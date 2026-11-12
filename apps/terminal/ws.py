@@ -7,7 +7,7 @@ from rest_framework.renderers import JSONRenderer
 
 from common.db.utils import safe_db_connection
 from common.utils import get_logger
-from common.utils.connection import Subscription
+from common.websocket import SubscriptionWebsocketMixin
 from terminal.const import TaskNameType
 from terminal.models import Session, Terminal
 from terminal.serializers import TaskSerializer, StatSerializer
@@ -17,8 +17,7 @@ from .signal_handlers import component_event_chan
 logger = get_logger(__name__)
 
 
-class TerminalTaskWebsocket(JsonWebsocketConsumer):
-    sub: Subscription = None
+class TerminalTaskWebsocket(SubscriptionWebsocketMixin, JsonWebsocketConsumer):
     terminal: Terminal = None
 
     def connect(self):
@@ -26,7 +25,7 @@ class TerminalTaskWebsocket(JsonWebsocketConsumer):
         if user.is_authenticated and user.terminal:
             self.accept()
             self.terminal = user.terminal
-            self.sub = self.watch_component_event()
+            self.register_subscription(self.watch_component_event())
         else:
             self.close()
 
@@ -74,11 +73,6 @@ class TerminalTaskWebsocket(JsonWebsocketConsumer):
                 ws.send_tasks_msg(payload.get('id'))
 
         return component_event_chan.subscribe(handle_task_msg_recv)
-
-    def disconnect(self, code):
-        if self.sub is None:
-            return
-        self.sub.unsubscribe()
 
 
 class LokiTailWebsocket(JsonWebsocketConsumer, LokiMixin):

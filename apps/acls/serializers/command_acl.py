@@ -47,7 +47,7 @@ class CommandFilterACLSerializer(WorkflowACLSerializerMixin, BaseSerializer, Bul
             'command_groups_amount': 'command_groups',
         }
         amount_fields = list(relation_count_fields)
-        fields = BaseSerializer.Meta.fields + ['command_groups', 'workflow'] + amount_fields
+        fields = BaseSerializer.Meta.fields + ['command_groups', 'workflow', 'workflow_name'] + amount_fields
         action_choices_exclude = [
             ActionChoices.notice,
             ActionChoices.face_verify,

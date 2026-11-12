@@ -18,7 +18,7 @@ class LoginACLSerializer(WorkflowACLSerializerMixin, BaseUserACLSerializer, Comm
 
     class Meta(BaseUserACLSerializer.Meta):
         model = LoginACL
-        fields = list((set(BaseUserACLSerializer.Meta.fields) | {'rules', 'workflow'}))
+        fields = list((set(BaseUserACLSerializer.Meta.fields) | {'rules', 'workflow', 'workflow_name'}))
         action_choices_exclude = [
             ActionChoices.warning,
             ActionChoices.notify_and_warn,

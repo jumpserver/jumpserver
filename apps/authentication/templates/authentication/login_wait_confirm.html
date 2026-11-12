@@ -60,7 +60,7 @@
                 <div class="alert alert-success info-messages">
                     {{ msg }}
                 </div>
-                <div class="alert alert-danger error-messages" style="display: none"></div>
+                <div class="alert alert-danger error-messages" role="alert" style="display: none"></div>
                 <div class="progress progress-bar-default progress-striped active">
                     <div aria-valuemax="3600" aria-valuemin="0" aria-valuenow="43" role="progressbar"
                          class="progress-bar">
@@ -104,6 +104,7 @@
     var progressBarRef = $(".progress-bar");
     var interval, checkInterval;
     var authCompleted = false;
+    var cancelling = false;
     var url = "{% url 'api-auth:login-confirm-ticket-status' %}";
     var successUrl = "{% url 'authentication:login-guard' %}";
 
@@ -167,10 +168,12 @@
         progressBarRef.attr('aria-valuenow', offset);
     }
 
-    function cancelTicket() {
+    function cancelTicket(success, error) {
         requestApi({
             url: url,
             method: "DELETE",
+            success: success,
+            error: error,
             flash_message: false
         })
     }
@@ -198,14 +201,26 @@
         initClipboard();
         setCloseConfirm();
     }).on('click', '.btn-refresh', function () {
+        if (cancelling) return;
         cancelCloseConfirm();
         window.location.reload();
     }).on('click', '.btn-return', function () {
-        cancelTicket();
-        cancelCloseConfirm();
+        if (cancelling) return;
+        cancelling = true;
+        // Ignore in-flight polls after the user decides to leave.
+        authCompleted = true;
         clearInterval(interval);
         clearInterval(checkInterval);
-        window.location = "{% url 'authentication:logout' %}"
+        $(".btn-return, .btn-refresh").addClass('disabled').attr('aria-disabled', 'true');
+        errorMsgRef.hide();
+        cancelTicket(function () {
+            cancelCloseConfirm();
+            window.location = "{% url 'authentication:logout' %}";
+        }, function () {
+            cancelling = false;
+            $(".btn-return, .btn-refresh").removeClass('disabled').removeAttr('aria-disabled');
+            errorMsgRef.text("{% trans 'Unable to cancel the login request. Please try again.' %}").show();
+        });
     })
 
 </script>
