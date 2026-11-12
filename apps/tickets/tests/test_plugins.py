@@ -990,6 +990,29 @@ class TicketPluginTests(TestCase):
             TicketSecretAccess.objects.filter(pk=grant.pk).update(expires_at=timezone.now() - timedelta(seconds=1))
             self.assertEqual(reveal(self.applicant).status_code, 403)
 
+    def test_account_workflow_options_localize_defaults_and_preserve_custom_names(self):
+        account = self.create_account()
+        workflow = self.workflow('view_secret')
+        request = APIRequestFactory().get('/')
+        force_authenticate(request, self.applicant)
+        for creator, name, chinese_name in [
+            ('System', 'View account password', '查看账号密码'),
+            ('Legacy workflow import', 'View account password', '查看账号密码'),
+            ('Administrator', 'View account password', 'View account password'),
+            ('System', 'Custom password approval', 'Custom password approval'),
+        ]:
+            workflow.name, workflow.created_by = name, creator
+            workflow.save(update_fields=['name', 'created_by'])
+            for language, expected in [('zh', chinese_name), ('en', name)]:
+                with self.subTest(creator=creator, name=name, language=language), override(language), \
+                        patch.object(User, 'has_perm', return_value=True):
+                    response = AccountTicketSecretRequestAPI.as_view()(request, pk=account.pk)
+                    self.assertEqual(response.status_code, 200, response.data)
+                    names = {item['id']: item['name'] for item in response.data['workflows']}
+                    self.assertEqual(names[str(workflow.pk)], expected)
+            workflow.refresh_from_db()
+            self.assertEqual(workflow.name, name)
+
     def test_account_operation_starts_exact_password_ticket(self):
         account = self.create_account()
         workflow = self.workflow('view_secret')
