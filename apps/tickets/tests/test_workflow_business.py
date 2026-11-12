@@ -166,6 +166,71 @@ class WorkflowBusinessTests(TestCase):
         self.assertEqual(ticket.state, 'approved')
         self.assertFalse(ticket.ticket_steps.exists())
 
+    def test_custom_global_login_workflow_supports_users_and_system_roles(self):
+        from rbac.builtin import BuiltinRole
+        from rbac.models import Role, RoleBinding
+
+        role, _ = Role.objects.get_or_create(id=BuiltinRole.system_admin.id,
+                                             defaults={'name': 'SystemAdmin', 'scope': 'system'})
+        RoleBinding.objects_raw.create(user=self.alice, role=role, scope='system')
+        for approvers in ({'type': 'user', 'value': [str(self.alice.pk)]},
+                          {'type': 'role', 'value': [str(role.pk)]}):
+            with self.subTest(approvers=approvers), tmp_to_root_org():
+                workflow = Workflow.objects.create(name=str(uuid4()), type='login_confirm',
+                                                    org_id=Organization.ROOT_ID, enabled=True)
+                publish_workflow(workflow, approval_definition([], approvers=approvers))
+                acl = LoginACL.objects.create(name=str(uuid4()), action='review', workflow=workflow)
+                ticket = acl.create_confirm_ticket(None, self.applicant)
+                instance = WorkflowInstance.objects.get(ticket=ticket)
+                self.assertEqual(instance.state, 'running')
+                self.engine.approve(self.task(instance), self.alice)
+                ticket.refresh_from_db()
+                self.assertEqual(ticket.state, 'approved')
+
+    def test_invalid_login_workflow_shows_error_and_clears_login_state(self):
+        import time
+        from django.conf import settings
+        from django.contrib.auth import SESSION_KEY
+        from django.urls import reverse
+        from authentication.views.login import UserLoginGuardView
+
+        with tmp_to_root_org():
+            # Represent an invalid login workflow published before resolver validation.
+            workflow = Workflow.objects.create(name='Existing invalid login', type='general',
+                                                org_id=Organization.ROOT_ID, enabled=True)
+            publish_workflow(workflow, approval_definition([], approvers={'type': 'org_admin'}))
+            workflow.type = 'login_confirm'
+            workflow.save(update_fields=['type'])
+        acl = LoginACL.objects.create(name='Invalid login approval', action='review', workflow=workflow,
+                                      users={'type': 'ids', 'ids': [str(self.applicant.pk)]})
+        for authenticated in (False, True):
+            with self.subTest(authenticated=authenticated):
+                if authenticated:
+                    self.client.force_login(self.applicant)
+                session = self.client.session
+                session.update({'auth_password': 1, 'user_id': str(self.applicant.pk),
+                                'auth_password_expired_at': time.time() + 600,
+                                'auth_backend': settings.AUTH_BACKEND_MODEL, 'auth_confirm_required': '1',
+                                'auth_acl_id': str(acl.pk)})
+                session.save()
+                with patch.object(UserLoginGuardView, 'send_auth_signal') as signal:
+                    response = self.client.get(reverse('authentication:login-guard'))
+                self.assertEqual(response.status_code, 302)
+                self.assertTrue(response.url.startswith(reverse('common:flash-message') + '?code='))
+                self.assertFalse(signal.call_args.kwargs['success'])
+                self.assertEqual(signal.call_args.kwargs['username'], self.applicant.username)
+                page = self.client.get(response.url)
+                self.assertEqual(page.status_code, 200)
+                self.assertTrue(page.context['error'])
+                self.assertFalse(page.context['auto_redirect'])
+                self.assertEqual(page.context['redirect_url'], reverse('authentication:login') + '?admin=1')
+                for key in (SESSION_KEY, 'auth_password', 'auth_confirm_required', 'auth_ticket_id', 'auth_acl_id'):
+                    self.assertNotIn(key, self.client.session)
+                self.assertRedirects(self.client.get(reverse('authentication:login-guard')),
+                                     reverse('authentication:login'), fetch_redirect_response=False)
+                with tmp_to_root_org():
+                    self.assertFalse(Ticket.objects.filter(workflow=workflow).exists())
+
     def test_login_poll_after_guard_preserves_authenticated_session(self):
         import time
         from django.conf import settings

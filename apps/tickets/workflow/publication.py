@@ -13,6 +13,13 @@ from .errors import WorkflowConfigurationError, WorkflowConflict
 def publish_workflow(workflow, definition, *, actor=None, expected_version=None):
     definition = validate_definition(definition)
     workflow = Workflow.objects.select_for_update().get(pk=workflow.pk)
+    if workflow.type == 'login_confirm':
+        for node in definition['nodes']:
+            if node['type'] == 'approval' and node['config']['approvers']['type'] == 'org_admin':
+                raise WorkflowConfigurationError(gettext(
+                    'Login confirmation cannot use organization administrators in node "{node}". '
+                    'Select specific users or a system role.'
+                ).format(node=node['name'] or node['id']))
     cc_user_ids = {user_id for node in definition['nodes'] if node['type'] == 'cc'
                    for user_id in node['config']['users']}
     if cc_user_ids:
