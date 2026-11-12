@@ -12,6 +12,8 @@ from .publication import publish_workflow
 
 @transaction.atomic
 def create_default_workflow(org_id, plugin):
+    if plugin.type == 'login_confirm':
+        org_id = Organization.ROOT_ID
     # Existing drafts and disabled definitions are deliberate administrator choices.
     scopes = [str(org_id), Organization.ROOT_ID]
     if (Workflow.objects.filter(org_id__in=scopes, type=plugin.type, is_system=False).exists()

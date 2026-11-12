@@ -2,6 +2,7 @@ from unittest.mock import patch
 
 from django.db import transaction
 from django.test import TestCase
+from django.utils.translation import override
 from rest_framework.test import force_authenticate
 
 from orgs.models import Organization
@@ -10,6 +11,7 @@ from tickets.api.workflow import WorkflowViewSet
 from tickets.models import Ticket, Workflow
 from tickets.tests import test_workflow as fixtures
 from tickets.workflow.publication import publish_workflow
+from tickets.workflow.errors import WorkflowConfigurationError
 from users.models import User
 
 
@@ -141,3 +143,57 @@ class WorkflowOrganizationTests(TestCase):
             inherited.refresh_from_db()
         self.assertFalse(inherited.enabled)
         self.assertEqual(inherited.org_id, Organization.ROOT_ID)
+
+    def test_login_workflow_creation_and_type_changes_require_global_organization(self):
+        data = {'name': 'Login approval', 'type': 'login_confirm'}
+        response = self.request('create', data=data, method='post')
+        self.assertEqual(response.status_code, 400, response.data)
+        self.assertFalse(Workflow.objects.filter(type='login_confirm').exists())
+        draft = Workflow.objects.create(name='Local draft', type='apply_asset')
+        response = self.request('partial_update', draft, {'type': 'login_confirm'}, method='patch')
+        self.assertEqual(response.status_code, 400, response.data)
+        draft.refresh_from_db()
+        self.assertEqual(draft.type, 'apply_asset')
+        self.assertEqual(self.request('create', data={**data, 'type': 'login_asset_confirm'},
+                                      method='post').status_code, 201)
+        with tmp_to_root_org():
+            response = self.request('create', data=data, method='post')
+            self.assertEqual(response.status_code, 201, response.data)
+            workflow = Workflow.objects.get(pk=response.data['id'])
+            self.assertEqual(workflow.org_id, Organization.ROOT_ID)
+            response = self.request('publish', workflow, {
+                'expected_version': 0, 'definition': fixtures.approval_definition([self.alice]),
+            }, method='post')
+            self.assertEqual(response.status_code, 201, response.data)
+            response = self.request('partial_update', workflow, {'enabled': True}, method='patch')
+            self.assertEqual(response.status_code, 200, response.data)
+            self.assertTrue(response.data['enabled'])
+        self.assertEqual(self.request('retrieve', workflow).status_code, 200)
+        response = self.request('partial_update', workflow, {'comment': 'Local override'}, method='patch')
+        self.assertEqual(response.status_code, 400, response.data)
+        self.assertFalse(Workflow.objects.filter(type='login_confirm').exists())
+
+    def test_historical_local_login_workflow_is_preserved_but_cannot_be_republished(self):
+        workflow = Workflow.objects.create(name='Historical login approval', type='general', enabled=True)
+        definition = fixtures.approval_definition([self.alice])
+        publish_workflow(workflow, definition)
+        workflow.refresh_from_db()
+        # Represent a local login definition created before the scope restriction.
+        workflow.type = 'login_confirm'
+        workflow.save(update_fields=['type'])
+        original_version = workflow.active_version_id
+        self.assertEqual(self.request('retrieve', workflow).status_code, 200)
+        self.assertEqual(self.request('versions', workflow).data['count'], 1)
+        response = self.request('publish', workflow, {'expected_version': 1, 'definition': definition}, method='post')
+        self.assertEqual(response.status_code, 400, response.data)
+        response = self.request('partial_update', workflow, {'enabled': True}, method='patch')
+        self.assertEqual(response.status_code, 400, response.data)
+        with tmp_to_root_org(), override('en'), self.assertRaisesMessage(
+            WorkflowConfigurationError, 'global organization',
+        ):
+            publish_workflow(workflow, definition)
+        workflow.refresh_from_db()
+        self.assertEqual(workflow.org_id, self.org.pk)
+        self.assertEqual(workflow.active_version_id, original_version)
+        self.assertTrue(workflow.enabled)
+        self.assertEqual(workflow.versions.count(), 1)
