@@ -122,7 +122,8 @@ def deliver_event(event_id):
                 # node immediately before the end must not send twice.
                 if ticket.status == 'closed':
                     return
-                ids = [recipient['id'] for recipient in event.data.get('recipients', [])]
+                recipients = event.data.get('added_recipients', event.data.get('recipients', []))
+                ids = [recipient['id'] for recipient in recipients]
                 users = available_users(ticket.org_id).filter(pk__in=ids).exclude(pk=ticket.applicant_id)
                 for user in users:
                     TicketUpdatedToCcUserMessage(user, ticket).publish_async()

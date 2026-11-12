@@ -645,7 +645,8 @@ class WorkflowTests(TestCase):
         self.assertEqual(self.engine.approve(self.task(instance, self.alice), self.alice).state, 'approved')
         self.assertFalse(instance.ticket.cc_users.exists())
         self.assertEqual(list(instance.events.filter(type='cc.added').values_list('data', flat=True)),
-                         [{'recipients': []}, {'recipients': []}])
+                         [{'recipients': [], 'added_recipients': []},
+                          {'recipients': [], 'added_recipients': []}])
 
     def test_configured_cc_recipients_must_still_be_active_organization_members(self):
         definition = approval_definition([self.alice])
