@@ -72,7 +72,7 @@ class AccountTicketSecretRequestAPI(APIView):
                 is_system=False, enabled=True, active_version__published_at__isnull=False,
             ).order_by('name')
             return Response({'org_id': org_id, 'workflows': [
-                {'id': str(flow.pk), 'name': flow.name} for flow in workflows
+                {'id': str(flow.pk), 'name': str(flow.display_name)} for flow in workflows
             ]})
 
     @transaction.atomic
