@@ -44,8 +44,13 @@ class WorkflowSerializer(serializers.ModelSerializer):
         if attrs.get('enabled') and (not self.instance or not self.instance.active_version_id):
             raise serializers.ValidationError({'enabled': gettext('Publish a version before enabling the workflow.')})
         org_id = self.instance.org_id if self.instance and current_org.is_root() else current_org.id
+        ticket_type = attrs.get('type', getattr(self.instance, 'type', ''))
+        if ticket_type == 'login_confirm' and org_id != Organization.ROOT_ID:
+            raise serializers.ValidationError({'type': gettext(
+                'Login confirmation workflows can only be configured in the global organization.'
+            )})
         qs = Workflow.objects.filter(org_id=org_id, name=attrs.get('name', getattr(self.instance, 'name', '')),
-                                     type=attrs.get('type', getattr(self.instance, 'type', '')))
+                                     type=ticket_type)
         if self.instance:
             qs = qs.exclude(pk=self.instance.pk)
         if qs.exists():

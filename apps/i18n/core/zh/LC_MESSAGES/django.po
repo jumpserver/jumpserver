@@ -20482,3 +20482,7 @@ msgstr "登录复核的「{node}」节点不能使用组织管理员，请选择
 #, python-brace-format
 msgid "Login confirmation has no assets and cannot use asset owners in node \"{node}\". Select another approver source."
 msgstr "登录复核不涉及资产，「{node}」节点不能使用资产负责人，请选择其他审批人来源。"
+
+#: tickets/serializers/workflow.py tickets/workflow/publication.py
+msgid "Login confirmation workflows can only be configured in the global organization."
+msgstr "登录复核流程仅支持在全局组织中配置。"

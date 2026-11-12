@@ -689,8 +689,9 @@ class WorkflowTests(TestCase):
 
     def test_login_publication_rejects_asset_owners_without_restricting_asset_flows(self):
         definition = approval_definition([], approvers={'type': 'asset_owner'})
-        workflow = Workflow.objects.create(name='Login with asset owner', type='login_confirm')
-        with override('en'), patch.object(User, 'has_perms', return_value=True):
+        with tmp_to_root_org(), override('en'), patch.object(User, 'has_perms', return_value=True):
+            workflow = Workflow.objects.create(name='Login with asset owner', type='login_confirm',
+                                               org_id=Organization.ROOT_ID)
             response = self.request(WorkflowViewSet, 'publish', self.alice, workflow.pk, {
                 'expected_version': 0, 'definition': definition,
             })

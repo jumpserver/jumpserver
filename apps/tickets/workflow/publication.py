@@ -3,6 +3,7 @@ from django.db import transaction
 from django.db.models import Max
 from django.utils import timezone
 
+from orgs.models import Organization
 from tickets.models import Workflow, WorkflowVersion, WorkflowNode, WorkflowEdge
 from .approvers import available_users
 from .definition import validate_definition
@@ -14,6 +15,10 @@ def publish_workflow(workflow, definition, *, actor=None, expected_version=None)
     definition = validate_definition(definition)
     workflow = Workflow.objects.select_for_update().get(pk=workflow.pk)
     if workflow.type == 'login_confirm':
+        if workflow.org_id != Organization.ROOT_ID:
+            raise WorkflowConfigurationError(gettext(
+                'Login confirmation workflows can only be configured in the global organization.'
+            ))
         for node in definition['nodes']:
             if node['type'] == 'approval' and node['config']['approvers']['type'] == 'org_admin':
                 raise WorkflowConfigurationError(gettext(
