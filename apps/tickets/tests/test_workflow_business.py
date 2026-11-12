@@ -283,6 +283,84 @@ class WorkflowBusinessTests(TestCase):
         self.assertEqual(self.client.get(url).json()['error'], 'login_confirm_error')
         self.assertNotIn(SESSION_KEY, self.client.session)
 
+    def test_login_return_cancels_session_ticket_in_its_own_organization(self):
+        from django.urls import reverse
+
+        acl = LoginACL.objects.create(name='Login cancellation', action='review')
+        acl.reviewers.add(self.alice)
+        url = reverse('api-auth:login-confirm-ticket-status')
+        for authenticated in (False, True):
+            for org_id in (None, self.org.pk, Organization.ROOT_ID):
+                with self.subTest(authenticated=authenticated, org_id=org_id):
+                    self.client.logout()
+                    if authenticated:
+                        self.client.force_login(self.applicant)
+                    ticket = acl.create_confirm_ticket(None, self.applicant)
+                    session = self.client.session
+                    session.update({'auth_ticket_id': str(ticket.pk), 'auth_confirm_required': '1'})
+                    session.save()
+                    headers = {'HTTP_X_JMS_ORG': org_id} if org_id else {}
+                    response = self.client.delete(url, **headers)
+                    self.assertEqual(response.status_code, 200, response.content)
+                    self.assertNotIn('auth_ticket_id', self.client.session)
+                    with tmp_to_root_org():
+                        ticket.refresh_from_db()
+                        instance = WorkflowInstance.objects.get(ticket=ticket)
+                        self.assertEqual((ticket.state, ticket.status), ('closed', 'closed'))
+                        self.assertEqual(instance.state, 'cancelled')
+                        self.assertFalse(instance.node_instances.filter(tasks__state='pending').exists())
+                        self.assertEqual(instance.events.filter(type='workflow.cancelled').count(), 1)
+                    self.assertEqual(self.client.delete(url, **headers).status_code, 200)
+
+    def test_login_return_preserves_finished_approval_results(self):
+        from django.urls import reverse
+
+        acl = LoginACL.objects.create(name='Finished login review', action='review')
+        acl.reviewers.add(self.alice)
+        for action in ('approve', 'reject', 'cancel'):
+            with self.subTest(action=action):
+                ticket = acl.create_confirm_ticket(None, self.applicant)
+                with tmp_to_root_org():
+                    instance = WorkflowInstance.objects.get(ticket=ticket)
+                    if action == 'cancel':
+                        self.engine.cancel(instance, self.applicant)
+                    else:
+                        getattr(self.engine, action)(self.task(instance), self.alice)
+                    ticket.refresh_from_db()
+                    instance.refresh_from_db()
+                    original = (ticket.state, instance.state, instance.events.count())
+                session = self.client.session
+                session['auth_ticket_id'] = str(ticket.pk)
+                session.save()
+                response = self.client.delete(reverse('api-auth:login-confirm-ticket-status'),
+                                              HTTP_X_JMS_ORG=Organization.DEFAULT_ID)
+                self.assertEqual(response.status_code, 200, response.content)
+                self.assertNotIn('auth_ticket_id', self.client.session)
+                with tmp_to_root_org():
+                    ticket.refresh_from_db()
+                    instance.refresh_from_db()
+                    self.assertEqual((ticket.state, instance.state, instance.events.count()), original)
+
+    def test_failed_login_cancellation_preserves_session_for_retry(self):
+        from django.urls import reverse
+
+        acl = LoginACL.objects.create(name='Retry login cancellation', action='review')
+        acl.reviewers.add(self.alice)
+        ticket = acl.create_confirm_ticket(None, self.applicant)
+        session = self.client.session
+        session['auth_ticket_id'] = str(ticket.pk)
+        session.save()
+        url = reverse('api-auth:login-confirm-ticket-status')
+        for failure in (WorkflowConfigurationError('Cancellation failed'), WorkflowConflict()):
+            with self.subTest(failure=type(failure).__name__), patch.object(Ticket, 'close', side_effect=failure):
+                response = self.client.delete(url)
+            self.assertEqual(response.status_code, failure.status_code)
+            self.assertEqual(self.client.session['auth_ticket_id'], str(ticket.pk))
+        self.assertEqual(self.client.delete(url).status_code, 200)
+        self.assertNotIn('auth_ticket_id', self.client.session)
+        with tmp_to_root_org():
+            self.assertEqual(WorkflowInstance.objects.get(ticket=ticket).state, 'cancelled')
+
     def test_completed_asset_review_displays_actual_reviewers_from_snapshot(self):
         from authentication.services.connection_acl import acl_state
         from authentication.services.connection_acl_batch import create_batch_reviews
