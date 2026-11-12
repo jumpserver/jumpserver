@@ -98,7 +98,7 @@ def check_adjustment(instance, task, user):
             or str(user.pk) in excluded_approver_ids(task.node_instance.node.config, instance.context, instance.applicant_id)):
         raise PermissionDenied()
     with tmp_to_org(instance.org_id):
-        if not {'assets.view_asset', 'accounts.view_account'}.issubset(user.get_all_permissions()):
+        if not {'assets.view_asset', 'accounts.view_account'}.issubset(user.perms):
             raise PermissionDenied(gettext('Adjusting resources requires asset and account query permissions in this organization.'))
     return plugin
 
@@ -194,7 +194,7 @@ def resource_options(instance, task, user, params):
             return list(assets.filter(Q(name__icontains=search) | Q(address__icontains=search))
                         .order_by('name', 'id').values('id', 'name', 'address')[:100])
         if resource == 'node' and plugin.type == 'apply_asset':
-            if 'assets.view_node' not in user.get_all_permissions():
+            if 'assets.view_node' not in user.perms:
                 raise PermissionDenied()
             return list(Node.objects.filter(org_id=instance.org_id, full_value__icontains=search)
                         .order_by('full_value').values('id', 'full_value')[:100])
