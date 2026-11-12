@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.utils.translation import gettext_lazy as _
 from orgs.models import Organization
 from orgs.utils import current_org, tmp_to_root_org
 from tickets.models import Workflow
@@ -6,6 +7,9 @@ from tickets.models import Workflow
 
 class WorkflowACLSerializerMixin(serializers.Serializer):
     workflow = serializers.UUIDField(required=False, allow_null=True)
+    workflow_name = serializers.CharField(
+        source='workflow.display_name', read_only=True, default='', label=_('Approval workflow'),
+    )
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
