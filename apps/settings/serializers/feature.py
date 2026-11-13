@@ -239,6 +239,15 @@ class SSHCAOpenBaoSerializer(serializers.Serializer):
         validators=[validate_ssh_ca_source_addresses]
     )
 
+    def validate(self, attrs):
+        address_field = 'SSH_CA_OPENBAO_ADDR'
+        current_address = settings.SSH_CA_OPENBAO_ADDR or settings.VAULT_OPENBAO_ADDR
+        new_address = attrs.get(address_field, settings.SSH_CA_OPENBAO_ADDR)
+        # Pinning the inherited Vault address does not change the destination.
+        if (new_address or settings.VAULT_OPENBAO_ADDR) != current_address:
+            validate_secret_destination(attrs, 'SSH_CA_OPENBAO_TOKEN', (address_field,))
+        return attrs
+
 
 class HashicorpKVSerializer(BaseVaultSettingSerializer, serializers.Serializer):
     PREFIX_TITLE = _('HCP Vault')
