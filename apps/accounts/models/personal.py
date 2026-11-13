@@ -31,6 +31,8 @@ class PersonalAssetCredential(VaultModelMixin, AbsConnectivity, JMSOrgBaseModel)
     )
     is_active = models.BooleanField(default=True, verbose_name=_('Active'))
     version = models.PositiveIntegerField(default=1, verbose_name=_('Version'))
+    # Connection tokens bind this version; metadata edits only advance version.
+    authentication_version = models.PositiveIntegerField(default=1, editable=False)
 
     class Meta:
         verbose_name = _('Personal asset credential')

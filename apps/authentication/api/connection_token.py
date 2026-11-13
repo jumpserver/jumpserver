@@ -852,7 +852,7 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
                 data['input_username'] = credential.username
                 data['input_secret'] = ''
                 data['input_secret_type'] = credential.secret_type
-                data['personal_credential_version'] = credential.version
+                data['personal_credential_version'] = credential.authentication_version
                 self.personal_credential_audit_context.update({
                     'username': credential.username,
                     'secret_type': credential.secret_type,
@@ -896,7 +896,7 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
                 permission_context=personal_permission_context,
             )
             data['personal_credential_id'] = credential.id
-            data['personal_credential_version'] = credential.version
+            data['personal_credential_version'] = credential.authentication_version
             data['input_username'] = credential.username
             data['input_secret'] = ''
             data['input_secret_type'] = credential.secret_type
