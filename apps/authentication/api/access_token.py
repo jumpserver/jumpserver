@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 from django.db import transaction
 from django.utils.decorators import method_decorator
+from django.utils import timezone
 from django.utils.translation import gettext as _
 
 from rest_framework.decorators import action
@@ -32,7 +33,10 @@ class AccessTokenViewSet(JMSModelViewSet):
 
     def get_queryset(self):
         """只返回当前用户的 access token，按创建时间倒序"""
-        return AccessToken.objects.filter(user=self.request.user).order_by('-created')
+        queryset = AccessToken.objects.filter(user=self.request.user)
+        if self.action == 'list' and self.request.query_params.get('valid_only') == 'true':
+            queryset = queryset.filter(expires__gt=timezone.now())
+        return queryset.order_by('-created')
 
     @action(methods=['DELETE'], detail=True, url_path='revoke')
     def revoke(self, request, *args, **kwargs):

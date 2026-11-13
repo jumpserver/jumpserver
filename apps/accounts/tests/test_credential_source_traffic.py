@@ -24,8 +24,8 @@ class CredentialSourceTrafficTests(CredentialTestCase):
         super().setUp()
         self.manager = CredentialRotationManager(self.credential.id)
         self.started = timezone.now()
-        self.credential.source_no_traffic_days = 1
-        self.credential.save(update_fields=['source_no_traffic_days'])
+        self.credential.source_no_traffic_minutes = 1440
+        self.credential.save(update_fields=['source_no_traffic_minutes'])
 
     def fetch_account(self, account):
         view = CredentialClientViewSet.as_view({'get': 'credential'})
@@ -40,18 +40,59 @@ class CredentialSourceTrafficTests(CredentialTestCase):
         return self.credential.rotation_records.first()
 
     def test_source_observation_duration_validation(self):
-        self.assertEqual(self.credential._meta.get_field('source_no_traffic_days').default, 7)
-        for value in (0, -1, 3651, 1.5):
+        self.assertEqual(self.credential._meta.get_field('source_no_traffic_minutes').default, 10080)
+        for value in (0, -1, 1.5, 5256001):
             serializer = ApplicationCredentialSerializer(
-                self.credential, data={'source_no_traffic_days': value}, partial=True,
+                self.credential, data={'source_no_traffic_minutes': value}, partial=True,
             )
             self.assertFalse(serializer.is_valid(), value)
+        for value in (1, 1440, 5256000):
+            serializer = ApplicationCredentialSerializer(
+                self.credential, data={'source_no_traffic_minutes': value}, partial=True,
+            )
+            self.assertTrue(serializer.is_valid(), serializer.errors)
+            serializer.save()
+            self.credential.refresh_from_db()
+            self.assertEqual(self.credential.source_no_traffic_minutes, value)
+            self.assertEqual(serializer.data['source_no_traffic_minutes'], value)
+
+    def test_legacy_api_duration_is_converted_from_days(self):
         serializer = ApplicationCredentialSerializer(
-            self.credential, data={'source_no_traffic_days': 14}, partial=True,
+            self.credential, data={'source_no_traffic_days': 3}, partial=True,
         )
         self.assertTrue(serializer.is_valid(), serializer.errors)
-        self.assertEqual(serializer.save().source_no_traffic_days, 14)
-        self.assertEqual(serializer.data['source_no_traffic_days'], 14)
+        self.assertEqual(serializer.save().source_no_traffic_minutes, 4320)
+        self.assertEqual(serializer.data['source_no_traffic_days'], 3)
+
+    def test_one_minute_source_observation_restarts_after_fetch(self):
+        self.credential.source_no_traffic_minutes = 1
+        self.credential.save(update_fields=['source_no_traffic_minutes'])
+        rotation = self.start_switch()
+        self.assertEqual(rotation.participant_snapshot['source_traffic']['no_traffic_minutes'], 1)
+        access_at = self.started + timedelta(seconds=30)
+        with patch('accounts.credential_rotation.source_traffic.timezone.now', return_value=access_at):
+            self.assertEqual(self.fetch_account(self.primary).status_code, 200)
+        ready_at = access_at + timedelta(minutes=1)
+        with patch('accounts.credential_rotation.source_traffic.timezone.now',
+                   return_value=ready_at - timedelta(microseconds=1)):
+            _, blockers = self.manager.check_usage()
+        self.assertEqual(blockers[0]['source_traffic']['eligible_at'], ready_at.isoformat())
+        with patch('accounts.credential_rotation.source_traffic.timezone.now', return_value=ready_at):
+            self.assertEqual(self.manager.check_usage()[1], [])
+
+    def test_legacy_day_snapshots_are_returned_in_minutes(self):
+        rotation = self.start_switch()
+        traffic = rotation.participant_snapshot['source_traffic']
+        event_id, event_traffic = next(iter(traffic['event_observations'].items()))
+        for observation in (traffic, event_traffic):
+            observation.pop('no_traffic_minutes')
+            observation['no_traffic_days'] = 2
+        rotation.save(update_fields=['participant_snapshot'])
+        detail = cycle_detail(self.credential, rotation.id)
+        self.assertEqual(detail['source_traffic']['no_traffic_minutes'], 2880)
+        self.assertEqual(detail['source_traffic']['eligible_at'], (self.started + timedelta(days=2)).isoformat())
+        event = next(event for event in detail['events'] if event['id'] == event_id)
+        self.assertEqual(event['source_traffic']['no_traffic_minutes'], 2880)
 
     def test_switch_has_no_prior_alignment_or_backup_idle_gate(self):
         with patch('accounts.credential_rotation.source_traffic.timezone.now', return_value=self.started):

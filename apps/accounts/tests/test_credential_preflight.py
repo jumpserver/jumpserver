@@ -64,6 +64,20 @@ class CredentialPreflightTests(CredentialTestCase):
         self.assertEqual(self.credential.revision, 2)
         self.assertEqual(self.credential.rotation_records.count(), 1)
 
+    def test_verification_started_with_days_can_publish_after_upgrade(self):
+        self.credential.source_no_traffic_minutes = 1440
+        self.credential.save(update_fields=['source_no_traffic_minutes'])
+        execution = self.start()
+        snapshot = execution.snapshot['pam_precheck']
+        snapshot.pop('source_no_traffic_minutes')
+        snapshot['source_no_traffic_days'] = 1
+        execution.save(update_fields=['snapshot'])
+        with patch.object(AutomationExecution, 'start', autospec=True, side_effect=self.verified):
+            preflight.run(execution.id)
+        self.credential.refresh_from_db()
+        self.assertEqual(self.credential.status, 'waiting_switch')
+        self.assertEqual(self.credential.active_account_id, self.backup.id)
+
     def test_failures_and_timeouts_never_publish(self):
         execution = self.start()
         execution.status = 'failed'
@@ -151,8 +165,8 @@ class CredentialPreflightTests(CredentialTestCase):
     def test_skip_keeps_source_observation_and_post_change_verification(self):
         from accounts.credential_rotation.execution import validate_parameters
         self.credential.verify_before_switch = False
-        self.credential.source_no_traffic_days = 7
-        self.credential.save(update_fields=['verify_before_switch', 'source_no_traffic_days'])
+        self.credential.source_no_traffic_minutes = 7
+        self.credential.save(update_fields=['verify_before_switch', 'source_no_traffic_minutes'])
         self.start()
         credential, blockers = self.manager.check_usage()
         self.assertEqual(credential.status, 'waiting_switch')

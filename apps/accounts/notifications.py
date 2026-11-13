@@ -25,8 +25,8 @@ class CredentialSourceReadyMsg(UserMessage):
             'message': format_html('<p>{}</p>', _(
                 'Credential policy "{name}" has switched to the backup account. '
                 'Required client confirmations are complete, and the original account had no successful '
-                'JumpServer secret fetch for {days} days. The original account secret can now be changed.'
-            ).format(name=self.credential.name, days=self.credential.source_no_traffic_days)),
+                'JumpServer secret fetch for {minutes} minutes. The original account secret can now be changed.'
+            ).format(name=self.credential.name, minutes=self.credential.source_no_traffic_minutes)),
         }
 
 
