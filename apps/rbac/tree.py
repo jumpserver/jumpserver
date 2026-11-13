@@ -10,6 +10,7 @@ from treelib.exceptions import NodeIDAbsentError
 
 from common.tree import TreeNode
 from reports.audit_contract import THEME_PERMISSIONS
+from .const import LEGACY_REPORT_PERMISSION_CODENAMES
 from .models import Permission, ContentType
 
 # 根节点
@@ -74,14 +75,11 @@ extra_nodes_data = [
     {'id': "job_audit", "name": _("Job audit"), "pId": "view_audit"},
     {'id': "report_node", "name": _("Report"), "pId": "view_audit"},
     {'id': 'audit_report_node', 'name': _('Audit reports'), 'pId': 'report_node'},
-    {'id': 'legacy_report_node', 'name': _('Legacy reports'), 'pId': 'report_node'},
-    {'id': 'userloginreport', 'name': _('User login report'), 'pId': 'legacy_report_node'},
-    {'id': 'userchangepasswordreport', 'name': _('User change password report'), 'pId': 'legacy_report_node'},
-    {'id': 'assetstatisticsreport', 'name': _('Asset statistics report'), 'pId': 'legacy_report_node'},
-    {'id': 'assetactivityreport', 'name': _('Asset activity report'), 'pId': 'legacy_report_node'},
-    {'id': 'accountstatisticsreport', 'name': _('Account statistics report'), 'pId': 'legacy_report_node'},
-    {'id': 'accountautomationreport', 'name': _('Account automation report'), 'pId': 'legacy_report_node'},
 ]
+
+# A rename may leave permissions on the old content type when the new one
+# already exists. Both records represent the same RBAC permission.
+model_id_aliases = {'xpack.account': 'xpack.cloudaccount'}
 
 # 将 model 放到其它节点下，而不是本来的 app 中
 special_pid_mapper = {
@@ -165,24 +163,6 @@ special_setting_pid_mapper = {
     'rbac.view_securityreport': 'audit_report_node',
     'rbac.view_inventoryreport': 'audit_report_node',
     'rbac.view_accountreport': 'audit_report_node',
-    "rbac.view_userloginreport": "userloginreport",
-    "rbac.add_userloginreport": "userloginreport",
-    "rbac.delete_userloginreport": "userloginreport",
-    "rbac.view_userchangepasswordreport": "userchangepasswordreport",
-    "rbac.add_userchangepasswordreport": "userchangepasswordreport",
-    "rbac.delete_userchangepasswordreport": "userchangepasswordreport",
-    "rbac.view_assetstatisticsreport": "assetstatisticsreport",
-    "rbac.add_assetstatisticsreport": "assetstatisticsreport",
-    "rbac.delete_assetstatisticsreport": "assetstatisticsreport",
-    "rbac.view_assetactivityreport": "assetactivityreport",
-    "rbac.add_assetactivityreport": "assetactivityreport",
-    "rbac.delete_assetactivityreport": "assetactivityreport",
-    "rbac.view_accountstatisticsreport": "accountstatisticsreport",
-    "rbac.add_accountstatisticsreport": "accountstatisticsreport",
-    "rbac.delete_accountstatisticsreport": "accountstatisticsreport",
-    "rbac.view_accountautomationreport": "accountautomationreport",
-    "rbac.add_accountautomationreport": "accountautomationreport",
-    "rbac.delete_accountautomationreport": "accountautomationreport",
     "settings.change_email": "notifications",
     "settings.change_sms": "notifications",
     "settings.change_systemmsgsubscription": "notifications",
@@ -226,6 +206,7 @@ special_setting_pid_mapper = {
 special_pid_mapper.update(special_setting_pid_mapper)
 
 verbose_name_mapper = {
+    'xpack.cloudaccount': _('Cloud account'),
     'orgs.organization': _("App organizations"),
     'tickets.comment': _("Ticket comment"),
     'tickets.view_ticket': _("Ticket"),
@@ -332,10 +313,13 @@ class CounterTree(Tree):
                 except NodeIDAbsentError:
                     failed.append(node)
             if len(failed) == len(pending):
-                # Only fall back for missing parents or cycles, not deeper groups.
-                for node in failed:
-                    self.create_node(node.name, node.id, '$ROOT$', data=node)
-                return
+                # Reparent the missing ancestor (or break one cycle), keeping
+                # descendants attached and the serialized pId in sync.
+                pending_ids = {node.id for node in failed}
+                node = next((node for node in failed if node.pId not in pending_ids), failed[0])
+                node.pId = self.root
+                self.create_node(node.name, node.id, node.pId, data=node)
+                failed.remove(node)
             pending = failed
 
 
@@ -407,9 +391,10 @@ class PermissionTreeUtil:
     def _create_models_nodes(self):
         content_types = ContentType.objects.all()
 
-        nodes = []
+        nodes = {}
         for ct in content_types:
             model_id = '{}.{}'.format(ct.app_label, ct.model)
+            model_id = model_id_aliases.get(model_id, model_id)
             if not self._check_model_xpack(model_id):
                 continue
 
@@ -428,8 +413,8 @@ class PermissionTreeUtil:
                 'name': name,
                 'pId': app,
             }, 'model', is_open=False)
-            nodes.append(node)
-        return nodes
+            nodes[model_id] = node
+        return list(nodes.values())
 
     def _get_permission_name_icon(self, p: Permission, content_types_name_mapper: dict):
         action, resource = p.codename.split('_', 1)
@@ -454,13 +439,19 @@ class PermissionTreeUtil:
         return name, icon
 
     def _create_perms_nodes(self):
-        permissions_id = self.permissions.values_list('id', flat=True)
-        nodes = []
+        permissions_id = set(self.permissions.values_list('id', flat=True))
+        nodes = {}
         content_types = ContentType.objects.all()
         content_types_name_mapper = {ct.app_model: ct.name for ct in content_types}
 
         for p in self.all_permissions:
             model_id = f'{p.app}.{p.model}'
+            canonical_model_id = model_id_aliases.get(model_id, model_id)
+            if (
+                model_id == 'rbac.menupermission'
+                and p.codename in LEGACY_REPORT_PERMISSION_CODENAMES
+            ):
+                continue
             if not self._check_model_xpack(model_id):
                 continue
             title = p.app_label_codename
@@ -472,12 +463,19 @@ class PermissionTreeUtil:
             if settings.DEBUG_DEV:
                 name += '[{}]'.format(p.app_label_codename)
 
-            pid = model_id
+            pid = canonical_model_id
             # perm node 的特殊设置用的是 title，因为 id 是数字，不一致
             if title in special_pid_mapper:
                 pid = special_pid_mapper[title]
 
             checked = p.id in permissions_id
+            key = title if canonical_model_id in model_id_aliases.values() else p.id
+            existing = nodes.get(key)
+            if existing:
+                checked = checked or existing.checked
+                if model_id != canonical_model_id:
+                    existing.checked = checked
+                    continue
 
             node = TreeNode(**{
                 'id': p.id,
@@ -493,8 +491,8 @@ class PermissionTreeUtil:
                     'type': 'perm',
                 }
             })
-            nodes.append(node)
-        return nodes
+            nodes[key] = node
+        return list(nodes.values())
 
     def _create_node(self, data, tp, is_parent=True, is_open=True, icon='', checked=None):
         assert data.get('id')
