@@ -314,7 +314,7 @@ class ConnectionToken(JMSOrgBaseModel):
         try:
             credential = get_personal_credential_for_use(
                 self.user, self.asset, self.protocol, self.personal_credential_id,
-                version=self.personal_credential_version,
+                authentication_version=self.personal_credential_version,
                 include_secret=include_secret,
                 permission_context=permission_context,
             )

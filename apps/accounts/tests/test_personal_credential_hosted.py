@@ -46,7 +46,7 @@ class HostedPersonalCredentialTestCase(SimpleTestCase):
         self.context = (self.platform_protocol, self.account)
         self.credential = SimpleNamespace(
             id='credential', username='root', secret_type='ssh_key',
-            version=3, secret='saved-private-key',
+            version=3, authentication_version=2, secret='saved-private-key',
         )
 
     def permission_context(self, alias=ACCOUNT_ID):
@@ -176,7 +176,7 @@ class HostedPersonalCredentialTestCase(SimpleTestCase):
         self.assertEqual(data['account'], ACCOUNT_ID)
         self.assertEqual(data['input_secret'], '')
         self.assertEqual(data['input_secret_type'], 'ssh_key')
-        self.assertEqual(data['personal_credential_version'], 3)
+        self.assertEqual(data['personal_credential_version'], self.credential.authentication_version)
         get_context.assert_called_once_with(self.user, self.asset, 'ssh', account_alias=ACCOUNT_ID)
         self.assertIs(view._validate.call_args.kwargs['permed_account'], self.account)
 
@@ -199,6 +199,7 @@ class HostedPersonalCredentialTestCase(SimpleTestCase):
         self.assertEqual(save.call_args.kwargs['secret'], 'replacement')
         self.assertEqual(data['account'], ACCOUNT_ID)
         self.assertEqual(data['input_secret'], '')
+        self.assertEqual(data['personal_credential_version'], self.credential.authentication_version)
 
     @patch('authentication.services.connection_token.get_personal_credential_permission_context')
     def test_update_requires_the_credential_version(self, get_context):

@@ -99,7 +99,7 @@ class VaultSignalHandler(object):
             else:
                 update_fields = kwargs.get('update_fields')
                 credential_fields = {'secret', '_secret', 'secret_type'}
-                if (isinstance(instance, Account) and update_fields is not None
+                if (isinstance(instance, (Account, PersonalAssetCredential)) and update_fields is not None
                         and not credential_fields.intersection(update_fields)):
                     # Metadata edits must not rewrite a concurrently changed credential.
                     if instance.is_sync_metadata:

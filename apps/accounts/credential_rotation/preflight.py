@@ -100,7 +100,7 @@ def fingerprint(credential):
     accounts = [credential.account, credential.alternate_account]
     return {
         'credential_id': str(credential.id), 'revision': credential.revision,
-        'source_no_traffic_days': credential.source_no_traffic_days,
+        'source_no_traffic_minutes': credential.source_no_traffic_minutes,
         'verify_before_switch': credential.verify_before_switch,
         'credential_updated': credential.date_updated.isoformat(),
         'accounts': [
@@ -109,6 +109,13 @@ def fingerprint(credential):
             for a in accounts if a
         ],
     }
+
+
+def fingerprint_matches(credential, expected):
+    if 'source_no_traffic_days' in expected:
+        expected = expected.copy()
+        expected['source_no_traffic_minutes'] = expected.pop('source_no_traffic_days') * 24 * 60
+    return fingerprint(credential) == expected
 
 
 def task_name(credential):
@@ -295,7 +302,7 @@ def finish(execution_id):
                 pk=rotation_id, credential=credential, status='preparing', date_finished__isnull=True,
             ).exists():
                 return fail(execution.id, 'changed')
-            if fingerprint(credential) != expected:
+            if not fingerprint_matches(credential, expected):
                 return fail(execution.id, 'changed')
             if not authorized(execution):
                 return fail(execution.id, 'changed')
@@ -322,7 +329,7 @@ def run(execution_id):
             return fail(execution.id, 'timeout')
         current = latest(credential) if credential else None
         if (not current or current.id != execution.id or not authorized(execution)
-                or fingerprint(credential) != execution.snapshot['pam_precheck']):
+                or not fingerprint_matches(credential, execution.snapshot['pam_precheck'])):
             return fail(execution.id, 'changed')
         try:
             check(credential)

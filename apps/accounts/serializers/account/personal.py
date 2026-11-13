@@ -9,6 +9,7 @@ from accounts.personal_credentials import (
     PERSONAL_CREDENTIAL_SECRET_CHOICES,
     PersonalCredentialVersionConflict,
     get_personal_credential_permission_context,
+    update_personal_credential,
     validate_personal_credential_secret_type,
     validate_personal_credential_ssh_key,
     validate_personal_credential_username,
@@ -208,12 +209,10 @@ class PersonalAssetCredentialSerializer(CommonModelSerializer):
             )
             if locked.version != expected_version:
                 raise PersonalCredentialVersionConflict()
-            validated_data['version'] = locked.version + 1
-            validated_data['updated_by'] = str(request.user)
-            validated_data['connectivity'] = Connectivity.UNKNOWN
-            validated_data['date_verified'] = None
             try:
-                return super().update(locked, validated_data)
+                return update_personal_credential(
+                    locked, user=request.user, updates=validated_data,
+                )
             except IntegrityError as error:
                 raise serializers.ValidationError({
                     'username': _('A personal credential with these fields already exists')

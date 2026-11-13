@@ -228,7 +228,7 @@ def cycle_directory(credential, limit=20, offset=0, *, kind='', status='', start
 
 def cycle_detail(credential, cycle_id):
     from .participants import build
-    from .source_traffic import info as source_traffic_info
+    from .source_traffic import info as source_traffic_info, observation_in_minutes
     events = _ordered(list(policy_events(credential).filter(
         cycle_key=cycle_id,
     ).select_related('rotation')))
@@ -246,7 +246,9 @@ def cycle_detail(credential, cycle_id):
             key: progress[key] for key in ('credential_status', 'rotation_phase', 'summary')
         }
     traffic_snapshot = (rotation.participant_snapshot.get('source_traffic', {}) if rotation else {})
-    source_traffic = (source_traffic_info(credential, rotation) if rotation else None) or traffic_snapshot.get('final')
+    source_traffic = (source_traffic_info(credential, rotation) if rotation else None) or observation_in_minutes(
+        traffic_snapshot.get('final'),
+    )
     traffic_observations = traffic_snapshot.get('event_observations', {})
     clients = {
         str(client.id): client for client in CredentialClientInstance.objects.filter(
@@ -321,7 +323,7 @@ def cycle_detail(credential, cycle_id):
             'account_id': str(audit.account_id) if audit and audit.account_id else None,
             'account': accounts.get(audit.account_id) if audit else None,
             **context,
-            'source_traffic': traffic_observations.get(str(event.source_event_id)),
+            'source_traffic': observation_in_minutes(traffic_observations.get(str(event.source_event_id))),
             'requires_confirmation': requires_confirmation,
             'recipient_count': len(recipients),
             'received_count': sum(bool(item['received_at']) for item in recipients),

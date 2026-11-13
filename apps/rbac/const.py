@@ -7,6 +7,17 @@ class Scope(models.TextChoices):
     org = 'org', _('Organization')
 
 
+LEGACY_REPORT_PERMISSION_CODENAMES = tuple(
+    f'{action}_{resource}'
+    for resource in (
+        'userloginreport', 'userchangepasswordreport',
+        'assetstatisticsreport', 'assetactivityreport',
+        'accountstatisticsreport', 'accountautomationreport',
+    )
+    for action in ('view', 'add', 'delete')
+)
+
+
 exclude_permissions = (
     # ('App', 'Model', 'Action', 'Resource') Model 和 Resource 可能不同
     # users.add_user

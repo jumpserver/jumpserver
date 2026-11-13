@@ -417,7 +417,7 @@ def validate_personal_credential_ssh_key(secret):
 
 def get_personal_credential_for_use(
         user, asset, protocol, credential_id, version=None, include_secret=False,
-        permission_context=None,
+        permission_context=None, authentication_version=None,
 ):
     if permission_context is None:
         permission_context = get_personal_credential_permission_context(
@@ -434,6 +434,8 @@ def get_personal_credential_for_use(
         )
         if version is not None:
             queryset = queryset.filter(version=version)
+        if authentication_version is not None:
+            queryset = queryset.filter(authentication_version=authentication_version)
         if not include_secret:
             queryset = queryset.defer('_secret')
         credential = queryset.first()
@@ -446,6 +448,27 @@ def get_personal_credential_for_use(
     validate_personal_credential_secret_type(
         platform_protocol, credential.secret_type
     )
+    return credential
+
+
+def update_personal_credential(credential, *, user, updates):
+    """Update a row locked by the caller, preserving sessions for metadata edits."""
+    changes = {
+        field: value for field, value in updates.items()
+        if value != getattr(credential, field)
+    }
+    if not changes:
+        return credential
+
+    changes['version'] = credential.version + 1
+    if {'username', 'secret', 'secret_type', 'is_active'}.intersection(changes):
+        changes['authentication_version'] = changes['version']
+        changes['connectivity'] = Connectivity.UNKNOWN
+        changes['date_verified'] = None
+    changes['updated_by'] = str(user)
+    for field, value in changes.items():
+        setattr(credential, field, value)
+    credential.save(update_fields=[*changes, 'date_updated'])
     return credential
 
 
@@ -493,16 +516,13 @@ def save_personal_credential(
                 if is_idempotent_retry:
                     return credential
                 raise PersonalCredentialVersionConflict()
-            credential.username = username
-            credential.secret = secret
-            credential.secret_type = secret_type
-            credential.is_active = True
-            credential.version += 1
-            credential.connectivity = Connectivity.UNKNOWN
-            credential.date_verified = None
-            credential.updated_by = str(user)
             try:
-                credential.save()
+                update_personal_credential(credential, user=user, updates={
+                    'username': username,
+                    'secret': secret,
+                    'secret_type': secret_type,
+                    'is_active': True,
+                })
             except IntegrityError as error:
                 raise serializers.ValidationError({
                     'input_username': _(
