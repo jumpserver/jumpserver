@@ -10,7 +10,7 @@ from django.db import router, transaction
 from django.utils import timezone
 from django.utils._os import safe_join
 from django.utils.translation import gettext_lazy as _
-from django.db.models import Min
+from django.db.models import Min, Q
 
 from common.const.crontab import CRONTAB_AT_AM_TWO
 from common.storage.ftp_file import FTPFileStorageHandler
@@ -20,7 +20,7 @@ from ops.celery.decorator import register_as_period_task
 from ops.models import CeleryTaskExecution
 from orgs.utils import tmp_to_root_org
 from terminal.backends import server_replay_storage
-from terminal.models import Session, Command
+from terminal.models import AgentAction, AgentEvent, AgentSession, Command, Session
 from .models import UserLoginLog, OperateLog, FTPLog, ActivityLog, PasswordChangeLog
 
 logger = get_logger(__name__)
@@ -182,11 +182,48 @@ def remove_files_by_days(root_path, days, file_types=None):
                 logger.error(f"Remove file {file} error: {e}")
 
 
+def clean_expired_agent_sessions(expire_date, batch_size=100):
+    sessions = AgentSession.objects.filter(
+        Q(date_closed__lt=expire_date)
+        | Q(date_closed__isnull=True, date_expires__lt=expire_date),
+    ).exclude(
+        terminal_session_id__in=Session.objects.filter(is_finished=False).values('pk'),
+    ).order_by('pk')
+    last_pk = None
+    while True:
+        page = sessions if last_pk is None else sessions.filter(pk__gt=last_pk)
+        pks = list(page.values_list('pk', flat=True)[:batch_size])
+        if not pks:
+            break
+        for pk in pks:
+            with transaction.atomic():
+                session = sessions.select_for_update().filter(pk=pk).first()
+                if session is None:
+                    continue
+                actions = AgentAction.objects.filter(session=session)
+                # Serialize late evidence without loading request/result JSON.
+                for _ in actions.select_for_update().values_list('pk', flat=True).iterator(chunk_size=batch_size):
+                    pass
+                events = AgentEvent.objects.filter(action__session=session)
+                recent_actions = actions.filter(
+                    Q(date_created__gte=expire_date) | Q(date_started__gte=expire_date)
+                    | Q(date_finished__gte=expire_date),
+                )
+                if (recent_actions.exists() or actions.filter(interactive_session__is_finished=False).exists()
+                        or events.filter(date_received__gte=expire_date).exists()):
+                    continue
+                delete_audit_records_in_batches(events, batch_size=batch_size)
+                delete_audit_records_in_batches(actions, batch_size=batch_size)
+                session.delete()
+        last_pk = pks[-1]
+
+
 def clean_expired_session_period():
     logger.info("Start clean expired session record, commands and replay")
     days = get_log_keep_day('TERMINAL_SESSION_KEEP_DURATION')
 
     expire_date = timezone.now() - timezone.timedelta(days=days)
+    clean_expired_agent_sessions(expire_date)
     expired_sessions = Session.objects.filter(date_start__lt=expire_date)
 
     logger.info("Start clean session item")

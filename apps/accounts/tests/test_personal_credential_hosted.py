@@ -46,7 +46,7 @@ class HostedPersonalCredentialTestCase(SimpleTestCase):
         self.context = (self.platform_protocol, self.account)
         self.credential = SimpleNamespace(
             id='credential', username='root', secret_type='ssh_key',
-            version=3, secret='saved-private-key',
+            version=3, authentication_version=2, secret='saved-private-key',
         )
 
     def permission_context(self, alias=ACCOUNT_ID):
@@ -149,9 +149,20 @@ class HostedPersonalCredentialTestCase(SimpleTestCase):
         view._validate = Mock(return_value={'input_username': ''})
         return view
 
-    @patch('authentication.api.connection_token.get_request_ip_or_data', return_value='127.0.0.1')
-    @patch('authentication.api.connection_token.get_personal_credential_permission_context')
-    @patch('authentication.api.connection_token.get_personal_credential_for_use')
+    def test_manual_account_does_not_replace_empty_username_with_alias(self):
+        view = self.make_view()
+        view.get_remote_addr = lambda: '127.0.0.1'
+        data = {
+            'asset': self.asset, 'account': '@INPUT', 'protocol': 'ssh',
+            'connect_method': 'web_cli', 'connect_options': {}, 'input_username': '',
+        }
+        view.validate_serializer(SimpleNamespace(validated_data=data))
+        self.assertEqual(view.input_username, '')
+        view._validate.assert_called_once()
+
+    @patch('authentication.services.connection_token.get_request_ip_or_data', return_value='127.0.0.1')
+    @patch('authentication.services.connection_token.get_personal_credential_permission_context')
+    @patch('authentication.services.connection_token.get_personal_credential_for_use')
     def test_token_use_keeps_the_hosted_id_without_copying_the_secret(self, get_credential, get_context, _ip):
         get_context.return_value = self.context
         get_credential.return_value = self.credential
@@ -165,13 +176,13 @@ class HostedPersonalCredentialTestCase(SimpleTestCase):
         self.assertEqual(data['account'], ACCOUNT_ID)
         self.assertEqual(data['input_secret'], '')
         self.assertEqual(data['input_secret_type'], 'ssh_key')
-        self.assertEqual(data['personal_credential_version'], 3)
+        self.assertEqual(data['personal_credential_version'], self.credential.authentication_version)
         get_context.assert_called_once_with(self.user, self.asset, 'ssh', account_alias=ACCOUNT_ID)
         self.assertIs(view._validate.call_args.kwargs['permed_account'], self.account)
 
-    @patch('authentication.api.connection_token.get_request_ip_or_data', return_value='127.0.0.1')
-    @patch('authentication.api.connection_token.get_personal_credential_permission_context')
-    @patch('authentication.api.connection_token.save_personal_credential')
+    @patch('authentication.services.connection_token.get_request_ip_or_data', return_value='127.0.0.1')
+    @patch('authentication.services.connection_token.get_personal_credential_permission_context')
+    @patch('authentication.services.connection_token.save_personal_credential')
     def test_token_save_uses_the_authorized_username_after_acl_validation(self, save, get_context, _ip):
         get_context.return_value = self.context
         save.return_value = self.credential
@@ -188,8 +199,9 @@ class HostedPersonalCredentialTestCase(SimpleTestCase):
         self.assertEqual(save.call_args.kwargs['secret'], 'replacement')
         self.assertEqual(data['account'], ACCOUNT_ID)
         self.assertEqual(data['input_secret'], '')
+        self.assertEqual(data['personal_credential_version'], self.credential.authentication_version)
 
-    @patch('authentication.api.connection_token.get_personal_credential_permission_context')
+    @patch('authentication.services.connection_token.get_personal_credential_permission_context')
     def test_update_requires_the_credential_version(self, get_context):
         get_context.return_value = self.context
         view = self.make_view()
@@ -201,11 +213,11 @@ class HostedPersonalCredentialTestCase(SimpleTestCase):
                 'input_secret': 'replacement', 'input_secret_type': 'password',
             }))
 
-    @patch('authentication.api.connection_token.ConnectMethodACL.is_method_allowed', return_value=True)
+    @patch('authentication.services.connection_token.ConnectMethodACL.is_method_allowed', return_value=True)
     def test_ephemeral_hosted_key_type_survives_validation(self, _allowed):
         view = self.make_view()
         del view._validate
-        view._validate_acl = Mock(return_value=None)
+        view._validate_acl = Mock(return_value={})
         data = view._validate(
             self.user, self.asset, ACCOUNT_ID, 'ssh', 'web_cli',
             permed_account=self.account,
@@ -218,7 +230,8 @@ class HostedPersonalCredentialTestCase(SimpleTestCase):
         )
         self.assertEqual(data['input_secret_type'], '')
 
-    def test_account_object_overlays_saved_secret_on_the_actual_hosted_account(self):
+    @patch('accounts.provisioning.check_account_ready')
+    def test_account_object_overlays_saved_secret_on_the_actual_hosted_account(self, check_ready):
         token = SimpleNamespace(
             asset=self.asset, account=ACCOUNT_ID, personal_credential_id='credential',
             get_asset_accounts_by_alias=Mock(return_value=self.account),
@@ -230,6 +243,7 @@ class HostedPersonalCredentialTestCase(SimpleTestCase):
         self.assertEqual(result.id, ACCOUNT_ID)
         self.assertEqual(result.secret, 'saved-private-key')
         self.assertEqual(result.secret_type, 'ssh_key')
+        check_ready.assert_called_once_with(token, self.account)
 
     def test_account_object_rejects_a_new_secret_or_changed_username(self):
         for field, value in (('secret', 'managed-secret'), ('username', 'admin')):

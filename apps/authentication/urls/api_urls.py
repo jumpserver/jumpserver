@@ -25,6 +25,7 @@ router.register('admin-connection-token', api.AdminConnectionTokenViewSet, 'admi
 router.register('confirm', api.UserConfirmationViewSet, 'confirm')
 router.register('ssh-key', api.SSHkeyViewSet, 'ssh-key')
 router.register('access-tokens', api.AccessTokenViewSet, 'access-token')
+router.register('user-agent-clients', api.UserAgentClientViewSet, 'user-agent-client')
 
 urlpatterns = [
     path('web-session/status/', WebSessionStatusView.as_view(), name='web-session-status'),

@@ -318,9 +318,11 @@ class TicketPluginTests(TestCase):
         self.assertFalse(serializer.is_valid())
 
     def test_system_types_and_forged_applicant_cannot_use_self_service(self):
+        data = self.payload()
         for ticket_type in ('login_confirm', 'login_asset_confirm', 'command_confirm', 'general'):
-            serializer = self.serializer(self.payload(ticket_type))
+            serializer = self.serializer({**data, 'type': ticket_type})
             self.assertFalse(serializer.is_valid())
+            self.assertIn('type', serializer.errors)
         self.create_account()
         data = self.payload(asset=str(self.asset.pk), accounts=['root'])
         serializer = self.serializer({**data, 'applicant': str(self.bob.pk)})

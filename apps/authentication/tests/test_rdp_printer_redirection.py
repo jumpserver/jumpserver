@@ -19,7 +19,7 @@ class RDPPrinterRedirectionTests(SimpleTestCase):
         ):
             with self.subTest(stored=stored, supplied=supplied):
                 preferences = [] if stored is None else [('printers_redirect', stored)]
-                with patch('authentication.api.connection_token.Preference.objects.filter') as query:
+                with patch('authentication.services.connection_token.Preference.objects.filter') as query:
                     query.return_value.values_list.return_value = preferences
                     # Applet assets do not necessarily use the RDP protocol.
                     data = {'protocol': 'http', 'connect_options': dict(supplied)}

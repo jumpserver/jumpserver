@@ -249,7 +249,9 @@ JUMPSERVER_UPTIME = int(time.time())
 
 # OAuth2 Provider settings
 OAUTH2_PROVIDER = {
-    'OAUTH2_VALIDATOR_CLASS': 'authentication.backends.oauth2_provider.validators.ClientOAuth2Validator',
+    'OAUTH2_VALIDATOR_CLASS': 'authentication.backends.oauth2_provider.agent.AgentOAuth2Validator',
+    'SCOPES': {'read': 'Read scope', 'write': 'Write scope', 'agent:access': 'Execute authorized asset operations'},
+    'DEFAULT_SCOPES': ['read', 'write'],
     'ALLOWED_REDIRECT_URI_SCHEMES': ['https', 'jms2'],
     'PKCE_REQUIRED': True,
     'ACCESS_TOKEN_EXPIRE_SECONDS': 60 * 60,
@@ -258,7 +260,14 @@ OAUTH2_PROVIDER = {
 }
 OAUTH2_PROVIDER_CLIENT_REDIRECT_URI = 'jms2://auth/callback'
 OAUTH2_PROVIDER_JUMPSERVER_CLIENT_NAME = 'JumpServer Client'
+MCP_ENABLED = CONFIG.MCP_ENABLED
+MCP_DCR_ENABLED = CONFIG.MCP_DCR_ENABLED
+MCP_PUBLIC_URL = CONFIG.MCP_PUBLIC_URL
 
 if CONFIG.DEBUG_DEV:
     OAUTH2_PROVIDER['ALLOWED_REDIRECT_URI_SCHEMES'].append('http')
     OAUTH2_PROVIDER_CLIENT_REDIRECT_URI += ' http://127.0.0.1:14876/auth/callback'
+
+# Explicit swappable references are required by Agent audit foreign keys.
+OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'
+OAUTH2_PROVIDER_ACCESS_TOKEN_MODEL = 'oauth2_provider.AccessToken'

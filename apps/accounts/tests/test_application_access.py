@@ -405,7 +405,10 @@ class ApplicationAccessTests(CredentialTestCase):
         )
 
     def test_agent_application_signature_syncs_and_sdk_cannot_use_agent_scope(self):
-        params = {'instance_id': 'application-agent', 'credentials': []}
+        params = {
+            'instance_id': 'application-agent', 'credentials': [],
+            'delivery_scope': {'keys': [self.credential.key], 'account_ids': []},
+        }
         response = self.signed_request('sync_agent', params, 'jms-pam-agent')
         self.assertEqual(response.status_code, 200, response.data)
         self.assertEqual(response.data['scope']['credential_keys'], [self.credential.key])

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 
-from django.urls import path
+from django.urls import path, include
 from rest_framework_bulk.routes import BulkRouter
 
 from .. import api
@@ -36,6 +36,7 @@ router.register(r'app-providers/((?P<provider>[^/.]+)/)?apps', api.AppProviderAp
 router.register(r'virtual-app-publications', api.VirtualAppPublicationViewSet, 'virtual-app-publication')
 
 urlpatterns = [
+    path('agent/', include('terminal.urls.agent')),
     path('my-sessions/', api.MySessionAPIView.as_view(), name='my-session'),
     path('terminal-registrations/', api.TerminalRegistrationApi.as_view(), name='terminal-registration'),
     path('registration/', api.TerminalRegistrationApi.as_view(), name='registration'),

@@ -2,12 +2,13 @@ import uuid
 
 from django.conf import settings
 from django.core.cache import cache
-from django.db import models
+from django.db import models, router, transaction
 from django.utils.translation import gettext_lazy as _
 
 from common.const.signals import OP_LOG_SKIP_SIGNAL
 from common.db.models import JMSBaseModel
 from common.utils import get_logger, lazyproperty
+from common.utils.mcp import get_mcp_authorization_server
 from orgs.utils import tmp_to_root_org
 from settings.models import get_chat_ai_config
 from terminal.const import TerminalType as TypeChoices
@@ -150,6 +151,12 @@ class Terminal(StorageMixin, TerminalStatusMixin, JMSBaseModel):
         configs.update(self.get_login_title_setting())
         if self.type == TypeChoices.kael:
             configs.update(self.get_chat_ai_setting())
+        if self.type == TypeChoices.koko:
+            configs.update({
+                'MCP_ENABLED': settings.MCP_ENABLED,
+                'MCP_PUBLIC_URL': settings.MCP_PUBLIC_URL,
+                'MCP_AUTHORIZATION_SERVER': get_mcp_authorization_server() if settings.MCP_ENABLED else '',
+            })
         configs.update(self.get_xpack_license())
         configs.update({
             'SECURITY_MAX_IDLE_TIME': settings.SECURITY_MAX_IDLE_TIME,
@@ -164,13 +171,20 @@ class Terminal(StorageMixin, TerminalStatusMixin, JMSBaseModel):
         return self.user
 
     def delete(self, using=None, keep_parents=False):
-        if self.user:
-            setattr(self.user, OP_LOG_SKIP_SIGNAL, True)
-            self.user.delete()
-        self.name = self.name + '_' + uuid.uuid4().hex[:8]
-        self.user = None
-        self.is_deleted = True
-        self.save()
+        using = using or router.db_for_write(type(self), instance=self)
+        with transaction.atomic(using=using):
+            service_account = self.user
+            if service_account:
+                if self.type == TypeChoices.koko:
+                    # Keep the Koko row and protected Agent history when the
+                    # service account's deletion follows its reverse relation.
+                    type(self).objects.using(using).filter(pk=self.pk).update(user=None)
+                setattr(service_account, OP_LOG_SKIP_SIGNAL, True)
+                service_account.delete(using=using)
+            self.name = self.name + '_' + uuid.uuid4().hex[:8]
+            self.user = None
+            self.is_deleted = True
+            self.save(using=using)
 
     def __str__(self):
         status = "Active"
