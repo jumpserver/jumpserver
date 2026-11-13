@@ -75,7 +75,7 @@ class CredentialRotationManager:
             initialize(rotation, states)
         switched_at = timezone.now()
         rotation.participant_snapshot['source_traffic'] = {
-            'no_traffic_days': credential.source_no_traffic_days,
+            'no_traffic_minutes': credential.source_no_traffic_minutes,
             'operator_id': str(operator_id) if operator_id else None,
         }
         rotation.save(update_fields=['participant_snapshot'])

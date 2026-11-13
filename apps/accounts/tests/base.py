@@ -56,7 +56,7 @@ class CredentialTestCase(TestCase):
             account=self.primary,
             alternate_account=self.backup,
             active_account=self.primary,
-            source_no_traffic_days=0,
+            source_no_traffic_minutes=0,
         )
         CredentialApplicationBinding.objects.create(
             credential=self.credential, application=self.application,

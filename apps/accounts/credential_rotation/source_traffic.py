@@ -14,6 +14,13 @@ from accounts.models import Account, ApplicationCredential
 from common.exceptions import JMSException
 
 
+def observation_in_minutes(observation):
+    if observation and 'no_traffic_days' in observation:
+        observation = observation.copy()
+        observation['no_traffic_minutes'] = observation.pop('no_traffic_days') * 24 * 60
+    return observation
+
+
 def info(credential, rotation=None, now=None):
     rotation = rotation or credential.rotation_records.first()
     if not rotation or rotation.date_finished or rotation.status != 'running':
@@ -29,17 +36,17 @@ def info(credential, rotation=None, now=None):
     started_at = parse_datetime(observation['started_at']) if observation.get('started_at') else None
     if not started_at:
         return None
-    days = observation.get('no_traffic_days', credential.source_no_traffic_days)
+    minutes = observation_in_minutes(observation).get('no_traffic_minutes', credential.source_no_traffic_minutes)
     last_access = Account.objects.filter(id=rotation.source_account_id).values_list(
         'date_last_secret_access', flat=True,
     ).get()
     idle_since = max(started_at, last_access) if last_access else started_at
-    eligible_at = idle_since + timedelta(days=days)
+    eligible_at = idle_since + timedelta(minutes=minutes)
     now = now or timezone.now()
     return {
         'source_account_id': str(rotation.source_account_id),
         'started_at': started_at.isoformat(),
-        'no_traffic_days': days,
+        'no_traffic_minutes': minutes,
         'last_secret_access': last_access.isoformat() if last_access and last_access >= started_at else None,
         'idle_since': idle_since.isoformat(),
         'eligible_at': eligible_at.isoformat(),
@@ -66,8 +73,9 @@ def start_if_ready(credential, rotation=None, now=None):
     if credential.get_blockers(now=now):
         return None
     now = now or timezone.now()
+    observation = observation_in_minutes(observation)
     observation.update(started_at=now.isoformat(), switch_confirmed_at=now.isoformat())
-    observation.setdefault('no_traffic_days', credential.source_no_traffic_days)
+    observation.setdefault('no_traffic_minutes', credential.source_no_traffic_minutes)
     rotation.participant_snapshot['source_traffic'] = observation
     rotation.save(update_fields=['participant_snapshot'])
     traffic = info(credential, rotation, now)

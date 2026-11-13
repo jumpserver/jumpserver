@@ -76,6 +76,7 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
     precheck = serializers.SerializerMethodField()
     mode = serializers.ChoiceField(choices=['alternating_rotation'], default='alternating_rotation')
     subscription_all_authorized = serializers.BooleanField(required=False)
+    source_no_traffic_days = serializers.FloatField(required=False)
 
 
     @staticmethod
@@ -127,7 +128,7 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
             'mode', 'asset', 'account', 'alternate_account', 'subscription_accounts',
             'subscription_all_authorized',
             'active_account', 'revision', 'status', 'rotation_phase', 'is_active',
-            'source_no_traffic_days', 'verify_before_switch',
+            'source_no_traffic_minutes', 'source_no_traffic_days', 'verify_before_switch',
             'date_last_rotated', 'applications_amount',
         ]
         fields = fields_small + [
@@ -177,6 +178,13 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
 
     def validate(self, attrs):
         from accounts.credential_rotation.preflight import check_ownership
+        days = attrs.pop('source_no_traffic_days', None)
+        if days is not None and 'source_no_traffic_minutes' not in attrs:
+            try:
+                days = serializers.IntegerField(min_value=1, max_value=3650).run_validation(days)
+            except serializers.ValidationError as exc:
+                raise serializers.ValidationError({'source_no_traffic_days': exc.detail})
+            attrs['source_no_traffic_minutes'] = days * 24 * 60
         attrs = self.validate_accounts(attrs)
         accounts = [
             attrs.get('account', getattr(self.instance, 'account', None)),
@@ -242,7 +250,7 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
             if precheck and precheck['status'] == 'checking':
                 raise serializers.ValidationError(_('Credential settings cannot be changed during rotation.'))
         if self.instance and self.instance.status != ApplicationCredential.Status.idle:
-            for field in ('account', 'alternate_account', 'is_active', 'source_no_traffic_days', 'verify_before_switch'):
+            for field in ('account', 'alternate_account', 'is_active', 'source_no_traffic_minutes', 'verify_before_switch'):
                 if field in attrs and attrs[field] != getattr(self.instance, field):
                     raise serializers.ValidationError(_('Credential settings cannot be changed during rotation.'))
             if 'applications' in attrs and {

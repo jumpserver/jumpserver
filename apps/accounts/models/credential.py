@@ -60,9 +60,9 @@ class ApplicationCredential(JMSOrgBaseModel):
             'When disabled, ensure the backup account is usable yourself.'
         ),
     )
-    source_no_traffic_days = models.PositiveIntegerField(
-        default=7, validators=[MinValueValidator(1), MaxValueValidator(3650)],
-        verbose_name=_('Source account no-secret-fetch duration (days)'),
+    source_no_traffic_minutes = models.PositiveIntegerField(
+        default=7 * 24 * 60, validators=[MinValueValidator(1), MaxValueValidator(3650 * 24 * 60)],
+        verbose_name=_('Source account no-secret-fetch duration (minutes)'),
     )
     status = models.CharField(
         max_length=32, choices=Status.choices, default=Status.idle,
@@ -103,6 +103,15 @@ class ApplicationCredential(JMSOrgBaseModel):
         if not self.key:
             self.key = f'cred-{random_string(16).lower()}'
         super().save(*args, **kwargs)
+
+    @property
+    def source_no_traffic_days(self):
+        return self.source_no_traffic_minutes / (24 * 60)
+
+    @source_no_traffic_days.setter
+    def source_no_traffic_days(self, days):
+        # The separately released PAM database demo still passes days on creation.
+        self.source_no_traffic_minutes = days * 24 * 60
 
     @property
     def asset(self):
