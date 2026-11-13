@@ -241,6 +241,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         category_setting_updated.send(sender=self.__class__, category=category, serializer=serializer)
 
     def perform_update(self, serializer):
+        self.validate_ssh_ca_fallback_destination(serializer)
         self.prepare_openbao_mount_change(serializer)
         self.prepare_ssh_ca_config(serializer)
         from authentication.services.client_login_session import (
@@ -285,6 +286,25 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         self.send_signal(serializer)
         if self.request.query_params.get('category') == User.Source.ldap.value:
             self.clean_ldap_user_dn_cache()
+
+    def validate_ssh_ca_fallback_destination(self, serializer):
+        if self.get_category() != 'openbao':
+            return
+        if settings.SSH_CA_OPENBAO_ADDR or not settings.SSH_CA_OPENBAO_TOKEN:
+            return
+
+        address_field = 'VAULT_OPENBAO_ADDR'
+        new_address = serializer.validated_data.get(address_field, settings.VAULT_OPENBAO_ADDR)
+        if (new_address or '') == (settings.VAULT_OPENBAO_ADDR or ''):
+            return
+
+        # Protect retained SSH CA tokens even while SSH CA is disabled.
+        raise ValidationError({
+            address_field: _(
+                'Set an explicit OpenBao address in the SSH CA settings before changing '
+                'the Vault address. The stored SSH CA token still uses this address.'
+            )
+        })
 
     def prepare_ssh_ca_config(self, serializer):
         if self.request.query_params.get('category') != 'ssh_ca':
