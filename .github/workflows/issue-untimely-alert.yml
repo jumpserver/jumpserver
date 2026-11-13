@@ -4,6 +4,11 @@ on:
 
 name: Check untimely handle issues
 
+permissions:
+  contents: read
+  # The alert action lists the open issues with GITHUB_TOKEN.
+  issues: read
+
 jobs:
   check-untimely-handle-issues:
     runs-on: ubuntu-latest
