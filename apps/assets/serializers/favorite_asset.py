@@ -109,7 +109,6 @@ class FavoriteAssetSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             'meta': {
                 'type': 'asset',
                 'data': {
-                    'platform_name': platform.name,
                     'platform_type': platform.type,
                     'org_name': asset.org_name,
                     'name': asset.name,
