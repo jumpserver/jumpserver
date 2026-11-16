@@ -73,7 +73,8 @@ class Command(BaseCommand):
                         mode = 'IMPORTED (enabled)' if options['apply'] else 'WOULD IMPORT'
                         approvals = sum(node['type'] == 'approval' for node in definition['nodes'])
                         self.stdout.write(
-                            f'{mode} {flow.pk}: {approvals} approval nodes; original selectors preserved'
+                            f'{mode} {flow.pk}: {approvals} approval nodes; '
+                            'original selectors preserved'
                         )
                 except WorkflowConfigurationError as exc:
                     failed += 1
