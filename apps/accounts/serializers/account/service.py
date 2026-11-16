@@ -76,7 +76,10 @@ class IntegrationApplicationSerializer(BulkOrgResourceModelSerializer):
         return super().update(instance, validated_data)
 
     def validate_accounts(self, value):
-        value = value or empty_application_accounts()
+        if not value:
+            return empty_application_accounts()
+        if value['type'] == 'ids' and not value['ids']:
+            raise serializers.ValidationError(_('Select at least one account.'), code='required')
         if self.instance and value == self.instance.accounts.value:
             return value
         if value['type'] == 'ids':
