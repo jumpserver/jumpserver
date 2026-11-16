@@ -18375,3 +18375,652 @@ msgstr "Trường này không được để trống."
 
 msgid "String value too large."
 msgstr "Chuỗi quá dài."
+
+#: terminal/tasks.py:42
+#, python-format
+msgid "Checking terminal status records older than %(days)s days."
+msgstr "Đang kiểm tra các bản ghi trạng thái terminal cũ hơn %(days)s ngày."
+
+#: terminal/tasks.py:47 ops/tasks.py:235
+#, python-format
+msgid "Expired records matched: %(checked)s; deleted: %(deleted)s."
+msgstr "Số bản ghi hết hạn phù hợp: %(checked)s; đã xóa: %(deleted)s."
+
+#: terminal/tasks.py:65
+msgid "Checking unfinished sessions; active sessions will be kept."
+msgstr "Đang kiểm tra các phiên chưa kết thúc; các phiên còn hoạt động sẽ được giữ lại."
+
+#: terminal/tasks.py:82
+#, python-format
+msgid "Sessions checked: %(checked)s; marked finished: %(finished)s; skipped because still active: %(active)s; related tasks marked finished: %(tasks)s."
+msgstr "Số phiên đã kiểm tra: %(checked)s; đánh dấu kết thúc: %(finished)s; bỏ qua vì còn hoạt động: %(active)s; tác vụ liên quan được đánh dấu hoàn tất: %(tasks)s."
+
+#: terminal/tasks.py:51 ops/tasks.py:239
+msgid "Nothing to clean: no records exceeded the retention period."
+msgstr "Không cần dọn dẹp: không có bản ghi vượt quá thời gian lưu giữ."
+
+#: terminal/tasks.py:87
+msgid "Nothing to process: no unfinished sessions."
+msgstr "Không cần xử lý: không có phiên chưa kết thúc."
+
+#: ops/celery/utils.py:38
+#, python-format
+msgid "Checking periodic task: %(name)s."
+msgstr "Đang kiểm tra tác vụ định kỳ: %(name)s."
+
+#: ops/celery/utils.py:61
+#, python-format
+msgid "Schedule: every %(seconds)s seconds."
+msgstr "Lịch chạy: mỗi %(seconds)s giây."
+
+#: ops/celery/utils.py:46
+#, python-format
+msgid "Skipped periodic task %(name)s: the scheduling database is unavailable."
+msgstr "Bỏ qua tác vụ định kỳ %(name)s: cơ sở dữ liệu lịch chạy không khả dụng."
+
+#: ops/celery/utils.py:77
+#, python-format
+msgid "Schedule (cron): %(cron)s; time zone: %(timezone)s."
+msgstr "Lịch chạy (cron): %(cron)s; múi giờ: %(timezone)s."
+
+#: ops/celery/utils.py:81
+#, python-format
+msgid "Skipped periodic task %(name)s: no valid interval or cron expression is configured."
+msgstr "Bỏ qua tác vụ định kỳ %(name)s: chưa cấu hình khoảng thời gian hoặc biểu thức cron hợp lệ."
+
+#: ops/celery/utils.py:66
+#, python-format
+msgid "Skipped periodic task %(name)s: the cron expression must contain five fields."
+msgstr "Bỏ qua tác vụ định kỳ %(name)s: biểu thức cron phải có năm trường."
+
+#: ops/tasks.py:123
+msgid "Checking periodic tasks; tasks still registered in the worker will be kept."
+msgstr "Đang kiểm tra các tác vụ định kỳ; tác vụ còn đăng ký trong Worker sẽ được giữ lại."
+
+#: ops/tasks.py:144
+#, python-format
+msgid "Periodic tasks checked: %(checked)s; deleted: %(cleaned)s; kept because still registered: %(kept)s; cleanup failures: %(failed)s."
+msgstr "Số tác vụ định kỳ đã kiểm tra: %(checked)s; đã xóa: %(cleaned)s; giữ lại vì còn đăng ký: %(kept)s; dọn dẹp thất bại: %(failed)s."
+
+#: ops/tasks.py:161
+msgid "Starting periodic task registration."
+msgstr "Bắt đầu đăng ký tác vụ định kỳ."
+
+#: ops/tasks.py:172
+#, python-format
+msgid "Periodic tasks checked: %(checked)s; created: %(created)s; updated: %(updated)s; skipped: %(skipped)s."
+msgstr "Số tác vụ định kỳ đã kiểm tra: %(checked)s; đã tạo: %(created)s; đã cập nhật: %(updated)s; đã bỏ qua: %(skipped)s."
+
+#: ops/tasks.py:203
+#, python-format
+msgid "Checking running jobs; jobs older than %(hours)s hours will be marked failed."
+msgstr "Đang kiểm tra các công việc đang chạy; công việc quá %(hours)s giờ sẽ được đánh dấu thất bại."
+
+#: ops/tasks.py:208
+#, python-format
+msgid "Jobs checked: %(checked)s; marked failed: %(cleaned)s; skipped because within the time limit: %(skipped)s."
+msgstr "Số công việc đã kiểm tra: %(checked)s; đánh dấu thất bại: %(cleaned)s; bỏ qua vì chưa vượt giới hạn thời gian: %(skipped)s."
+
+#: ops/tasks.py:229
+#, python-format
+msgid "Checking job execution records older than %(days)s days."
+msgstr "Đang kiểm tra các bản ghi thực thi công việc cũ hơn %(days)s ngày."
+
+#: ops/tasks.py:133
+#, python-format
+msgid "Removing periodic task %(name)s: its task is no longer registered."
+msgstr "Đang xóa tác vụ định kỳ %(name)s: tác vụ tương ứng không còn được đăng ký."
+
+#: ops/tasks.py:213
+msgid "Nothing to process: no running jobs."
+msgstr "Không cần xử lý: không có công việc đang chạy."
+
+#: ops/tasks.py:143
+#, python-format
+msgid "Periodic task %(name)s still exists after cleanup."
+msgstr "Tác vụ định kỳ %(name)s vẫn tồn tại sau khi dọn dẹp."
+
+#: settings/tasks/ldap.py:88
+#, python-format
+msgid "Checking LDAP periodic sync configuration: %(name)s."
+msgstr "Đang kiểm tra cấu hình đồng bộ LDAP định kỳ: %(name)s."
+
+#: settings/tasks/ldap.py:95
+#, python-format
+msgid "Skipped registration: LDAP periodic sync is disabled; schedules kept disabled: %(count)s."
+msgstr "Bỏ qua đăng ký: đồng bộ LDAP định kỳ đã tắt; số lịch chạy được giữ ở trạng thái tắt: %(count)s."
+
+#: users/tasks.py:97
+msgid "Checking active local users with unexpired accounts and passwords."
+msgstr "Đang kiểm tra người dùng cục bộ đang hoạt động có tài khoản và mật khẩu chưa hết hạn."
+
+#: users/tasks.py:113 users/tasks.py:187
+#, python-format
+msgid "Users checked: %(checked)s; reminders queued: %(notified)s; skipped because inactive or expired: %(invalid)s; skipped because outside the reminder window: %(outside)s."
+msgstr "Số người dùng đã kiểm tra: %(checked)s; lời nhắc đã đưa vào hàng đợi: %(notified)s; bỏ qua vì không hoạt động hoặc hết hạn: %(invalid)s; bỏ qua vì ngoài thời gian nhắc: %(outside)s."
+
+#: users/tasks.py:156
+#, python-format
+msgid "Checking active local users expiring within %(first)s days; remind %(first)s days before expiry and daily within %(daily)s days."
+msgstr "Đang kiểm tra người dùng cục bộ đang hoạt động sẽ hết hạn trong %(first)s ngày; nhắc trước %(first)s ngày và hằng ngày trong %(daily)s ngày cuối."
+
+#: users/tasks.py:107
+#, python-format
+msgid "Queuing a password expiration reminder for %(user)s: %(days)s days remaining."
+msgstr "Đang đưa lời nhắc hết hạn mật khẩu của %(user)s vào hàng đợi: còn %(days)s ngày."
+
+#: users/tasks.py:119 users/tasks.py:193
+msgid "Nothing to process: no users matched the check criteria."
+msgstr "Không cần xử lý: không có người dùng phù hợp với điều kiện kiểm tra."
+
+#: users/tasks.py:181
+#, python-format
+msgid "Queuing an account expiration reminder for %(user)s: %(days)s days remaining."
+msgstr "Đang đưa lời nhắc hết hạn tài khoản của %(user)s vào hàng đợi: còn %(days)s ngày."
+
+#: accounts/tasks/openbao.py:114
+#, python-format
+msgid "OpenBao tokens checked: 1; rotated: 1; new TTL: %(ttl)s seconds."
+msgstr "Số token OpenBao đã kiểm tra: 1; đã luân chuyển: 1; thời hạn mới: %(ttl)s giây."
+
+#: accounts/tasks/openbao.py:124
+msgid "Checking OpenBao token rotation configuration."
+msgstr "Đang kiểm tra cấu hình luân chuyển token OpenBao."
+
+#: accounts/tasks/openbao.py:126
+msgid "Skipped token rotation: the OpenBao vault backend is not enabled."
+msgstr "Bỏ qua luân chuyển token: backend kho bảo mật OpenBao chưa được bật."
+
+#: accounts/tasks/openbao.py:130
+msgid "Skipped token rotation: no enabled rotation AppRole is configured."
+msgstr "Bỏ qua luân chuyển token: chưa cấu hình AppRole luân chuyển đang bật."
+
+#: accounts/tasks/openbao.py:137
+msgid "Skipped token rotation: another rotation task is running."
+msgstr "Bỏ qua luân chuyển token: một tác vụ luân chuyển khác đang chạy."
+
+#: accounts/tasks/openbao.py:82
+#, python-format
+msgid "OpenBao tokens checked: 1; rotated: 0; skipped: 1. The token is still valid for %(ttl)s seconds, above the rotation threshold of %(threshold)s seconds."
+msgstr "Số token OpenBao đã kiểm tra: 1; đã luân chuyển: 0; đã bỏ qua: 1. Token còn hiệu lực trong %(ttl)s giây, lớn hơn ngưỡng luân chuyển %(threshold)s giây."
+
+#: ops/celery/utils.py
+#, python-format
+msgid "Created periodic task %(name)s; enabled: %(enabled)s."
+msgstr "Đã tạo tác vụ định kỳ %(name)s; đã bật: %(enabled)s."
+
+#: ops/celery/utils.py
+#, python-format
+msgid "Updated periodic task %(name)s; enabled: %(enabled)s."
+msgstr "Đã cập nhật tác vụ định kỳ %(name)s; đã bật: %(enabled)s."
+
+#: tickets/tasks.py perms/tasks.py tickets/plugins/file_transfer/execution.py
+msgid "The batch limit was reached; remaining records will be checked next time."
+msgstr "Đã đạt giới hạn lô; các bản ghi còn lại sẽ được kiểm tra trong lần chạy tiếp theo."
+
+#: perms/tasks.py
+msgid "No reminder was queued; recipients are missing or publication failed."
+msgstr "Không có lời nhắc được đưa vào hàng đợi: thiếu người nhận hoặc gửi thất bại."
+
+#: perms/tasks.py
+msgid "No users or administrators are available to receive reminders."
+msgstr "Không có người dùng hoặc quản trị viên có thể nhận lời nhắc."
+
+#: perms/tasks.py authentication/tasks.py
+msgid "Notifications queued"
+msgstr "Thông báo đã đưa vào hàng đợi"
+
+#: perms/tasks.py
+msgid "The permission is outside the reminder window."
+msgstr "Quyền nằm ngoài thời gian nhắc."
+
+#: perms/tasks.py
+msgid "Unable to queue a notification."
+msgstr "Không thể đưa thông báo vào hàng đợi."
+
+#: terminal/tasks.py
+msgid "Alert notifications queued"
+msgstr "Cảnh báo đã đưa vào hàng đợi"
+
+#: terminal/tasks.py
+#, python-format
+msgid "Storage check failed: %(name)s (%(type)s)."
+msgstr "Kiểm tra lưu trữ thất bại: %(name)s (%(type)s)."
+
+#: terminal/tasks.py
+msgid "Storage connectivity or credential validation failed."
+msgstr "Kết nối lưu trữ hoặc xác thực thông tin đăng nhập thất bại."
+
+#: users/tasks.py
+msgid "Automatic disabling of unused users is not enabled."
+msgstr "Chưa bật tính năng tự động vô hiệu hóa người dùng không sử dụng."
+
+#: users/tasks.py
+#, python-format
+msgid "Checking users with no login or API key use for %(days)s days; admin is excluded."
+msgstr "Đang kiểm tra người dùng không đăng nhập hoặc sử dụng khóa API trong %(days)s ngày; loại trừ admin."
+
+#: users/tasks.py ops/celery/task_logging.py accounts/tasks/automation.py tickets/plugins/file_transfer/execution.py
+msgid "The record was already handled by another task."
+msgstr "Bản ghi đã được tác vụ khác xử lý."
+
+#: users/tasks.py
+msgid "The unused-user threshold is outside the enabled range of 1–998 days."
+msgstr "Ngưỡng người dùng không sử dụng nằm ngoài phạm vi bật từ 1 đến 998 ngày."
+
+#: users/tasks.py
+msgid "Users disabled"
+msgstr "Người dùng đã vô hiệu hóa"
+
+#: users/signal_handlers.py
+msgid "Sessions deleted"
+msgstr "Phiên đã xóa"
+
+#: ops/tasks.py
+msgid "Components with health alerts"
+msgstr "Thành phần có cảnh báo tình trạng"
+
+#: ops/tasks.py
+msgid "No health alerts to send."
+msgstr "Không có cảnh báo tình trạng cần gửi."
+
+#: ops/tasks.py
+msgid "Service performance checks are disabled by configuration."
+msgstr "Kiểm tra hiệu năng dịch vụ đã bị tắt trong cấu hình."
+
+#: ops/tasks.py
+msgid "The component is inactive."
+msgstr "Thành phần không hoạt động."
+
+#: authentication/tasks.py
+msgid "Client login session cleanup"
+msgstr "Dọn dẹp phiên đăng nhập ứng dụng khách"
+
+#: authentication/tasks.py
+msgid "Credential activity records included"
+msgstr "Bản ghi hoạt động thông tin xác thực trong bản tổng hợp"
+
+#: authentication/tasks.py
+msgid "No recent credential activity matched this user."
+msgstr "Không có hoạt động thông tin xác thực gần đây phù hợp với người dùng này."
+
+#: authentication/tasks.py
+msgid "OAuth credential cleanup categories"
+msgstr "Các loại thông tin xác thực OAuth được dọn dẹp"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Expired ID tokens deleted"
+msgstr "Token ID hết hạn đã xóa"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Expired access tokens deleted"
+msgstr "Token truy cập hết hạn đã xóa"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Expired grant tokens deleted"
+msgstr "Mã ủy quyền hết hạn đã xóa"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Expired refresh tokens deleted"
+msgstr "Token làm mới hết hạn đã xóa"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "No expired records in this credential category."
+msgstr "Không có bản ghi hết hạn trong loại thông tin xác thực này."
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Orphaned refresh tokens deleted"
+msgstr "Token làm mới mồ côi đã xóa"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Refresh-token retention settings require these tokens to be kept."
+msgstr "Cấu hình lưu giữ token làm mới yêu cầu giữ lại các token này."
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Revoked refresh tokens deleted"
+msgstr "Token làm mới đã thu hồi được xóa"
+
+#: notifications/notifications.py
+#, python-format
+msgid "Channel %(channel)s: matched recipients %(matched)s; recipients with a channel account %(bound)s; unbound %(unbound)s."
+msgstr "Kênh %(channel)s: người nhận phù hợp %(matched)s; đã liên kết tài khoản kênh %(bound)s; chưa liên kết %(unbound)s."
+
+#: notifications/notifications.py
+msgid "No recipients have an account for this notification channel."
+msgstr "Không có người nhận nào có tài khoản cho kênh thông báo này."
+
+#: notifications/notifications.py
+msgid "Notification channel calls completed"
+msgstr "Lần gọi kênh thông báo đã hoàn tất"
+
+#: notifications/notifications.py
+msgid "The notification channel does not support this message."
+msgstr "Kênh thông báo không hỗ trợ thông điệp này."
+
+#: notifications/notifications.py
+msgid "The notification channel raised an error."
+msgstr "Kênh thông báo gặp lỗi."
+
+#: authentication/services/client_login_session.py
+msgid "Client sessions revoked"
+msgstr "Phiên ứng dụng khách đã thu hồi"
+
+#: authentication/services/client_login_session.py
+msgid "The client login session is still valid."
+msgstr "Phiên đăng nhập ứng dụng khách vẫn hợp lệ."
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Failed %(count)s: %(reason)s"
+msgstr "Thất bại %(count)s: %(reason)s"
+
+#: ops/celery/task_logging.py
+msgid "No matching records to process."
+msgstr "Không có bản ghi phù hợp cần xử lý."
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Result count — %(name)s: %(count)s."
+msgstr "Kết quả — %(name)s: %(count)s."
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Skipped %(count)s: %(reason)s"
+msgstr "Bỏ qua %(count)s: %(reason)s"
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Task interrupted after %(checked)s checks; changes may have been rolled back. See the task error for details."
+msgstr "Tác vụ bị gián đoạn sau %(checked)s lần kiểm tra; các thay đổi có thể đã được hoàn tác. Xem lỗi tác vụ để biết chi tiết."
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Task started: %(name)s."
+msgstr "Bắt đầu tác vụ: %(name)s."
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Task summary: checked %(checked)s; processed %(processed)s; skipped %(skipped)s; failed %(failed)s."
+msgstr "Tổng kết: kiểm tra %(checked)s; xử lý %(processed)s; bỏ qua %(skipped)s; thất bại %(failed)s."
+
+#: accounts/tasks/remove_account.py
+msgid "History cleanup is disabled by the retention limit."
+msgstr "Dọn dẹp lịch sử bị tắt theo giới hạn lưu giữ."
+
+#: accounts/tasks/remove_account.py
+#, python-format
+msgid "Keeping %(count)s history records per account, including the current version."
+msgstr "Giữ %(count)s bản ghi lịch sử cho mỗi tài khoản, bao gồm phiên bản hiện tại."
+
+#: accounts/tasks/automation.py
+msgid "Another instance of this maintenance task is running."
+msgstr "Một phiên bản khác của tác vụ bảo trì này đang chạy."
+
+#: accounts/tasks/automation.py
+msgid "Records belong to a credential rotation that is still running."
+msgstr "Bản ghi thuộc về tác vụ luân chuyển thông tin xác thực vẫn đang chạy."
+
+#: accounts/tasks/automation.py xpack/plugins/cloud/tasks.py
+#, python-format
+msgid "Retention period: %(days)s days."
+msgstr "Thời gian lưu giữ: %(days)s ngày."
+
+#: accounts/tasks/automation.py
+msgid "The latest unsuccessful first-login result must be retained."
+msgstr "Phải giữ lại kết quả đăng nhập lần đầu không thành công gần nhất."
+
+#: accounts/tasks/automation.py
+msgid "The owning worker has not replied and the hard timeout has not elapsed."
+msgstr "Worker phụ trách chưa phản hồi và thời gian chạy tối đa chưa hết."
+
+#: accounts/tasks/automation.py
+msgid "The task is still running on a worker."
+msgstr "Tác vụ vẫn đang chạy trên một Worker."
+
+#: accounts/tasks/automation.py
+msgid "The task is still within the startup grace period."
+msgstr "Tác vụ vẫn trong thời gian ân hạn khởi động."
+
+#: accounts/tasks/automation.py
+msgid "Unable to acquire the task lock."
+msgstr "Không thể lấy khóa tác vụ."
+
+#: accounts/tasks/automation.py
+msgid "Unable to release the task lock."
+msgstr "Không thể giải phóng khóa tác vụ."
+
+#: accounts/tasks/automation.py
+msgid "Waiting for repeated confirmation that the task is missing."
+msgstr "Đang chờ xác nhận lại rằng tác vụ đã biến mất."
+
+#: accounts/tasks/automation.py
+msgid "Worker status is unavailable; recovery cannot be confirmed."
+msgstr "Không thể lấy trạng thái Worker; chưa xác nhận được nhu cầu khôi phục."
+
+#: accounts/tasks/application_events.py
+msgid "Deliveries marked expired"
+msgstr "Lượt gửi đã đánh dấu hết hạn"
+
+#: accounts/tasks/application_events.py tickets/plugins/change_secret/execution.py tickets/plugins/file_transfer/execution.py
+msgid "Executions queued"
+msgstr "Lần thực thi đã đưa vào hàng đợi"
+
+#: accounts/tasks/application_events.py tickets/plugins/change_secret/execution.py tickets/plugins/file_transfer/execution.py
+msgid "Unable to queue an execution; it will be retried later."
+msgstr "Không thể đưa lần thực thi vào hàng đợi; sẽ thử lại sau."
+
+#: accounts/tasks/credential_preparation.py
+msgid "Unable to check credential rotation readiness."
+msgstr "Không thể kiểm tra mức độ sẵn sàng luân chuyển thông tin xác thực."
+
+#: accounts/tasks/credential_preparation.py
+msgid "Waiting for client confirmation or the source-account quiet period."
+msgstr "Đang chờ xác nhận của ứng dụng khách hoặc kết thúc thời gian không hoạt động của tài khoản nguồn."
+
+#: tickets/workflow/engine.py
+msgid "The workflow has changed or its approval deadline has not elapsed."
+msgstr "Quy trình đã thay đổi hoặc chưa đến hạn phê duyệt."
+
+#: tickets/plugins/change_secret/execution.py tickets/plugins/file_transfer/execution.py
+msgid "The execution is no longer eligible for dispatch."
+msgstr "Lần thực thi không còn đủ điều kiện phân phối."
+
+#: tickets/plugins/file_transfer/execution.py
+msgid "Clean ticket transfer files"
+msgstr "Dọn dẹp tệp truyền của phiếu yêu cầu"
+
+#: tickets/plugins/file_transfer/execution.py
+msgid "Files belong to a transfer that is still running."
+msgstr "Tệp thuộc về quá trình truyền vẫn đang chạy."
+
+#: tickets/plugins/file_transfer/execution.py
+msgid "Interrupted transfers marked for verification"
+msgstr "Lượt truyền gián đoạn đã đánh dấu cần xác minh"
+
+#: tickets/plugins/file_transfer/execution.py
+msgid "Maintain ticket file transfers"
+msgstr "Bảo trì truyền tệp của phiếu yêu cầu"
+
+#: tickets/plugins/file_transfer/execution.py
+msgid "Unable to remove a temporary file; it will be retried later."
+msgstr "Không thể xóa tệp tạm; sẽ thử lại sau."
+
+#: xpack/plugins/cloud/tasks.py
+msgid "Cleanup is disabled because the retention period is not positive."
+msgstr "Dọn dẹp bị tắt vì thời gian lưu giữ không lớn hơn không."
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Reason: %(reason)s"
+msgstr "Lý do: %(reason)s"
+
+#: notifications/notifications.py
+msgid "No notification channels are configured."
+msgstr "Chưa cấu hình kênh thông báo."
+
+#: accounts/tasks/application_events.py:46
+#, python-format
+msgid "Unable to dispatch application webhook delivery %(delivery)s."
+msgstr "Không thể lên lịch gửi webhook ứng dụng %(delivery)s."
+
+#: accounts/tasks/application_events.py:167 accounts/tasks/application_events.py:170
+msgid "Expire application event deliveries"
+msgstr "Đánh dấu các lượt gửi sự kiện ứng dụng đã hết hạn"
+
+#: accounts/tasks/automation.py:139
+msgid "Skipped interrupted account task inspection: no Celery worker replied."
+msgstr "Bỏ qua kiểm tra tác vụ tài khoản bị gián đoạn: không có worker Celery nào phản hồi."
+
+#: accounts/tasks/automation.py:132
+msgid "Unable to inspect active Celery tasks."
+msgstr "Không thể kiểm tra các tác vụ Celery đang chạy."
+
+#: accounts/tasks/automation.py:169
+#, python-format
+msgid "Unable to confirm interrupted task status: execution=%(execution)s."
+msgstr "Không thể xác nhận trạng thái tác vụ bị gián đoạn: lần thực thi=%(execution)s."
+
+#: accounts/tasks/automation.py:180
+#, python-format
+msgid "Unable to clear the interrupted task confirmation marker: execution=%(execution)s."
+msgstr "Không thể xóa dấu xác nhận tác vụ bị gián đoạn: lần thực thi=%(execution)s."
+
+#: accounts/tasks/automation.py:202
+msgid "Unable to acquire the interrupted account task recovery lock."
+msgstr "Không thể lấy khóa khôi phục tác vụ tài khoản bị gián đoạn."
+
+#: accounts/tasks/automation.py:218
+msgid "Unable to release the interrupted account task recovery lock."
+msgstr "Không thể giải phóng khóa khôi phục tác vụ tài khoản bị gián đoạn."
+
+#: accounts/tasks/credential_preparation.py:12 accounts/tasks/credential_preparation.py:15
+msgid "Check credential rotation readiness"
+msgstr "Kiểm tra mức độ sẵn sàng luân chuyển thông tin xác thực"
+
+#: accounts/tasks/credential_preparation.py:33
+#, python-format
+msgid "Unable to check rotation readiness: credential=%(credential)s."
+msgstr "Không thể kiểm tra mức độ sẵn sàng luân chuyển: thông tin xác thực=%(credential)s."
+
+#: accounts/tasks/openbao.py:28
+msgid "JumpServer must use the OpenBao vault backend."
+msgstr "JumpServer phải sử dụng backend kho bí mật OpenBao."
+
+#: accounts/tasks/openbao.py:30
+msgid "OpenBao token rotation requires HTTPS with TLS verification."
+msgstr "Luân chuyển token OpenBao yêu cầu HTTPS có xác minh TLS."
+
+#: accounts/tasks/openbao.py:62
+#, python-format
+msgid "OpenBao token lookup returned HTTP %(status)s."
+msgstr "Truy vấn token OpenBao trả về HTTP %(status)s."
+
+#: accounts/tasks/openbao.py:70
+msgid "OpenBao address changed. Reconfigure the rotation AppRole."
+msgstr "Địa chỉ OpenBao đã thay đổi. Hãy cấu hình lại AppRole dùng để luân chuyển."
+
+#: accounts/tasks/openbao.py:98
+msgid "OpenBao did not issue a distinct token."
+msgstr "OpenBao không cấp token mới khác với token trước đó."
+
+#: accounts/tasks/openbao.py:102
+msgid "The new OpenBao token must support self lookup and last over seven days."
+msgstr "Token OpenBao mới phải hỗ trợ tự truy vấn và có hiệu lực hơn bảy ngày."
+
+#: accounts/tasks/openbao.py:104
+msgid "The new token failed the JumpServer OpenBao operation check."
+msgstr "Token mới không vượt qua kiểm tra thao tác OpenBao của JumpServer."
+
+#: accounts/tasks/openbao.py:94
+#, python-format
+msgid "OpenBao AppRole login returned HTTP %(status)s."
+msgstr "Đăng nhập AppRole OpenBao trả về HTTP %(status)s."
+
+#: accounts/tasks/openbao.py:109
+msgid "The configured OpenBao token changed during rotation."
+msgstr "Token OpenBao đã cấu hình bị thay đổi trong quá trình luân chuyển."
+
+#: accounts/tasks/openbao.py:120
+msgid "Check and rotate the OpenBao vault token"
+msgstr "Kiểm tra và luân chuyển token kho bí mật OpenBao"
+
+#: accounts/tasks/openbao.py:133
+msgid "OpenBao rotation requires encrypted AppRole credentials."
+msgstr "Luân chuyển OpenBao yêu cầu thông tin xác thực AppRole được mã hóa."
+
+#: authentication/services/client_login_session.py:411
+msgid "Access tokens deleted"
+msgstr "Token truy cập đã xóa"
+
+#: authentication/services/client_login_session.py:412
+msgid "Refresh tokens deleted"
+msgstr "Token làm mới đã xóa"
+
+#: authentication/services/client_login_session.py:419
+msgid "Client login sessions deleted"
+msgstr "Phiên đăng nhập máy khách đã xóa"
+
+#: perms/tasks.py:141
+#, python-format
+msgid "Unable to queue an asset permission expiration reminder: permission=%(permission)s; user=%(user)s."
+msgstr "Không thể đưa lời nhắc hết hạn quyền tài sản vào hàng đợi: quyền=%(permission)s; người dùng=%(user)s."
+
+#: terminal/tasks.py:268
+#, python-brace-format
+msgid "Test failure: {error}"
+msgstr "Kiểm tra thất bại: {error}"
+
+#: tickets/plugins/change_secret/execution.py:100
+#, python-format
+msgid "Unable to queue password change for ticket %(ticket)s (%(error)s)."
+msgstr "Không thể đưa tác vụ đổi mật khẩu của phiếu %(ticket)s vào hàng đợi (%(error)s)."
+
+#: tickets/plugins/file_transfer/execution.py:50
+#, python-format
+msgid "Unable to queue ticket transfer %(ticket)s (%(error)s)."
+msgstr "Không thể đưa tác vụ truyền tệp của phiếu %(ticket)s vào hàng đợi (%(error)s)."
+
+#: tickets/plugins/file_transfer/execution.py:249
+#, python-format
+msgid "Unable to purge ticket transfer file %(file)s (%(error)s)."
+msgstr "Không thể xóa tệp truyền của phiếu %(file)s (%(error)s)."
+
+#: tickets/tasks.py:16 tickets/tasks.py:21
+msgid "Expire overdue ticket approvals"
+msgstr "Xử lý phê duyệt phiếu đã quá hạn"
+
+#: tickets/tasks.py:17
+msgid "Check approval deadlines every minute and apply the configured timeout action."
+msgstr "Kiểm tra thời hạn phê duyệt mỗi phút và thực hiện hành động hết hạn đã cấu hình."
+
+#: tickets/tasks.py:47 tickets/tasks.py:52
+msgid "Dispatch ticket password changes"
+msgstr "Lên lịch đổi mật khẩu theo phiếu"
+
+#: tickets/tasks.py:48
+msgid "Dispatch pending password change executions every minute."
+msgstr "Lên lịch các lần đổi mật khẩu đang chờ mỗi phút."
+
+#: accounts/automations/recovery.py:38
+msgid "Invalid interrupted automation runtime path."
+msgstr "Đường dẫn thư mục thực thi của tác vụ tự động bị gián đoạn không hợp lệ."
+
+#: accounts/automations/recovery.py:269
+#, python-format
+msgid "Interrupted account automation finalized: execution=%(execution)s; status=%(status)s; password change records=%(changes)s; password push records=%(pushes)s."
+msgstr "Đã hoàn tất xử lý tác vụ tự động tài khoản bị gián đoạn: lần thực thi=%(execution)s; trạng thái=%(status)s; bản ghi đổi mật khẩu=%(changes)s; bản ghi đẩy mật khẩu=%(pushes)s."
+
+#: accounts/automations/recovery.py:264
+#, python-format
+msgid "Unable to clean the interrupted automation runtime: execution=%(execution)s."
+msgstr "Không thể dọn thư mục thực thi của tác vụ tự động bị gián đoạn: lần thực thi=%(execution)s."
+
+#: accounts/automations/recovery.py:244
+#, python-format
+msgid "Unable to clear interrupted account task status: execution=%(execution)s; account=%(account)s."
+msgstr "Không thể xóa trạng thái tác vụ tài khoản bị gián đoạn: lần thực thi=%(execution)s; tài khoản=%(account)s."
+
+#: accounts/automations/recovery.py:257
+#, python-format
+msgid "Unable to release the interrupted account lock: execution=%(execution)s; account=%(account)s."
+msgstr "Không thể giải phóng khóa tài khoản bị gián đoạn: lần thực thi=%(execution)s; tài khoản=%(account)s."

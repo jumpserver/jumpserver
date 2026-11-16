@@ -5,6 +5,8 @@ from datetime import timedelta
 from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
+from django.utils.translation import gettext
+from ops.celery.task_logging import TaskLog
 
 from orgs.utils import tmp_to_org, tmp_to_root_org
 from tickets.models import Ticket, TicketTransferExecution, TicketTransferFile, WorkflowEvent
@@ -25,18 +27,29 @@ def pending():
         Q(dispatch_after__isnull=True) | Q(dispatch_after__lte=timezone.now()))
 
 
-def dispatch(ticket_id):
+def dispatch(ticket_id, task_log=None):
     from tickets.tasks import execute_ticket_file_transfer
+    if task_log:
+        task_log.checked += 1
     with tmp_to_root_org(), transaction.atomic():
         execution = pending().select_for_update().filter(pk=ticket_id).first()
         if not execution:
+            if task_log:
+                task_log.skip(gettext('The execution is no longer eligible for dispatch.'))
             return
         execution.dispatch_after = timezone.now() + timedelta(minutes=5)
         execution.save(update_fields=['dispatch_after'])
     try:
         execute_ticket_file_transfer.delay(str(ticket_id))
+        if task_log:
+            task_log.processed += 1
+            task_log.metric(gettext('Executions queued'), 1)
     except Exception as exc:
-        logger.error('Unable to queue ticket transfer %s (%s)', ticket_id, type(exc).__name__)
+        if task_log:
+            task_log.fail(gettext('Unable to queue an execution; it will be retried later.'))
+        logger.error(gettext('Unable to queue ticket transfer %(ticket)s (%(error)s).'), {
+            'ticket': ticket_id, 'error': type(exc).__name__,
+        })
 
 
 def execute(ticket_id):
@@ -173,47 +186,69 @@ def get_result(ticket, user):
 
 
 def maintain():
-    with tmp_to_root_org():
-        ids = list(pending().order_by('date_created').values_list('pk', flat=True)[:100])
-        for pk in ids:
-            dispatch(pk)
-        # Started transfers are never replayed: an interrupted upload may already exist remotely.
-        stale = TicketTransferExecution.objects.filter(state='running',
-                                                       date_started__lt=timezone.now() - timedelta(minutes=17))
-        for execution in stale[:100]:
-            with transaction.atomic():
-                execution = stale.select_for_update().filter(pk=execution.pk).first()
-                if not execution:
-                    continue
-                for item in execution.files:
-                    if item['state'] in ('pending', 'running'):
-                        item.update(state='unverified', error='interrupted')
-                execution.state, execution.date_finished = 'unverified', timezone.now()
-                execution.save(update_fields=['state', 'files', 'date_finished'])
-    return len(ids)
+    with TaskLog(logger, gettext('Maintain ticket file transfers')) as log:
+        with tmp_to_root_org():
+            ids = list(pending().order_by('date_created').values_list('pk', flat=True)[:100])
+            for pk in ids:
+                dispatch(pk, task_log=log)
+            # Started transfers are never replayed: an interrupted upload may already exist remotely.
+            stale = TicketTransferExecution.objects.filter(state='running',
+                                                           date_started__lt=timezone.now() - timedelta(minutes=17))
+            stale_checked = 0
+            for execution in stale[:100]:
+                stale_checked += 1
+                log.checked += 1
+                with transaction.atomic():
+                    execution = stale.select_for_update().filter(pk=execution.pk).first()
+                    if not execution:
+                        log.skip(gettext('The record was already handled by another task.'))
+                        continue
+                    for item in execution.files:
+                        if item['state'] in ('pending', 'running'):
+                            item.update(state='unverified', error='interrupted')
+                    execution.state, execution.date_finished = 'unverified', timezone.now()
+                    execution.save(update_fields=['state', 'files', 'date_finished'])
+                log.processed += 1
+                log.metric(gettext('Interrupted transfers marked for verification'), 1)
+            if len(ids) == 100 or stale_checked == 100:
+                log.skip(gettext('The batch limit was reached; remaining records will be checked next time.'), 0)
+        return len(ids)
 
 
 def cleanup():
-    purged = 0
-    with tmp_to_root_org():
-        files = TicketTransferFile.objects.filter(purged_at__isnull=True).filter(
-            Q(expires_at__lte=timezone.now()) | Q(ticket__state__in=['rejected', 'closed', 'cancelled', 'expired', 'error'])
-        ).exclude(ticket__transfer_execution__state='running')
-        remaining = files
-        while ids := list(remaining.order_by('pk').values_list('pk', flat=True)[:100]):
-            for pk in ids:
-                try:
-                    with transaction.atomic():
-                        record = TicketTransferFile.objects.select_for_update().filter(
-                            pk=pk, pk__in=files.values('pk'),
-                        ).first()
-                        if record:
-                            record.path.unlink(missing_ok=True)
-                            record.purged_at = timezone.now()
-                            record.save(update_fields=['purged_at'])
-                            purged += 1
-                except OSError as exc:
-                    logger.error('Unable to purge ticket transfer file %s (%s)', pk, type(exc).__name__)
-            # Advance past failed or no-longer-eligible files; retry failures on the next hourly run.
-            remaining = files.filter(pk__gt=ids[-1])
-    return purged
+    with TaskLog(logger, gettext('Clean ticket transfer files')) as log:
+        purged = 0
+        with tmp_to_root_org():
+            candidates = TicketTransferFile.objects.filter(purged_at__isnull=True).filter(
+                Q(expires_at__lte=timezone.now()) | Q(ticket__state__in=['rejected', 'closed', 'cancelled', 'expired', 'error'])
+            )
+            protected = candidates.filter(ticket__transfer_execution__state='running').count()
+            log.checked += protected
+            if protected:
+                log.skip(gettext('Files belong to a transfer that is still running.'), protected)
+            files = candidates.exclude(ticket__transfer_execution__state='running')
+            remaining = files
+            while ids := list(remaining.order_by('pk').values_list('pk', flat=True)[:100]):
+                for pk in ids:
+                    log.checked += 1
+                    try:
+                        with transaction.atomic():
+                            record = TicketTransferFile.objects.select_for_update().filter(
+                                pk=pk, pk__in=files.values('pk'),
+                            ).first()
+                            if record:
+                                record.path.unlink(missing_ok=True)
+                                record.purged_at = timezone.now()
+                                record.save(update_fields=['purged_at'])
+                                purged += 1
+                                log.processed += 1
+                            else:
+                                log.skip(gettext('The record was already handled by another task.'))
+                    except OSError as exc:
+                        log.fail(gettext('Unable to remove a temporary file; it will be retried later.'))
+                        logger.error(gettext('Unable to purge ticket transfer file %(file)s (%(error)s).'), {
+                            'file': pk, 'error': type(exc).__name__,
+                        })
+                # Advance past failed or no-longer-eligible files; retry failures on the next hourly run.
+                remaining = files.filter(pk__gt=ids[-1])
+        return purged

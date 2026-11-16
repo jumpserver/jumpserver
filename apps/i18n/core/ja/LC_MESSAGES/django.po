@@ -18377,3 +18377,652 @@ msgstr "リソースの失敗とスキャンやタスクのエラーは別々に
 #: xpack/plugins/cloud/const.py
 msgid "Partial"
 msgstr "一部成功"
+
+#: terminal/tasks.py:42
+#, python-format
+msgid "Checking terminal status records older than %(days)s days."
+msgstr "%(days)s 日を超えたターミナル状態レコードを確認しています。"
+
+#: terminal/tasks.py:47 ops/tasks.py:235
+#, python-format
+msgid "Expired records matched: %(checked)s; deleted: %(deleted)s."
+msgstr "期限切れの該当レコード：%(checked)s 件、削除：%(deleted)s 件。"
+
+#: terminal/tasks.py:65
+msgid "Checking unfinished sessions; active sessions will be kept."
+msgstr "未終了のセッションを確認しています。アクティブなセッションは保持します。"
+
+#: terminal/tasks.py:82
+#, python-format
+msgid "Sessions checked: %(checked)s; marked finished: %(finished)s; skipped because still active: %(active)s; related tasks marked finished: %(tasks)s."
+msgstr "確認したセッション：%(checked)s 件、終了に変更：%(finished)s 件、アクティブのためスキップ：%(active)s 件、完了に変更した関連タスク：%(tasks)s 件。"
+
+#: terminal/tasks.py:51 ops/tasks.py:239
+msgid "Nothing to clean: no records exceeded the retention period."
+msgstr "クリーンアップ不要：保持期間を超えたレコードはありません。"
+
+#: terminal/tasks.py:87
+msgid "Nothing to process: no unfinished sessions."
+msgstr "処理不要：未終了のセッションはありません。"
+
+#: ops/celery/utils.py:38
+#, python-format
+msgid "Checking periodic task: %(name)s."
+msgstr "定期タスクを確認しています：%(name)s。"
+
+#: ops/celery/utils.py:61
+#, python-format
+msgid "Schedule: every %(seconds)s seconds."
+msgstr "実行スケジュール：%(seconds)s 秒ごと。"
+
+#: ops/celery/utils.py:46
+#, python-format
+msgid "Skipped periodic task %(name)s: the scheduling database is unavailable."
+msgstr "定期タスク %(name)s をスキップ：スケジュール用データベースを利用できません。"
+
+#: ops/celery/utils.py:77
+#, python-format
+msgid "Schedule (cron): %(cron)s; time zone: %(timezone)s."
+msgstr "実行スケジュール（cron）：%(cron)s、タイムゾーン：%(timezone)s。"
+
+#: ops/celery/utils.py:81
+#, python-format
+msgid "Skipped periodic task %(name)s: no valid interval or cron expression is configured."
+msgstr "定期タスク %(name)s をスキップ：有効な実行間隔または cron 式が設定されていません。"
+
+#: ops/celery/utils.py:66
+#, python-format
+msgid "Skipped periodic task %(name)s: the cron expression must contain five fields."
+msgstr "定期タスク %(name)s をスキップ：cron 式には 5 つのフィールドが必要です。"
+
+#: ops/tasks.py:123
+msgid "Checking periodic tasks; tasks still registered in the worker will be kept."
+msgstr "定期タスクを確認しています。Worker に登録されているタスクは保持します。"
+
+#: ops/tasks.py:144
+#, python-format
+msgid "Periodic tasks checked: %(checked)s; deleted: %(cleaned)s; kept because still registered: %(kept)s; cleanup failures: %(failed)s."
+msgstr "確認した定期タスク：%(checked)s 件、削除：%(cleaned)s 件、登録済みのため保持：%(kept)s 件、クリーンアップ失敗：%(failed)s 件。"
+
+#: ops/tasks.py:161
+msgid "Starting periodic task registration."
+msgstr "定期タスクの登録を開始します。"
+
+#: ops/tasks.py:172
+#, python-format
+msgid "Periodic tasks checked: %(checked)s; created: %(created)s; updated: %(updated)s; skipped: %(skipped)s."
+msgstr "確認した定期タスク：%(checked)s 件、作成：%(created)s 件、更新：%(updated)s 件、スキップ：%(skipped)s 件。"
+
+#: ops/tasks.py:203
+#, python-format
+msgid "Checking running jobs; jobs older than %(hours)s hours will be marked failed."
+msgstr "実行中のジョブを確認しています。%(hours)s 時間を超えたジョブは失敗に変更します。"
+
+#: ops/tasks.py:208
+#, python-format
+msgid "Jobs checked: %(checked)s; marked failed: %(cleaned)s; skipped because within the time limit: %(skipped)s."
+msgstr "確認したジョブ：%(checked)s 件、失敗に変更：%(cleaned)s 件、制限時間内のためスキップ：%(skipped)s 件。"
+
+#: ops/tasks.py:229
+#, python-format
+msgid "Checking job execution records older than %(days)s days."
+msgstr "%(days)s 日を超えたジョブ実行レコードを確認しています。"
+
+#: ops/tasks.py:133
+#, python-format
+msgid "Removing periodic task %(name)s: its task is no longer registered."
+msgstr "定期タスク %(name)s を削除しています：対応するタスクの登録がなくなりました。"
+
+#: ops/tasks.py:213
+msgid "Nothing to process: no running jobs."
+msgstr "処理不要：実行中のジョブはありません。"
+
+#: ops/tasks.py:143
+#, python-format
+msgid "Periodic task %(name)s still exists after cleanup."
+msgstr "クリーンアップ後も定期タスク %(name)s が存在します。"
+
+#: settings/tasks/ldap.py:88
+#, python-format
+msgid "Checking LDAP periodic sync configuration: %(name)s."
+msgstr "LDAP 定期同期の設定を確認しています：%(name)s。"
+
+#: settings/tasks/ldap.py:95
+#, python-format
+msgid "Skipped registration: LDAP periodic sync is disabled; schedules kept disabled: %(count)s."
+msgstr "登録をスキップ：LDAP 定期同期は無効です。無効状態を維持するスケジュール：%(count)s 件。"
+
+#: users/tasks.py:97
+msgid "Checking active local users with unexpired accounts and passwords."
+msgstr "アカウントとパスワードが有効期限内の、有効なローカルユーザーを確認しています。"
+
+#: users/tasks.py:113 users/tasks.py:187
+#, python-format
+msgid "Users checked: %(checked)s; reminders queued: %(notified)s; skipped because inactive or expired: %(invalid)s; skipped because outside the reminder window: %(outside)s."
+msgstr "確認したユーザー：%(checked)s 人、通知をキューに登録：%(notified)s 件、無効または期限切れのためスキップ：%(invalid)s 人、通知期間外のためスキップ：%(outside)s 人。"
+
+#: users/tasks.py:156
+#, python-format
+msgid "Checking active local users expiring within %(first)s days; remind %(first)s days before expiry and daily within %(daily)s days."
+msgstr "%(first)s 日以内に期限切れとなる有効なローカルユーザーを確認しています。期限の %(first)s 日前と、最後の %(daily)s 日間は毎日通知します。"
+
+#: users/tasks.py:107
+#, python-format
+msgid "Queuing a password expiration reminder for %(user)s: %(days)s days remaining."
+msgstr "%(user)s のパスワード期限通知をキューに登録しています：残り %(days)s 日。"
+
+#: users/tasks.py:119 users/tasks.py:193
+msgid "Nothing to process: no users matched the check criteria."
+msgstr "処理不要：確認条件に一致するユーザーはいません。"
+
+#: users/tasks.py:181
+#, python-format
+msgid "Queuing an account expiration reminder for %(user)s: %(days)s days remaining."
+msgstr "%(user)s のアカウント期限通知をキューに登録しています：残り %(days)s 日。"
+
+#: accounts/tasks/openbao.py:114
+#, python-format
+msgid "OpenBao tokens checked: 1; rotated: 1; new TTL: %(ttl)s seconds."
+msgstr "確認した OpenBao トークン：1 個、ローテーション：1 個、新しい有効期間：%(ttl)s 秒。"
+
+#: accounts/tasks/openbao.py:124
+msgid "Checking OpenBao token rotation configuration."
+msgstr "OpenBao トークンのローテーション設定を確認しています。"
+
+#: accounts/tasks/openbao.py:126
+msgid "Skipped token rotation: the OpenBao vault backend is not enabled."
+msgstr "トークンのローテーションをスキップ：OpenBao Vault バックエンドが有効ではありません。"
+
+#: accounts/tasks/openbao.py:130
+msgid "Skipped token rotation: no enabled rotation AppRole is configured."
+msgstr "トークンのローテーションをスキップ：有効なローテーション用 AppRole が設定されていません。"
+
+#: accounts/tasks/openbao.py:137
+msgid "Skipped token rotation: another rotation task is running."
+msgstr "トークンのローテーションをスキップ：別のローテーションタスクが実行中です。"
+
+#: accounts/tasks/openbao.py:82
+#, python-format
+msgid "OpenBao tokens checked: 1; rotated: 0; skipped: 1. The token is still valid for %(ttl)s seconds, above the rotation threshold of %(threshold)s seconds."
+msgstr "確認した OpenBao トークン：1 個、ローテーション：0 個、スキップ：1 個。残りの有効期間は %(ttl)s 秒で、ローテーションのしきい値 %(threshold)s 秒を超えています。"
+
+#: ops/celery/utils.py
+#, python-format
+msgid "Created periodic task %(name)s; enabled: %(enabled)s."
+msgstr "定期タスク %(name)s を作成しました。有効：%(enabled)s。"
+
+#: ops/celery/utils.py
+#, python-format
+msgid "Updated periodic task %(name)s; enabled: %(enabled)s."
+msgstr "定期タスク %(name)s を更新しました。有効：%(enabled)s。"
+
+#: tickets/tasks.py perms/tasks.py tickets/plugins/file_transfer/execution.py
+msgid "The batch limit was reached; remaining records will be checked next time."
+msgstr "バッチ上限に達しました。残りのレコードは次回確認します。"
+
+#: perms/tasks.py
+msgid "No reminder was queued; recipients are missing or publication failed."
+msgstr "通知はキューに登録されませんでした。受信者がいないか、登録に失敗しました。"
+
+#: perms/tasks.py
+msgid "No users or administrators are available to receive reminders."
+msgstr "通知を受信できるユーザーまたは管理者がいません。"
+
+#: perms/tasks.py authentication/tasks.py
+msgid "Notifications queued"
+msgstr "キューに登録した通知"
+
+#: perms/tasks.py
+msgid "The permission is outside the reminder window."
+msgstr "権限が通知期間外です。"
+
+#: perms/tasks.py
+msgid "Unable to queue a notification."
+msgstr "通知をキューに登録できません。"
+
+#: terminal/tasks.py
+msgid "Alert notifications queued"
+msgstr "キューに登録したアラート通知"
+
+#: terminal/tasks.py
+#, python-format
+msgid "Storage check failed: %(name)s (%(type)s)."
+msgstr "ストレージの確認に失敗しました：%(name)s（%(type)s）。"
+
+#: terminal/tasks.py
+msgid "Storage connectivity or credential validation failed."
+msgstr "ストレージの接続または認証情報の検証に失敗しました。"
+
+#: users/tasks.py
+msgid "Automatic disabling of unused users is not enabled."
+msgstr "未使用ユーザーの自動無効化が有効になっていません。"
+
+#: users/tasks.py
+#, python-format
+msgid "Checking users with no login or API key use for %(days)s days; admin is excluded."
+msgstr "%(days)s 日間ログインも API キーの使用もないユーザーを確認しています。admin は除外します。"
+
+#: users/tasks.py ops/celery/task_logging.py accounts/tasks/automation.py tickets/plugins/file_transfer/execution.py
+msgid "The record was already handled by another task."
+msgstr "レコードは別のタスクで処理済みです。"
+
+#: users/tasks.py
+msgid "The unused-user threshold is outside the enabled range of 1–998 days."
+msgstr "未使用ユーザーのしきい値が有効範囲（1～998 日）の外です。"
+
+#: users/tasks.py
+msgid "Users disabled"
+msgstr "無効化したユーザー"
+
+#: users/signal_handlers.py
+msgid "Sessions deleted"
+msgstr "削除したセッション"
+
+#: ops/tasks.py
+msgid "Components with health alerts"
+msgstr "正常性アラートのあるコンポーネント"
+
+#: ops/tasks.py
+msgid "No health alerts to send."
+msgstr "送信する正常性アラートはありません。"
+
+#: ops/tasks.py
+msgid "Service performance checks are disabled by configuration."
+msgstr "設定によりサービス性能チェックが無効になっています。"
+
+#: ops/tasks.py
+msgid "The component is inactive."
+msgstr "コンポーネントが無効です。"
+
+#: authentication/tasks.py
+msgid "Client login session cleanup"
+msgstr "クライアントログインセッションのクリーンアップ"
+
+#: authentication/tasks.py
+msgid "Credential activity records included"
+msgstr "集計に含まれる認証情報のアクティビティ記録"
+
+#: authentication/tasks.py
+msgid "No recent credential activity matched this user."
+msgstr "このユーザーには対象となる最近の認証情報アクティビティがありません。"
+
+#: authentication/tasks.py
+msgid "OAuth credential cleanup categories"
+msgstr "OAuth 認証情報カテゴリのクリーンアップ"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Expired ID tokens deleted"
+msgstr "削除した期限切れ ID トークン"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Expired access tokens deleted"
+msgstr "削除した期限切れアクセストークン"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Expired grant tokens deleted"
+msgstr "削除した期限切れ認可コード"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Expired refresh tokens deleted"
+msgstr "削除した期限切れリフレッシュトークン"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "No expired records in this credential category."
+msgstr "この認証情報カテゴリに期限切れレコードはありません。"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Orphaned refresh tokens deleted"
+msgstr "削除した孤立リフレッシュトークン"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Refresh-token retention settings require these tokens to be kept."
+msgstr "リフレッシュトークンの保持設定により、これらのトークンは保持されます。"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Revoked refresh tokens deleted"
+msgstr "削除した失効済みリフレッシュトークン"
+
+#: notifications/notifications.py
+#, python-format
+msgid "Channel %(channel)s: matched recipients %(matched)s; recipients with a channel account %(bound)s; unbound %(unbound)s."
+msgstr "チャネル %(channel)s：対象受信者 %(matched)s 人、チャネルアカウント連携済み %(bound)s 人、未連携 %(unbound)s 人。"
+
+#: notifications/notifications.py
+msgid "No recipients have an account for this notification channel."
+msgstr "この通知チャネルのアカウントを持つ受信者がいません。"
+
+#: notifications/notifications.py
+msgid "Notification channel calls completed"
+msgstr "完了した通知チャネル呼び出し"
+
+#: notifications/notifications.py
+msgid "The notification channel does not support this message."
+msgstr "この通知チャネルはこのメッセージをサポートしていません。"
+
+#: notifications/notifications.py
+msgid "The notification channel raised an error."
+msgstr "通知チャネルでエラーが発生しました。"
+
+#: authentication/services/client_login_session.py
+msgid "Client sessions revoked"
+msgstr "失効したクライアントセッション"
+
+#: authentication/services/client_login_session.py
+msgid "The client login session is still valid."
+msgstr "クライアントログインセッションはまだ有効です。"
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Failed %(count)s: %(reason)s"
+msgstr "失敗 %(count)s：%(reason)s"
+
+#: ops/celery/task_logging.py
+msgid "No matching records to process."
+msgstr "処理対象のレコードはありません。"
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Result count — %(name)s: %(count)s."
+msgstr "処理結果 — %(name)s：%(count)s。"
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Skipped %(count)s: %(reason)s"
+msgstr "スキップ %(count)s：%(reason)s"
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Task interrupted after %(checked)s checks; changes may have been rolled back. See the task error for details."
+msgstr "%(checked)s 件の確認後にタスクが中断しました。変更はロールバックされた可能性があります。詳細はタスクのエラーログを確認してください。"
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Task started: %(name)s."
+msgstr "タスク開始：%(name)s。"
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Task summary: checked %(checked)s; processed %(processed)s; skipped %(skipped)s; failed %(failed)s."
+msgstr "タスク集計：確認 %(checked)s、処理 %(processed)s、スキップ %(skipped)s、失敗 %(failed)s。"
+
+#: accounts/tasks/remove_account.py
+msgid "History cleanup is disabled by the retention limit."
+msgstr "保持上限の設定により履歴のクリーンアップが無効です。"
+
+#: accounts/tasks/remove_account.py
+#, python-format
+msgid "Keeping %(count)s history records per account, including the current version."
+msgstr "現在のバージョンを含め、アカウントごとに %(count)s 件の履歴を保持します。"
+
+#: accounts/tasks/automation.py
+msgid "Another instance of this maintenance task is running."
+msgstr "同じメンテナンスタスクの別のインスタンスが実行中です。"
+
+#: accounts/tasks/automation.py
+msgid "Records belong to a credential rotation that is still running."
+msgstr "レコードは実行中の認証情報ローテーションに属しています。"
+
+#: accounts/tasks/automation.py xpack/plugins/cloud/tasks.py
+#, python-format
+msgid "Retention period: %(days)s days."
+msgstr "保持期間：%(days)s 日。"
+
+#: accounts/tasks/automation.py
+msgid "The latest unsuccessful first-login result must be retained."
+msgstr "初回ログインの最新の失敗結果は保持する必要があります。"
+
+#: accounts/tasks/automation.py
+msgid "The owning worker has not replied and the hard timeout has not elapsed."
+msgstr "担当 Worker が応答せず、最大実行時間も経過していません。"
+
+#: accounts/tasks/automation.py
+msgid "The task is still running on a worker."
+msgstr "タスクは Worker で実行中です。"
+
+#: accounts/tasks/automation.py
+msgid "The task is still within the startup grace period."
+msgstr "タスクは起動猶予期間内です。"
+
+#: accounts/tasks/automation.py
+msgid "Unable to acquire the task lock."
+msgstr "タスクのロックを取得できません。"
+
+#: accounts/tasks/automation.py
+msgid "Unable to release the task lock."
+msgstr "タスクのロックを解放できません。"
+
+#: accounts/tasks/automation.py
+msgid "Waiting for repeated confirmation that the task is missing."
+msgstr "タスクが消失したかどうかの再確認を待っています。"
+
+#: accounts/tasks/automation.py
+msgid "Worker status is unavailable; recovery cannot be confirmed."
+msgstr "Worker の状態を取得できないため、復旧の必要性を確認できません。"
+
+#: accounts/tasks/application_events.py
+msgid "Deliveries marked expired"
+msgstr "期限切れに変更した配信"
+
+#: accounts/tasks/application_events.py tickets/plugins/change_secret/execution.py tickets/plugins/file_transfer/execution.py
+msgid "Executions queued"
+msgstr "キューに登録した実行タスク"
+
+#: accounts/tasks/application_events.py tickets/plugins/change_secret/execution.py tickets/plugins/file_transfer/execution.py
+msgid "Unable to queue an execution; it will be retried later."
+msgstr "実行タスクをキューに登録できません。後で再試行します。"
+
+#: accounts/tasks/credential_preparation.py
+msgid "Unable to check credential rotation readiness."
+msgstr "認証情報ローテーションの準備状態を確認できません。"
+
+#: accounts/tasks/credential_preparation.py
+msgid "Waiting for client confirmation or the source-account quiet period."
+msgstr "クライアントの確認または元アカウントの無操作期間の終了を待っています。"
+
+#: tickets/workflow/engine.py
+msgid "The workflow has changed or its approval deadline has not elapsed."
+msgstr "ワークフローが変更されたか、承認期限がまだ経過していません。"
+
+#: tickets/plugins/change_secret/execution.py tickets/plugins/file_transfer/execution.py
+msgid "The execution is no longer eligible for dispatch."
+msgstr "実行レコードが配信条件を満たさなくなりました。"
+
+#: tickets/plugins/file_transfer/execution.py
+msgid "Clean ticket transfer files"
+msgstr "チケット転送ファイルのクリーンアップ"
+
+#: tickets/plugins/file_transfer/execution.py
+msgid "Files belong to a transfer that is still running."
+msgstr "ファイルは実行中の転送に属しています。"
+
+#: tickets/plugins/file_transfer/execution.py
+msgid "Interrupted transfers marked for verification"
+msgstr "要検証に変更した中断済み転送"
+
+#: tickets/plugins/file_transfer/execution.py
+msgid "Maintain ticket file transfers"
+msgstr "チケットのファイル転送のメンテナンス"
+
+#: tickets/plugins/file_transfer/execution.py
+msgid "Unable to remove a temporary file; it will be retried later."
+msgstr "一時ファイルを削除できません。後で再試行します。"
+
+#: xpack/plugins/cloud/tasks.py
+msgid "Cleanup is disabled because the retention period is not positive."
+msgstr "保持期間が正の値ではないため、クリーンアップは無効です。"
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Reason: %(reason)s"
+msgstr "説明：%(reason)s"
+
+#: notifications/notifications.py
+msgid "No notification channels are configured."
+msgstr "通知チャネルが設定されていません。"
+
+#: accounts/tasks/application_events.py:46
+#, python-format
+msgid "Unable to dispatch application webhook delivery %(delivery)s."
+msgstr "アプリケーション Webhook の配信 %(delivery)s をスケジュールできません。"
+
+#: accounts/tasks/application_events.py:167 accounts/tasks/application_events.py:170
+msgid "Expire application event deliveries"
+msgstr "アプリケーションイベントの配信を期限切れにする"
+
+#: accounts/tasks/automation.py:139
+msgid "Skipped interrupted account task inspection: no Celery worker replied."
+msgstr "Celery Worker から応答がないため、中断されたアカウントタスクの確認をスキップしました。"
+
+#: accounts/tasks/automation.py:132
+msgid "Unable to inspect active Celery tasks."
+msgstr "実行中の Celery タスクを確認できません。"
+
+#: accounts/tasks/automation.py:169
+#, python-format
+msgid "Unable to confirm interrupted task status: execution=%(execution)s."
+msgstr "中断されたタスクの状態を確認できません：実行=%(execution)s。"
+
+#: accounts/tasks/automation.py:180
+#, python-format
+msgid "Unable to clear the interrupted task confirmation marker: execution=%(execution)s."
+msgstr "中断されたタスクの確認マーカーを削除できません：実行=%(execution)s。"
+
+#: accounts/tasks/automation.py:202
+msgid "Unable to acquire the interrupted account task recovery lock."
+msgstr "中断されたアカウントタスクの復旧ロックを取得できません。"
+
+#: accounts/tasks/automation.py:218
+msgid "Unable to release the interrupted account task recovery lock."
+msgstr "中断されたアカウントタスクの復旧ロックを解放できません。"
+
+#: accounts/tasks/credential_preparation.py:12 accounts/tasks/credential_preparation.py:15
+msgid "Check credential rotation readiness"
+msgstr "認証情報ローテーションの準備状況を確認する"
+
+#: accounts/tasks/credential_preparation.py:33
+#, python-format
+msgid "Unable to check rotation readiness: credential=%(credential)s."
+msgstr "ローテーションの準備状況を確認できません：認証情報=%(credential)s。"
+
+#: accounts/tasks/openbao.py:28
+msgid "JumpServer must use the OpenBao vault backend."
+msgstr "JumpServer は OpenBao ボールトバックエンドを使用する必要があります。"
+
+#: accounts/tasks/openbao.py:30
+msgid "OpenBao token rotation requires HTTPS with TLS verification."
+msgstr "OpenBao トークンのローテーションには、TLS 検証を有効にした HTTPS が必要です。"
+
+#: accounts/tasks/openbao.py:62
+#, python-format
+msgid "OpenBao token lookup returned HTTP %(status)s."
+msgstr "OpenBao トークンの照会が HTTP %(status)s を返しました。"
+
+#: accounts/tasks/openbao.py:70
+msgid "OpenBao address changed. Reconfigure the rotation AppRole."
+msgstr "OpenBao のアドレスが変更されました。ローテーション用 AppRole を再設定してください。"
+
+#: accounts/tasks/openbao.py:98
+msgid "OpenBao did not issue a distinct token."
+msgstr "OpenBao は元のトークンと異なる新しいトークンを発行しませんでした。"
+
+#: accounts/tasks/openbao.py:102
+msgid "The new OpenBao token must support self lookup and last over seven days."
+msgstr "新しい OpenBao トークンは自己照会をサポートし、有効期間が 7 日を超える必要があります。"
+
+#: accounts/tasks/openbao.py:104
+msgid "The new token failed the JumpServer OpenBao operation check."
+msgstr "新しいトークンは JumpServer の OpenBao 操作チェックに失敗しました。"
+
+#: accounts/tasks/openbao.py:94
+#, python-format
+msgid "OpenBao AppRole login returned HTTP %(status)s."
+msgstr "OpenBao AppRole のログインが HTTP %(status)s を返しました。"
+
+#: accounts/tasks/openbao.py:109
+msgid "The configured OpenBao token changed during rotation."
+msgstr "設定された OpenBao トークンがローテーション中に変更されました。"
+
+#: accounts/tasks/openbao.py:120
+msgid "Check and rotate the OpenBao vault token"
+msgstr "OpenBao ボールトトークンを確認してローテーションする"
+
+#: accounts/tasks/openbao.py:133
+msgid "OpenBao rotation requires encrypted AppRole credentials."
+msgstr "OpenBao のローテーションには、暗号化された AppRole 認証情報が必要です。"
+
+#: authentication/services/client_login_session.py:411
+msgid "Access tokens deleted"
+msgstr "削除されたアクセストークン"
+
+#: authentication/services/client_login_session.py:412
+msgid "Refresh tokens deleted"
+msgstr "削除されたリフレッシュトークン"
+
+#: authentication/services/client_login_session.py:419
+msgid "Client login sessions deleted"
+msgstr "削除されたクライアントログインセッション"
+
+#: perms/tasks.py:141
+#, python-format
+msgid "Unable to queue an asset permission expiration reminder: permission=%(permission)s; user=%(user)s."
+msgstr "資産権限の有効期限リマインダーをキューに追加できません：権限=%(permission)s、ユーザー=%(user)s。"
+
+#: terminal/tasks.py:268
+#, python-brace-format
+msgid "Test failure: {error}"
+msgstr "テスト失敗：{error}"
+
+#: tickets/plugins/change_secret/execution.py:100
+#, python-format
+msgid "Unable to queue password change for ticket %(ticket)s (%(error)s)."
+msgstr "チケット %(ticket)s のパスワード変更をキューに追加できません（%(error)s）。"
+
+#: tickets/plugins/file_transfer/execution.py:50
+#, python-format
+msgid "Unable to queue ticket transfer %(ticket)s (%(error)s)."
+msgstr "チケット転送 %(ticket)s をキューに追加できません（%(error)s）。"
+
+#: tickets/plugins/file_transfer/execution.py:249
+#, python-format
+msgid "Unable to purge ticket transfer file %(file)s (%(error)s)."
+msgstr "チケット転送ファイル %(file)s を削除できません（%(error)s）。"
+
+#: tickets/tasks.py:16 tickets/tasks.py:21
+msgid "Expire overdue ticket approvals"
+msgstr "期限切れのチケット承認を処理する"
+
+#: tickets/tasks.py:17
+msgid "Check approval deadlines every minute and apply the configured timeout action."
+msgstr "承認期限を毎分確認し、設定されたタイムアウト処理を実行します。"
+
+#: tickets/tasks.py:47 tickets/tasks.py:52
+msgid "Dispatch ticket password changes"
+msgstr "チケットのパスワード変更をスケジュールする"
+
+#: tickets/tasks.py:48
+msgid "Dispatch pending password change executions every minute."
+msgstr "待機中のパスワード変更を毎分スケジュールします。"
+
+#: accounts/automations/recovery.py:38
+msgid "Invalid interrupted automation runtime path."
+msgstr "中断された自動化タスクの実行ディレクトリのパスが無効です。"
+
+#: accounts/automations/recovery.py:269
+#, python-format
+msgid "Interrupted account automation finalized: execution=%(execution)s; status=%(status)s; password change records=%(changes)s; password push records=%(pushes)s."
+msgstr "中断されたアカウント自動化を終了処理しました：実行=%(execution)s、状態=%(status)s、パスワード変更レコード=%(changes)s、パスワード配信レコード=%(pushes)s。"
+
+#: accounts/automations/recovery.py:264
+#, python-format
+msgid "Unable to clean the interrupted automation runtime: execution=%(execution)s."
+msgstr "中断された自動化タスクの実行ディレクトリを削除できません：実行=%(execution)s。"
+
+#: accounts/automations/recovery.py:244
+#, python-format
+msgid "Unable to clear interrupted account task status: execution=%(execution)s; account=%(account)s."
+msgstr "中断されたアカウントタスクの状態を削除できません：実行=%(execution)s、アカウント=%(account)s。"
+
+#: accounts/automations/recovery.py:257
+#, python-format
+msgid "Unable to release the interrupted account lock: execution=%(execution)s; account=%(account)s."
+msgstr "中断されたアカウントのロックを解放できません：実行=%(execution)s、アカウント=%(account)s。"

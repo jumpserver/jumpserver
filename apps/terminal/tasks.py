@@ -8,11 +8,13 @@ from celery import shared_task
 from celery.utils.log import get_task_logger
 from django.core.files.storage import default_storage
 from django.utils import timezone
+from django.utils.text import format_lazy
 from django.utils.translation import gettext, gettext_lazy as _
 
 from common.storage.replay import ReplayStorageHandler
 from ops.celery.decorator import (
     register_as_period_task, after_app_ready_start)
+from ops.celery.task_logging import TaskLog
 from orgs.utils import tmp_to_builtin_org
 from orgs.utils import tmp_to_root_org
 from .backends import server_replay_storage
@@ -39,8 +41,16 @@ class AppProviderDeploymentError(RuntimeError):
 @register_as_period_task(interval=3600)
 @after_app_ready_start
 def delete_terminal_status_period():
+    logger.info(gettext('Checking terminal status records older than %(days)s days.'), {'days': 7})
     yesterday = timezone.now() - datetime.timedelta(days=7)
-    Status.objects.filter(date_created__lt=yesterday).delete()
+    expired = Status.objects.filter(date_created__lt=yesterday)
+    checked = expired.count()
+    _, deleted = expired.delete()
+    logger.info(gettext('Expired records matched: %(checked)s; deleted: %(deleted)s.'), {
+        'checked': checked, 'deleted': deleted.get(Status._meta.label, 0),
+    })
+    if not checked:
+        logger.info(gettext('Nothing to clean: no records exceeded the retention period.'))
 
 
 @shared_task(
@@ -54,18 +64,29 @@ def delete_terminal_status_period():
 @after_app_ready_start
 @tmp_to_root_org()
 def clean_orphan_session():
+    logger.info(gettext('Checking unfinished sessions; active sessions will be kept.'))
     active_sessions = Session.objects.filter(is_finished=False)
+    checked = finished = active = finished_tasks = 0
     for session in active_sessions:
+        checked += 1
         # finished task
-        Task.objects.filter(args=str(session.id), is_finished=False).update(
+        finished_tasks += Task.objects.filter(args=str(session.id), is_finished=False).update(
             is_finished=True, date_finished=timezone.now()
         )
         # finished session
         if session.is_active():
+            active += 1
             continue
         session.is_finished = True
         session.date_end = timezone.now()
         session.save()
+        finished += 1
+    logger.info(gettext(
+        'Sessions checked: %(checked)s; marked finished: %(finished)s; '
+        'skipped because still active: %(active)s; related tasks marked finished: %(tasks)s.'
+    ), {'checked': checked, 'finished': finished, 'active': active, 'tasks': finished_tasks})
+    if not checked:
+        logger.info(gettext('Nothing to process: no unfinished sessions.'))
 
 
 @shared_task(
@@ -227,30 +248,39 @@ def run_applet_host_deployment_uninstall_applet(ids, applet_id):
 @register_as_period_task(crontab='0 0 * * *')
 @tmp_to_root_org()
 def check_command_replay_storage_connectivity():
-    errors = []
-    replays = ReplayStorage.objects.exclude(
-        type__in=[ReplayStorageType.server, ReplayStorageType.null]
-    )
-    commands = CommandStorage.objects.exclude(
-        type__in=[CommandStorageType.server, CommandStorageType.null]
-    )
+    with TaskLog(logger, gettext('Check command replay storage connectivity')) as log:
+        errors = []
+        replays = ReplayStorage.objects.exclude(
+            type__in=[ReplayStorageType.server, ReplayStorageType.null]
+        )
+        commands = CommandStorage.objects.exclude(
+            type__in=[CommandStorageType.server, CommandStorageType.null]
+        )
 
-    for instance in chain(replays, commands):
-        msg = None
-        try:
-            is_valid = instance.is_valid()
-        except Exception as e:
-            is_valid = False
-            msg = _("Test failure: {}".format(str(e)))
-        if is_valid:
-            continue
-        errors.append({
-            'msg': msg or _("Test failure: Account invalid"),
-            'type': instance.get_type_display(),
-            'name': instance.name
-        })
+        for instance in chain(replays, commands):
+            log.checked += 1
+            msg = None
+            try:
+                is_valid = instance.is_valid()
+            except Exception as e:
+                is_valid = False
+                # Notification content is rendered in each recipient's language.
+                msg = format_lazy(_('Test failure: {error}'), error=str(e))
+            if is_valid:
+                log.processed += 1
+                continue
+            log.fail(gettext('Storage connectivity or credential validation failed.'))
+            logger.warning(gettext('Storage check failed: %(name)s (%(type)s).'), {
+                'name': instance.name, 'type': instance.get_type_display(),
+            })
+            errors.append({
+                'msg': msg or _("Test failure: Account invalid"),
+                'type': instance.get_type_display(),
+                'name': instance.name
+            })
 
-    if not errors:
-        return
+        if not errors:
+            return
 
-    StorageConnectivityMessage(errors).publish_async()
+        StorageConnectivityMessage(errors).publish_async()
+        log.metric(gettext('Alert notifications queued'), 1)

@@ -214,20 +214,45 @@ class CeleryTaskViewSet(
         return queryset
 
 
+class CeleryTaskExecutionFilterSet(BaseFilterSet):
+    state = drf_filters.ChoiceFilter(choices=(
+        ('PENDING', gettext_lazy('Pending')),
+        ('RECEIVED', gettext_lazy('Pending')),
+        ('RUNNING', gettext_lazy('Running')),
+        ('STARTED', gettext_lazy('Running')),
+        ('SUCCESS', gettext_lazy('Success')),
+        ('FAILURE', gettext_lazy('Failed')),
+        ('RETRY', gettext_lazy('Retry')),
+        ('REVOKED', gettext_lazy('Cancelled')),
+    ), label=gettext_lazy('Status'))
+
+    class Meta:
+        model = CeleryTaskExecution
+        fields = ['name', 'state', 'is_finished']
+
+
 class CeleryTaskExecutionViewSet(CommonApiMixin, viewsets.ModelViewSet):
     serializer_class = CeleryTaskExecutionSerializer
     http_method_names = ('get', 'post', 'head', 'options',)
     queryset = CeleryTaskExecution.objects.all()
-    search_fields = ('id',)
+    search_fields = ('id', 'name')
+    filterset_class = CeleryTaskExecutionFilterSet
+
+    @property
+    def ordering(self):
+        if self.request.query_params.get('task_id'):
+            return ('-date_start', '-id')
+        return ('-date_published', '-id')
 
     def get_queryset(self):
+        queryset = super().get_queryset()
         task_id = self.request.query_params.get('task_id')
         if task_id:
             task = get_object_or_404(CeleryTask, id=task_id)
-            self.queryset = self.queryset.filter(name=task.name)
+            queryset = queryset.filter(name=task.name)
         if not self.request.user.is_superuser:
-            self.queryset = self.queryset.filter(creator=self.request.user)
-        return self.queryset
+            queryset = queryset.filter(creator=self.request.user)
+        return queryset
 
     def create(self, request, *args, **kwargs):
         form_id = self.request.query_params.get('from', None)

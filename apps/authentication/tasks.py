@@ -9,15 +9,18 @@ from django.conf import settings
 from django.contrib.sessions.models import Session
 from django.db.models import Q
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 from oauth2_provider.models import get_access_token_model
 
 from authentication.models import AccessKey, ConnectionToken, Passkey, PrivateToken, TempToken
 from authentication.notifications import CredentialActivityDigestMessage
 from common.const.crontab import CRONTAB_AT_AM_TEN, CRONTAB_AT_AM_TWO
 from ops.celery.decorator import register_as_period_task
+from ops.celery.task_logging import TaskLog
 from orgs.utils import tmp_to_root_org
 from users.models import User
+
+logger = logging.getLogger(__name__)
 
 
 def _recent(value, start):
@@ -113,61 +116,67 @@ def _iter_credential_activity_rows(queryset, fields, *, cursor_field='pk', batch
 @register_as_period_task(crontab=CRONTAB_AT_AM_TEN)
 @tmp_to_root_org()
 def send_credential_activity_summary():
-    start = timezone.now() - datetime.timedelta(hours=24)
-    sources = _credential_activity_queries(start)
-    category_order = {source[0]: index for index, source in enumerate(sources)}
-    for user_batch in _iter_activity_user_batches(sources):
-        users = {user.id: user for user in user_batch}
-        users_by_name = {user.username: user for user in user_batch}
-        items = defaultdict(list)
-        for credential_type, queryset, created_field, used_field in sources:
-            is_temporary = credential_type == 'temp_token'
-            owner_field = 'username' if is_temporary else 'user_id'
-            owner_values = users_by_name if is_temporary else users
-            queryset = queryset.filter(**{f'{owner_field}__in': owner_values})
-            cursor_field = 'user_id' if credential_type == 'private_token' else 'pk'
-            fields = (owner_field, created_field, used_field)
-            if credential_type == 'connection_token':
-                fields += ('date_expired',)
-            rows = _iter_credential_activity_rows(
-                queryset, fields,
-                cursor_field=cursor_field,
-            )
-            for row in rows:
-                # SQL collations may match different username spellings. Keep
-                # the old Python dictionary's exact match for temporary tokens.
-                user = owner_values.get(row[owner_field])
-                identifier = '' if credential_type == 'private_token' else row['pk']
+    with TaskLog(logger, gettext('Send credential activity summary')) as log:
+        start = timezone.now() - datetime.timedelta(hours=24)
+        sources = _credential_activity_queries(start)
+        category_order = {source[0]: index for index, source in enumerate(sources)}
+        for user_batch in _iter_activity_user_batches(sources):
+            log.checked += len(user_batch)
+            users = {user.id: user for user in user_batch}
+            users_by_name = {user.username: user for user in user_batch}
+            items = defaultdict(list)
+            for credential_type, queryset, created_field, used_field in sources:
+                is_temporary = credential_type == 'temp_token'
+                owner_field = 'username' if is_temporary else 'user_id'
+                owner_values = users_by_name if is_temporary else users
+                queryset = queryset.filter(**{f'{owner_field}__in': owner_values})
+                cursor_field = 'user_id' if credential_type == 'private_token' else 'pk'
+                fields = (owner_field, created_field, used_field)
                 if credential_type == 'connection_token':
-                    # The full ID is an authentication credential for bootstrap APIs.
-                    identifier = f'{str(identifier)[:8]}...{str(identifier)[-4:]}'
-                created, used = row[created_field], row[used_field]
-                if credential_type == 'access_token' and used <= created:
-                    used = None
-                activity = _add_activity(items, user, credential_type, identifier, created, used, start)
-                if activity is not None and credential_type == 'connection_token':
-                    activity['_date_expired'] = row['date_expired']
+                    fields += ('date_expired',)
+                rows = _iter_credential_activity_rows(
+                    queryset, fields,
+                    cursor_field=cursor_field,
+                )
+                for row in rows:
+                    # SQL collations may match different username spellings. Keep
+                    # the old Python dictionary's exact match for temporary tokens.
+                    user = owner_values.get(row[owner_field])
+                    identifier = '' if credential_type == 'private_token' else row['pk']
+                    if credential_type == 'connection_token':
+                        # The full ID is an authentication credential for bootstrap APIs.
+                        identifier = f'{str(identifier)[:8]}...{str(identifier)[-4:]}'
+                    created, used = row[created_field], row[used_field]
+                    if credential_type == 'access_token' and used <= created:
+                        used = None
+                    activity = _add_activity(items, user, credential_type, identifier, created, used, start)
+                    if activity is not None and credential_type == 'connection_token':
+                        activity['_date_expired'] = row['date_expired']
 
-        # Gather every category before publishing: each user still receives one
-        # complete, sorted digest. Only this batch's activity stays in memory.
-        for user in user_batch:
-            user_items = items.pop(user.id, [])
-            if not user_items:
-                continue
-            user_items.sort(
-                key=lambda item: (
-                    item['date_last_used'] or item['date_created'],
-                    -category_order[item['credential_type']],
-                    item.get('_date_expired', start),
-                ),
-                reverse=True,
-            )
-            # Preserve ConnectionToken's default ordering for equal activity
-            # times without using its mutable expiry as a pagination cursor.
-            for item in user_items:
-                item.pop('_date_expired', None)
-            CredentialActivityDigestMessage(user, user_items).publish_async()
-        del users, users_by_name, owner_values, items, user_items, user_batch
+            # Gather every category before publishing: each user still receives one
+            # complete, sorted digest. Only this batch's activity stays in memory.
+            for user in user_batch:
+                user_items = items.pop(user.id, [])
+                if not user_items:
+                    log.skip(gettext('No recent credential activity matched this user.'))
+                    continue
+                user_items.sort(
+                    key=lambda item: (
+                        item['date_last_used'] or item['date_created'],
+                        -category_order[item['credential_type']],
+                        item.get('_date_expired', start),
+                    ),
+                    reverse=True,
+                )
+                # Preserve ConnectionToken's default ordering for equal activity
+                # times without using its mutable expiry as a pagination cursor.
+                for item in user_items:
+                    item.pop('_date_expired', None)
+                CredentialActivityDigestMessage(user, user_items).publish_async()
+                log.processed += 1
+                log.metric(gettext('Credential activity records included'), len(user_items))
+                log.metric(gettext('Notifications queued'), 1)
+            del users, users_by_name, owner_values, items, user_items, user_batch
 
 
 @shared_task(
@@ -178,7 +187,8 @@ def send_credential_activity_summary():
 )
 @register_as_period_task(interval=3600 * 24)
 def clean_django_sessions():
-    Session.objects.filter(expire_date__lt=timezone.now()).delete()
+    with TaskLog(logger, gettext('Clean expired session')) as log:
+        log.delete(Session.objects.filter(expire_date__lt=timezone.now()), label=gettext('Sessions deleted'))
 
 
 @shared_task(
@@ -211,5 +221,10 @@ def clear_oauth2_provider_expired_tokens():
     from oauth2_provider.models import clear_expired
     from authentication.services.client_login_session import clear_client_login_sessions
 
-    clear_client_login_sessions()
-    clear_expired()
+    from .oauth_cleanup_logging import OAuthCleanupLog
+
+    with TaskLog(logger, gettext('Client login session cleanup')) as log:
+        clear_client_login_sessions(task_log=log)
+    with TaskLog(logger, gettext('OAuth credential cleanup categories')) as log:
+        with OAuthCleanupLog(log):
+            clear_expired()

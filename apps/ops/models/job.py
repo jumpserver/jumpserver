@@ -323,9 +323,13 @@ class JobExecution(JMSOrgBaseModel):
 
     @classmethod
     def clean_unexpected_execution(cls):
+        checked = cleaned = 0
         for execution in cls.objects.filter(status__in=[JobStatus.running]).all():
+            checked += 1
             if execution.date_created < (timezone.now() - timedelta(hours=3)):
                 execution.set_error(zombie_task_exception)
+                cleaned += 1
+        return checked, cleaned
 
     @property
     def current_job(self):
