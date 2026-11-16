@@ -1,0 +1,13 @@
+id: gather_accounts_database_native
+name: "{{ 'Database account collection' | trans }}"
+category: database
+type:
+  - dameng
+  - oceanbase
+  - clickhouse
+  - db2
+method: gather_accounts
+i18n:
+  Database account collection:
+    en: Database account collection
+    zh: 数据库账号采集
