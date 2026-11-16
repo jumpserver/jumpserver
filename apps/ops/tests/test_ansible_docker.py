@@ -37,6 +37,9 @@ class PrepareIsolatedAnsibleRuntimeTest(SimpleTestCase):
                 )),
             )
             self.assertEqual(envvars['PYTHONPATH'], runtime_apps_dir)
+            self.assertEqual(
+                envvars['ANSIBLE_SSH_CONTROL_PATH_DIR'], '/tmp/jms-ansible-cp'
+            )
 
             for relative_path in (
                 'modules/mongodb_user.py',

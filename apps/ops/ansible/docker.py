@@ -137,6 +137,8 @@ def prepare_isolated_ansible_runtime(project_dir):
     return {
         'ANSIBLE_CONFIG': os.path.join(project_dir, 'ansible.cfg'),
         'ANSIBLE_LIBRARY': os.pathsep.join(module_paths),
+        # macOS bind mounts cannot reliably create SSH multiplexing sockets.
+        'ANSIBLE_SSH_CONTROL_PATH_DIR': '/tmp/jms-ansible-cp',
         'PYTHONPATH': runtime_apps_dir,
     }
 
