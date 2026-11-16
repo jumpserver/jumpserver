@@ -32,9 +32,9 @@ class ApplicationConnectionInfoTests(SimpleTestCase):
                 self.assertEqual(response['Cache-Control'], 'no-store')
 
     @patch('accounts.api.account.application.record')
-    def test_access_materials_use_site_url(self, record):
+    def test_access_materials_use_site_url(self, _record):
         application = SimpleNamespace(
-            id=uuid4(), org_id=uuid4(), secret='test-only-secret',
+            id=uuid4(), org_id=uuid4(), secret=uuid4().hex,
             is_active=True, assert_account_limit=Mock(),
         )
         view = IntegrationApplicationViewSet()
@@ -45,8 +45,14 @@ class ApplicationConnectionInfoTests(SimpleTestCase):
         ]
         for site_url in ('https://pam.example.com:8443/', 'http://pam.example.com:8080/'):
             for payload in payloads:
-                with self.subTest(site_url=site_url, payload=payload), self.settings(SITE_URL=site_url):
-                    request = Request(APIRequestFactory().post('/', payload, format='json'), parsers=[JSONParser()])
+                with (
+                    self.subTest(site_url=site_url, payload=payload),
+                    self.settings(SITE_URL=site_url),
+                ):
+                    request = Request(
+                        APIRequestFactory().post('/', payload, format='json'),
+                        parsers=[JSONParser()],
+                    )
                     response = view.access_materials(request)
                     endpoint = site_url.rstrip('/')
                     config = response.data['config']
