@@ -27,6 +27,7 @@ class HistoricalInstanceUpgradeTests(TestCase):
     applicant: User
     alice: User
     bob: User
+    org: Organization
     other_org: Organization
     platform: Platform
 
@@ -126,8 +127,8 @@ class HistoricalInstanceUpgradeTests(TestCase):
                     self.assertEqual(instance.state, 'approved')
                     self.assertEqual(instance.events.filter(type='approval.approved').count(),
                                      levels)
-                    permission = AssetPermission.objects.get(pk=ticket.pk)
-                    self.assertEqual(list(permission.assets.all()), [asset])
+                    self.assertEqual(
+                        list(AssetPermission.objects.get(pk=ticket.pk).assets.all()), [asset])
 
     def test_partial_legacy_resources_remain_pending_without_losing_selected_values(self):
         asset = Asset.objects.create(
