@@ -21122,3 +21122,16 @@ msgstr "无法清除中断账号任务状态：执行记录=%(execution)s；账�
 #, python-format
 msgid "Unable to release the interrupted account lock: execution=%(execution)s; account=%(account)s."
 msgstr "无法释放中断账号锁：执行记录=%(execution)s；账号=%(account)s。"
+
+#: accounts/models/application.py:56
+msgid "The application account scope exceeds the configured limit."
+msgstr "应用的账号范围超出配置上限，请缩小账号范围后重试。"
+
+#: accounts/serializers/account/service.py:127
+#, python-format
+msgid ""
+"The application account scope has %(count)s accounts; the configured limit "
+"is %(limit)s."
+msgstr ""
+"当前应用的账号范围包含 %(count)s 个账号，超过配置上限 %(limit)s 个。"
+"请缩小账号范围后重试。"
