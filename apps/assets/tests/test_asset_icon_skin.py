@@ -1,6 +1,10 @@
+from types import SimpleNamespace
+from unittest.mock import patch
+
 from django.test import SimpleTestCase
 
-from assets.models import Asset, Platform
+from assets.api.mixin import SerializeToTreeNodeMixin
+from assets.models import Asset, MyAsset, Platform, Protocol
 
 
 class AssetIconSkinTests(SimpleTestCase):
@@ -31,6 +35,28 @@ class AssetIconSkinTests(SimpleTestCase):
 
     def test_device_category_uses_switch_skin(self):
         self.assertEqual(self.get_skin('Cisco', 'unix', category='device'), 'switch')
+
+    def test_generic_device_tree_node_includes_its_platform_name(self):
+        platform = Platform(id=1, name='Cisco', category='device', type='general')
+        asset = SimpleNamespace(
+            id='test-asset', name='Test device', address='192.0.2.1', comment='',
+            org_name='Default', is_active=True,
+            get_icon_skin=lambda: 'switch', _state=SimpleNamespace(fields_cache={}),
+            platform_id=platform.id,
+        )
+        mixin = SerializeToTreeNodeMixin()
+        mixin.request = SimpleNamespace(user=None)
+        with (
+            patch.object(Platform.objects, 'filter', return_value=[platform]),
+            patch.object(Protocol.objects, 'filter') as protocols,
+            patch.object(MyAsset, 'set_asset_custom_value'),
+        ):
+            protocols.return_value.values_list.return_value = []
+            [node] = mixin.serialize_assets([asset], node_key='root')
+
+        self.assertEqual(node['iconSkin'], 'switch')
+        self.assertEqual(node['meta']['data']['platform_type'], 'general')
+        self.assertEqual(node['meta']['data']['platform_name'], 'Cisco')
 
     def test_unknown_type_falls_back_to_file(self):
         self.assertEqual(self.get_skin('Custom', 'weird'), 'file')
