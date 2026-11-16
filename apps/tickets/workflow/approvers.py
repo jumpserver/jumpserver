@@ -4,11 +4,14 @@ from uuid import UUID
 from django.db.models import Q
 from django.utils import timezone
 
+from common.db.fields import RelatedManager
+from labels.models import Label
 from orgs.models import Organization
 from orgs.utils import tmp_to_org
 from rbac.builtin import BuiltinRole
 from rbac.models import Role, RoleBinding
 from users.models import User, UserGroup
+from .definition import validate_user_selector
 from .errors import WorkflowConfigurationError
 
 
@@ -50,10 +53,6 @@ def excluded_approver_ids(config, context, applicant_id):
 
 
 def selected_users(selector, org_id):
-    from common.db.fields import RelatedManager
-    from labels.models import Label
-    from .definition import validate_user_selector
-
     try:
         validate_user_selector(selector)
     except (ValueError, TypeError) as exc:

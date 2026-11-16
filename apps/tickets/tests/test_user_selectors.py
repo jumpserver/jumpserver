@@ -37,7 +37,9 @@ class UserSelectorValidationTests(SimpleTestCase):
             {'name': 'username', 'match': 'regex', 'value': '['},
         ):
             with self.subTest(attr=attr), self.assertRaises(WorkflowConfigurationError):
-                validate_approvers({'type': 'user_selector', 'value': {'type': 'attrs', 'attrs': [attr]}})
+                validate_approvers({
+                    'type': 'user_selector', 'value': {'type': 'attrs', 'attrs': [attr]},
+                })
 
 
 class UserSelectorUpgradeTests(TestCase):
@@ -60,7 +62,9 @@ class UserSelectorUpgradeTests(TestCase):
     def upgraded_flow(self, selector):
         flow = TicketFlow.objects.create(name=str(uuid4()), type='general', approval_level=2)
         flow.rules.add(
-            ApprovalRule.objects.create(level=1, users={'type': 'ids', 'ids': [str(self.alice.pk)]}),
+            ApprovalRule.objects.create(
+                level=1, users={'type': 'ids', 'ids': [str(self.alice.pk)]},
+            ),
             ApprovalRule.objects.create(level=2, users=selector),
         )
         self.assertEqual(self.historical_import(flow), [])
@@ -73,17 +77,22 @@ class UserSelectorUpgradeTests(TestCase):
 
     @patch('tickets.workflow.business.deliver_event')
     def test_upgraded_filters_are_dynamic_between_tickets_but_frozen_for_all_levels(self, _deliver):
-        selector = {'type': 'attrs', 'attrs': [{'name': 'name', 'match': 'exact', 'value': 'bob', 'rel': 'and', 'index': 0}]}
+        selector = {'type': 'attrs', 'attrs': [
+            {'name': 'name', 'match': 'exact', 'value': 'bob', 'rel': 'and', 'index': 0},
+        ]}
         workflow = self.upgraded_flow(selector)
         instance = self.start(workflow)
         self.assertEqual(instance.context['approver_selections']['approval_2'], [str(self.bob.pk)])
         User.objects.filter(pk=self.bob.pk).update(name='Former reviewer')
         User.objects.filter(pk=self.carol.pk).update(name='bob')
         next_instance = self.start(workflow)
-        self.assertEqual(next_instance.context['approver_selections']['approval_2'], [str(self.carol.pk)])
+        self.assertEqual(next_instance.context['approver_selections']['approval_2'],
+                         [str(self.carol.pk)])
         self.engine.approve(self.task(instance, self.alice), self.alice)
         self.assertEqual(self.task(instance, self.bob).assignee_id, self.bob.pk)
-        self.assertFalse(ApprovalTask.objects.filter(node_instance__instance=instance, assignee=self.carol).exists())
+        self.assertFalse(ApprovalTask.objects.filter(
+            node_instance__instance=instance, assignee=self.carol,
+        ).exists())
         self.engine.approve(self.task(instance, self.bob), self.bob)
         instance.refresh_from_db()
         self.assertEqual(instance.state, 'approved')
@@ -91,12 +100,16 @@ class UserSelectorUpgradeTests(TestCase):
     def test_all_selector_and_no_current_matches_remain_valid_definitions(self):
         workflow = self.upgraded_flow({'type': 'all'})
         instance = self.start(workflow)
-        self.assertNotIn(str(self.outsider.pk), instance.context['approver_selections']['approval_2'])
-        workflow = self.upgraded_flow({'type': 'attrs', 'attrs': [{'name': 'name', 'value': 'not-yet-added'}]})
+        self.assertNotIn(str(self.outsider.pk),
+                         instance.context['approver_selections']['approval_2'])
+        workflow = self.upgraded_flow({
+            'type': 'attrs', 'attrs': [{'name': 'name', 'value': 'not-yet-added'}],
+        })
         with self.assertRaises(WorkflowConfigurationError):
             self.start(workflow)
         User.objects.filter(pk=self.bob.pk).update(name='not-yet-added')
-        self.assertEqual(self.start(workflow).context['approver_selections']['approval_2'], [str(self.bob.pk)])
+        self.assertEqual(self.start(workflow).context['approver_selections']['approval_2'],
+                         [str(self.bob.pk)])
 
     def test_multiple_attribute_conditions_keep_roles_groups_and_exclusions(self):
         group_a = UserGroup.objects.create(name='A')
@@ -110,7 +123,8 @@ class UserSelectorUpgradeTests(TestCase):
             {'name': 'name', 'match': 'not', 'value': 'alice'},
         ]}
         workflow = self.upgraded_flow(selector)
-        self.assertEqual(self.start(workflow).context['approver_selections']['approval_2'], [str(self.bob.pk)])
+        self.assertEqual(self.start(workflow).context['approver_selections']['approval_2'],
+                         [str(self.bob.pk)])
 
     def test_selector_rejects_foreign_references_and_excludes_unavailable_users(self):
         with tmp_to_org(self.other_org):
@@ -120,14 +134,19 @@ class UserSelectorUpgradeTests(TestCase):
                 {'name': 'groups', 'match': 'm2m', 'value': [str(group.pk)]},
             ]}, self.org.pk)
         User.objects.filter(pk=self.bob.pk).update(is_active=False)
-        User.objects.filter(pk=self.carol.pk).update(date_expired=timezone.now() - timedelta(days=1))
-        self.assertEqual(set(selected_users({'type': 'all'}, self.org.pk)), {self.applicant, self.alice})
+        User.objects.filter(pk=self.carol.pk).update(
+            date_expired=timezone.now() - timedelta(days=1),
+        )
+        self.assertEqual(set(selected_users({'type': 'all'}, self.org.pk)),
+                         {self.applicant, self.alice})
 
     @patch('tickets.workflow.business.deliver_event')
     def test_frozen_later_approvers_are_still_checked_for_validity_and_organization(self, _deliver):
         for change in ('inactive', 'organization'):
             with self.subTest(change=change):
-                workflow = self.upgraded_flow({'type': 'attrs', 'attrs': [{'name': 'name', 'value': 'bob'}]})
+                workflow = self.upgraded_flow({
+                    'type': 'attrs', 'attrs': [{'name': 'name', 'value': 'bob'}],
+                })
                 instance = self.start(workflow)
                 if change == 'inactive':
                     User.objects.filter(pk=self.bob.pk).update(is_active=False)
@@ -136,5 +155,7 @@ class UserSelectorUpgradeTests(TestCase):
                 self.engine.approve(self.task(instance, self.alice), self.alice)
                 instance.refresh_from_db()
                 self.assertEqual(instance.state, 'error')
-                self.assertFalse(ApprovalTask.objects.filter(node_instance__instance=instance, state='pending').exists())
+                self.assertFalse(ApprovalTask.objects.filter(
+                    node_instance__instance=instance, state='pending',
+                ).exists())
                 User.objects.filter(pk=self.bob.pk).update(is_active=True)

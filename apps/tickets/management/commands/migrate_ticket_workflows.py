@@ -4,7 +4,7 @@ from importlib import import_module
 from django.apps import apps
 from django.core.exceptions import FieldError, ValidationError
 from django.core.management.base import BaseCommand, CommandError
-from django.db import transaction
+from django.db import router, transaction
 
 from orgs.utils import tmp_to_root_org
 from tickets.models import TicketFlow, Workflow
@@ -16,7 +16,7 @@ from tickets.workflow.publication import publish_workflow
 def convert_flow(flow):
     converter = import_module('tickets.migrations.0010_ticket_workflow_refactor').convert_flow
     try:
-        definition, notes = converter(apps, flow._state.db, flow)
+        definition, notes = converter(apps, router.db_for_read(TicketFlow, instance=flow), flow)
     except (ValueError, TypeError, AttributeError, FieldError, ValidationError) as exc:
         raise WorkflowConfigurationError(str(exc)) from exc
     return validate_definition(definition), notes
@@ -42,7 +42,8 @@ def import_flow(flow):
 
 
 class Command(BaseCommand):
-    help = 'Preview legacy workflow imports. Use --apply to publish and enable workflows with their original selectors.'
+    help = ('Preview legacy workflow imports. Use --apply to publish and enable workflows '
+            'with their original selectors.')
 
     def add_arguments(self, parser):
         parser.add_argument('--apply', action='store_true')
@@ -71,7 +72,9 @@ class Command(BaseCommand):
                         imported += 1
                         mode = 'IMPORTED (enabled)' if options['apply'] else 'WOULD IMPORT'
                         approvals = sum(node['type'] == 'approval' for node in definition['nodes'])
-                        self.stdout.write(f'{mode} {flow.pk}: {approvals} approval nodes; original selectors preserved')
+                        self.stdout.write(
+                            f'{mode} {flow.pk}: {approvals} approval nodes; original selectors preserved'
+                        )
                 except WorkflowConfigurationError as exc:
                     failed += 1
                     self.stderr.write(f'FAILED {flow_id}: {exc.detail}')
