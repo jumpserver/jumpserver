@@ -1,5 +1,6 @@
 from uuid import UUID
 
+from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.utils.translation import gettext_lazy as _, get_language
 from rest_framework.decorators import action
@@ -94,7 +95,7 @@ class IntegrationApplicationViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
             data=request.data, context={'application': application},
         )
         params.is_valid(raise_exception=True)
-        data = materials(application, params.validated_data, request.build_absolute_uri('/').rstrip('/'))
+        data = materials(application, params.validated_data, settings.SITE_URL.rstrip('/'))
         record(AuditEvent.CONFIGURATION_UPDATED, application=application, summary='Generated application access materials.')
         response = Response(data)
         response['Cache-Control'] = 'no-store'
@@ -175,7 +176,7 @@ class IntegrationApplicationViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
         response = Response(data={
             'id': instance.id, 'secret': instance.secret,
             'org_id': str(instance.org_id),
-            'endpoint': request.build_absolute_uri('/').rstrip('/'),
+            'endpoint': settings.SITE_URL.rstrip('/'),
         })
         response['Cache-Control'] = 'no-store'
         return response
