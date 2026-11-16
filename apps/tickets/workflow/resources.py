@@ -90,7 +90,9 @@ def check_adjustment(instance, task, user):
     from .approvers import available_users, excluded_approver_ids
     WorkflowEngine._check_org(instance.org_id)
     plugin = get_ticket_plugin(instance.ticket.type)
-    if (not plugin.resource_serializer or 'legacy' in instance.context or instance.state != 'running'
+    legacy_readonly = 'legacy' in instance.context and (
+        plugin.type != 'apply_asset' or not instance.context.get('resources_pending'))
+    if (not plugin.resource_serializer or legacy_readonly or instance.state != 'running'
             or task.state != 'pending' or task.node_instance.state != 'running'
             or (task.node_instance.deadline and task.node_instance.deadline <= timezone.now())):
         raise WorkflowConflict(gettext('This request cannot be adjusted now.'))
@@ -105,7 +107,7 @@ def check_adjustment(instance, task, user):
 
 def adjustment_status(instance, user):
     plugin = get_ticket_plugin(instance.ticket.type)
-    if not plugin.resource_serializer or 'legacy' in instance.context:
+    if not plugin.resource_serializer or ('legacy' in instance.context and plugin.type != 'apply_asset'):
         return None
     status = {'revision': instance.context.get('resource_revision', 0),
               'pending': instance.context.get('resources_pending', False), 'can_adjust': False}
@@ -153,6 +155,8 @@ def adjust_resources(engine, instance, task, user, data, reason, revision):
         context = build_context(ticket)
         context['applicant'] = instance.context['applicant']
         context['resource_revision'] = instance.context.get('resource_revision', 0) + 1
+        if 'legacy' in instance.context:
+            context['legacy'] = instance.context['legacy']
         plugin.validate_submission(ticket, context)
         # An owner task only covers the assets and owners for which it was assigned.
         owners_changed = task.node_instance.node.config['approvers']['type'] == 'asset_owner' and (
@@ -169,6 +173,8 @@ def adjust_resources(engine, instance, task, user, data, reason, revision):
     restarted = owners_changed or instance.node_instances.filter(tasks__state='approved').exists()
     # Conditions already traversed may depend on the amended scope even before a vote.
     restarted = restarted or instance.node_instances.filter(node__type='condition').exists()
+    # Completing an old request must not replay its already approved levels.
+    restarted = restarted and 'legacy' not in context
     engine._event(instance, 'resources.adjusted', node=task.node_instance, task=task, actor=user,
                   before=before, after=ticket.request_data, reason=reason,
                   revision=context['resource_revision'], restarted=restarted)

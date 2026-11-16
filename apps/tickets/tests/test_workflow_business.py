@@ -806,6 +806,7 @@ class WorkflowBusinessTests(TestCase):
     def test_invalid_legacy_pending_ticket_is_closed_without_effects(self):
         ticket = self.ticket()
         ticket.request_data['apply_nodes'] = []
+        ticket.request_data['apply_assets'] = [str(uuid4())]
         ticket.save(update_fields=['request_data'])
         step = TicketStep.objects.create(ticket=ticket, state='pending', status='active')
         TicketAssignee.objects.create(step=step, assignee=self.alice)

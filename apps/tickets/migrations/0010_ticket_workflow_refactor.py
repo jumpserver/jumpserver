@@ -303,9 +303,9 @@ def asset_request_context(apps, db, ticket):
         ids.update(str(pk) for pk in Asset.objects.using(db).filter(
             descendants, org_id=ticket.org_id, nodes__org_id=ticket.org_id,
         ).values_list('pk', flat=True))
-    assets = asset_snapshots(apps, db, ticket.org_id, ids)
-    selectors = data.get('apply_accounts') or []
-    if not isinstance(selectors, list) or not selectors or any(not isinstance(s, str) for s in selectors):
+    assets = asset_snapshots(apps, db, ticket.org_id, ids) if ids else []
+    selectors = data.get('apply_accounts', [])
+    if not isinstance(selectors, list) or any(not isinstance(s, str) for s in selectors):
         raise ValueError('Select valid accounts before submitting the request.')
     start = parse_datetime(data['apply_date_start']) if data.get('apply_date_start') else None
     end = parse_datetime(data['apply_date_expired']) if data.get('apply_date_expired') else None
@@ -324,8 +324,10 @@ def asset_request_context(apps, db, ticket):
     grant_selectors = sorted(set([s for s in selectors if s != '@ALL'] + (
         [account['username'] for account in accounts] if '@ALL' in selectors else []
     )))
-    if not grant_selectors:
-        raise ValueError('No accounts matched the request.')
+    # Legacy applications could leave resources for the reviewer to complete.
+    resources_pending = not assets or not grant_selectors
+    if resources_pending and (ticket.state != 'pending' or ticket.status != 'open'):
+        raise ValueError('The historical request has incomplete resources.')
     snapshots = [{**a, 'id': str(a['id']), 'asset_id': str(a['asset_id'])} for a in accounts]
     known = {a['username'] for a in accounts}
     for selector in dict.fromkeys(selectors):
@@ -340,7 +342,7 @@ def asset_request_context(apps, db, ticket):
     if type(actions) is not int:
         raise ValueError('Select valid asset actions.')
     return {
-        'assets': assets, 'accounts': snapshots,
+        'assets': assets, 'accounts': snapshots, 'resources_pending': resources_pending,
         'nodes': [{'id': str(node.pk), 'name': node.value} for node in nodes],
         'actions': [name for index, name in enumerate(
             ['connect', 'upload', 'download', 'copy', 'paste', 'delete', 'share']) if actions & (1 << index)],
