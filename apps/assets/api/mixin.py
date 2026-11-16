@@ -172,6 +172,7 @@ class SerializeToTreeNodeMixin:
                 'meta': {
                     'type': 'asset',
                     'data': {
+                        'platform_name': platform.name,
                         'platform_type': platform.type,
                         'org_name': asset.org_name,
                         'sftp': asset.id in sftp_asset_ids,
