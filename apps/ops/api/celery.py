@@ -2,8 +2,7 @@
 #
 import re
 import logging
-from django.db.models import Count, F, Q, Window
-from django.db.models.functions import RowNumber
+from django.db.models import Count, Q
 
 from django.shortcuts import get_object_or_404
 from django.core.cache import cache
@@ -145,31 +144,39 @@ class CeleryTaskViewSet(
             i.enabled = task.enabled
         return queryset
 
-    def generate_summary_state(self, execution_qs):
+    def generate_summary_state(self, names):
         model = self.get_queryset().model
-        summaries = {
-            row['name']: {'summary': {'total': row['total'], 'success': row['success']},
-                          'state': 'green', 'states': []}
-            for row in execution_qs.order_by().values('name').annotate(
-                total=Count('id'), success=Count('id', filter=Q(state='SUCCESS')),
-            )
-        }
-        # Bound Python memory to five states per displayed task. Window filtering
-        # is supported by our Django and MariaDB/PostgreSQL minimum versions.
-        recent = execution_qs.filter(name__in=summaries).order_by().annotate(
-            position=Window(RowNumber(), partition_by=[F('name')],
-                            order_by=[F('date_published').desc(), F('id').desc()]),
-        ).filter(position__lte=5).order_by('name', 'position').values('name', 'state')
-        for row in recent:
-            summaries[row['name']]['states'].append(row['state'])
-        for summary in summaries.values():
-            summary['state'] = model.compute_state_color(summary.pop('states'))
+        names = list(dict.fromkeys(names))
+        summaries = {}
+        # Conditional aggregates avoid grouping a 1024-character task name into
+        # a disk-backed temporary table. Bound the SQL width for large exports.
+        for offset in range(0, len(names), 50):
+            batch = names[offset:offset + 50]
+            aggregates = {}
+            for index, name in enumerate(batch):
+                aggregates[f'total_{index}'] = Count('id', filter=Q(name=name))
+                aggregates[f'success_{index}'] = Count(
+                    'id', filter=Q(name=name, state='SUCCESS')
+                )
+            counts = CeleryTaskExecution.objects.filter(name__in=batch).aggregate(**aggregates)
+            for index, name in enumerate(batch):
+                total = counts[f'total_{index}']
+                if not total:
+                    continue
+                # Fetch only five rows through the task/date index. A window
+                # query sorts every historical execution before limiting rows.
+                states = list(CeleryTaskExecution.objects.filter(name=name).order_by(
+                    '-date_published', '-id'
+                ).values_list('state', flat=True)[:5])
+                summaries[name] = {
+                    'summary': {'total': total, 'success': counts[f'success_{index}']},
+                    'state': model.compute_state_color(states),
+                }
         return summaries
 
     def loading_summary_state(self, queryset):
         names = [i.name for i in queryset]
-        execution_qs = CeleryTaskExecution.objects.filter(name__in=names)
-        summary_state_dict = self.generate_summary_state(execution_qs)
+        summary_state_dict = self.generate_summary_state(names)
         for i in queryset:
             i.summary = summary_state_dict.get(i.name, {}).get('summary', {})
             i.state = summary_state_dict.get(i.name, {}).get('state', 'green')
@@ -202,7 +209,9 @@ class CeleryTaskViewSet(
     @staticmethod
     def mark_periodic_and_sorted(queryset):
         names = queryset.values_list('name', flat=True)
-        periodic_tasks = PeriodicTask.objects.filter(name__in=names)
+        periodic_tasks = PeriodicTask.objects.filter(name__in=names).select_related(
+            'interval', 'crontab', 'solar', 'clocked'
+        )
         periodic_task_dict = {task.task: task for task in periodic_tasks}
         for q in queryset:
             if q.name in periodic_task_dict:

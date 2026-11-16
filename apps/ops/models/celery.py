@@ -123,3 +123,6 @@ class CeleryTaskExecution(models.Model):
     class Meta:
         ordering = ['-date_start']
         verbose_name = _("Celery Task Execution")
+        indexes = [
+            models.Index(fields=['name', '-date_published', '-id'], name='ops_task_name_recent_idx'),
+        ]
