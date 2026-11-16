@@ -228,8 +228,10 @@ class ApplicationWebhookSerializer(serializers.ModelSerializer):
         events = attrs.get('events', getattr(instance, 'events', []))
         applications = attrs.get('applications')
         if applications is None and instance and instance.pk:
-            applications = instance.applications.all()
-        if not applications:
+            has_applications = instance.applications.exists()
+        else:
+            has_applications = bool(applications)
+        if not has_applications:
             raise serializers.ValidationError({'applications': _('Select at least one application.')})
         if enabled and not url:
             raise serializers.ValidationError({'url': _('URL is required when webhook is enabled.')})

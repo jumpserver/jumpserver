@@ -530,7 +530,7 @@ class ServiceAccountSerializer(serializers.ModelSerializer):
         else:
             users = User.objects.all()
         email_lookup = text_hmac_sha256(email)
-        if users.filter(email_lookup=email_lookup) or users.filter(username=username):
+        if users.filter(email_lookup=email_lookup).exists() or users.filter(username=username).exists():
             raise serializers.ValidationError(_("name not unique"), code="unique")
         return name
 

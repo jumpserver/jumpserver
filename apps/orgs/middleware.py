@@ -23,10 +23,12 @@ class OrgMiddleware:
         if has_roles:
             return
 
-        roles_bindings = RoleBinding.objects.filter(user=request.user).exclude(org=None)
-        if roles_bindings:
-            org_id = str(list(roles_bindings.values_list('org_id', flat=True))[0])
-            request.session['oid'] = org_id
+        org_id = (
+            RoleBinding.objects.filter(user=request.user).exclude(org=None)
+            .values_list('org_id', flat=True).first()
+        )
+        if org_id is not None:
+            request.session['oid'] = str(org_id)
 
     def __call__(self, request):
         self.set_permed_org_if_need(request)

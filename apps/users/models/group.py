@@ -29,10 +29,8 @@ class UserGroup(LabeledMixin, JMSOrgBaseModel):
 
     @classmethod
     def initial(cls):
-        default_group = cls.objects.filter(name='Default')
-        if not default_group:
+        group = cls.objects.filter(name='Default').first()
+        if group is None:
             group = cls(name='Default', created_by='System', comment='Default user group')
             group.save()
-        else:
-            group = default_group[0]
         return group
