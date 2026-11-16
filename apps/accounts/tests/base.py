@@ -8,13 +8,14 @@ from accounts.models import (
 )
 from assets.const import Category
 from assets.models import Asset, Platform
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from orgs.models import Organization
 from orgs.utils import set_current_org, set_to_root_org
 from rest_framework.test import APIRequestFactory, force_authenticate
 from users.models import User
 
 
+@override_settings(XPACK_LICENSE_IS_VALID=True)
 class CredentialTestCase(TestCase):
     def setUp(self):
         self.factory = APIRequestFactory()

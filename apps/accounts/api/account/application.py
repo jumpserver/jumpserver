@@ -1,5 +1,6 @@
 from uuid import UUID
 
+from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.utils.translation import gettext_lazy as _, get_language
 from rest_framework.decorators import action
@@ -60,8 +61,11 @@ class IntegrationApplicationViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
         serializer = serializers.ApplicationCommandSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
-        if data['event'] == SWITCH and not request.user.has_perm('accounts.change_applicationcredential'):
-            raise PermissionDenied()
+        if data['event'] == SWITCH:
+            if not request.user.has_perm('accounts.change_applicationcredential'):
+                raise PermissionDenied()
+            if not settings.XPACK_LICENSE_IS_VALID:
+                raise PermissionDenied(_('A valid license is required'), code='license_required')
         application = self.get_object()
         self.start_audit(AuditEvent.COMMAND_REQUESTED, application=application)
         command = send(application, data, request.user.name)
