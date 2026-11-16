@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.db import transaction
 from django.db.models import Q
 
 from common.api.generic import JMSBulkModelViewSet
@@ -25,6 +26,17 @@ class AdHocViewSet(JMSBulkModelViewSet):
         'name', 'module', 'scope', 'created_by', 'date_created',
         'date_updated',
     )
+
+    @transaction.atomic
+    def perform_bulk_update(self, serializer):
+        ids = [item['id'] for item in serializer.validated_data]
+        queryset = serializer.instance
+        targets = queryset.select_for_update().order_by('pk').prefetch_related('creator').in_bulk(ids)
+        for obj in targets.values():
+            self.check_object_permissions(self.request, obj)
+        # The bulk serializer queries again on save. Limit it to the rows we checked and locked.
+        serializer.instance = queryset.filter(pk__in=targets)
+        return super().perform_bulk_update(serializer)
 
     def allow_bulk_destroy(self, qs, filtered):
         for obj in filtered:
