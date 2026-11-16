@@ -321,13 +321,6 @@ def asset_request_context(apps, db, ticket):
     if '@ALL' not in selectors:
         accounts = accounts.filter(username__in=selectors)
     accounts = list(accounts)
-    grant_selectors = sorted(set([s for s in selectors if s != '@ALL'] + (
-        [account['username'] for account in accounts] if '@ALL' in selectors else []
-    )))
-    # Legacy applications could leave resources for the reviewer to complete.
-    resources_pending = not assets or not grant_selectors
-    if resources_pending and (ticket.state != 'pending' or ticket.status != 'open'):
-        raise ValueError('The historical request has incomplete resources.')
     snapshots = [{**a, 'id': str(a['id']), 'asset_id': str(a['asset_id'])} for a in accounts]
     known = {a['username'] for a in accounts}
     for selector in dict.fromkeys(selectors):
@@ -342,7 +335,7 @@ def asset_request_context(apps, db, ticket):
     if type(actions) is not int:
         raise ValueError('Select valid asset actions.')
     return {
-        'assets': assets, 'accounts': snapshots, 'resources_pending': resources_pending,
+        'assets': assets, 'accounts': snapshots,
         'nodes': [{'id': str(node.pk), 'name': node.value} for node in nodes],
         'actions': [name for index, name in enumerate(
             ['connect', 'upload', 'download', 'copy', 'paste', 'delete', 'share']) if actions & (1 << index)],
@@ -351,7 +344,7 @@ def asset_request_context(apps, db, ticket):
             'permission_name': data.get('apply_permission_name') or f'Ticket {ticket.pk}',
             'users': [user_snapshot(user) for user in users],
             'is_on_behalf': len(users) != 1 or users[0].pk != ticket.applicant_id,
-            'account_selectors': grant_selectors, 'actions': actions,
+            'account_selectors': selectors, 'actions': actions,
             'date_start': start.isoformat(), 'date_expired': end.isoformat(),
             'expire_soon_notice_minutes': data.get('apply_expire_soon_notice_minutes'),
         },

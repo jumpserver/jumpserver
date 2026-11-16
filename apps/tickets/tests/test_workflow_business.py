@@ -548,8 +548,7 @@ class WorkflowBusinessTests(TestCase):
                 with override('zh-hans'):
                     items = TicketSerializer.get_request_items(ticket)
                     accounts = next(item['value'] for item in items if item['name'] == 'apply_accounts')
-                    expected = (['匿名账号', '手动输入', '指定账号', '同名账号', '@custom', 'ops'] if imported
-                                else ['指定账号', 'ops', '全部', '手动输入', '同名账号', '匿名账号', '@custom'])
+                    expected = ['指定账号', 'ops', '全部', '手动输入', '同名账号', '匿名账号', '@custom']
                     self.assertEqual(accounts, expected)
                     self.assertIn('指定账号', TicketRequestItemsField().to_file_representation(items))
                 ticket.refresh_from_db()

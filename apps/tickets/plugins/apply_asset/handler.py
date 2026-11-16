@@ -81,24 +81,34 @@ def on_approved(instance, ticket):
     from perms.utils.expire_soon_notice import sync_expire_soon_notice
     data = instance.context
     requested = data['request']
+    legacy = ticket.request_data if 'legacy' in data else None
     snapshots = requested.get('users', [data['applicant']])
     users = list(available_users(instance.org_id).filter(pk__in=[user['id'] for user in snapshots]))
     if len(users) != len(snapshots):
         raise WorkflowConfigurationError(gettext('An authorized user is no longer an active organization member.'))
-    if '@USER' in requested['account_selectors']:
+    if legacy is None and '@USER' in requested['account_selectors']:
         names = {user['id']: user['username'] for user in snapshots}
         if any(user.username != names[str(user.pk)] for user in users):
             raise WorkflowConfigurationError(gettext('A dynamic account username changed. Submit a new request.'))
-    ids = [asset['id'] for asset in data['assets']]
+    ids = (legacy.get('apply_assets', []) if legacy is not None
+           else [asset['id'] for asset in data['assets']])
     with tmp_to_org(instance.org_id):
         assets = Asset.objects.filter(pk__in=ids, org_id=instance.org_id)
         if assets.count() != len(ids):
             raise WorkflowConfigurationError(gettext('A requested asset was deleted or moved. Submit a new request.'))
+        nodes = Node.objects.none()
+        if legacy is not None:
+            nodes = Node.objects.filter(
+                pk__in=legacy.get('apply_nodes', []), org_id=instance.org_id)
+            if nodes.count() != len(legacy.get('apply_nodes', [])):
+                raise WorkflowConfigurationError(gettext('A requested node was deleted or moved.'))
         if AssetPermission.objects.filter(pk=ticket.pk).exists():
             return
         attrs = {
             'id': ticket.pk, 'from_ticket': True, 'name': requested['permission_name'],
-            'accounts': requested['account_selectors'], 'actions': requested['actions'],
+            'accounts': (legacy.get('apply_accounts', []) if legacy is not None
+                         else requested['account_selectors']),
+            'actions': requested['actions'],
             'date_start': parse_datetime(requested['date_start']),
             'date_expired': parse_datetime(requested['date_expired']),
             'expire_soon_notice_minutes': requested['expire_soon_notice_minutes'],
@@ -109,7 +119,9 @@ def on_approved(instance, ticket):
             raise WorkflowConfigurationError(gettext('The requested access period has already expired.'))
         sync_expire_soon_notice(None, attrs, allow_past=True, disable_if_past=True)
         permission = AssetPermission.objects.create(**attrs)
-        # Never grant a live node selection: its membership can grow after approval.
+        # Only migrated tickets retain the original live node and account selections.
+        if legacy is not None:
+            permission.nodes.set(nodes)
         permission.assets.set(assets)
         permission.users.set(users)
     return {'action': ticket.type, 'ticket': str(ticket.pk),
