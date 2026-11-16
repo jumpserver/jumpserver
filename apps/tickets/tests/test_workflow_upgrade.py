@@ -61,7 +61,9 @@ class HistoricalWorkflowUpgradeTests(TestCase):
         self.assertEqual(self.historical_import(flow), [])
         workflow = Workflow.objects.get(legacy_flow_id=flow.pk)
         self.assertEqual(workflow.active_version.nodes.get(type='approval').config['approvers'],
-                         {'type': 'role', 'value': [SYSTEM_ADMIN_ID]})
+                         {'type': 'user_selector', 'value': {'type': 'attrs', 'attrs': [
+                             {'name': 'system_roles', 'match': 'm2m', 'value': [SYSTEM_ADMIN_ID]},
+                         ]}})
 
     def test_missing_role_disables_flow(self):
         flow = TicketFlow.objects.create(name='Missing role', type='general')
@@ -73,15 +75,17 @@ class HistoricalWorkflowUpgradeTests(TestCase):
         self.assertFalse(workflow.enabled)
         self.assertIsNone(workflow.active_version_id)
 
-    def test_complex_selector_is_frozen_but_disabled(self):
+    def test_attribute_selector_is_preserved_published_and_enabled(self):
         flow = TicketFlow.objects.create(name='Attribute rule', type='general')
         flow.rules.add(ApprovalRule.objects.create(users={'type': 'attrs', 'attrs': [
             {'name': 'username', 'match': 'exact', 'value': self.alice.username},
         ]}))
-        self.assertTrue(self.historical_import(flow))
+        self.assertEqual(self.historical_import(flow), [])
         workflow = Workflow.objects.get(legacy_flow_id=flow.pk)
-        self.assertFalse(workflow.enabled)
-        self.assertEqual(workflow.active_version.nodes.get(type='approval').config['approvers']['value'], [str(self.alice.pk)])
+        self.assertTrue(workflow.enabled)
+        self.assertIsNotNone(workflow.active_version.published_at)
+        self.assertEqual(workflow.active_version.nodes.get(type='approval').config['approvers'],
+                         {'type': 'user_selector', 'value': flow.rules.get().users.value})
 
     def test_defaults_do_not_bypass_invalid_legacy_flow_or_duplicate(self):
         flow = TicketFlow.objects.create(name='Broken asset rule', type='apply_asset')

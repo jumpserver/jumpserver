@@ -21139,3 +21139,7 @@ msgstr ""
 #: accounts/serializers/account/service.py
 msgid "Select at least one account."
 msgstr "请至少选择一个账号。"
+
+#: tickets/workflow/definition.py tickets/workflow/approvers.py
+msgid "Invalid user filter."
+msgstr "用户筛选规则无效。"

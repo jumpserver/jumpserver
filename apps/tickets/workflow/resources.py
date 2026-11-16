@@ -152,6 +152,8 @@ def adjust_resources(engine, instance, task, user, data, reason, revision):
         ticket.request_data = {**before, **json.loads(JSONRenderer().render(serializer.validated_data))}
         context = build_context(ticket)
         context['applicant'] = instance.context['applicant']
+        if 'approver_selections' in instance.context:
+            context['approver_selections'] = instance.context['approver_selections']
         context['resource_revision'] = instance.context.get('resource_revision', 0) + 1
         plugin.validate_submission(ticket, context)
         # An owner task only covers the assets and owners for which it was assigned.

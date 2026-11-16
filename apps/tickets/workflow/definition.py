@@ -7,7 +7,45 @@ from uuid import UUID
 from .conditions import validate_condition
 from .errors import WorkflowConfigurationError
 
-RESOLVERS = {'user', 'user_group', 'role', 'org_admin', 'asset_owner'}
+RESOLVERS = {'user', 'user_group', 'role', 'org_admin', 'asset_owner', 'user_selector'}
+
+
+def validate_user_selector(selector):
+    """Validate the fields exposed by the existing user attribute selector."""
+    if isinstance(selector, dict) and selector == {'type': 'all'}:
+        return
+    if (not isinstance(selector, dict) or set(selector) != {'type', 'attrs'}
+            or selector['type'] != 'attrs' or not isinstance(selector['attrs'], list)
+            or not 1 <= len(selector['attrs']) <= 100):
+        raise ValueError('Invalid user filter.')
+    for attr in selector['attrs']:
+        if (not isinstance(attr, dict) or attr.keys() - {'name', 'match', 'value', 'rel', 'index'}
+                or 'name' not in attr or 'value' not in attr):
+            raise ValueError('Invalid user filter.')
+        name, value, match = attr['name'], attr['value'], attr.get('match', 'exact')
+        if name in ('system_roles', 'org_roles', 'groups', 'labels'):
+            if (match not in ('m2m', 'm2m_all') or not isinstance(value, list)
+                    or not 1 <= len(value) <= 1000):
+                raise ValueError('Invalid user filter.')
+            for pk in value:
+                UUID(str(pk))
+        elif name in ('is_active', 'is_first_login'):
+            if match not in ('exact', 'not') or type(value) is not bool:
+                raise ValueError('Invalid user filter.')
+        elif name in ('name', 'username', 'email', 'comment'):
+            if match == 'in':
+                if not isinstance(value, list) or not value or any(not isinstance(v, str) for v in value):
+                    raise ValueError('Invalid user filter.')
+            elif (match not in ('exact', 'not', 'contains', 'startswith', 'endswith', 'regex')
+                  or not isinstance(value, str)):
+                raise ValueError('Invalid user filter.')
+            if match == 'regex':
+                try:
+                    re.compile(value)
+                except re.error as exc:
+                    raise ValueError('Invalid user filter.') from exc
+        else:
+            raise ValueError('Invalid user filter.')
 
 
 def json_snapshot(value, max_bytes=262144):
@@ -25,7 +63,12 @@ def validate_approvers(spec):
         raise WorkflowConfigurationError(gettext('Unknown approver resolver.'))
     if spec.keys() - {'type', 'value'}:
         raise WorkflowConfigurationError(gettext('Unknown approver configuration field.'))
-    if spec['type'] in ('user', 'user_group', 'role'):
+    if spec['type'] == 'user_selector':
+        try:
+            validate_user_selector(spec.get('value'))
+        except (ValueError, TypeError) as exc:
+            raise WorkflowConfigurationError(gettext('Invalid user filter.')) from exc
+    elif spec['type'] in ('user', 'user_group', 'role'):
         ids = spec.get('value')
         if isinstance(ids, str):
             ids = [ids]
