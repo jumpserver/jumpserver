@@ -6,7 +6,7 @@ from django.conf import settings
 from django.core.cache import cache
 from django.db.models import Exists, OuterRef, Q
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _, gettext_noop
+from django.utils.translation import gettext, gettext_lazy as _, gettext_noop
 
 from accounts.const import AutomationTypes
 from accounts.tasks.common import quickstart_automation_by_snapshot
@@ -14,6 +14,7 @@ from common.const.crontab import CRONTAB_AT_AM_THREE
 from common.utils import get_logger, get_object_or_none, get_log_keep_day
 from common.utils.lock import DistributedLock
 from ops.celery.decorator import register_as_period_task
+from ops.celery.task_logging import TaskLog
 from orgs.utils import tmp_to_org, tmp_to_root_org
 
 logger = get_logger(__file__)
@@ -128,14 +129,14 @@ def _get_active_celery_tasks():
     try:
         active_workers = app.control.inspect(timeout=2).active()
     except Exception:
-        logger.exception('Inspect active Celery tasks failed')
+        logger.exception(gettext('Unable to inspect active Celery tasks.'))
         return None
 
     # None means that no worker replied. Treat it as an unavailable inspection,
     # not as proof that every running task has disappeared.
     if not active_workers:
         logger.warning(
-            'Skip interrupted account task check: no Celery worker replied'
+            gettext('Skipped interrupted account task inspection: no Celery worker replied.')
         )
         return None
 
@@ -165,8 +166,8 @@ def _missing_task_confirmed(execution_id, now):
         # Do not recover based on a single observation when the debounce store
         # itself is unavailable.
         logger.exception(
-            'Check interrupted task debounce failed: execution=%s',
-            execution_id,
+            gettext('Unable to confirm interrupted task status: execution=%(execution)s.'),
+            {'execution': execution_id},
         )
         return False
 
@@ -176,8 +177,8 @@ def _clear_missing_task_marker(execution_id):
         cache.delete(f'{INTERRUPTED_TASK_CACHE_PREFIX}{execution_id}')
     except Exception:
         logger.exception(
-            'Clear interrupted task debounce failed: execution=%s',
-            execution_id,
+            gettext('Unable to clear the interrupted task confirmation marker: execution=%(execution)s.'),
+            {'execution': execution_id},
         )
 
 
@@ -191,33 +192,37 @@ def _clear_missing_task_marker(execution_id):
 )
 @register_as_period_task(interval=INTERRUPTED_TASK_CHECK_INTERVAL)
 def recover_interrupted_account_automation_tasks():
-    lock = DistributedLock(INTERRUPTED_TASK_LOCK_NAME)
-    try:
-        acquired = lock.acquire(blocking=False)
-    except Exception:
-        logger.exception(
-            'Acquire interrupted account task recovery lock failed'
-        )
-        return
-
-    if not acquired:
-        logger.info(
-            'Skip interrupted account task recovery: another check is running'
-        )
-        return
-
-    try:
-        _recover_interrupted_account_automation_tasks()
-    finally:
+    with TaskLog(logger, gettext('Recover interrupted account automation tasks')) as log:
+        lock = DistributedLock(INTERRUPTED_TASK_LOCK_NAME)
         try:
-            lock.release()
+            acquired = lock.acquire(blocking=False)
         except Exception:
+            log.fail(gettext('Unable to acquire the task lock.'))
             logger.exception(
-                'Release interrupted account task recovery lock failed'
+                gettext('Unable to acquire the interrupted account task recovery lock.')
             )
+            return
+
+        if not acquired:
+            log.skip(gettext('Another instance of this maintenance task is running.'), 0)
+            return
+
+        try:
+            _recover_interrupted_account_automation_tasks(log)
+        finally:
+            try:
+                lock.release()
+            except Exception:
+                log.fail(gettext('Unable to release the task lock.'))
+                logger.exception(
+                    gettext('Unable to release the interrupted account task recovery lock.')
+                )
 
 
-def _recover_interrupted_account_automation_tasks():
+def _recover_interrupted_account_automation_tasks(log=None):
+    if log is None:
+        with TaskLog(logger, gettext('Recover interrupted account automation tasks')) as log:
+            return _recover_interrupted_account_automation_tasks(log)
     from accounts.automations.recovery import (
         finalize_interrupted_execution,
     )
@@ -239,6 +244,7 @@ def _recover_interrupted_account_automation_tasks():
             )
         )
 
+    log.checked = len(executions)
     if not executions:
         return
 
@@ -280,9 +286,13 @@ def _recover_interrupted_account_automation_tasks():
                     'Celery task ended before the automation result was '
                     'written back; the remote secret state may be unknown.'
                 )
-            finalize_interrupted_execution(
+            recovered = finalize_interrupted_execution(
                 execution.id, reason, status=execution_status
             )
+            if recovered:
+                log.processed += 1
+            else:
+                log.skip(gettext('The record was already handled by another task.'))
             _clear_missing_task_marker(execution.id)
             continue
         pending_inspection.append(execution)
@@ -292,6 +302,7 @@ def _recover_interrupted_account_automation_tasks():
 
     active_tasks = _get_active_celery_tasks()
     if active_tasks is None:
+        log.skip(gettext('Worker status is unavailable; recovery cannot be confirmed.'), len(pending_inspection))
         return
     active_task_ids, responding_workers = active_tasks
 
@@ -314,11 +325,13 @@ def _recover_interrupted_account_automation_tasks():
     for execution in pending_inspection:
         started_at = execution.date_start or execution.date_created
         if started_at > stale_before:
+            log.skip(gettext('The task is still within the startup grace period.'))
             continue
 
         execution_id = str(execution.id)
         owner_task_id = owner_task_ids[execution_id]
         if owner_task_id in active_task_ids:
+            log.skip(gettext('The task is still running on a worker.'))
             _clear_missing_task_marker(execution_id)
             continue
 
@@ -335,15 +348,18 @@ def _recover_interrupted_account_automation_tasks():
                 unavailable_worker_stale_before is None
                 or started_at > unavailable_worker_stale_before
         ):
+            log.skip(gettext('The owning worker has not replied and the hard timeout has not elapsed.'))
             _clear_missing_task_marker(execution_id)
             continue
         if not _missing_task_confirmed(execution_id, now):
+            log.skip(gettext('Waiting for repeated confirmation that the task is missing.'))
             continue
 
         recovered = finalize_interrupted_execution(
             execution.id, reason, status=Status.canceled
         )
         if recovered:
+            log.processed += 1
             CeleryTaskExecution.objects.filter(
                 id=owner_task_id,
                 is_finished=False,
@@ -352,6 +368,8 @@ def _recover_interrupted_account_automation_tasks():
                 is_finished=True,
                 date_finished=now,
             )
+        else:
+            log.skip(gettext('The record was already handled by another task.'))
         _clear_missing_task_marker(execution_id)
 
 
@@ -370,37 +388,49 @@ def _recover_interrupted_account_automation_tasks():
 )
 @register_as_period_task(crontab=CRONTAB_AT_AM_THREE)
 def clean_change_secret_and_push_record_period():
-    from accounts.models import ChangeSecretRecord, PushSecretRecord
-    print('Start clean change secret and push record period')
-    with tmp_to_root_org():
-        now = timezone.now()
-        days = get_log_keep_day('ACCOUNT_CHANGE_SECRET_RECORD_KEEP_DAYS')
-        expired_time = now - datetime.timedelta(days=days)
+    with TaskLog(logger, gettext('Clean change secret and push record period')) as log:
+        from accounts.models import ChangeSecretRecord, PushSecretRecord
+        with tmp_to_root_org():
+            now = timezone.now()
+            days = get_log_keep_day('ACCOUNT_CHANGE_SECRET_RECORD_KEEP_DAYS')
+            logger.info(gettext('Retention period: %(days)s days.'), {'days': days})
+            expired_time = now - datetime.timedelta(days=days)
 
-        null_related_q = Q(execution__isnull=True) | Q(asset__isnull=True) | Q(account__isnull=True)
-        expired_q = Q(date_updated__lt=expired_time)
+            null_related_q = Q(execution__isnull=True) | Q(asset__isnull=True) | Q(account__isnull=True)
+            expired_q = Q(date_updated__lt=expired_time)
 
-        from accounts.models import CredentialRotationRecord
-        active_execution_ids = CredentialRotationRecord.objects.filter(
-            status='running', date_finished__isnull=True,
-            change_execution_id__isnull=False,
-        ).values_list('change_execution_id', flat=True)
-        removable_changes = ChangeSecretRecord.objects.exclude(execution_id__in=active_execution_ids)
-        removable_changes.filter(null_related_q).delete()
-        removable_changes.filter(expired_q).delete()
+            from accounts.models import CredentialRotationRecord
+            active_execution_ids = CredentialRotationRecord.objects.filter(
+                status='running', date_finished__isnull=True,
+                change_execution_id__isnull=False,
+            ).values_list('change_execution_id', flat=True)
+            removable_changes = ChangeSecretRecord.objects.exclude(execution_id__in=active_execution_ids)
+            protected_changes = ChangeSecretRecord.objects.filter(
+                null_related_q | expired_q, execution_id__in=active_execution_ids,
+            ).count()
+            log.checked += protected_changes
+            if protected_changes:
+                log.skip(gettext('Records belong to a credential rotation that is still running.'), protected_changes)
+            log.delete(removable_changes.filter(null_related_q))
+            log.delete(removable_changes.filter(expired_q))
 
-        # Keep the latest unsuccessful first-login result. Removing it would
-        # turn an unprepared account into an
-        # ordinary existing account and allow login without a verified push.
-        newer_first_login = PushSecretRecord.objects.filter(
-            account_id=OuterRef('account_id'), is_first_login=True,
-        ).filter(
-            Q(date_created__gt=OuterRef('date_created'))
-            | Q(date_created=OuterRef('date_created'), id__gt=OuterRef('id')),
-        )
-        protected_ids = list(PushSecretRecord.objects.filter(
-            is_first_login=True, account__isnull=False,
-        ).exclude(
-            status='success', execution__status='success', execution__date_finished__isnull=False,
-        ).filter(~Exists(newer_first_login)).values_list('id', flat=True))
-        PushSecretRecord.objects.filter(null_related_q | expired_q).exclude(id__in=protected_ids).delete()
+            # Keep the latest unsuccessful first-login result. Removing it would
+            # turn an unprepared account into an
+            # ordinary existing account and allow login without a verified push.
+            newer_first_login = PushSecretRecord.objects.filter(
+                account_id=OuterRef('account_id'), is_first_login=True,
+            ).filter(
+                Q(date_created__gt=OuterRef('date_created'))
+                | Q(date_created=OuterRef('date_created'), id__gt=OuterRef('id')),
+            )
+            protected_ids = list(PushSecretRecord.objects.filter(
+                is_first_login=True, account__isnull=False,
+            ).exclude(
+                status='success', execution__status='success', execution__date_finished__isnull=False,
+            ).filter(~Exists(newer_first_login)).values_list('id', flat=True))
+            candidates = PushSecretRecord.objects.filter(null_related_q | expired_q)
+            protected_pushes = candidates.filter(id__in=protected_ids).count()
+            log.checked += protected_pushes
+            if protected_pushes:
+                log.skip(gettext('The latest unsuccessful first-login result must be retained.'), protected_pushes)
+            log.delete(candidates.exclude(id__in=protected_ids))

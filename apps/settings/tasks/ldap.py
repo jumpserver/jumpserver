@@ -2,7 +2,7 @@
 import time
 from celery import shared_task
 from django.conf import settings
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
 from common.utils import get_logger
 from common.utils.timezone import local_now_display
@@ -85,12 +85,17 @@ def import_ldap_ha_user():
 
 
 def register_periodic_task(task_name, task_func, interval_key, enabled_key, crontab_key, **kwargs):
+    logger.info(gettext('Checking LDAP periodic sync configuration: %(name)s.'), {'name': task_name})
     interval = kwargs.get(interval_key, getattr(settings, interval_key))
     enabled = kwargs.get(enabled_key, getattr(settings, enabled_key))
     crontab = kwargs.get(crontab_key, getattr(settings, crontab_key))
 
     if not enabled:
-        disable_celery_periodic_task(task_name)
+        count = disable_celery_periodic_task(task_name)
+        logger.info(gettext(
+            'Skipped registration: LDAP periodic sync is disabled; schedules kept disabled: %(count)s.'
+        ), {'count': count})
+        return
 
     if isinstance(interval, int):
         interval = interval * 3600

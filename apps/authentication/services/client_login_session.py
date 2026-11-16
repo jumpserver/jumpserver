@@ -10,7 +10,7 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.utils.crypto import constant_time_compare
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 from oauth2_provider.models import (
     get_access_token_model, get_application_model, get_grant_model, get_refresh_token_model,
 )
@@ -361,7 +361,7 @@ def revoke_client_authorizations(reason='policy_changed'):
         get_grant_model().objects.filter(application__in=applications).delete()
 
 
-def clear_client_login_sessions():
+def clear_client_login_sessions(task_log=None):
     """Keep terminated rows for the login-log retention period and while credentials refer to them."""
     from django.db.models import Exists, OuterRef, Q
 
@@ -374,7 +374,14 @@ def clear_client_login_sessions():
             Q(policy_expires_at__lte=now) | Q(policy_expires_at__isnull=True, expires_at__lte=now),
             revoked_at__isnull=True,
         ):
-            _session_is_valid(session, policy, now, mutate=True)
+            valid = _session_is_valid(session, policy, now, mutate=True)
+            if task_log:
+                task_log.checked += 1
+                if valid:
+                    task_log.skip(gettext('The client login session is still valid.'))
+                else:
+                    task_log.processed += 1
+                    task_log.metric(gettext('Client sessions revoked'), 1)
         refresh_tokens = get_refresh_token_model().objects.filter(
             application_id=OuterRef('application_id'), token_family=OuterRef('token_family'),
         )
@@ -383,9 +390,13 @@ def clear_client_login_sessions():
             has_live_refresh=Exists(refresh_tokens.filter(revoked__isnull=True, access_token__isnull=False)),
         )
         # Tokens may have been revoked by the existing OAuth admin or cleanup path.
-        sessions.filter(revoked_at__isnull=True, has_live_refresh=False).update(
+        revoked = sessions.filter(revoked_at__isnull=True, has_live_refresh=False).update(
             revoked_at=timezone.now(), revoke_reason='security_revoke',
         )
+        if task_log:
+            task_log.checked += revoked
+            task_log.processed += revoked
+            task_log.metric(gettext('Client sessions revoked'), revoked)
         # Also reclaim legacy credentials without a login record and credentials
         # whose session was invalidated by a migration or policy change.
         live_sessions = ClientLoginSession.objects.filter(
@@ -395,7 +406,16 @@ def clear_client_login_sessions():
         obsolete = get_refresh_token_model().objects.filter(application__in=client_applications()).annotate(
             has_live_session=Exists(live_sessions),
         ).filter(has_live_session=False)
-        get_access_token_model().objects.filter(pk__in=obsolete.values('access_token_id')).delete()
-        obsolete.delete()
+        access_tokens = get_access_token_model().objects.filter(pk__in=obsolete.values('access_token_id'))
+        if task_log:
+            task_log.delete(access_tokens, label=gettext('Access tokens deleted'))
+            task_log.delete(obsolete, label=gettext('Refresh tokens deleted'))
+        else:
+            access_tokens.delete()
+            obsolete.delete()
         days = get_log_keep_day('LOGIN_LOG_KEEP_DAYS')
-        sessions.filter(revoked_at__lt=timezone.now() - timedelta(days=days), has_refresh=False).delete()
+        expired = sessions.filter(revoked_at__lt=timezone.now() - timedelta(days=days), has_refresh=False)
+        if task_log:
+            task_log.delete(expired, label=gettext('Client login sessions deleted'))
+        else:
+            expired.delete()

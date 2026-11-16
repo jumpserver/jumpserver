@@ -76,19 +76,30 @@ def pending_executions():
     ).filter(Q(result__dispatch_after__isnull=True) | Q(result__dispatch_after__lte=timezone.now().isoformat()))
 
 
-def dispatch_execution(execution_id):
+def dispatch_execution(execution_id, task_log=None):
     from tickets.tasks import execute_ticket_change_secret
+    if task_log:
+        task_log.checked += 1
     with tmp_to_root_org(), transaction.atomic():
         execution = pending_executions().select_for_update().filter(pk=execution_id).first()
         if not execution:
+            if task_log:
+                task_log.skip(gettext('The execution is no longer eligible for dispatch.'))
             return
         execution.result = {'dispatch_after': (timezone.now() + timedelta(minutes=5)).isoformat()}
         execution.save(update_fields=['result'])
     try:
         execute_ticket_change_secret.delay(str(execution_id))
+        if task_log:
+            task_log.processed += 1
+            task_log.metric(gettext('Executions queued'), 1)
     except Exception as exc:
+        if task_log:
+            task_log.fail(gettext('Unable to queue an execution; it will be retried later.'))
         # The pending execution is durable; the periodic dispatcher retries publication.
-        logger.error('Unable to queue password change for ticket %s (%s)', execution_id, type(exc).__name__)
+        logger.error(gettext('Unable to queue password change for ticket %(ticket)s (%(error)s).'), {
+            'ticket': execution_id, 'error': type(exc).__name__,
+        })
 
 
 def execute(execution_id, task_id, hostname):

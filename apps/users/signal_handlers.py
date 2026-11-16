@@ -221,7 +221,13 @@ def on_ldap_create_user(sender, user, ldap_user, **kwargs):
 )
 @register_as_period_task(crontab=CRONTAB_AT_AM_TWO)
 def clean_expired_user_session_period():
-    UserSession.clear_expired_sessions()
+    from django.utils.translation import gettext
+    from ops.celery.task_logging import TaskLog
+    with TaskLog(logger, gettext('Clean up expired user sessions')) as log:
+        matched, deleted = UserSession.clear_expired_sessions()
+        log.checked = matched
+        log.processed = deleted
+        log.metric(gettext('Sessions deleted'), deleted)
 
 
 @receiver(user_logged_out)

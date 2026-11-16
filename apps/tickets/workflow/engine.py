@@ -301,10 +301,16 @@ class WorkflowEngine:
         return instance
 
     @transaction.atomic
-    def expire(self, instance):
+    def expire(self, instance, *, task_log=None):
         instance = self._lock_instance(instance.pk)
+        expired = False
         if instance.state == InstanceState.running:
             run = instance.node_instances.select_related('node').filter(state=NodeState.running).first()
             if run:
-                self._expire_if_due(instance, run)
+                expired = self._expire_if_due(instance, run)
+        if task_log:
+            if expired:
+                task_log.processed += 1
+            else:
+                task_log.skip(gettext('The workflow has changed or its approval deadline has not elapsed.'))
         return instance

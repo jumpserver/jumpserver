@@ -399,7 +399,10 @@ class UserSession(models.Model):
     @classmethod
     def clear_expired_sessions(cls):
         keys = user_session_manager.get_keys()
-        cls.objects.exclude(key__in=keys).delete()
+        expired = cls.objects.exclude(key__in=keys)
+        matched = expired.count()
+        _, deleted = expired.delete()
+        return matched, deleted.get(cls._meta.label, 0)
 
     class Meta:
         ordering = ['-date_created']

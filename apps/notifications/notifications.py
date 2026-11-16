@@ -3,11 +3,12 @@ import traceback
 from itertools import chain
 
 from celery import shared_task
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
-from common.utils import lazyproperty, convert_html_to_markdown, convert_html_to_text
+from common.utils import get_logger, lazyproperty, convert_html_to_markdown, convert_html_to_text
 from common.utils.timezone import local_now
 from notifications.backends import BACKEND
+from ops.celery.task_logging import TaskLog
 from settings.utils import get_login_title
 from users.models import User
 from users.utils import activate_user_language
@@ -17,6 +18,7 @@ __all__ = ('SystemMessage', 'UserMessage', 'system_msgs', 'Message')
 
 system_msgs = []
 user_msgs = []
+logger = get_logger(__name__)
 
 
 class MessageType(type):
@@ -50,7 +52,10 @@ class MessageType(type):
     )
 )
 def publish_task(receive_user_ids, backends_msg_mapper):
-    Message.send_msg(receive_user_ids, backends_msg_mapper)
+    with TaskLog(logger, gettext('Publish the station message')) as log:
+        if not backends_msg_mapper:
+            log.skip(gettext('No notification channels are configured.'), 0)
+        Message.send_msg(receive_user_ids, backends_msg_mapper, task_log=log)
 
 
 class CustomMsgTemplateBase:
@@ -110,16 +115,35 @@ class Message(CustomMsgTemplateBase, metaclass=MessageType):
         return backends_msg_mapper
 
     @staticmethod
-    def send_msg(receive_user_ids, backends_msg_mapper):
+    def send_msg(receive_user_ids, backends_msg_mapper, task_log=None):
         for backend, msg in backends_msg_mapper.items():
+            if task_log:
+                task_log.checked += 1
             try:
                 backend = BACKEND(backend)
                 client = backend.client()
                 users = User.objects.filter(id__in=receive_user_ids).all()
+                if task_log:
+                    accounts, unbound, __ = client.get_accounts(users)
+                    logger.info(gettext(
+                        'Channel %(channel)s: matched recipients %(matched)s; '
+                        'recipients with a channel account %(bound)s; unbound %(unbound)s.'
+                    ), {'channel': backend.label, 'matched': len(users),
+                        'bound': len(accounts), 'unbound': len(unbound)})
+                    if not accounts:
+                        task_log.skip(gettext('No recipients have an account for this notification channel.'))
+                        continue
                 client.send_msg(users, **msg)
+                if task_log:
+                    task_log.processed += 1
+                    task_log.metric(gettext('Notification channel calls completed'), 1)
             except NotImplementedError:
+                if task_log:
+                    task_log.skip(gettext('The notification channel does not support this message.'))
                 continue
             except:
+                if task_log:
+                    task_log.fail(gettext('The notification channel raised an error.'))
                 traceback.print_exc()
 
     @classmethod

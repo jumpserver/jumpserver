@@ -3,11 +3,12 @@ from datetime import timedelta
 from celery import shared_task
 from django.db import transaction
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
 from common.const.crontab import CRONTAB_AT_AM_THREE
 from common.utils import get_log_keep_day, get_logger
 from ops.celery.decorator import register_as_period_task
+from ops.celery.task_logging import TaskLog
 from orgs.utils import tmp_to_org, tmp_to_root_org
 
 
@@ -28,14 +29,23 @@ def _delete_in_batches(queryset, batch_size=APPLICATION_RECORD_CLEAN_BATCH_SIZE)
     return deleted
 
 
-def dispatch_application_webhook(delivery_id, org_id, countdown=0):
+def dispatch_application_webhook(delivery_id, org_id, countdown=0, task_log=None):
+    if task_log:
+        task_log.checked += 1
     try:
         deliver_application_webhook.apply_async(
             args=(str(delivery_id), str(org_id)), countdown=countdown,
         )
+        if task_log:
+            task_log.processed += 1
+            task_log.metric(gettext('Executions queued'), 1)
     except Exception:
+        if task_log:
+            task_log.fail(gettext('Unable to queue an execution; it will be retried later.'))
         # Periodic recovery will pick this delivery up without exposing its URL or headers.
-        logger.error('Unable to dispatch application webhook delivery %s.', delivery_id)
+        logger.error(gettext('Unable to dispatch application webhook delivery %(delivery)s.'), {
+            'delivery': delivery_id,
+        })
 
 
 def _finish(delivery, result, reason):
@@ -157,25 +167,29 @@ def deliver_application_webhook(delivery_id, org_id):
 @shared_task(verbose_name=_('Expire application event deliveries'))
 @register_as_period_task(interval=60)
 def expire_application_event_deliveries():
-    from accounts.models import ApplicationEventDelivery
-    now = timezone.now()
-    with tmp_to_root_org():
-        with transaction.atomic():
-            deliveries = ApplicationEventDelivery.objects.select_for_update().filter(
-                status='pending', expires_at__lte=now,
-            )
-            for delivery in deliveries.iterator():
-                delivery.attempts.filter(result='pending').update(
-                    result='failed', reason='Delivery deadline reached.',
+    with TaskLog(logger, gettext('Expire application event deliveries')) as log:
+        from accounts.models import ApplicationEventDelivery
+        now = timezone.now()
+        with tmp_to_root_org():
+            with transaction.atomic():
+                deliveries = ApplicationEventDelivery.objects.select_for_update().filter(
+                    status='pending', expires_at__lte=now,
                 )
-                _finish(delivery, 'failed', 'Notification delivery deadline reached.')
-            recovery = list(ApplicationEventDelivery.objects.filter(
-                method__in=('POST', 'PUT', 'PATCH'),
-                status='pending',
-                available_at__lte=now, expires_at__gt=now,
-            ).values_list('id', 'org_id'))
-        for delivery_id, org_id in recovery:
-            dispatch_application_webhook(delivery_id, org_id)
+                for delivery in deliveries.iterator():
+                    log.checked += 1
+                    delivery.attempts.filter(result='pending').update(
+                        result='failed', reason='Delivery deadline reached.',
+                    )
+                    _finish(delivery, 'failed', 'Notification delivery deadline reached.')
+                    log.processed += 1
+                    log.metric(gettext('Deliveries marked expired'), 1)
+                recovery = list(ApplicationEventDelivery.objects.filter(
+                    method__in=('POST', 'PUT', 'PATCH'),
+                    status='pending',
+                    available_at__lte=now, expires_at__gt=now,
+                ).values_list('id', 'org_id'))
+            for delivery_id, org_id in recovery:
+                dispatch_application_webhook(delivery_id, org_id, task_log=log)
 
 
 @shared_task(

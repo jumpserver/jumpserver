@@ -6,7 +6,7 @@ from celery import shared_task, current_task
 from django.conf import settings
 from django.db import router, transaction
 from django.db.models import Count, Q
-from django.utils.translation import gettext_noop, gettext_lazy as _
+from django.utils.translation import gettext, gettext_noop, gettext_lazy as _
 
 from accounts.const import AutomationTypes
 from accounts.models import Account
@@ -15,6 +15,7 @@ from audits.const import ActivityChoices
 from common.const.crontab import CRONTAB_AT_AM_TWO
 from common.utils import get_logger
 from ops.celery.decorator import register_as_period_task
+from ops.celery.task_logging import TaskLog
 from orgs.utils import tmp_to_root_org
 
 logger = get_logger(__file__)
@@ -107,32 +108,34 @@ def _iter_obsolete_history_batches(history_model, keep_count, batch_size=500, *,
 @register_as_period_task(crontab=CRONTAB_AT_AM_TWO)
 @tmp_to_root_org()
 def clean_historical_accounts():
-    from audits.signal_handlers import create_activities
-    print("Clean historical accounts start.")
-    if settings.HISTORY_ACCOUNT_CLEAN_LIMIT >= 999:
-        return
-    limit = settings.HISTORY_ACCOUNT_CLEAN_LIMIT
-    limit += 1  # 因为当前账号的密码是最新的那条历史记录，因此保留 n 条历史，实际上应该保留 n+1 条历史记录
+    with TaskLog(logger, gettext('Clean historical accounts')) as log:
+        from audits.signal_handlers import create_activities
+        if settings.HISTORY_ACCOUNT_CLEAN_LIMIT >= 999:
+            log.skip(gettext('History cleanup is disabled by the retention limit.'), 0)
+            return
+        limit = settings.HISTORY_ACCOUNT_CLEAN_LIMIT
+        limit += 1  # 因为当前账号的密码是最新的那条历史记录，因此保留 n 条历史，实际上应该保留 n+1 条历史记录
+        logger.info(gettext('Keeping %(count)s history records per account, including the current version.'), {'count': limit})
 
-    task_id = current_task.request.id if current_task else str(uuid.uuid4())
-    detail = gettext_noop('Remove historical accounts that are out of range.')
-    history_model = Account.history.model
-    using = router.db_for_write(history_model)
-    # Keep the original commit boundary: delete all histories first, then write
-    # activities. An activity failure must not restore rows whose Vault secrets
-    # were already removed by post_delete. This private file holds only IDs.
-    with TemporaryFile(mode='w+t', encoding='utf-8') as activity_batches:
-        with transaction.atomic(using=using):
-            for history_qs in _iter_obsolete_history_batches(history_model, limit, using=using):
-                # Recheck and lock the bounded batch so concurrent cleanup cannot
-                # produce duplicate deletion activities for rows already removed.
-                resource_ids = list(history_qs.select_for_update().values_list('history_id', flat=True))
-                if not resource_ids:
-                    continue
-                activity_batches.write(json.dumps(resource_ids) + '\n')
-                # ORM deletion is required: post_delete also removes Vault entries.
-                history_qs.filter(history_id__in=resource_ids).delete()
-            activity_batches.flush()
-        activity_batches.seek(0)
-        for line in activity_batches:
-            create_activities(json.loads(line), detail, task_id, action=ActivityChoices.task, org_id='')
+        task_id = current_task.request.id if current_task else str(uuid.uuid4())
+        detail = gettext_noop('Remove historical accounts that are out of range.')
+        history_model = Account.history.model
+        using = router.db_for_write(history_model)
+        # Keep the original commit boundary: delete all histories first, then write
+        # activities. An activity failure must not restore rows whose Vault secrets
+        # were already removed by post_delete. This private file holds only IDs.
+        with TemporaryFile(mode='w+t', encoding='utf-8') as activity_batches:
+            with transaction.atomic(using=using):
+                for history_qs in _iter_obsolete_history_batches(history_model, limit, using=using):
+                    # Recheck and lock the bounded batch so concurrent cleanup cannot
+                    # produce duplicate deletion activities for rows already removed.
+                    resource_ids = list(history_qs.select_for_update().values_list('history_id', flat=True))
+                    if not resource_ids:
+                        continue
+                    activity_batches.write(json.dumps(resource_ids) + '\n')
+                    # ORM deletion is required: post_delete also removes Vault entries.
+                    log.delete(history_qs.filter(history_id__in=resource_ids))
+                activity_batches.flush()
+            activity_batches.seek(0)
+            for line in activity_batches:
+                create_activities(json.loads(line), detail, task_id, action=ActivityChoices.task, org_id='')
