@@ -96,7 +96,6 @@ def on_approved(instance, ticket):
         assets = Asset.objects.filter(pk__in=ids, org_id=instance.org_id)
         if assets.count() != len(ids):
             raise WorkflowConfigurationError(gettext('A requested asset was deleted or moved. Submit a new request.'))
-        nodes = Node.objects.none()
         if legacy is not None:
             nodes = Node.objects.filter(
                 pk__in=legacy.get('apply_nodes', []), org_id=instance.org_id)
