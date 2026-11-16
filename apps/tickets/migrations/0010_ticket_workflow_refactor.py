@@ -303,9 +303,9 @@ def asset_request_context(apps, db, ticket):
         ids.update(str(pk) for pk in Asset.objects.using(db).filter(
             descendants, org_id=ticket.org_id, nodes__org_id=ticket.org_id,
         ).values_list('pk', flat=True))
-    assets = asset_snapshots(apps, db, ticket.org_id, ids)
-    selectors = data.get('apply_accounts') or []
-    if not isinstance(selectors, list) or not selectors or any(not isinstance(s, str) for s in selectors):
+    assets = asset_snapshots(apps, db, ticket.org_id, ids) if ids else []
+    selectors = data.get('apply_accounts', [])
+    if not isinstance(selectors, list) or any(not isinstance(s, str) for s in selectors):
         raise ValueError('Select valid accounts before submitting the request.')
     start = parse_datetime(data['apply_date_start']) if data.get('apply_date_start') else None
     end = parse_datetime(data['apply_date_expired']) if data.get('apply_date_expired') else None
@@ -321,11 +321,6 @@ def asset_request_context(apps, db, ticket):
     if '@ALL' not in selectors:
         accounts = accounts.filter(username__in=selectors)
     accounts = list(accounts)
-    grant_selectors = sorted(set([s for s in selectors if s != '@ALL'] + (
-        [account['username'] for account in accounts] if '@ALL' in selectors else []
-    )))
-    if not grant_selectors:
-        raise ValueError('No accounts matched the request.')
     snapshots = [{**a, 'id': str(a['id']), 'asset_id': str(a['asset_id'])} for a in accounts]
     known = {a['username'] for a in accounts}
     for selector in dict.fromkeys(selectors):
@@ -349,7 +344,7 @@ def asset_request_context(apps, db, ticket):
             'permission_name': data.get('apply_permission_name') or f'Ticket {ticket.pk}',
             'users': [user_snapshot(user) for user in users],
             'is_on_behalf': len(users) != 1 or users[0].pk != ticket.applicant_id,
-            'account_selectors': grant_selectors, 'actions': actions,
+            'account_selectors': selectors, 'actions': actions,
             'date_start': start.isoformat(), 'date_expired': end.isoformat(),
             'expire_soon_notice_minutes': data.get('apply_expire_soon_notice_minutes'),
         },
