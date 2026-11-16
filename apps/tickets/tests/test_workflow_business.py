@@ -548,8 +548,7 @@ class WorkflowBusinessTests(TestCase):
                 with override('zh-hans'):
                     items = TicketSerializer.get_request_items(ticket)
                     accounts = next(item['value'] for item in items if item['name'] == 'apply_accounts')
-                    expected = (['匿名账号', '手动输入', '指定账号', '同名账号', '@custom', 'ops'] if imported
-                                else ['指定账号', 'ops', '全部', '手动输入', '同名账号', '匿名账号', '@custom'])
+                    expected = ['指定账号', 'ops', '全部', '手动输入', '同名账号', '匿名账号', '@custom']
                     self.assertEqual(accounts, expected)
                     self.assertIn('指定账号', TicketRequestItemsField().to_file_representation(items))
                 ticket.refresh_from_db()
@@ -806,6 +805,7 @@ class WorkflowBusinessTests(TestCase):
     def test_invalid_legacy_pending_ticket_is_closed_without_effects(self):
         ticket = self.ticket()
         ticket.request_data['apply_nodes'] = []
+        ticket.request_data['apply_assets'] = [str(uuid4())]
         ticket.save(update_fields=['request_data'])
         step = TicketStep.objects.create(ticket=ticket, state='pending', status='active')
         TicketAssignee.objects.create(step=step, assignee=self.alice)
