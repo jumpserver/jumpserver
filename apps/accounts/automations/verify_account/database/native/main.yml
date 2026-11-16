@@ -1,0 +1,16 @@
+- hosts: all
+  gather_facts: false
+  vars:
+    ansible_python_interpreter: "{{ local_python_interpreter }}"
+  tasks:
+    - name: Database account verification
+      database_automation:
+        database_type: "{{ jms_asset.type }}"
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        login_user: "{{ account.username }}"
+        login_password: "{{ account.secret }}"
+        login_database: "{{ jms_asset.spec_info.db_name | default('') }}"
+        connection_options: "{{ jms_asset.database_options }}"
+        connect_timeout: 15
+        action: ping

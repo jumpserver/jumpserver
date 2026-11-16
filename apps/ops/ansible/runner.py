@@ -10,6 +10,7 @@ from common.utils import is_macos
 from common.utils.yml import sanitize_ansible_inventory_json, sanitize_ansible_playbook
 
 from ..utils import get_ansible_log_verbosity
+from ..database import DATABASE_JOB_MODULES
 from .callback import DefaultCallback
 from .docker import (
     docker_extravars,
@@ -46,7 +47,7 @@ def quote_ansible_module_arg(value):
 
 class AdHocRunner:
     cmd_modules_choices = ('shell', 'raw', 'command', 'script', 'win_shell')
-    need_local_connection_modules_choices = ("mysql", "postgresql", "sqlserver", "huawei")
+    need_local_connection_modules_choices = (*DATABASE_JOB_MODULES, 'huawei')
 
     def __init__(self, inventory, job_module, module, module_args='', pattern='*', project_dir='/tmp/', extra_vars=None,
                  dry_run=False, timeout=-1):

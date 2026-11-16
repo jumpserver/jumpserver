@@ -52,8 +52,14 @@ class JobModules(models.TextChoices):
     winshell = 'win_shell', _('Powershell')
     python = 'python', _('Python')
     mysql = 'mysql', _('MySQL')
+    mariadb = 'mariadb', _('MariaDB')
     postgresql = 'postgresql', _('PostgreSQL')
     sqlserver = 'sqlserver', _('SQLServer')
+    oracle = 'oracle', _('Oracle')
+    dameng = 'dameng', _('Dameng')
+    oceanbase = 'oceanbase', _('OceanBase')
+    db2 = 'db2', _('DB2')
+    clickhouse = 'clickhouse', _('ClickHouse')
     raw = 'raw', _('Raw')
     huawei = 'huawei', _('HUAWEI')
 
@@ -67,6 +73,10 @@ class AdHocModules(models.TextChoices):
     postgresql = 'postgresql', _('PostgreSQL')
     sqlserver = 'sqlserver', _('SQLServer')
     oracle = 'oracle', _('Oracle')
+    dameng = 'dameng', _('Dameng')
+    oceanbase = 'oceanbase', _('OceanBase')
+    db2 = 'db2', _('DB2')
+    clickhouse = 'clickhouse', _('ClickHouse')
     raw = 'raw', _('Raw')
 
 
