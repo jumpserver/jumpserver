@@ -90,9 +90,12 @@ def check_adjustment(instance, task, user):
     from .approvers import available_users, excluded_approver_ids
     WorkflowEngine._check_org(instance.org_id)
     plugin = get_ticket_plugin(instance.ticket.type)
-    legacy_readonly = 'legacy' in instance.context and (
-        plugin.type != 'apply_asset' or not instance.context.get('resources_pending'))
-    if (not plugin.resource_serializer or legacy_readonly or instance.state != 'running'
+    legacy_readonly = (
+        'legacy' in instance.context and
+        (plugin.type != 'apply_asset' or not instance.context.get('resources_pending')))
+    if not plugin.resource_serializer or legacy_readonly:
+        raise WorkflowConflict(gettext('This request cannot be adjusted now.'))
+    if (instance.state != 'running'
             or task.state != 'pending' or task.node_instance.state != 'running'
             or (task.node_instance.deadline and task.node_instance.deadline <= timezone.now())):
         raise WorkflowConflict(gettext('This request cannot be adjusted now.'))
@@ -107,7 +110,8 @@ def check_adjustment(instance, task, user):
 
 def adjustment_status(instance, user):
     plugin = get_ticket_plugin(instance.ticket.type)
-    if not plugin.resource_serializer or ('legacy' in instance.context and plugin.type != 'apply_asset'):
+    if (not plugin.resource_serializer or
+            ('legacy' in instance.context and plugin.type != 'apply_asset')):
         return None
     status = {'revision': instance.context.get('resource_revision', 0),
               'pending': instance.context.get('resources_pending', False), 'can_adjust': False}

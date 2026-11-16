@@ -9,19 +9,27 @@ from django.test import TestCase
 from django.utils import timezone
 
 from accounts.models import Account
-from assets.models import Asset, Node
+from assets.models import Asset, Node, Platform
+from orgs.models import Organization
 from orgs.utils import tmp_to_org
 from perms.models import AssetPermission
 from tickets.models import Ticket, TicketAssignee, TicketStep, Workflow, WorkflowInstance, ApprovalTask
 from tickets.tests import test_workflow as fixtures, test_resource_adjustment as resource_fixtures
 from tickets.workflow.engine import WorkflowEngine
 from tickets.workflow.resources import adjustment_status
+from users.models import User
 
 
 import_ticket = import_module('tickets.migrations.0010_ticket_workflow_refactor').import_ticket
 
 
 class HistoricalInstanceUpgradeTests(TestCase):
+    applicant: User
+    alice: User
+    bob: User
+    other_org: Organization
+    platform: Platform
+
     setUpTestData = fixtures.WorkflowTests.__dict__['setUpTestData']
     grant_query = resource_fixtures.ResourceAdjustmentTests.grant_query
     call = resource_fixtures.ResourceAdjustmentTests.call
@@ -55,7 +63,8 @@ class HistoricalInstanceUpgradeTests(TestCase):
         for level in range(1, levels + 1):
             step = TicketStep.objects.create(
                 ticket=ticket, level=level, state='approved' if level < current else 'pending',
-                status='closed' if level < current else ('active' if level == current else 'pending'))
+                status='closed' if level < current else (
+                    'active' if level == current else 'pending'))
             TicketAssignee.objects.create(
                 step=step, assignee=self.alice if level == current else self.applicant,
                 state='approved' if level < current else 'pending', comment='Original review')
@@ -63,8 +72,10 @@ class HistoricalInstanceUpgradeTests(TestCase):
 
     def test_incomplete_resources_preserve_one_to_five_level_approval_progress(self):
         self.grant_query()
-        asset = Asset.objects.create(name='Upgrade target', address='192.0.2.24', platform=self.platform)
-        Account.objects.bulk_create([Account(name='audit', username='audit', asset=asset, org_id=self.org.pk)])
+        asset = Asset.objects.create(
+            name='Upgrade target', address='192.0.2.24', platform=self.platform)
+        Account.objects.bulk_create([
+            Account(name='audit', username='audit', asset=asset, org_id=self.org.pk)])
         with patch('tickets.workflow.business.deliver_event'):
             for levels in range(1, 6):
                 with self.subTest(levels=levels):
@@ -73,43 +84,54 @@ class HistoricalInstanceUpgradeTests(TestCase):
                     self.assertEqual(self.import_ticket(ticket), [])
                     ticket.refresh_from_db()
                     instance = WorkflowInstance.objects.get(ticket=ticket)
-                    self.assertEqual((ticket.state, ticket.status, instance.state), ('pending', 'open', 'running'))
+                    self.assertEqual((ticket.state, ticket.status, instance.state),
+                                     ('pending', 'open', 'running'))
                     legacy = instance.context['legacy']
                     tasks = list(ApprovalTask.objects.filter(node_instance__instance=instance)
-                                 .order_by('id').values('id', 'node_instance_id', 'assignee_id', 'state', 'comment'))
+                                 .order_by('id').values(
+                                     'id', 'node_instance_id', 'assignee_id', 'state', 'comment'))
                     self.assertEqual(len(tasks), current)
-                    task = ApprovalTask.objects.get(node_instance__instance=instance, state='pending')
+                    task = ApprovalTask.objects.get(
+                        node_instance__instance=instance, state='pending')
                     self.assertEqual(self.call(task, operation='approve').status_code, 409)
                     status = adjustment_status(instance, self.alice)
                     self.assertTrue(status['pending'])
                     self.assertTrue(status['can_adjust'])
                     resources = {**ticket.request_data, 'apply_assets': [str(asset.pk)],
                                  'apply_accounts': ['audit'], 'apply_actions': ['connect']}
-                    response = self.call(task, {'resources': resources, 'reason': 'Completed legacy request',
-                                                'expected_revision': 0})
+                    response = self.call(task, {
+                        'resources': resources, 'reason': 'Completed legacy request',
+                        'expected_revision': 0})
                     self.assertEqual(response.status_code, 200, response.data)
                     instance.refresh_from_db()
                     self.assertEqual(instance.context['legacy'], legacy)
                     self.assertFalse(instance.context['resources_pending'])
-                    self.assertEqual(list(ApprovalTask.objects.filter(node_instance__instance=instance)
-                                          .order_by('id').values(*tasks[0].keys())), tasks)
-                    self.assertFalse(instance.events.get(type='resources.adjusted').data['restarted'])
+                    self.assertEqual(
+                        list(ApprovalTask.objects.filter(node_instance__instance=instance)
+                             .order_by('id').values(*tasks[0].keys())), tasks)
+                    event = instance.events.get(type='resources.adjusted')
+                    self.assertFalse(event.data['restarted'])
                     self.assertFalse(AssetPermission.objects.filter(pk=ticket.pk).exists())
                     self.assertFalse(adjustment_status(instance, self.alice)['can_adjust'])
                     self.assertEqual(self.call(task, operation='approve').status_code, 409)
                     for level in range(current, levels + 1):
-                        task = ApprovalTask.objects.get(node_instance__instance=instance, state='pending')
+                        task = ApprovalTask.objects.get(
+                            node_instance__instance=instance, state='pending')
                         reviewer = self.alice if level == current else self.applicant
                         self.assertEqual(task.assignee_id, reviewer.pk)
-                        response = self.call(task, {'expected_revision': 1}, user=reviewer, operation='approve')
+                        response = self.call(task, {'expected_revision': 1},
+                                             user=reviewer, operation='approve')
                         self.assertEqual(response.status_code, 200, response.data)
                     instance.refresh_from_db()
                     self.assertEqual(instance.state, 'approved')
-                    self.assertEqual(instance.events.filter(type='approval.approved').count(), levels)
-                    self.assertEqual(list(AssetPermission.objects.get(pk=ticket.pk).assets.all()), [asset])
+                    self.assertEqual(instance.events.filter(type='approval.approved').count(),
+                                     levels)
+                    permission = AssetPermission.objects.get(pk=ticket.pk)
+                    self.assertEqual(list(permission.assets.all()), [asset])
 
     def test_partial_legacy_resources_remain_pending_without_losing_selected_values(self):
-        asset = Asset.objects.create(name='Upgrade target', address='192.0.2.24', platform=self.platform)
+        asset = Asset.objects.create(
+            name='Upgrade target', address='192.0.2.24', platform=self.platform)
         node = Node.objects.create(key='502', value='Empty upgrade node')
         for resources in ({'apply_assets': [str(asset.pk)]}, {'apply_accounts': ['root']},
                           {'apply_assets': [str(asset.pk)], 'apply_accounts': ['@ALL']},
@@ -129,20 +151,24 @@ class HistoricalInstanceUpgradeTests(TestCase):
         self.assertEqual(self.import_ticket(ticket), [])
         instance = WorkflowInstance.objects.get(ticket=ticket)
         task = ApprovalTask.objects.get(node_instance__instance=instance, state='pending')
-        asset = Asset.objects.create(name='Upgrade target', address='192.0.2.24', platform=self.platform)
+        asset = Asset.objects.create(
+            name='Upgrade target', address='192.0.2.24', platform=self.platform)
         resources = {**ticket.request_data, 'apply_assets': [str(asset.pk)],
                      'apply_accounts': ['root'], 'apply_actions': ['connect']}
         data = {'resources': resources, 'reason': 'Complete resources', 'expected_revision': 0}
         self.assertEqual(self.call(task, data).status_code, 403)
         self.grant_query()
-        self.alice = type(self.alice).objects.get(pk=self.alice.pk)
+        reviewer = User.objects.get(pk=self.alice.pk)
         self.assertEqual(self.call(task, data, user=self.bob).status_code, 404)
         with tmp_to_org(self.other_org):
-            foreign = Asset.objects.create(name='Other organization', address='192.0.2.25', platform=self.platform)
-        for invalid in ({'apply_assets': []}, {'apply_accounts': []}, {'apply_assets': [str(foreign.pk)]},
+            foreign = Asset.objects.create(
+                name='Other organization', address='192.0.2.25', platform=self.platform)
+        for invalid in ({'apply_assets': []}, {'apply_accounts': []},
+                        {'apply_assets': [str(foreign.pk)]},
                         {'apply_date_expired': resources['apply_date_start']}):
             with self.subTest(invalid=invalid):
-                response = self.call(task, {**data, 'resources': {**resources, **invalid}})
+                response = self.call(task, {**data, 'resources': {**resources, **invalid}},
+                                     user=reviewer)
                 self.assertEqual(response.status_code, 400, response.data)
         instance.refresh_from_db()
         task.refresh_from_db()
