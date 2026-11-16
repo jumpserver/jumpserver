@@ -20497,3 +20497,7 @@ msgstr "撤销登录申请失败，请重试。"
 #: authentication/serializers/connection_token.py
 msgid "Account preparation required"
 msgstr "需要准备账号"
+
+
+msgid "ClickHouse HTTP backend port for DBX and the default DBeaver driver. The protocol port remains the Native TCP port."
+msgstr "DBX 和 DBeaver 默认驱动使用的 ClickHouse HTTP 后端端口。协议端口仍用于 Native TCP。"

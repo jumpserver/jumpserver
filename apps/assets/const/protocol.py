@@ -240,6 +240,19 @@ class Protocol(ChoicesMixin, models.TextChoices):
                 'required': True,
                 'secret_types': ['password'],
                 'xpack': True,
+                'setting': {
+                    'http_port': {
+                        'type': 'int',
+                        'default': 8123,
+                        'min_value': 1,
+                        'max_value': 65535,
+                        'label': _('HTTP port'),
+                        'help_text': _(
+                            'ClickHouse HTTP backend port for DBX and the default DBeaver driver. '
+                            'The protocol port remains the Native TCP port.'
+                        ),
+                    },
+                },
             },
             cls.mongodb: {
                 'port': 27017,
