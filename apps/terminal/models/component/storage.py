@@ -42,12 +42,12 @@ class CommonStorageModelMixin(models.Model):
 
     @classmethod
     def default(cls):
-        objs = cls.objects.filter(is_default=True)
-        if not objs:
-            objs = cls.objects.filter(name="default", type="server")
-        if not objs:
-            objs = cls.objects.all()
-        return objs.first()
+        obj = cls.objects.filter(is_default=True).first()
+        if obj is None:
+            obj = cls.objects.filter(name="default", type="server").first()
+        if obj is None:
+            obj = cls.objects.first()
+        return obj
 
 
 class CommandStorage(CommonStorageModelMixin, JMSBaseModel):

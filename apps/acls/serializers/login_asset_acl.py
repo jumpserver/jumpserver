@@ -143,8 +143,10 @@ class LoginAssetACLSerializer(WorkflowACLSerializerMixin, BaseSerializer, BulkOr
         if action == ActionChoices.accept and notice_enabled:
             recipients = attrs.get('recipients')
             if recipients is None:
-                recipients = self.instance.recipients.all() if self.instance else []
-            if not recipients:
+                has_recipients = self.instance.recipients.exists() if self.instance else False
+            else:
+                has_recipients = bool(recipients)
+            if not has_recipients:
                 raise serializers.ValidationError({
                     'recipients': _('Select at least one notification recipient.'),
                 })
