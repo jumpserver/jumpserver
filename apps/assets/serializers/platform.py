@@ -89,6 +89,20 @@ class PlatformProtocolSerializer(serializers.ModelSerializer):
     port_from_addr = serializers.BooleanField(label=_("Port from addr"), read_only=True)
     port = serializers.IntegerField(label=_("Port"), required=False, min_value=0, max_value=65535)
 
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        name = attrs.get('name', getattr(self.instance, 'name', None))
+        setting = attrs.get('setting', {})
+        # Nested platform forms have no ?name= query parameter, so their
+        # MethodSerializer may use the generic dict rather than typed fields.
+        if name == 'clickhouse' and 'http_port' in setting:
+            try:
+                field = serializers.IntegerField(min_value=1, max_value=65535)
+                setting['http_port'] = field.run_validation(setting['http_port'])
+            except serializers.ValidationError as exc:
+                raise serializers.ValidationError({'setting': {'http_port': exc.detail}})
+        return attrs
+
     class Meta:
         model = PlatformProtocol
         fields = [
