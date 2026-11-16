@@ -21135,3 +21135,7 @@ msgid ""
 msgstr ""
 "当前应用的账号范围包含 %(count)s 个账号，超过配置上限 %(limit)s 个。"
 "请缩小账号范围后重试。"
+
+#: accounts/serializers/account/service.py
+msgid "Select at least one account."
+msgstr "请至少选择一个账号。"
