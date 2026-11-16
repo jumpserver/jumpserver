@@ -20,12 +20,14 @@ from authentication.backends.drf import (
 )
 from common.api import JMSGenericViewSet
 from common.exceptions import JMSException
+from common.permissions import IsValidLicense
 from django.core.cache import cache
 from django.db import transaction
 from django.db.models import Count, Max, Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from orgs.mixins.api import OrgBulkModelViewSet, OrgGenericViewSet
+from rbac.permissions import RBACPermission
 from rest_framework import mixins, status
 from rest_framework import serializers as drf_serializers
 from rest_framework.decorators import action
@@ -148,6 +150,7 @@ class CredentialClientAgentAuthentication(
 
 class ApplicationCredentialViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
     model = ApplicationCredential
+    permission_classes = [RBACPermission, IsValidLicense]
     serializer_class = serializers.ApplicationCredentialSerializer
     serializer_classes = {'list': serializers.ApplicationCredentialListSerializer}
     filterset_fields = ('id', 'name', 'key', 'mode', 'status', 'is_active', 'applications')
