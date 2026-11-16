@@ -276,13 +276,14 @@ class OrderingFielderFieldsMixin:
         return fields
 
     def get_valid_ordering_fields(self):
-        if getattr(self, 'model', None):
-            model = self.model
-        elif getattr(self, 'queryset', None):
-            model = self.queryset.model
-        else:
-            queryset = self.get_queryset()
-            model = None if isinstance(queryset, list) else queryset.model
+        model = getattr(self, 'model', None)
+        if model is None:
+            queryset = getattr(self, 'queryset', None)
+            # A truthiness check evaluates the entire queryset. OPTIONS only
+            # needs the model schema, even when the table contains no records.
+            if queryset is None:
+                queryset = self.get_queryset()
+            model = getattr(queryset, 'model', None)
 
         if not model:
             return []
