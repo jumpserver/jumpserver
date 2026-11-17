@@ -605,7 +605,9 @@ def validate_action_request(kind, request):
         if kind == 'file_write':
             content = request.get('content')
             if not isinstance(content, str) or len(content.encode()) > 65536:
-                raise ValidationError('Use a file upload operation for content larger than 64 KiB', code='file_content_too_large')
+                raise ValidationError(
+                    'Use a file upload operation for content larger than 64 KiB', code='file_content_too_large'
+                )
     if 'timeout_seconds' in request:
         integer(request['timeout_seconds'], 'timeout_seconds', 1, 600)
 
@@ -640,7 +642,9 @@ def create_action(node, data):
         if kind.startswith('file_') and mode not in ACTION_POLICIES[kind].modes:
             raise ValidationError('File operations require an SFTP session', code='sftp_session_required')
         if kind == 'execute_command' and mode != 'shell' and (data['request'].get('cwd') or data['request'].get('env')):
-            raise ValidationError('Working directory and environment apply only to SSH execution', code='shell_context_required')
+            raise ValidationError(
+                'Working directory and environment apply only to SSH execution', code='shell_context_required'
+            )
         if kind == 'execute_command' and mode not in ACTION_POLICIES[kind].modes:
             raise ValidationError('This operation requires a command session', code='shell_session_required')
         if kind != 'open_terminal' and (
@@ -679,14 +683,18 @@ def command_policy(session, command):
     # Use the same current connection policy and command groups as terminal
     # execution, rather than accepting a client-supplied ACL or approval ID.
     priorities = {'reject': 0, 'review': 1, 'notify_and_warn': 2, 'warning': 3, 'accept': 4}
-    rules = sorted(session.connection_token.command_filter_acls, key=lambda a: (a.priority, priorities.get(a.action, 5), str(a.id)))
+    rules = sorted(
+        session.connection_token.command_filter_acls,
+        key=lambda a: (a.priority, priorities.get(a.action, 5), str(a.id))
+    )
     for rule in rules:
         for group in rule.command_groups.all():
             matched, _ = group.match(command)
             if matched:
                 digest = fingerprint({
                     'acl': str(rule.id), 'action': rule.action, 'priority': rule.priority,
-                    'group': str(group.id), 'type': group.type, 'content': group.content, 'ignore_case': group.ignore_case,
+                    'group': str(group.id), 'type': group.type, 'content': group.content,
+                    'ignore_case': group.ignore_case,
                     'reviewers': sorted(str(pk) for pk in rule.reviewers.values_list('pk', flat=True)),
                     'workflow': str(rule.workflow_id),
                     'workflow_version': str(rule.workflow.active_version_id) if rule.workflow_id else None,
@@ -698,7 +706,10 @@ def command_policy(session, command):
 def authorize_action(action):
     from perms.const import ActionChoices
 
-    if action.cancel_requested or action.status in FINAL_STATES or action.status in ('dispatching', 'running', 'awaiting_input'):
+    if (
+        action.cancel_requested or action.status in FINAL_STATES
+        or action.status in ('dispatching', 'running', 'awaiting_input')
+    ):
         return
     session = action.session
     if action.kind == 'open_terminal':
@@ -721,7 +732,9 @@ def authorize_action(action):
         elif rule and rule.action == 'notify_and_warn':
             action.status, action.date_finished = 'rejected', timezone.now()
             action.result = {
-                'error': 'Command requires user confirmation; call open_terminal to continue in the controlled terminal',
+                'error': (
+                    'Command requires user confirmation; call open_terminal to continue in the controlled terminal'
+                ),
                 'requires_terminal': True, 'acl_id': str(rule.id),
             }
         elif rule and rule.action == 'review':
@@ -736,12 +749,19 @@ def authorize_action(action):
                     action.request['command'], session.terminal_session, rule, action.org_id,
                 )
                 # A reviewer must see the exact context, not only the shell text.
-                ticket.comment = 'Agent action ' + str(action.id) + '\nRequest SHA256: ' + action.request_hash + '\n' + canonical(action.request)
-                ticket.meta = {**ticket.meta, 'agent_action': {'id': str(action.id), 'request_hash': action.request_hash}}
+                ticket.comment = (
+                    'Agent action ' + str(action.id)
+                    + '\nRequest SHA256: ' + action.request_hash + '\n' + canonical(action.request)
+                )
+                ticket.meta = {
+                    **ticket.meta, 'agent_action': {'id': str(action.id), 'request_hash': action.request_hash}
+                }
                 ticket.save(update_fields=['comment', 'meta'])
                 action.ticket, action.policy_hash, action.status = ticket, policy_hash, 'awaiting_approval'
             elif (action.ticket.type != 'command_confirm'
-                  or action.ticket.meta.get('agent_action') != {'id': str(action.id), 'request_hash': action.request_hash}
+                  or action.ticket.meta.get('agent_action') != {
+                      'id': str(action.id), 'request_hash': action.request_hash
+                  }
                   or action.ticket.request_data.get('apply_run_command') != action.request['command'][:4090]
                   or action.ticket.request_data.get('apply_from_session') != str(session.terminal_session_id)
                   or action.ticket.request_data.get('apply_from_cmd_filter_acl') != str(rule.id)):
@@ -760,10 +780,16 @@ def authorize_action(action):
             # A raw-command ACL cannot authorize changes to lookup, interpreter
             # startup or working-directory semantics. Only the full-request
             # review branch above may approve context under command filtering.
-            if (action.request.get('cwd') or action.request.get('env')) and session.connection_token.command_filter_acls:
+            if (
+                (action.request.get('cwd') or action.request.get('env'))
+                and session.connection_token.command_filter_acls
+            ):
                 action.status, action.date_finished = 'rejected', timezone.now()
                 action.result = {
-                    'error': 'Command context requires full-request approval under command filtering; use open_terminal or omit cwd/env',
+                    'error': (
+                        'Command context requires full-request approval under command filtering; '
+                        'use open_terminal or omit cwd/env'
+                    ),
                     'requires_terminal': True,
                 }
             elif action.ticket_id and action.policy_hash != policy_hash:
@@ -813,7 +839,11 @@ def action_data(action):
         'id': str(action.id), 'action_id': str(action.id), 'session_id': str(action.session_id),
         'kind': action.kind, 'status': action.status, 'request_hash': action.request_hash,
         'cancel_requested': action.cancel_requested, 'last_sequence': action.last_sequence,
-        'result': action.result, 'handoff_url': f'/core/auth/agent/session/{action.session_id}/?action={action.id}' if action.kind == 'open_terminal' else None,
+        'result': action.result,
+        'handoff_url': (
+            f'/core/auth/agent/session/{action.session_id}/?action={action.id}'
+            if action.kind == 'open_terminal' else None
+        ),
         'date_created': action.date_created.isoformat(),
         'date_started': action.date_started.isoformat() if action.date_started else None,
         'date_finished': action.date_finished.isoformat() if action.date_finished else None,
