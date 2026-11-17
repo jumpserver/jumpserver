@@ -1,5 +1,6 @@
 import os
 import shutil
+import stat
 
 from django.conf import settings
 from django.core.exceptions import SuspiciousFileOperation
@@ -12,6 +13,7 @@ from common.exceptions import JMSException
 from common.permissions import IsOwnerOrAdminWritable
 from common.serializers import EmptySerializer
 from common.utils.http import is_true
+from common.utils.yml import atomic_dump_text
 from common.utils.zip import safe_extract_zip
 from ops.filters import PlaybookFilterSet
 from rbac.permissions import RBACPermission
@@ -70,7 +72,6 @@ class PlaybookViewSet(JMSBulkModelViewSet):
         return queryset
 
     def perform_create(self, serializer):
-        instance = serializer.save()
         base_path = safe_join(settings.DATA_DIR, "ops", "playbook")
         clone_id = self.request.query_params.get('clone_from')
 
@@ -79,13 +80,30 @@ class PlaybookViewSet(JMSBulkModelViewSet):
             clone_from = queryset.filter(id=clone_id).first()
             if not clone_from:
                 raise JMSException(code='invalid_clone_id', detail={"msg": gettext("Invalid clone_from id")})
-            src_path = safe_join(base_path, clone_id)
-            dest_path = safe_join(base_path, str(instance.id))
-            if not os.path.exists(src_path):
+            src_path = safe_join(base_path, str(clone_from.id))
+            if not os.path.isdir(src_path):
                 raise JMSException(code='invalid_playbook_id', detail={"msg": gettext("clone playbook file not found")})
-            shutil.copytree(src_path, dest_path)
+
+            def reject_symlinks(directory, names):
+                if os.path.islink(directory) or any(
+                    os.path.islink(os.path.join(directory, name)) for name in names
+                ):
+                    raise JMSException(code='invalid_file_path', detail={"msg": _("Invalid file path")})
+                return []
+
+            clone_options = {} if 'scope' in self.request.data else {'scope': clone_from.scope}
+            instance = serializer.save(**clone_options)
+            dest_path = safe_join(base_path, str(instance.id))
+            destination_exists = os.path.lexists(dest_path)
+            try:
+                shutil.copytree(src_path, dest_path, ignore=reject_symlinks)
+            except Exception:
+                if not destination_exists and os.path.isdir(dest_path) and not os.path.islink(dest_path):
+                    shutil.rmtree(dest_path)
+                raise
             return
 
+        instance = serializer.save()
         if 'multipart/form-data' in self.request.headers['Content-Type']:
             src_path = safe_join(settings.MEDIA_ROOT, instance.path.name)
             dest_path = safe_join(base_path, str(instance.id))
@@ -132,7 +150,44 @@ class PlaybookFileViewSet(JMSGenericViewSet):
         'destroy': 'ops.change_playbook',
         'partial_update': 'ops.change_playbook',
     }
-    protected_files = ['root', 'main.yml']
+    protected_files = {'main.yml', 'main.yaml', 'main'}
+
+    @staticmethod
+    def resolve_file_path(work_path, key, allow_root=False):
+        if not isinstance(key, str) or '\x00' in key or '\\' in key or os.path.isabs(key):
+            raise JMSException(code='invalid_file_path', detail={"msg": _("Invalid file path")})
+        if key == 'root':
+            key = ''
+        elif key.startswith('root/'):
+            key = key[5:]
+
+        try:
+            root_path = os.path.abspath(work_path)
+            file_path = safe_join(root_path, key)
+        except (SuspiciousFileOperation, ValueError):
+            raise JMSException(code='invalid_file_path', detail={"msg": _("Invalid file path")})
+
+        relative_path = os.path.relpath(file_path, root_path)
+        if relative_path == '.' and not allow_root:
+            raise JMSException(code='invalid_file_path', detail={"msg": _("Invalid file path")})
+
+        # safe_join checks the lexical path, so reject links in every component too.
+        current = root_path
+        if os.path.islink(current):
+            raise JMSException(code='invalid_file_path', detail={"msg": _("Invalid file path")})
+        for part in relative_path.split(os.sep):
+            current = os.path.join(current, part)
+            if os.path.islink(current):
+                raise JMSException(code='invalid_file_path', detail={"msg": _("Invalid file path")})
+        real_root = os.path.realpath(root_path)
+        if os.path.commonpath((real_root, os.path.realpath(file_path))) != real_root:
+            raise JMSException(code='invalid_file_path', detail={"msg": _("Invalid file path")})
+        return file_path
+
+    @staticmethod
+    def validate_file_name(name):
+        if name in {'.', '..', 'root'} or any(char in name for char in ('/', '\\', '\x00')):
+            raise JMSException(code='invalid_file_path', detail={"msg": _("Invalid file path")})
 
     def get_response_serializer(self):
         if self.action == 'create':
@@ -153,7 +208,7 @@ class PlaybookFileViewSet(JMSGenericViewSet):
         file_key = request.query_params.get('key', '')
         if file_key:
             try:
-                file_path = safe_join(work_path, file_key)
+                file_path = self.resolve_file_path(work_path, file_key)
                 with open(file_path, 'r') as f:
                     content = f.read()
             except UnicodeDecodeError:
@@ -162,6 +217,7 @@ class PlaybookFileViewSet(JMSGenericViewSet):
                 raise JMSException(code='invalid_file_path', detail={"msg": _("Invalid file path")})
             return Response({'content': content})
         else:
+            self.resolve_file_path(work_path, '', allow_root=True)
             expand_key = request.query_params.get('expand', '')
             nodes = self.generate_tree(playbook, work_path, expand_key)
             return Response(nodes)
@@ -174,17 +230,12 @@ class PlaybookFileViewSet(JMSGenericViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
-        parent_key = data.get('key', '')
-        if parent_key == 'root':
-            parent_key = ''
-        if os.path.dirname(parent_key) == 'root':
-            parent_key = os.path.basename(parent_key)
-
-        full_path = safe_join(work_path, parent_key)
+        full_path = self.resolve_file_path(work_path, data.get('key', ''), allow_root=True)
 
         is_directory = data.get('is_directory', False)
         content = data.get('content', '')
         name = data.get('name', '')
+        self.validate_file_name(name)
 
         def find_new_name(p, is_file=False):
             if not p:
@@ -194,19 +245,21 @@ class PlaybookFileViewSet(JMSGenericViewSet):
                     p = 'new_dir'
             np = safe_join(full_path, p)
             n = 0
-            while os.path.exists(np):
+            while os.path.lexists(np):
                 n += 1
                 np = safe_join(full_path, '{}({})'.format(p, n))
             return np
 
         try:
+            new_file_path = find_new_name(name, not is_directory)
+            self.resolve_file_path(work_path, os.path.relpath(new_file_path, work_path))
             if is_directory:
-                new_file_path = find_new_name(name)
                 os.makedirs(new_file_path)
             else:
-                new_file_path = find_new_name(name, True)
-                with open(new_file_path, 'w') as f:
+                with open(new_file_path, 'x') as f:
                     f.write(content)
+        except FileExistsError:
+            raise JMSException(code='file_already_exists', detail={"msg": _("File already exists")})
         except SuspiciousFileOperation:
             raise JMSException(code='invalid_file_path', detail={"msg": _("Invalid file path")})
 
@@ -214,11 +267,9 @@ class PlaybookFileViewSet(JMSGenericViewSet):
         new_node = {
             "name": os.path.basename(new_file_path),
             "title": os.path.basename(new_file_path),
-            "id": safe_join(relative_path, os.path.basename(new_file_path))
-            if not safe_join(relative_path, os.path.basename(new_file_path)).startswith('.')
-            else os.path.basename(new_file_path),
+            "id": os.path.relpath(new_file_path, work_path),
             "isParent": is_directory,
-            "pId": relative_path if not relative_path.startswith('.') else 'root',
+            "pId": relative_path if relative_path != '.' else 'root',
             "open": True,
         }
         if not is_directory:
@@ -236,20 +287,16 @@ class PlaybookFileViewSet(JMSGenericViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
-        file_key = data['key']
+        file_path = self.resolve_file_path(work_path, data['key'])
+        file_key = os.path.relpath(file_path, work_path)
         new_name = data.get('new_name', '')
+        self.validate_file_name(new_name)
 
-        if file_key in self.protected_files and new_name:
+        if file_key.casefold() in self.protected_files and new_name:
             raise JMSException(code='this_file_can_not_be_rename', detail={"msg": _("This file can not be rename")})
-
-        if os.path.dirname(file_key) == 'root':
-            file_key = os.path.basename(file_key)
 
         content = data.get('content', '')
         is_directory = data.get('is_directory', False)
-        if file_key == 'root':
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        file_path = safe_join(work_path, file_key)
 
         # rename
         if new_name:
@@ -257,7 +304,8 @@ class PlaybookFileViewSet(JMSGenericViewSet):
                 new_file_path = safe_join(os.path.dirname(file_path), new_name)
                 if new_file_path == file_path:
                     return Response(status=status.HTTP_200_OK)
-                if os.path.exists(new_file_path):
+                self.resolve_file_path(work_path, os.path.relpath(new_file_path, work_path))
+                if os.path.lexists(new_file_path):
                     raise JMSException(code='file_already exists', detail={"msg": _("File already exists")})
                 os.rename(file_path, new_file_path)
             except SuspiciousFileOperation:
@@ -266,8 +314,18 @@ class PlaybookFileViewSet(JMSGenericViewSet):
         # edit content
         else:
             if not is_directory:
-                with open(file_path, 'w') as f:
-                    f.write(content)
+                try:
+                    file_mode = stat.S_IMODE(os.stat(file_path, follow_symlinks=False).st_mode)
+                except FileNotFoundError:
+                    file_mode = None
+
+                def write_content(stream):
+                    stream.write(content)
+                    if file_mode is not None:
+                        stream.flush()
+                        os.fchmod(stream.fileno(), file_mode)
+
+                atomic_dump_text(file_path, write_content)
         return Response(status=status.HTTP_200_OK)
 
     def destroy(self, request, **kwargs):
@@ -278,9 +336,10 @@ class PlaybookFileViewSet(JMSGenericViewSet):
         if not file_key:
             raise JMSException(code='file_key_is_required', detail={"msg": _("File key is required")})
 
-        if file_key in self.protected_files:
+        file_path = self.resolve_file_path(work_path, file_key)
+        file_key = os.path.relpath(file_path, work_path)
+        if file_key.casefold() in self.protected_files:
             raise JMSException(code='This file can not be delete', detail={"msg": _("This file can not be delete")})
-        file_path = safe_join(work_path, file_key)
         if os.path.isdir(file_path):
             shutil.rmtree(file_path)
         else:
@@ -312,7 +371,7 @@ class PlaybookFileViewSet(JMSGenericViewSet):
                     "id": dir_id,
                     "isParent": True,
                     "open": True,
-                    "pId": relative_path if not relative_path.startswith('.') else 'root',
+                    "pId": relative_path if relative_path != '.' else 'root',
                     "temp": False
                 }
                 if expand_key == node['id']:
@@ -327,7 +386,7 @@ class PlaybookFileViewSet(JMSGenericViewSet):
                     "id": file_id,
                     "isParent": False,
                     "open": False,
-                    "pId": relative_path if not relative_path.startswith('.') else 'root',
+                    "pId": relative_path if relative_path != '.' else 'root',
                     "temp": False
                 }
                 nodes.append(node)
