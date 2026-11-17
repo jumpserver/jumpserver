@@ -27,14 +27,16 @@ class CommandAlertAddressTests(TestCase):
         platform = Platform.objects.create(name='Alert database', category='database', type='mysql')
         self.asset = Asset.objects.create(name='database', address='192.0.2.55', platform=platform)
         self.session = Session.objects.create(
-            asset_id=str(self.asset.pk), asset=self.asset.name, user=str(self.user), user_id=str(self.user.pk),
+            asset_id=str(self.asset.pk), asset=self.asset.name,
+            user=str(self.user), user_id=str(self.user.pk),
             account='root', protocol='mysql', remote_addr='2001:db8::5',
         )
         self.acl = CommandFilterACL.objects.create(name='Alert rule', action='warning')
         self.acl.reviewers.add(self.user)
         self.group = CommandGroup.objects.create(name='SELECT', content='SELECT')
         self.command = dict(
-            user=str(self.user), asset=self.asset.name, input='SELECT 1', session=str(self.session.pk),
+            user=str(self.user), asset=self.asset.name, input='SELECT 1',
+            session=str(self.session.pk),
             org_id=str(self.org.pk), cmd_filter_acl=str(self.acl.pk), cmd_group=str(self.group.pk),
             timestamp=int(timezone.now().timestamp()), risk_level=RiskLevelChoices.warning,
         )
