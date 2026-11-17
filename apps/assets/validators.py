@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 _JINJA_DELIMITER_RE = re.compile(r'\{\{|\}\}|\{%|%\}|\{#|#\}')
-_HOST_LABEL_RE = re.compile(r'^(?!-)[A-Za-z0-9-]{1,63}(?<!-)$')
+_HOST_LABEL_RE = re.compile(r'^(?!-)[A-Za-z0-9_-]{1,63}(?<!-)$')
 
 
 def validate_asset_address(value):
