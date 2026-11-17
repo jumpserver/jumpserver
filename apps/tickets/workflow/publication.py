@@ -6,7 +6,7 @@ from django.utils import timezone
 from orgs.models import Organization
 from tickets.models import Workflow, WorkflowVersion, WorkflowNode, WorkflowEdge
 from .approvers import available_users, selected_users
-from .definition import validate_definition
+from .definition import ACL_TICKET_TYPES, validate_definition
 from .errors import WorkflowConfigurationError, WorkflowConflict
 
 
@@ -15,6 +15,11 @@ def publish_workflow(workflow, definition, *, actor=None, expected_version=None)
     definition = validate_definition(definition)
     workflow = Workflow.objects.select_for_update().get(pk=workflow.pk)
     for node in definition['nodes']:
+        if (node['type'] == 'approval' and node['config']['approvers']['type'] == 'acl_reviewers'
+                and workflow.type not in ACL_TICKET_TYPES):
+            raise WorkflowConfigurationError(gettext(
+                'ACL reviewers are only available for ACL approval workflows.'
+            ))
         if node['type'] == 'approval' and node['config']['approvers']['type'] == 'user_selector':
             selected_users(node['config']['approvers']['value'], workflow.org_id)
     if workflow.type == 'login_confirm':

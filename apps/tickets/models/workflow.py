@@ -39,6 +39,10 @@ class Workflow(JMSOrgBaseModel):
         return str(self.display_name)
 
     @property
+    def requires_acl_reviewers(self):
+        return bool(self.active_version_id and self.active_version.acl_reviewer_keys)
+
+    @property
     def display_name(self):
         if self.is_system and self.created_by == 'Legacy ticket import':
             return _('Legacy ticket approval')
@@ -78,11 +82,14 @@ class Workflow(JMSOrgBaseModel):
     def _combined_source_nodes(self):
         source_ids = self.migration_notes.get('source_versions', [])
         versions = WorkflowVersion.objects.filter(pk__in=source_ids).select_related('workflow').prefetch_related('nodes')
+        by_id = {str(version.pk): version for version in versions}
         # Composition keys follow source version order, then source node key order.
         return {
-            f'p{source_ids.index(str(version.pk))}_{offset}': node
-            for version in versions
-            for offset, node in enumerate(sorted(version.nodes.all(), key=lambda item: item.key))
+            f'p{index}_{offset}': node
+            for index, version_id in enumerate(source_ids) if version_id in by_id
+            for offset, node in enumerate(sorted(
+                by_id[version_id].nodes.all(), key=lambda item: item.key,
+            ))
         }
 
     @classmethod
@@ -169,6 +176,11 @@ class WorkflowVersion(DefinitionModel):
         constraints = [
             models.UniqueConstraint(fields=['workflow', 'number'], name='tickets_workflow_version_uniq'),
         ]
+
+    @cached_property
+    def acl_reviewer_keys(self):
+        return [node.key for node in self.nodes.all()
+                if node.type == 'approval' and node.config['approvers']['type'] == 'acl_reviewers']
 
     def as_definition(self):
         return {
