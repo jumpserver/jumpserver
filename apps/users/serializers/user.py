@@ -144,6 +144,9 @@ class UserSerializer(
     is_org_admin = serializers.BooleanField(
         read_only=True, label=_("Organization Administrator")
     )
+    is_service_account = serializers.BooleanField(
+        read_only=True, label=_("Is service account")
+    )
     can_public_key_auth = serializers.BooleanField(
         source="can_use_ssh_key_login",
         label=_("Can public key authentication"),
@@ -281,7 +284,7 @@ class UserSerializer(
             "is_first_login": {"label": _("Is first login"), "read_only": True},
             "is_active": {"label": _("Is active"), "help_text": ""},
             "is_valid": {"label": _("Is valid")},
-            "is_service_account": {"label": _("Is service account")},
+            "is_service_account": {"label": _("Is service account"), "read_only": True},
             "is_org_admin": {"label": _("Is org admin")},
             "is_expired": {"label": _("Is expired")},
             "avatar_url": {"label": _("Avatar url")},
