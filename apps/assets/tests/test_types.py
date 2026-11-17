@@ -4,6 +4,7 @@ from django.test import SimpleTestCase
 
 from assets.const.host import HostTypes
 from assets.const.database import DatabaseTypes
+from assets.const.device import DeviceTypes
 from assets.const.types import AllTypes
 
 
@@ -80,6 +81,20 @@ class HostTypesInternalPlatformsTestCase(SimpleTestCase):
             virtual_app_host['automation']['ansible_config'],
             {'ansible_connection': 'ssh'},
         )
+
+
+class DeviceTypesInternalPlatformsTestCase(SimpleTestCase):
+    def test_vendor_platforms_use_distinct_types_in_community_edition(self):
+        platform_types = DeviceTypes.internal_platforms()
+        with self.settings(XPACK_LICENSE_IS_VALID=False):
+            choices = dict(DeviceTypes.get_choices())
+
+        for platform_type, name in (('cisco', 'Cisco'), ('huawei', 'Huawei'), ('h3c', 'H3C')):
+            with self.subTest(platform_type=platform_type):
+                self.assertEqual(platform_types[platform_type], [{'name': name}])
+                self.assertIn(platform_type, choices)
+
+        self.assertEqual(platform_types['general'], [{'name': 'General'}])
 
 
 class OceanBaseTypeTestCase(SimpleTestCase):
