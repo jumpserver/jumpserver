@@ -156,7 +156,9 @@ class LoginAssetACL(UserAssetAccountBaseACL):
         for rule in rules:
             value = {}
             if rule.workflow_id:
-                value.update(workflow=str(rule.workflow_id), version=str(rule.workflow.active_version_id))
+                value.update(
+                    workflow=str(rule.workflow_id), version=str(rule.workflow.active_version_id),
+                )
             if not rule.workflow_id or rule.workflow.requires_acl_reviewers:
                 value['reviewers'] = sorted(str(user.pk) for user in rule.reviewers.all())
             config[str(rule.pk)] = value
@@ -278,7 +280,9 @@ class LoginAssetACL(UserAssetAccountBaseACL):
             workflow_rules = [rule for rule in ordered_rules if rule.workflow_id]
             workflows = [rule.workflow for rule in workflow_rules]
             reviewers = {
-                index: [str(user.pk) for user in self.filter_available_reviewers(rule.reviewers.all(), rule.org_id)]
+                index: [str(user.pk) for user in self.filter_available_reviewers(
+                    rule.reviewers.all(), rule.org_id,
+                )]
                 for index, rule in enumerate(workflow_rules) if rule.workflow.requires_acl_reviewers
             }
             if assignees:

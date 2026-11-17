@@ -7,7 +7,9 @@ from uuid import UUID
 from .conditions import validate_condition
 from .errors import WorkflowConfigurationError
 
-RESOLVERS = {'user', 'user_group', 'role', 'org_admin', 'asset_owner', 'user_selector', 'acl_reviewers'}
+RESOLVERS = {
+    'user', 'user_group', 'role', 'org_admin', 'asset_owner', 'user_selector', 'acl_reviewers',
+}
 ACL_TICKET_TYPES = {'login_confirm', 'login_asset_confirm', 'command_confirm'}
 
 

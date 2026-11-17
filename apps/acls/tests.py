@@ -191,7 +191,9 @@ class AssetReviewExemptionTests(SimpleTestCase):
                 }],
             })
             self.assertEqual(create.call_args.kwargs['request_data']['apply_login_account'], 'root')
-        ticket.open_by_system.assert_called_once_with(reviewers, workflow=workflow, acl_reviewers=None)
+        ticket.open_by_system.assert_called_once_with(
+            reviewers, workflow=workflow, acl_reviewers=None,
+        )
 
     def test_duration_validation_and_private_ticket_metadata(self):
         field = LoginAssetACLSerializer().fields['review_duration']

@@ -15,7 +15,9 @@ class WorkflowACLSerializerMixin(serializers.Serializer):
     def to_representation(self, instance):
         data = super().to_representation(instance)
         data['workflow'] = str(instance.workflow_id) if instance.workflow_id else None
-        data['workflow_requires_reviewers'] = bool(instance.workflow_id and instance.workflow.requires_acl_reviewers)
+        data['workflow_requires_reviewers'] = bool(
+            instance.workflow_id and instance.workflow.requires_acl_reviewers
+        )
         return data
 
     def validate(self, attrs):

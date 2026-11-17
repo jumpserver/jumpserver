@@ -87,7 +87,9 @@ class Workflow(JMSOrgBaseModel):
         return {
             f'p{index}_{offset}': node
             for index, version_id in enumerate(source_ids) if version_id in by_id
-            for offset, node in enumerate(sorted(by_id[version_id].nodes.all(), key=lambda item: item.key))
+            for offset, node in enumerate(sorted(
+                by_id[version_id].nodes.all(), key=lambda item: item.key,
+            ))
         }
 
     @classmethod

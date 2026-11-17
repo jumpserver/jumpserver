@@ -75,6 +75,25 @@ def selected_users(selector, org_id):
         return users.distinct()
 
 
+def bind_acl_reviewers(context, version, bindings, org_id):
+    # Only matched server-side ACLs may supply these identities.
+    context.pop('acl_reviewers', None)
+    snapshot = {}
+    for key in version.acl_reviewer_keys:
+        ids = set((bindings or {}).get(key, []))
+        valid = {
+            str(pk) for pk in available_users(org_id).filter(pk__in=ids)
+            .values_list('pk', flat=True)
+        }
+        if not 1 <= len(ids) <= 1000 or ids != valid:
+            raise WorkflowConfigurationError(gettext(
+                'Select at least one active, unexpired reviewer from this organization.'
+            ))
+        snapshot[key] = sorted(ids)
+    if snapshot:
+        context['acl_reviewers'] = snapshot
+
+
 def resolve_approvers(node_instance, context, org_id, applicant_id):
     config = node_instance.node.config
     spec = config['approvers']

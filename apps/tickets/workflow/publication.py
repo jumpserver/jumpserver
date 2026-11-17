@@ -17,7 +17,9 @@ def publish_workflow(workflow, definition, *, actor=None, expected_version=None)
     for node in definition['nodes']:
         if (node['type'] == 'approval' and node['config']['approvers']['type'] == 'acl_reviewers'
                 and workflow.type not in ACL_TICKET_TYPES):
-            raise WorkflowConfigurationError(gettext('ACL reviewers are only available for ACL approval workflows.'))
+            raise WorkflowConfigurationError(gettext(
+                'ACL reviewers are only available for ACL approval workflows.'
+            ))
         if node['type'] == 'approval' and node['config']['approvers']['type'] == 'user_selector':
             selected_users(node['config']['approvers']['value'], workflow.org_id)
     if workflow.type == 'login_confirm':

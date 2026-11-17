@@ -56,11 +56,15 @@ class WorkflowViewSet(mixins.CreateModelMixin, mixins.UpdateModelMixin, viewsets
             workflows = Workflow.get_org_related_flows(org_id).filter(
                 type=ticket_type, is_system=False, enabled=True, active_version__published_at__isnull=False,
             )
-            workflows = workflows.select_related('active_version').prefetch_related('active_version__nodes')
+            workflows = workflows.select_related('active_version').prefetch_related(
+                'active_version__nodes',
+            )
             workflows = plugin.filter_workflow_options(request, org_id, workflows)
-            return Response([{'id': str(workflow.pk), 'name': str(workflow.display_name), 'type': workflow.type,
-                              'requires_acl_reviewers': workflow.requires_acl_reviewers}
-                             for workflow in workflows])
+            return Response([
+                {'id': str(workflow.pk), 'name': str(workflow.display_name), 'type': workflow.type,
+                 'requires_acl_reviewers': workflow.requires_acl_reviewers}
+                for workflow in workflows
+            ])
 
     @action(detail=True, methods=['post'])
     def publish(self, request, **kwargs):

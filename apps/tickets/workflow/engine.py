@@ -19,6 +19,7 @@ from tickets.models import (
 )
 from .approvers import (
     available_users, resolve_approvers, user_snapshot, excluded_approver_ids, selected_users,
+    bind_acl_reviewers,
 )
 from .conditions import evaluate_condition
 from .const import InstanceState, NodeState, TaskState
@@ -93,17 +94,7 @@ class WorkflowEngine:
         snapshot.pop('approver_selections', None)
         if selections:
             snapshot['approver_selections'] = selections
-        # ACL identities come from the matched server-side rules, never request context.
-        snapshot.pop('acl_reviewers', None)
-        bindings = {}
-        for key in version.acl_reviewer_keys:
-            ids = set((acl_reviewers or {}).get(key, []))
-            valid = {str(pk) for pk in available_users(ticket.org_id).filter(pk__in=ids).values_list('pk', flat=True)}
-            if not 1 <= len(ids) <= 1000 or ids != valid:
-                raise WorkflowConfigurationError(gettext('Select at least one active, unexpired reviewer from this organization.'))
-            bindings[key] = sorted(ids)
-        if bindings:
-            snapshot['acl_reviewers'] = bindings
+        bind_acl_reviewers(snapshot, version, acl_reviewers, ticket.org_id)
         snapshot = json_snapshot(snapshot)
         with tmp_to_org(ticket.org_id):
             instance = WorkflowInstance.objects.create(
