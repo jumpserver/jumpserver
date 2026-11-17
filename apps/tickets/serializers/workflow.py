@@ -162,6 +162,7 @@ class WorkflowInstanceSerializer(serializers.ModelSerializer):
 
 class WorkflowInstanceDetailSerializer(WorkflowInstanceSerializer):
     workflow_name = serializers.CharField(source='version.workflow.display_name', read_only=True)
+    workflow_is_system = serializers.BooleanField(source='version.workflow.is_system', read_only=True)
     approver_role_names = serializers.SerializerMethodField()
     nodes = WorkflowNodeInstanceSerializer(source='node_instances', many=True, read_only=True)
     upcoming_nodes = serializers.SerializerMethodField()
@@ -187,7 +188,8 @@ class WorkflowInstanceDetailSerializer(WorkflowInstanceSerializer):
 
     class Meta(WorkflowInstanceSerializer.Meta):
         fields = WorkflowInstanceSerializer.Meta.fields + [
-            'workflow_name', 'approver_role_names', 'context', 'nodes', 'upcoming_nodes', 'resource_adjustment',
+            'workflow_name', 'workflow_is_system', 'approver_role_names', 'context', 'nodes',
+            'upcoming_nodes', 'resource_adjustment',
         ]
         read_only_fields = fields
 

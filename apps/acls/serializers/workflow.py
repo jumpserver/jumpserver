@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from orgs.models import Organization
 from orgs.utils import current_org, tmp_to_root_org
 from tickets.models import Workflow
+from tickets.workflow.approvers import available_users
 
 
 class WorkflowACLSerializerMixin(serializers.Serializer):
@@ -16,6 +17,24 @@ class WorkflowACLSerializerMixin(serializers.Serializer):
         data['workflow'] = str(instance.workflow_id) if instance.workflow_id else None
         return data
 
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        action = attrs.get('action', getattr(self.instance, 'action', None))
+        workflow = attrs.get('workflow', getattr(self.instance, 'workflow', None))
+        if action == 'review' and not workflow:
+            reviewers = attrs.get('reviewers')
+            if reviewers is None:
+                reviewers = self.instance.reviewers.all() if self.instance else []
+            org_id = (Organization.ROOT_ID if self.Meta.model._meta.model_name == 'loginacl'
+                      else str(current_org.id))
+            if not available_users(org_id).filter(pk__in=[user.pk for user in reviewers]).exists():
+                raise serializers.ValidationError({
+                    'reviewers': _(
+                        'Select at least one active, unexpired reviewer from this organization.'
+                    ),
+                })
+        return attrs
+
     def validate_workflow(self, value):
         if value is None:
             return None
@@ -24,8 +43,10 @@ class WorkflowACLSerializerMixin(serializers.Serializer):
         ticket_type = types[self.Meta.model._meta.model_name]
         org_id = Organization.ROOT_ID if ticket_type == 'login_confirm' else str(current_org.id)
         with tmp_to_root_org():
-            workflow = Workflow.objects.filter(pk=value, type=ticket_type, org_id__in=[org_id, Organization.ROOT_ID],
-                                               enabled=True, active_version__published_at__isnull=False).first()
+            workflow = Workflow.objects.filter(
+                pk=value, type=ticket_type, org_id__in=[org_id, Organization.ROOT_ID],
+                is_system=False, enabled=True, active_version__published_at__isnull=False,
+            ).first()
         if not workflow:
             raise serializers.ValidationError('Select an enabled workflow for this ACL type and organization.')
         return workflow
