@@ -2,7 +2,6 @@
 from django.db import transaction
 from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
-from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from oauth2_provider.models import get_application_model
 from rest_framework import mixins, serializers, status
@@ -19,7 +18,6 @@ from common.drf.filters import SearchFilter
 from common.permissions import IsValidUser
 from common.utils import get_request_ip
 from orgs.models import Organization
-from terminal.agent_service import available_agent_organizations
 from terminal.models import AgentApplication, AgentOAuthBinding
 
 __all__ = ['UserAgentClientViewSet']
@@ -46,25 +44,15 @@ def record_client_operation(request, operation, client, result):
 
 class UserAgentClientSerializer(serializers.ModelSerializer):
     client_id = serializers.CharField(read_only=True, label=_('Client ID'))
-    organizations = serializers.SerializerMethodField(label=_('Organizations'))
-    all_organizations = serializers.SerializerMethodField()
     status = serializers.SerializerMethodField(label=_('Status'))
 
     class Meta:
         model = get_application_model()
-        fields = ('id', 'name', 'client_id', 'organizations', 'all_organizations', 'status')
+        fields = ('id', 'name', 'client_id', 'status')
         read_only_fields = fields
 
-    def get_all_organizations(self, obj):
-        return any(binding.is_live for binding in obj.user_bindings)
-
-    def get_organizations(self, obj):
-        return (
-            self.context['view'].available_organizations if self.get_all_organizations(obj) else []
-        )
-
     def get_status(self, obj):
-        return 'active' if self.get_organizations(obj) else 'expired'
+        return 'active' if any(binding.is_live for binding in obj.user_bindings) else 'expired'
 
 
 class UserAgentClientPagination(LimitOffsetPagination):
@@ -84,13 +72,6 @@ class UserAgentClientViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, G
         response = super().finalize_response(request, response, *args, **kwargs)
         response['Cache-Control'] = 'no-store'
         return response
-
-    @cached_property
-    def available_organizations(self):
-        return [
-            {'id': str(org.pk), 'name': org.name}
-            for org in available_agent_organizations(self.request.user)
-        ]
 
     def get_queryset(self):
         user = self.request.user

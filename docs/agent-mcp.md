@@ -199,15 +199,21 @@ DCR still leaves existing registrations usable.
 Disabling DCR stops new registrations and removes registration discovery. It does
 not revoke existing grants or stop the MCP service. Clients can revoke tokens
 through the advertised OAuth revocation endpoint. In **Personal Settings >
-Agent / MCP**, users see their own clients and connection documentation, across
-all their organizations. Each user can authorize at most ten distinct clients;
-the same client in several organizations counts once. Clients with expired
+Agent / MCP**, users see their own clients and connection documentation.
+Clients use the user's current asset permissions without an organization
+binding.
+Each user can authorize at most ten distinct clients; reauthorizing the same
+client does not consume another slot. Clients with expired
 bindings still occupy their personal list slot until revoked or reused by a
 new user after the previous authorization has ended.
 
 The personal API is `/api/v1/authentication/user-agent-clients/`: GET lists the
 current user's clients; POST `{id}/revoke/` revokes that user's authorization in
-all organizations. When no authorization remains, the unused Agent registration
+all organizations. The list reports authorization validity, including usable
+refresh tokens, independently of organization membership. It does not return
+organization display fields. Execution and audit queries retain their
+organization isolation and recheck the user's current permissions.
+When no authorization remains, the unused Agent registration
 is reclaimed automatically. Referenced OAuth identities and execution history
 are retained; an unreferenced identity
 can be removed. Revocation records an operation audit with operator, source IP,

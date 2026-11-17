@@ -5,6 +5,7 @@ from threading import Barrier
 from unittest.mock import patch
 from urllib.parse import urlsplit
 
+from django.conf import settings
 from django.db import close_old_connections, transaction
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 from django.urls import resolve
@@ -114,11 +115,7 @@ class UserAgentClientTests(TestCase):
                 client = response.data['results'][0]
                 self.assertEqual(
                     set(client),
-                    {'id', 'name', 'client_id', 'organizations', 'all_organizations', 'status'},
-                )
-                self.assertEqual(
-                    {item['id'] for item in client['organizations']},
-                    {str(self.first.pk), str(self.second.pk)},
+                    {'id', 'name', 'client_id', 'status'},
                 )
                 self.assertEqual(client['status'], 'active')
                 self.assertNotIn(access.token, str(response.data))
@@ -130,28 +127,36 @@ class UserAgentClientTests(TestCase):
         for method in ('get', 'options'):
             self.assertIn(self.request(method).status_code, (401, 403))
 
-    def test_all_org_scope_tracks_membership_and_refresh_status(self):
-        access, _ = self.authorize(self.user)
+    def test_authorization_status_is_independent_of_organization_membership(self):
+        access, refresh = self.authorize(self.user)
+        self.first.members.through.objects_raw.filter(
+            user=self.user, org_id__in=(self.first.pk, self.second.pk)
+        ).delete()
+        self.assertEqual(self.request(user=self.user).data['results'][0]['status'], 'active')
         get_access_token_model().objects.filter(pk=access.pk).update(
             expires=timezone.now() - timedelta(seconds=1)
         )
-        self.second.members.through.objects_raw.filter(
-            user=self.user, org_id=self.second.pk
-        ).delete()
-        client = self.request(user=self.user).data['results'][0]
-        self.assertTrue(client['all_organizations'])
-        self.assertEqual(
-            client['organizations'], [{'id': str(self.first.pk), 'name': self.first.name}]
+        self.assertEqual(self.request(user=self.user).data['results'][0]['status'], 'active')
+        with self.settings(OAUTH2_PROVIDER={
+            **settings.OAUTH2_PROVIDER, 'REFRESH_TOKEN_EXPIRE_SECONDS': 60,
+        }):
+            get_access_token_model().objects.filter(pk=access.pk).update(
+                expires=timezone.now() - timedelta(seconds=61)
+            )
+            self.assertEqual(self.request(user=self.user).data['results'][0]['status'], 'expired')
+        get_refresh_token_model().objects.filter(pk=refresh.pk).update(revoked=timezone.now())
+        self.assertEqual(self.request(user=self.user).data['results'][0]['status'], 'expired')
+        get_refresh_token_model().objects.filter(pk=refresh.pk).delete()
+        get_access_token_model().objects.filter(pk=access.pk).update(
+            expires=timezone.now() + timedelta(minutes=5)
         )
-        self.assertEqual(client['status'], 'active')
-        get_refresh_token_model().objects.filter(user=self.user).update(revoked=timezone.now())
+        self.assertEqual(self.request(user=self.user).data['results'][0]['status'], 'active')
+        get_access_token_model().objects.filter(pk=access.pk).update(
+            expires=timezone.now() - timedelta(seconds=1)
+        )
         self.assertEqual(self.request(user=self.user).data['results'][0]['status'], 'expired')
         self.authorize(self.user)
-        client = self.request(user=self.user).data['results'][0]
-        self.assertTrue(client['all_organizations'])
-        self.assertEqual(
-            client['organizations'], [{'id': str(self.first.pk), 'name': self.first.name}]
-        )
+        self.assertEqual(self.request(user=self.user).data['results'][0]['status'], 'active')
 
     def test_admins_cannot_use_personal_api_to_read_or_revoke_other_users_clients(self):
         access, refresh = self.authorize(self.user)
@@ -181,8 +186,7 @@ class UserAgentClientTests(TestCase):
         response = self.request(path=f'{self.url}?user_id={self.user.pk}', user=self.manager)
         client = response.data['results'][0]
         self.assertEqual(response.data['count'], 1)
-        self.assertTrue(client['all_organizations'])
-        self.assertIn({'id': str(self.first.pk), 'name': self.first.name}, client['organizations'])
+        self.assertEqual(client['status'], 'active')
         self.assertNotIn('registration_id', client)
         self.assertNotIn('is_active', client)
         path = f'{self.url}{self.other_application.pk}/revoke/?user_id={self.user.pk}'
