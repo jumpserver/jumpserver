@@ -9,8 +9,9 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_201_CREATED
 
 from acls.models import CommandFilterACL, CommandGroup
+from assets.models import Asset
 from common.api import JMSBulkModelViewSet
-from common.utils import get_logger
+from common.utils import get_logger, is_uuid
 from orgs.utils import current_org
 from terminal.backends import (
     get_command_storage, get_multi_command_storage
@@ -223,6 +224,11 @@ class InsecureCommandAlertAPI(generics.CreateAPIView):
             'id', 'org_id', 'asset', 'asset_id', 'user', 'user_id', 'account', 'account_id'
         )
         session_mapper = {str(i.id): i for i in sessions}
+        asset_addresses = {
+            str(pk): address for pk, address in Asset.objects.filter(
+                id__in={s.asset_id for s in sessions if is_uuid(s.asset_id)},
+            ).values_list('id', 'address')
+        }
         acls = CommandFilterACL.objects.filter(id__in=acl_ids).only('id', 'name', 'reviewers')
         acl_mapper = {str(i.id): i for i in acls}
         cmd_groups = CommandGroup.objects.filter(id__in=cmd_group_ids).only('id', 'name')
@@ -240,6 +246,7 @@ class InsecureCommandAlertAPI(generics.CreateAPIView):
             if session:
                 command.update({
                     '_account': session.account,
+                    '_asset_address': asset_addresses.get(session.asset_id, ''),
                     '_org_name': session.org.name,
                     '_protocol': session.protocol,
                     '_remote_addr': session.remote_addr,

@@ -8,9 +8,12 @@
 <ul>
     <li><strong>{% trans 'User' %}:</strong> [{{ user }}]</li>
     <li><strong>{% trans 'Asset' %}:</strong> [{{ asset }}]</li>
+    {% if asset_address %}
+        <li><strong>{% trans 'Asset address' %}:</strong> [{{ asset_address }}]</li>
+    {% endif %}
     <li><strong>{% trans 'Account' %}:</strong> [{{ account }}]</li>
     {% if remote_addr %}
-        <li><strong>IP:</strong> [{{ remote_addr }}]</li>
+        <li><strong>{% trans 'Source IP' %}:</strong> [{{ remote_addr }}]</li>
     {% endif %}
     {% if login_from %}
         <li><strong>{% trans 'Login from' %}:</strong> [{{ login_from }}]</li>

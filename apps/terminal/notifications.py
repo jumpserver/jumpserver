@@ -104,6 +104,7 @@ class CommandWarningMessage(CommandAlertMixin, UserMessage):
             'command': command['input'],
             'user': command['user'],
             'asset': command['asset'],
+            'asset_address': command.get('_asset_address', ''),
             'account': command.get('_account', ''),
             'protocol': command.get('_protocol', ''),
             'remote_addr': command.get('_remote_addr', ''),
@@ -165,10 +166,11 @@ class CommandAlertMessage(CommandAlertMixin, SystemMessage):
         cmd_group_name = cmd_group.name if cmd_group else ''
         items = {
             _("Asset"): command['asset'],
+            _("Asset address"): command.get('_asset_address', ''),
             _("User"): command['user'],
             _("Level"): level,
             _("Protocol"): command.get('_protocol', ''),
-            _("Remote addr"): command.get('_remote_addr', ''),
+            _("Source IP"): command.get('_remote_addr', ''),
             _("Policy"): cmd_acl_name or cmd_group_name or '',
             _("Date"): local_now_display(),
         }
