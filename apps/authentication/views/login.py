@@ -21,7 +21,7 @@ from django.utils.translation import gettext as _, get_language, get_language_fr
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
-from django.views.generic.base import TemplateView, RedirectView, View
+from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.edit import FormView
 
 from common.const import Language
@@ -374,7 +374,9 @@ class UserLoginWaitConfirmView(TemplateView):
 
 
 @method_decorator(never_cache, name='dispatch')
-class UserLogoutView(View):
+class UserLogoutView(TemplateView):
+    template_name = 'flash_message_standalone.html'
+
     def get_backend_logout_url(self):
         backend = self.request.session.get(BACKEND_SESSION_KEY, '')
         if 'OIDC' in backend:
@@ -396,4 +398,16 @@ class UserLogoutView(View):
             return redirect(backend_logout_url)
 
         auth_logout(request)
-        return redirect('authentication:login')
+        response = super().get(request, *args, **kwargs)
+        return response
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'title': _('Logout success'),
+            'message': _('Logout success, return login page'),
+            'interval': 3,
+            'redirect_url': reverse('authentication:login'),
+            'auto_redirect': True,
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
