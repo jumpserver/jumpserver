@@ -18,6 +18,7 @@ class AgentApplication(models.Model):
 
 class AgentOAuthBinding(models.Model):
     """Bind OAuth subjects to their authorizing user and client."""
+
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     application = models.ForeignKey('oauth2_provider.Application', on_delete=models.CASCADE)
     grant = models.OneToOneField(
@@ -29,14 +30,22 @@ class AgentOAuthBinding(models.Model):
     refresh_family = models.UUIDField(null=True, unique=True)
 
     class Meta:
-        constraints = [models.CheckConstraint(
-            condition=(
-                models.Q(grant__isnull=False, access_token__isnull=True, refresh_family__isnull=True)
-                | models.Q(grant__isnull=True, access_token__isnull=False, refresh_family__isnull=True)
-                | models.Q(grant__isnull=True, access_token__isnull=True, refresh_family__isnull=False)
-            ),
-            name='agent_oauth_binding_subject',
-        )]
+        constraints = [
+            models.CheckConstraint(
+                condition=(
+                    models.Q(
+                        grant__isnull=False, access_token__isnull=True, refresh_family__isnull=True
+                    )
+                    | models.Q(
+                        grant__isnull=True, access_token__isnull=False, refresh_family__isnull=True
+                    )
+                    | models.Q(
+                        grant__isnull=True, access_token__isnull=True, refresh_family__isnull=False
+                    )
+                ),
+                name='agent_oauth_binding_subject',
+            )
+        ]
 
 
 class AgentSession(OrgModelMixin):
@@ -45,10 +54,14 @@ class AgentSession(OrgModelMixin):
     user_display = models.CharField(max_length=258, default='', blank=True, editable=False)
     application = models.ForeignKey('oauth2_provider.Application', on_delete=models.PROTECT)
     terminal = models.ForeignKey('terminal.Terminal', on_delete=models.PROTECT)
-    connection_token = models.OneToOneField('authentication.ConnectionToken', null=True, on_delete=models.SET_NULL)
+    connection_token = models.OneToOneField(
+        'authentication.ConnectionToken', null=True, on_delete=models.SET_NULL
+    )
     requested = models.JSONField(default=dict)
     terminal_session = models.ForeignKey('terminal.Session', null=True, on_delete=models.SET_NULL)
-    oauth_token = models.ForeignKey('oauth2_provider.AccessToken', null=True, on_delete=models.SET_NULL)
+    oauth_token = models.ForeignKey(
+        'oauth2_provider.AccessToken', null=True, on_delete=models.SET_NULL
+    )
     oauth_family = models.UUIDField(null=True)
     resource = models.URLField(max_length=512)
     idempotency_key = models.CharField(max_length=128)
@@ -66,9 +79,12 @@ class AgentSession(OrgModelMixin):
         return super().save(*args, **kwargs)
 
     class Meta:
-        constraints = [models.UniqueConstraint(
-            fields=('org_id', 'user', 'application', 'idempotency_key'), name='agent_session_idempotency',
-        )]
+        constraints = [
+            models.UniqueConstraint(
+                fields=('org_id', 'user', 'application', 'idempotency_key'),
+                name='agent_session_idempotency',
+            )
+        ]
         ordering = ('-date_created',)
 
 
@@ -85,8 +101,18 @@ class AgentAction(OrgModelMixin):
     status = models.CharField(max_length=32, default='accepted')
     cancel_requested = models.BooleanField(default=False)
     ticket = models.ForeignKey('tickets.Ticket', null=True, on_delete=models.PROTECT)
-    interactive_token = models.OneToOneField('authentication.ConnectionToken', null=True, on_delete=models.SET_NULL, related_name='agent_interactive_action')
-    interactive_session = models.ForeignKey('terminal.Session', null=True, on_delete=models.SET_NULL, related_name='agent_interactive_actions')
+    interactive_token = models.OneToOneField(
+        'authentication.ConnectionToken',
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name='agent_interactive_action',
+    )
+    interactive_session = models.ForeignKey(
+        'terminal.Session',
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name='agent_interactive_actions',
+    )
     policy_hash = models.CharField(max_length=64, blank=True)
     date_created = models.DateTimeField(default=timezone.now)
     date_started = models.DateTimeField(null=True)
@@ -101,9 +127,12 @@ class AgentAction(OrgModelMixin):
         return super().save(*args, **kwargs)
 
     class Meta:
-        constraints = [models.UniqueConstraint(
-            fields=('org_id', 'user', 'application', 'idempotency_key'), name='agent_action_idempotency',
-        )]
+        constraints = [
+            models.UniqueConstraint(
+                fields=('org_id', 'user', 'application', 'idempotency_key'),
+                name='agent_action_idempotency',
+            )
+        ]
         ordering = ('-date_created',)
 
 

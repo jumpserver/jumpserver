@@ -43,7 +43,9 @@ class BasicSettingSerializer(serializers.Serializer):
             try:
                 get_mcp_authorization_server(s)
             except ImproperlyConfigured as exc:
-                raise serializers.ValidationError(_('Agent MCP requires an HTTP or HTTPS Site URL.')) from exc
+                raise serializers.ValidationError(
+                    _('Agent MCP requires an HTTP or HTTPS Site URL.')
+                ) from exc
         return s
 
     @staticmethod

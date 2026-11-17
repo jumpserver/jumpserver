@@ -28,17 +28,26 @@ class FTPAgentAuditTests(TestCase):
         cls.org.add_member(cls.user)
         cls.org.add_member(cls.ordinary)
         role = Role.objects.create(name='FTP auditor', scope='org')
-        role.permissions.add(Permission.objects.get(content_type__app_label='audits', codename='view_ftplog'))
+        role.permissions.add(
+            Permission.objects.get(content_type__app_label='audits', codename='view_ftplog')
+        )
         with tmp_to_org(cls.org):
             cls.user.org_roles.add(role)
             cls.sessions = [Session.objects.create(
                 user='FTP user', user_id=str(cls.user.pk), asset='FTP asset', account='root',
                 account_id='root', protocol='sftp', login_from=source,
             ) for source in ('AG', 'AH', 'WT')]
-            cls.logs = [FTPLog.objects.create(
-                user='FTP user', asset='FTP asset', account='root', operate='download', filename='/file',
-                session=str(session.pk),
-            ) for session in cls.sessions]
+            cls.logs = [
+                FTPLog.objects.create(
+                    user='FTP user',
+                    asset='FTP asset',
+                    account='root',
+                    operate='download',
+                    filename='/file',
+                    session=str(session.pk),
+                )
+                for session in cls.sessions
+            ]
             malformed = 'a' + cls.sessions[0].pk.hex
             for reference in ('', 'invalid', str(uuid.uuid4()), malformed):
                 cls.logs.append(FTPLog.objects.create(
@@ -46,12 +55,22 @@ class FTPAgentAuditTests(TestCase):
                     filename='/unknown', session=reference,
                 ))
         with tmp_to_org(cls.other_org):
-            other = Session.objects.create(user='Other', asset='Other', account='root', login_from='AG')
+            other = Session.objects.create(
+                user='Other', asset='Other', account='root', login_from='AG'
+            )
             cls.foreign_log = FTPLog.objects.create(user='Other', asset='Other', account='root',
                 operate='download', filename='/other', session=str(other.pk))
         with tmp_to_org(cls.org):
-            cls.logs.append(FTPLog.objects.create(user='FTP user', asset='FTP asset', account='root',
-                operate='download', filename='/mismatch', session=str(other.pk)))
+            cls.logs.append(
+                FTPLog.objects.create(
+                    user='FTP user',
+                    asset='FTP asset',
+                    account='root',
+                    operate='download',
+                    filename='/mismatch',
+                    session=str(other.pk),
+                )
+            )
 
     def setUp(self):
         self.enterContext(tmp_to_org(self.org))
@@ -68,7 +87,9 @@ class FTPAgentAuditTests(TestCase):
             sources = ftp_log_sources(self.logs)
         with self.assertNumQueries(0):
             data = FTPLogSerializer(self.logs, many=True, context={'ftp_sources': sources}).data
-        self.assertEqual([row['login_from']['value'] for row in data], ['AG', 'AH', 'WT', '', '', '', '', ''])
+        self.assertEqual(
+            [row['login_from']['value'] for row in data], ['AG', 'AH', 'WT', '', '', '', '', '']
+        )
         view = FTPLogViewSet()
         view.action = 'list'
         view.request = Request(APIRequestFactory().get('/api/v1/audits/ftp-logs/'))
@@ -83,7 +104,9 @@ class FTPAgentAuditTests(TestCase):
                 self.assertEqual(response.status_code, 200, response.data)
                 self.assertEqual(response.data['count'], expected)
                 source = response.data['results'][0]['login_from']['value']
-                self.assertIn(source, {'agent': ('AG',), 'user': ('AH', 'WT'), 'unknown': ('',)}[category])
+                self.assertIn(
+                    source, {'agent': ('AG',), 'user': ('AH', 'WT'), 'unknown': ('',)}[category]
+                )
         response = self.request({'session': str(self.sessions[0].pk), 'limit': 20})
         self.assertEqual([row['id'] for row in response.data['results']], [str(self.logs[0].pk)])
 

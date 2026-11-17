@@ -17,5 +17,7 @@ def get_mcp_authorization_server(site_url=None):
             raise ValueError
         validate_mcp_resource_url(origin + '/mcp')
     except (ValueError, TypeError, UnicodeError, ValidationError) as exc:
-        raise ImproperlyConfigured('Agent MCP requires SITE_URL to be a public HTTP or HTTPS URL.') from exc
+        raise ImproperlyConfigured(
+            'Agent MCP requires SITE_URL to be a public HTTP or HTTPS URL.'
+        ) from exc
     return origin

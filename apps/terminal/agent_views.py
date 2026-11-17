@@ -64,15 +64,28 @@ class AgentSessionView(LoginRequiredMixin, View):
                         get_refresh_token_model().revoke_family(session.oauth_family)
                     elif session.oauth_token_id:
                         session.oauth_token.delete()
-                    raise service.Conflict('Agent authorization revoked; active operations are being stopped')
+                    raise service.Conflict(
+                        'Agent authorization revoked; active operations are being stopped'
+                    )
                 if action_id:
                     service.check_handoff_authority(session)
-                    actions = session.actions.select_for_update() if request.method == 'POST' else session.actions
-                    action = get_object_or_404(actions, pk=service.identifier(action_id), kind='open_terminal')
+                    actions = (
+                        session.actions.select_for_update()
+                        if request.method == 'POST'
+                        else session.actions
+                    )
+                    action = get_object_or_404(
+                        actions, pk=service.identifier(action_id), kind='open_terminal'
+                    )
                     if action.status in service.FINAL_STATES or action.cancel_requested:
-                        return HttpResponse('This terminal handoff has finished', status=410, headers={
-                            'Cache-Control': 'no-store', 'Referrer-Policy': 'same-origin',
-                        })
+                        return HttpResponse(
+                            'This terminal handoff has finished',
+                            status=410,
+                            headers={
+                                'Cache-Control': 'no-store',
+                                'Referrer-Policy': 'same-origin',
+                            },
+                        )
                     token = action.interactive_token
                 else:
                     token = session.connection_token
@@ -85,7 +98,9 @@ class AgentSessionView(LoginRequiredMixin, View):
                         credentials = {name: request.POST.get(name, '') for name in (
                             'input_username', 'input_secret', 'input_secret_type',
                         )}
-                        credentials['input_secret_type'] = credentials['input_secret_type'] or 'password'
+                        credentials['input_secret_type'] = (
+                            credentials['input_secret_type'] or 'password'
+                        )
                         token = service.create_connection_token(
                             request.user, session.requested, credentials,
                             face_monitor_token=uuid.uuid4().hex if action else '',
@@ -104,9 +119,17 @@ class AgentSessionView(LoginRequiredMixin, View):
                             payload.pop('mfa_code', None)
                         request.data = payload
                         token = advance_acl(token, request)
-                        if payload.get('retry_face') and token.acl_context.get('requirements', {}).get('face') == 'pending':
-                            from authentication.services.connection_token import ConnectionTokenService
-                            ConnectionTokenService.for_request(request).create_face_verify(str(token.id))
+                        if (
+                            payload.get('retry_face')
+                            and token.acl_context.get('requirements', {}).get('face') == 'pending'
+                        ):
+                            from authentication.services.connection_token import (
+                                ConnectionTokenService,
+                            )
+
+                            ConnectionTokenService.for_request(request).create_face_verify(
+                                str(token.id)
+                            )
                             token.refresh_from_db()
                     if token and token.acl_ready:
                         token.is_valid()
@@ -121,10 +144,18 @@ class AgentSessionView(LoginRequiredMixin, View):
             except APIException as exc:
                 error = str(exc.detail)
                 state = acl_state(token) if token else {}
-            response = render(request, 'terminal/agent_session.html', {
-                'session': session, 'action': action, 'token': token, 'state': state, 'error': error,
-                'terminal_url': terminal_url,
-            })
+            response = render(
+                request,
+                'terminal/agent_session.html',
+                {
+                    'session': session,
+                    'action': action,
+                    'token': token,
+                    'state': state,
+                    'error': error,
+                    'terminal_url': terminal_url,
+                },
+            )
             response['Cache-Control'] = 'no-store'
             response['Referrer-Policy'] = 'same-origin'
             return response

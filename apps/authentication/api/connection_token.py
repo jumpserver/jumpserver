@@ -614,7 +614,9 @@ class ExtraActionApiMixin(RDPFileClientProtocolURLMixin):
         return response
 
 
-class ConnectionTokenViewSet(ConnectionTokenService, ExtraActionApiMixin, RootOrgViewMixin, JMSModelViewSet):
+class ConnectionTokenViewSet(
+    ConnectionTokenService, ExtraActionApiMixin, RootOrgViewMixin, JMSModelViewSet
+):
     queryset = ConnectionToken.objects.none()
     filterset_fields = (
         'user_display', 'asset_display'

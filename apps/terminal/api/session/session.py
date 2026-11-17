@@ -92,7 +92,11 @@ class SessionFilterSet(BaseFilterSet):
 
     @staticmethod
     def filter_category(queryset, name, value):
-        return queryset.filter(login_from=LoginFrom.AG) if value == 'agent' else queryset.exclude(login_from=LoginFrom.AG)
+        return (
+            queryset.filter(login_from=LoginFrom.AG)
+            if value == 'agent'
+            else queryset.exclude(login_from=LoginFrom.AG)
+        )
 
     @staticmethod
     def filter_terminal(queryset, name, value):

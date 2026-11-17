@@ -4,21 +4,25 @@ from django.db.models.fields.json import KeyTextTransform
 from django.db.models.functions import Cast
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from rest_framework.permissions import BasePermission
+from rest_framework.exceptions import APIException, ValidationError
 from rest_framework.generics import GenericAPIView
+from rest_framework.permissions import BasePermission
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.exceptions import APIException, ValidationError
 
-from common.permissions import IsValidUser
-from rbac.permissions import RBACPermission
 from common.drf.filters import DatetimeRangeFilterBackend, RewriteOrderingFilter, SearchFilter
+from common.permissions import IsValidUser
 from orgs.utils import tmp_to_org, tmp_to_root_org
-from terminal import agent_service as service
+from rbac.permissions import RBACPermission
 from terminal import agent_queries
+from terminal import agent_service as service
 from terminal.const import LoginFrom
+from terminal.filters import (
+    AgentActionAuditFilterSet,
+    AgentAuditFilterBackend,
+    AgentSessionAuditFilterSet,
+)
 from terminal.models import AgentAction, AgentSession, Session
-from terminal.filters import AgentAuditFilterBackend, AgentActionAuditFilterSet, AgentSessionAuditFilterSet
 from terminal.serializers.agent import AgentActionAuditSerializer, AgentSessionAuditSerializer
 
 
@@ -77,7 +81,11 @@ class AgentComponentAPI(APIView):
     def assets(node, data):
         from perms.utils import UserPermAssetUtil, PermAssetDetailUtil
 
-        service.require_keys(data, ('context_token', 'search', 'limit', 'offset', 'asset_id', 'account_offset'), ('context_token',))
+        service.require_keys(
+            data,
+            ('context_token', 'search', 'limit', 'offset', 'asset_id', 'account_offset'),
+            ('context_token',),
+        )
         context, user = service.context_identity(node, data['context_token'])
         limit = service.integer(data.get('limit', 20), 'limit', 1, 100)
         offset = service.integer(data.get('offset', 0), 'offset', 0, 100000)
@@ -97,18 +105,33 @@ class AgentComponentAPI(APIView):
             for asset in page[:limit]:
                 with tmp_to_org(asset.org_id):
                     util = PermAssetDetailUtil(user, asset)
-                    protocols = sorted({item.name for item in util.get_permed_protocols_for_user()} & service.context_protocols(context).keys())
+                    protocols = sorted(
+                        {item.name for item in util.get_permed_protocols_for_user()}
+                        & service.context_protocols(context).keys()
+                    )
                     if not protocols:
                         continue
-                    accounts, account_next = AgentComponentAPI.account_page(user, asset, util, protocols, account_offset)
+                    accounts, account_next = AgentComponentAPI.account_page(
+                        user, asset, util, protocols, account_offset
+                    )
                     if accounts or account_next is not None:
-                        results.append({
-                            'id': str(asset.id), 'name': asset.name, 'address': asset.address,
-                            'org_id': asset.org_id, 'org_name': asset.org.name, 'protocols': protocols, 'accounts': accounts,
-                            'accounts_next_offset': account_next,
-                        })
-            return {'results': results[:limit], 'next_offset': offset + limit if len(page) > limit else None,
-                    'has_more': len(page) > limit}
+                        results.append(
+                            {
+                                'id': str(asset.id),
+                                'name': asset.name,
+                                'address': asset.address,
+                                'org_id': asset.org_id,
+                                'org_name': asset.org.name,
+                                'protocols': protocols,
+                                'accounts': accounts,
+                                'accounts_next_offset': account_next,
+                            }
+                        )
+            return {
+                'results': results[:limit],
+                'next_offset': offset + limit if len(page) > limit else None,
+                'has_more': len(page) > limit,
+            }
 
     @staticmethod
     def account_page(user, asset, util, protocols, offset):
@@ -116,10 +139,16 @@ class AgentComponentAPI(APIView):
         # Restrict real account rows before using the existing permission
         # resolver. That resolver expands @ALL, exclusions and same-name
         # accounts correctly but normally loads every account on an asset.
-        rules = [rule for rule in util.user_asset_perms if 'all' in rule.protocols or set(protocols).intersection(rule.protocols)]
+        rules = [
+            rule
+            for rule in util.user_asset_perms
+            if 'all' in rule.protocols or set(protocols).intersection(rule.protocols)
+        ]
         aliases = {alias for rule in rules for alias in rule.accounts}
         candidates = asset.all_valid_accounts
-        same_name_exists = candidates.filter(username=user.username).exists() if '@USER' in aliases else False
+        same_name_exists = (
+            candidates.filter(username=user.username).exists() if '@USER' in aliases else False
+        )
         virtual = {'@INPUT', '@USER'} & aliases
         if same_name_exists:
             virtual.discard('@USER')
@@ -129,15 +158,27 @@ class AgentComponentAPI(APIView):
                 usernames.add(user.username)
             candidates = candidates.filter(username__in=usernames)
         page_size = 100 - len(virtual) if offset == 0 else 100
-        ids = list(candidates.order_by('username', 'id').values_list('id', flat=True)[offset:offset + page_size + 1])
+        ids = list(
+            candidates.order_by('username', 'id').values_list('id', flat=True)[
+                offset : offset + page_size + 1
+            ]
+        )
         has_more = len(ids) > page_size
         limited_asset = copy(asset)
-        limited_asset.all_valid_accounts = asset.all_valid_accounts.filter(pk__in=ids[:page_size]).only(
-            'id', 'name', 'username', 'asset_id', 'secret_type',
+        limited_asset.all_valid_accounts = asset.all_valid_accounts.filter(
+            pk__in=ids[:page_size]
+        ).only(
+            'id',
+            'name',
+            'username',
+            'asset_id',
+            'secret_type',
         )
         by_alias = {}
         for protocol in protocols:
-            protocol_rules = [rule for rule in rules if 'all' in rule.protocols or protocol in rule.protocols]
+            protocol_rules = [
+                rule for rule in rules if 'all' in rule.protocols or protocol in rule.protocols
+            ]
             for account in util.get_permed_accounts_from_perms(protocol_rules, user, limited_asset):
                 alias = str(account.alias)
                 if account.date_expired <= timezone.now():
@@ -145,7 +186,12 @@ class AgentComponentAPI(APIView):
                 if alias.startswith('@') and (offset or alias not in virtual):
                     continue
                 if alias not in by_alias:
-                    by_alias[alias] = {'id': alias, 'name': account.name, 'username': account.username, 'protocols': []}
+                    by_alias[alias] = {
+                        'id': alias,
+                        'name': account.name,
+                        'username': account.username,
+                        'protocols': [],
+                    }
                 by_alias[alias]['protocols'].append(protocol)
         accounts = sorted(by_alias.values(), key=lambda value: (value['username'], value['id']))
         return accounts, offset + page_size if has_more else None
@@ -158,14 +204,24 @@ class AgentComponentAPI(APIView):
             'bind': ('session_token', 'terminal_session_id'),
         }
         service.require_keys(data, allowed[self.operation], ('session_token',))
-        session = service.owned_session(node, session_id, data['session_token'], lock=True, check=False)
+        session = service.owned_session(
+            node, session_id, data['session_token'], lock=True, check=False
+        )
         with tmp_to_org(session.org_id):
             if self.operation == 'close':
-                actions = list(session.actions.exclude(status__in=service.FINAL_STATES).select_for_update())
+                actions = list(
+                    session.actions.exclude(status__in=service.FINAL_STATES).select_for_update()
+                )
                 if any(action.status in ('dispatching', 'running') for action in actions):
-                    raise service.Conflict('Drain or terminate running actions before closing the session')
+                    raise service.Conflict(
+                        'Drain or terminate running actions before closing the session'
+                    )
                 for action in actions:
-                    action.status, action.cancel_requested, action.date_finished = 'cancelled', True, timezone.now()
+                    action.status, action.cancel_requested, action.date_finished = (
+                        'cancelled',
+                        True,
+                        timezone.now(),
+                    )
                     action.save(update_fields=['status', 'cancel_requested', 'date_finished'])
                     service.finish_action_controls(action)
                 service.cancel_connection_controls(session.connection_token)
@@ -174,9 +230,15 @@ class AgentComponentAPI(APIView):
                     session.save(update_fields=['status', 'date_closed'])
                 if session.terminal_session_id:
                     from terminal.serializers import SessionSerializer
-                    terminal = Session.objects.select_for_update().filter(pk=session.terminal_session_id).first()
+                    terminal = (
+                        Session.objects.select_for_update()
+                        .filter(pk=session.terminal_session_id)
+                        .first()
+                    )
                     if terminal and not terminal.is_finished:
-                        SessionSerializer().update(terminal, {'is_finished': True, 'date_end': session.date_closed})
+                        SessionSerializer().update(
+                            terminal, {'is_finished': True, 'date_end': session.date_closed}
+                        )
             elif self.operation == 'bind':
                 service.check_session_authority(session)
                 terminal_session = get_object_or_404(
@@ -186,13 +248,24 @@ class AgentComponentAPI(APIView):
                 )
                 from terminal.serializers import SessionSerializer
                 SessionSerializer.get_connection_reason(
-                    session.connection_token_id, {
-                        'org_id': session.org_id, 'protocol': terminal_session.protocol,
-                        'account_id': terminal_session.account_id, 'account': terminal_session.account,
-                    }, session.user, session.connection_token.asset, verify_account=True,
+                    session.connection_token_id,
+                    {
+                        'org_id': session.org_id,
+                        'protocol': terminal_session.protocol,
+                        'account_id': terminal_session.account_id,
+                        'account': terminal_session.account,
+                    },
+                    session.user,
+                    session.connection_token.asset,
+                    verify_account=True,
                 )
-                if session.terminal_session_id and session.terminal_session_id != terminal_session.id:
-                    raise service.Conflict('Agent session is already bound to another terminal session')
+                if (
+                    session.terminal_session_id
+                    and session.terminal_session_id != terminal_session.id
+                ):
+                    raise service.Conflict(
+                        'Agent session is already bound to another terminal session'
+                    )
                 Session.objects.filter(pk=terminal_session.pk).update(login_from=LoginFrom.AG)
                 session.terminal_session = terminal_session
                 session.save(update_fields=['terminal_session'])
@@ -207,7 +280,9 @@ class AgentComponentAPI(APIView):
                 if action.cancel_requested or action.status in service.FINAL_STATES:
                     raise service.Conflict('The connection action was cancelled or completed')
                 service.check_session_authority(session)
-                public_key = service.text_field(data.get('public_key', ''), 'public_key', 16384, empty=True)
+                public_key = service.text_field(
+                    data.get('public_key', ''), 'public_key', 16384, empty=True
+                )
                 result = get_connection_token_secret(
                     session.connection_token, ConnectionTokenSecretSerializer,
                     public_key=public_key, expire_now=True,
@@ -273,20 +348,31 @@ class AgentComponentAPI(APIView):
                     'event_id', 'sequence', 'state', 'payload', 'date_received',
                 )[:limit + 1])
                 result['events'] = [self.event_data(action, item) for item in events[:limit]]
-                result['next_offset'] = events[limit - 1]['sequence'] if len(events) > limit else None
+                result['next_offset'] = (
+                    events[limit - 1]['sequence'] if len(events) > limit else None
+                )
             return result
 
 
     @staticmethod
     def event_data(action, item):
-        return {**item, 'action_id': str(action.id),
-                'occurred_at': item['payload'].get('_executor_occurred_at') or item['date_received'].isoformat()}
+        return {
+            **item,
+            'action_id': str(action.id),
+            'occurred_at': item['payload'].get('_executor_occurred_at')
+            or item['date_received'].isoformat(),
+        }
 
 
 class AgentAuditAPI(GenericAPIView):
     permission_classes = [IsValidUser, RBACPermission]
     kind = 'sessions'
-    filter_backends = [AgentAuditFilterBackend, SearchFilter, RewriteOrderingFilter, DatetimeRangeFilterBackend]
+    filter_backends = [
+        AgentAuditFilterBackend,
+        SearchFilter,
+        RewriteOrderingFilter,
+        DatetimeRangeFilterBackend,
+    ]
     date_range_filter_fields = [('date_created', ('date_from', 'date_to'))]
     page_default_limit = 100
     page_max_limit = 100
@@ -307,11 +393,26 @@ class AgentAuditAPI(GenericAPIView):
 
     @property
     def ordering_fields(self):
-        fields = ['id', 'user_display', 'client_id', 'asset_id', 'account', 'protocol', 'status', 'date_created']
-        return fields if self.kind == 'sessions' else fields + ['kind', 'date_started', 'date_finished']
+        fields = [
+            'id',
+            'user_display',
+            'client_id',
+            'asset_id',
+            'account',
+            'protocol',
+            'status',
+            'date_created',
+        ]
+        return (
+            fields
+            if self.kind == 'sessions'
+            else fields + ['kind', 'date_started', 'date_finished']
+        )
 
     def get_serializer_class(self):
-        return AgentSessionAuditSerializer if self.kind == 'sessions' else AgentActionAuditSerializer
+        return (
+            AgentSessionAuditSerializer if self.kind == 'sessions' else AgentActionAuditSerializer
+        )
 
     def get_queryset(self):
         model = AgentSession if self.kind == 'sessions' else AgentAction
@@ -342,19 +443,23 @@ class AgentAuditAPI(GenericAPIView):
             if isinstance(item, AgentAction):
                 result['request'] = item.request
                 try:
-                    after = service.integer(int(request.query_params.get('after', 0)), 'after', 0, 1000000)
-                except (TypeError, ValueError):
-                    raise ValidationError('Invalid evidence cursor')
+                    after = service.integer(
+                        int(request.query_params.get('after', 0)), 'after', 0, 1000000
+                    )
+                except (TypeError, ValueError) as exc:
+                    raise ValidationError('Invalid evidence cursor') from exc
                 events = list(item.events.filter(sequence__gt=after).values(
                     'event_id', 'sequence', 'state', 'payload', 'date_received',
                 )[:33])
-                result['events'] = [AgentComponentAPI.event_data(item, event) for event in events[:32]]
+                result['events'] = [
+                    AgentComponentAPI.event_data(item, event) for event in events[:32]
+                ]
                 result['next_offset'] = events[31]['sequence'] if len(events) > 32 else None
         else:
             try:
                 service.integer(int(request.query_params.get('offset', 0)), 'offset', 0, 10000000)
-            except (ValueError, TypeError):
-                raise ValidationError('Invalid audit offset')
+            except (ValueError, TypeError) as exc:
+                raise ValidationError('Invalid audit offset') from exc
             queryset = self.filter_queryset(queryset)
             page = self.paginate_queryset(queryset)
             response = self.get_paginated_response([self.serialize(item) for item in page])
@@ -378,10 +483,16 @@ class AgentAuditAPI(GenericAPIView):
         }
         if isinstance(item, AgentAction):
             return {
-                **service.action_data(item), **context, 'user_display': item.user_display,
-                'user_id': str(item.user_id) if item.user_id else None, 'org_id': item.org_id,
-                'terminal_session_id': str(item.interactive_session_id or parent.terminal_session_id)
-                if item.interactive_session_id or parent.terminal_session_id else None,
+                **service.action_data(item),
+                **context,
+                'user_display': item.user_display,
+                'user_id': str(item.user_id) if item.user_id else None,
+                'org_id': item.org_id,
+                'terminal_session_id': (
+                    str(item.interactive_session_id or parent.terminal_session_id)
+                    if item.interactive_session_id or parent.terminal_session_id
+                    else None
+                ),
             }
         # Never include a session capability or a connection credential in a
         # user-facing audit response.

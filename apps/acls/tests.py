@@ -97,7 +97,9 @@ class AssetReviewExemptionTests(SimpleTestCase):
         self.query.return_value.first.return_value = self.acl
         patch('acls.models.login_asset_acl.tmp_to_org', side_effect=lambda org: nullcontext()).start()
         patch.object(LoginAssetACL, 'get_review_assignees', return_value=[Mock()]).start()
-        patch('authentication.services.connection_token.get_request_os', return_value='linux').start()
+        patch(
+            'authentication.services.connection_token.get_request_os', return_value='linux'
+        ).start()
         patch('authentication.services.connection_token.ConnectMethodUtil.get_connect_method', return_value=None).start()
         self.addCleanup(patch.stopall)
 
@@ -237,9 +239,11 @@ class AssetReviewExemptionTests(SimpleTestCase):
         view = ConnectionTokenViewSet()
         view.request = SimpleNamespace(query_params={}, META={}, user=self.user)
         view._record_operate_log = Mock()
-        with patch.object(LoginAssetACL, 'filter_queryset', return_value=[self.acl, reject]), \
-                patch('authentication.services.connection_token.get_request_ip_or_data') as request_ip, \
-                patch('common.utils.timezone.local_now') as now:
+        with (
+            patch.object(LoginAssetACL, 'filter_queryset', return_value=[self.acl, reject]),
+            patch('authentication.services.connection_token.get_request_ip_or_data') as request_ip,
+            patch('common.utils.timezone.local_now') as now,
+        ):
             for ip, hour, allowed in [('192.0.2.10', 9, True), ('192.0.2.11', 9, False), ('192.0.2.10', 12, False)]:
                 request_ip.return_value = ip
                 now.return_value = datetime(2026, 9, 23, hour, 30)

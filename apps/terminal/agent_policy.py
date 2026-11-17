@@ -8,7 +8,16 @@ from perms.const import ActionChoices
 
 
 EXECUTION_MODES = frozenset(('shell', 'process', 'pipeline', 'database', 'files'))
-FILE_FIELDS = ('path', 'destination', 'size', 'sha256', 'limit', 'content', 'overwrite', 'timeout_seconds')
+FILE_FIELDS = (
+    'path',
+    'destination',
+    'size',
+    'sha256',
+    'limit',
+    'content',
+    'overwrite',
+    'timeout_seconds',
+)
 
 
 class ActionPolicy(NamedTuple):
@@ -20,24 +29,37 @@ class ActionPolicy(NamedTuple):
 COMMAND_MODES = frozenset(('shell', 'process', 'pipeline', 'database'))
 FILE_MODES = frozenset(('files',))
 ACTION_POLICIES = {
-    'execute_command': ActionPolicy(COMMAND_MODES, ('command', 'prepared_command', 'cwd', 'env', 'timeout_seconds'), ActionChoices.connect),
+    'execute_command': ActionPolicy(
+        COMMAND_MODES,
+        ('command', 'prepared_command', 'cwd', 'env', 'timeout_seconds'),
+        ActionChoices.connect,
+    ),
     'open_terminal': ActionPolicy(COMMAND_MODES, ('timeout_seconds',), ActionChoices.connect),
     'file_list': ActionPolicy(FILE_MODES, FILE_FIELDS + ('cursor',), ActionChoices.connect),
-    **{kind: ActionPolicy(FILE_MODES, FILE_FIELDS, permission) for kind, permission in (
-        ('file_stat', ActionChoices.connect),
-        ('file_read', ActionChoices.download), ('file_download', ActionChoices.download),
-        ('file_write', ActionChoices.upload), ('file_upload', ActionChoices.upload),
-        ('file_mkdir', ActionChoices.upload), ('file_remove', ActionChoices.delete),
-        ('file_rename', ActionChoices.upload | ActionChoices.delete),
-    )},
+    **{
+        kind: ActionPolicy(FILE_MODES, FILE_FIELDS, permission)
+        for kind, permission in (
+            ('file_stat', ActionChoices.connect),
+            ('file_read', ActionChoices.download),
+            ('file_download', ActionChoices.download),
+            ('file_write', ActionChoices.upload),
+            ('file_upload', ActionChoices.upload),
+            ('file_mkdir', ActionChoices.upload),
+            ('file_remove', ActionChoices.delete),
+            ('file_rename', ActionChoices.upload | ActionChoices.delete),
+        )
+    },
 }
 
 
 def allowed_actions(mode, permissions):
     if not ActionChoices.contains(permissions, ActionChoices.connect):
         return []
-    return sorted(kind for kind, policy in ACTION_POLICIES.items()
-                  if mode in policy.modes and ActionChoices.contains(permissions, policy.permission))
+    return sorted(
+        kind
+        for kind, policy in ACTION_POLICIES.items()
+        if mode in policy.modes and ActionChoices.contains(permissions, policy.permission)
+    )
 
 
 def node_capabilities(value):
@@ -49,8 +71,12 @@ def node_capabilities(value):
     if not isinstance(protocols, dict) or not 1 <= len(protocols) <= 32:
         raise ValidationError('Invalid Agent protocol capabilities')
     for protocol, mode in protocols.items():
-        if (not isinstance(protocol, str) or not re.fullmatch(r'[a-z0-9][a-z0-9_.+-]{0,15}', protocol)
-                or not isinstance(mode, str) or mode not in EXECUTION_MODES):
+        if (
+            not isinstance(protocol, str)
+            or not re.fullmatch(r'[a-z0-9][a-z0-9_.+-]{0,15}', protocol)
+            or not isinstance(mode, str)
+            or mode not in EXECUTION_MODES
+        ):
             raise ValidationError('Invalid Agent protocol capability')
     return {'version': 1, 'protocols': dict(protocols)}
 

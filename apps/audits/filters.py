@@ -106,7 +106,9 @@ class ClientUserSessionFilterSet(UserSessionFilterSet):
 
 
 class FTPLogFilterSet(BaseFilterSet):
-    category = drf_filters.ChoiceFilter(choices=FTP_CATEGORY_CHOICES, method='filter_category', label=_('Operation type'))
+    category = drf_filters.ChoiceFilter(
+        choices=FTP_CATEGORY_CHOICES, method='filter_category', label=_('Operation type')
+    )
     user = drf_filters.CharFilter(
         lookup_expr='iexact', label=_('User name')
     )

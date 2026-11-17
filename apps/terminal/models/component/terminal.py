@@ -152,11 +152,15 @@ class Terminal(StorageMixin, TerminalStatusMixin, JMSBaseModel):
         if self.type == TypeChoices.kael:
             configs.update(self.get_chat_ai_setting())
         if self.type == TypeChoices.koko:
-            configs.update({
-                'MCP_ENABLED': settings.MCP_ENABLED,
-                'MCP_PUBLIC_URL': settings.MCP_PUBLIC_URL,
-                'MCP_AUTHORIZATION_SERVER': get_mcp_authorization_server() if settings.MCP_ENABLED else '',
-            })
+            configs.update(
+                {
+                    'MCP_ENABLED': settings.MCP_ENABLED,
+                    'MCP_PUBLIC_URL': settings.MCP_PUBLIC_URL,
+                    'MCP_AUTHORIZATION_SERVER': (
+                        get_mcp_authorization_server() if settings.MCP_ENABLED else ''
+                    ),
+                }
+            )
         configs.update(self.get_xpack_license())
         configs.update({
             'SECURITY_MAX_IDLE_TIME': settings.SECURITY_MAX_IDLE_TIME,

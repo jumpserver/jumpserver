@@ -20,10 +20,12 @@ class MCPSettingSerializer(serializers.Serializer):
                     'Disable MCP access before clearing this address.'),
     )
     MCP_ENABLED = serializers.BooleanField(
-        required=False, label=_('Enable MCP access'),
+        required=False,
+        label=_('Enable MCP access'),
         help_text=_(
             'Koko retrieves this setting every 60 seconds. Disabling stops new MCP requests '
-            'while accepted operations and audit delivery finish. The authorization address uses the Site URL.'
+            'while accepted operations and audit delivery finish. '
+            'The authorization address uses the Site URL.'
         ),
     )
     MCP_DCR_ENABLED = serializers.BooleanField(
@@ -40,7 +42,9 @@ class MCPSettingSerializer(serializers.Serializer):
         resource = attrs.get('MCP_PUBLIC_URL', settings.MCP_PUBLIC_URL)
         if enabled:
             if not resource:
-                raise serializers.ValidationError({'MCP_PUBLIC_URL': _('This field is required when MCP access is enabled.')})
+                raise serializers.ValidationError(
+                    {'MCP_PUBLIC_URL': _('This field is required when MCP access is enabled.')}
+                )
             # A partial update must also validate the existing deployment value.
             try:
                 validate_mcp_resource_url(resource)
@@ -49,7 +53,13 @@ class MCPSettingSerializer(serializers.Serializer):
             try:
                 get_mcp_authorization_server(attrs.get('SITE_URL', settings.SITE_URL))
             except ImproperlyConfigured as exc:
-                raise serializers.ValidationError({'MCP_ENABLED': _('Configure a valid HTTP or HTTPS Site URL in Basic settings first.')}) from exc
+                raise serializers.ValidationError(
+                    {
+                        'MCP_ENABLED': _(
+                            'Configure a valid HTTP or HTTPS Site URL in Basic settings first.'
+                        )
+                    }
+                ) from exc
         attrs = super().validate(attrs)
         if attrs.get('MCP_ENABLED') is False:
             # Stop discovery before a cleared URL is applied by subscribers.

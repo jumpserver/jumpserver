@@ -24,7 +24,9 @@ class AgentAllowForm(AllowForm):
                 client_id=data.get('client_id'),
             ).values_list('pk', flat=True).first()
             if application_id and has_other_agent_authorizations(self.user.pk, application_id):
-                raise forms.ValidationError(agent_authorization_conflict_message(), code='mcp_client_in_use')
+                raise forms.ValidationError(
+                    agent_authorization_conflict_message(), code='mcp_client_in_use'
+                )
         if data.get('allow') and user_agent_client_limit_reached(self.user, data.get('client_id')):
             raise forms.ValidationError(user_agent_client_limit_message(), code='mcp_client_limit')
         return data

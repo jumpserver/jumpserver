@@ -9,7 +9,11 @@ from orgs.utils import tmp_to_root_org
 from terminal.const import LoginFrom
 from terminal.models import Session
 
-FTP_CATEGORY_CHOICES = [('agent', _('Agent')), ('user', _('User operation')), ('unknown', _('Unknown'))]
+FTP_CATEGORY_CHOICES = [
+    ('agent', _('Agent')),
+    ('user', _('User operation')),
+    ('unknown', _('Unknown')),
+]
 
 
 def filter_ftp_category(queryset, category):
@@ -23,7 +27,9 @@ def filter_ftp_category(queryset, category):
         if category == 'agent':
             sessions = sessions.filter(login_from=LoginFrom.AG)
         elif category == 'user':
-            sessions = sessions.filter(login_from__in=[value for value in LoginFrom.values if value != LoginFrom.AG])
+            sessions = sessions.filter(
+                login_from__in=[value for value in LoginFrom.values if value != LoginFrom.AG]
+            )
         else:
             sessions = sessions.filter(login_from__in=LoginFrom.values)
     return queryset.filter(~Exists(sessions) if category == 'unknown' else Exists(sessions))
@@ -43,6 +49,8 @@ def ftp_log_sources(logs):
     if not ids:
         return {}
     with tmp_to_root_org():
-        sessions = Session.objects.filter(pk__in=set(ids.values())).values_list('pk', 'org_id', 'login_from')
+        sessions = Session.objects.filter(pk__in=set(ids.values())).values_list(
+            'pk', 'org_id', 'login_from'
+        )
         sources = {(pk, str(org_id)): source for pk, org_id, source in sessions}
     return {log.pk: sources.get((ids.get(log.pk), str(log.org_id))) for log in logs}

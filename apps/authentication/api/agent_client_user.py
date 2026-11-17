@@ -25,12 +25,18 @@ from terminal.models import AgentApplication, AgentOAuthBinding
 __all__ = ['UserAgentClientViewSet']
 
 
-def record_client_operation(request, action, client, result):
+def record_client_operation(request, operation, client, result):
     create_or_update_operate_log(
-        action, _('Agent MCP client'), force=True,
+        operation,
+        _('Agent MCP client'),
+        force=True,
         resource_id=str(client['id']),
-        resource_display=f"{client['name']} ({client['client_id']})" if client['client_id'] else client['name'],
-        user=request.user, org_id=Organization.SYSTEM_ID, remote_addr=get_request_ip(request),
+        resource_display=(
+            f"{client['name']} ({client['client_id']})" if client['client_id'] else client['name']
+        ),
+        user=request.user,
+        org_id=Organization.SYSTEM_ID,
+        remote_addr=get_request_ip(request),
         after={
             'Client ID': {'name': 'client_id', 'value': client['client_id']},
             'Result': {'name': 'result', 'value': result},
@@ -53,7 +59,9 @@ class UserAgentClientSerializer(serializers.ModelSerializer):
         return any(binding.is_live for binding in obj.user_bindings)
 
     def get_organizations(self, obj):
-        return self.context['view'].available_organizations if self.get_all_organizations(obj) else []
+        return (
+            self.context['view'].available_organizations if self.get_all_organizations(obj) else []
+        )
 
     def get_status(self, obj):
         return 'active' if self.get_organizations(obj) else 'expired'
@@ -99,11 +107,21 @@ class UserAgentClientViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, G
         with transaction.atomic():
             # Match token issuance's application-first lock order. A refresh
             # validated before this revocation must not restore its binding.
-            application = get_object_or_404(get_application_model().objects.select_for_update(), pk=client.pk)
-            registration = get_object_or_404(AgentApplication.objects.select_for_update(), application=application)
-            if not AgentOAuthBinding.objects.filter(user=request.user, application=application).exists():
+            application = get_object_or_404(
+                get_application_model().objects.select_for_update(), pk=client.pk
+            )
+            registration = get_object_or_404(
+                AgentApplication.objects.select_for_update(), application=application
+            )
+            if not AgentOAuthBinding.objects.filter(
+                user=request.user, application=application
+            ).exists():
                 raise NotFound()
-            client_info = {'id': registration.pk, 'name': application.name, 'client_id': application.client_id}
+            client_info = {
+                'id': registration.pk,
+                'name': application.name,
+                'client_id': application.client_id,
+            }
             recycled = revoke_user_agent_client(request.user, application, registration)
             result = 'revoked only the current user authorizations in all organizations'
             if recycled:

@@ -38,9 +38,16 @@ class AgentAuditRetentionTests(TestCase):
                 date_created=self.old, date_expires=self.old, date_closed=self.old,
             )
             action = AgentAction.objects.create(
-                session=session, user=self.user, application=self.application,
-                kind='execute_command', idempotency_key=uuid.uuid4().hex, request_hash='0' * 64,
-                status='succeeded', date_created=self.old, date_started=self.old, date_finished=self.old,
+                session=session,
+                user=self.user,
+                application=self.application,
+                kind='execute_command',
+                idempotency_key=uuid.uuid4().hex,
+                request_hash='0' * 64,
+                status='succeeded',
+                date_created=self.old,
+                date_started=self.old,
+                date_finished=self.old,
             )
             event = AgentEvent.objects.create(
                 event_id=uuid.uuid4(), action=action, sequence=1, state='succeeded',
@@ -74,16 +81,31 @@ class AgentAuditRetentionTests(TestCase):
 
     def test_cleanup_preserves_active_connections_and_recent_evidence(self):
         expected = set()
-        for state in ('live', 'native', 'interactive', 'closed', 'created', 'started', 'finished', 'event'):
+        for state in (
+            'live',
+            'native',
+            'interactive',
+            'closed',
+            'created',
+            'started',
+            'finished',
+            'event',
+        ):
             session, action, event = self.graph()
             expected.add(session.pk)
             recent = self.cutoff
             if state == 'live':
-                AgentSession.objects.filter(pk=session.pk).update(date_closed=None, date_expires=timezone.now())
+                AgentSession.objects.filter(pk=session.pk).update(
+                    date_closed=None, date_expires=timezone.now()
+                )
             elif state == 'native':
-                AgentSession.objects.filter(pk=session.pk).update(terminal_session=self.terminal_session(False))
+                AgentSession.objects.filter(pk=session.pk).update(
+                    terminal_session=self.terminal_session(False)
+                )
             elif state == 'interactive':
-                AgentAction.objects.filter(pk=action.pk).update(interactive_session=self.terminal_session(False))
+                AgentAction.objects.filter(pk=action.pk).update(
+                    interactive_session=self.terminal_session(False)
+                )
             elif state == 'closed':
                 AgentSession.objects.filter(pk=session.pk).update(date_closed=recent)
             elif state == 'event':

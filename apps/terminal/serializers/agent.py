@@ -26,14 +26,22 @@ class AgentAuditSerializer(serializers.Serializer):
 
 
 class AgentSessionAuditSerializer(AgentAuditSerializer):
-    status = serializers.ChoiceField(choices=SESSION_STATUS_CHOICES, read_only=True, label=_('Status'))
-    terminal_session_id = serializers.UUIDField(read_only=True, allow_null=True, label=_('Session ID'))
+    status = serializers.ChoiceField(
+        choices=SESSION_STATUS_CHOICES, read_only=True, label=_('Status')
+    )
+    terminal_session_id = serializers.UUIDField(
+        read_only=True, allow_null=True, label=_('Session ID')
+    )
     date_expires = serializers.DateTimeField(read_only=True, label=_('Date expired'))
 
 
 class AgentActionAuditSerializer(AgentAuditSerializer):
-    kind = serializers.ChoiceField(choices=ACTION_KIND_CHOICES, read_only=True, label=_('Operation'))
-    status = serializers.ChoiceField(choices=ACTION_STATUS_CHOICES, read_only=True, label=_('Status'))
+    kind = serializers.ChoiceField(
+        choices=ACTION_KIND_CHOICES, read_only=True, label=_('Operation')
+    )
+    status = serializers.ChoiceField(
+        choices=ACTION_STATUS_CHOICES, read_only=True, label=_('Status')
+    )
     session_id = serializers.UUIDField(read_only=True, label=_('Session ID'))
     date_started = serializers.DateTimeField(read_only=True, allow_null=True, label=_('Date start'))
     date_finished = serializers.DateTimeField(read_only=True, allow_null=True, label=_('Date end'))

@@ -9,20 +9,23 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from oauth2_provider.http import OAuth2ResponseRedirect
 from oauth2_provider.models import get_application_model, get_refresh_token_model
-from oauthlib.oauth2 import InvalidScopeError, InvalidRequestError, InvalidGrantError
+from oauthlib.oauth2 import InvalidGrantError, InvalidRequestError, InvalidScopeError
 from oauthlib.oauth2.rfc6749.errors import CustomOAuth2Error
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
+from authentication.backends.oauth2_provider.agent_forms import AgentAllowForm
+from authentication.backends.oauth2_provider.client_views import ClientAuthorizationView
+from authentication.backends.oauth2_provider.validators import ClientOAuth2Validator
+from authentication.backends.oauth2_provider.views import OAuthAuthorizationServerView
+from authentication.services.agent_clients import (
+    agent_authorization_conflict_message,
+    agent_oauth_bindings,
+    has_other_agent_authorizations,
+    user_agent_client_limit_message,
+    user_agent_client_limit_reached,
+)
 from terminal.agent_service import check_agent_scope
 from terminal.models import AgentApplication, AgentOAuthBinding
-from authentication.services.agent_clients import (
-    agent_authorization_conflict_message, agent_oauth_bindings, has_other_agent_authorizations,
-    user_agent_client_limit_reached, user_agent_client_limit_message,
-)
-from .agent_forms import AgentAllowForm
-from .client_views import ClientAuthorizationView
-from .validators import ClientOAuth2Validator
-from .views import OAuthAuthorizationServerView
 
 SCOPE = 'agent:access'
 
@@ -56,31 +59,52 @@ class AgentOAuth2Validator(ClientOAuth2Validator):
             if set(request.scopes) != {SCOPE}:
                 raise InvalidScopeError(request=request)
             if request.code_challenge_method != 'S256' or not request.code_challenge:
-                raise InvalidRequestError(description='Agent clients require S256 PKCE', request=request)
-            resources = request.resource if isinstance(request.resource, list) else [request.resource]
+                raise InvalidRequestError(
+                    description='Agent clients require S256 PKCE', request=request
+                )
+            resources = (
+                request.resource if isinstance(request.resource, list) else [request.resource]
+            )
             if resources != [registration.resource]:
                 raise CustomOAuth2Error(error='invalid_target', request=request)
             request.resource = resources
             try:
                 check_agent_scope(request.user)
-            except (PermissionDenied, ValidationError):
-                raise InvalidRequestError(description='No authorized organizations are available', request=request)
+            except (PermissionDenied, ValidationError) as exc:
+                raise InvalidRequestError(
+                    description='No authorized organizations are available', request=request
+                ) from exc
             with transaction.atomic():
                 # Use the same lock order as cleanup of never-authorized DCR clients.
-                Application = get_application_model()
+                application_model = get_application_model()
                 try:
-                    Application.objects.select_for_update().get(pk=request.client.pk)
-                    registration = AgentApplication.objects.select_for_update().get(pk=registration.pk)
-                except (Application.DoesNotExist, AgentApplication.DoesNotExist):
-                    raise InvalidRequestError(description='Agent client is no longer available', request=request)
+                    application_model.objects.select_for_update().get(pk=request.client.pk)
+                    registration = AgentApplication.objects.select_for_update().get(
+                        pk=registration.pk
+                    )
+                except (application_model.DoesNotExist, AgentApplication.DoesNotExist) as exc:
+                    raise InvalidRequestError(
+                        description='Agent client is no longer available', request=request
+                    ) from exc
                 if has_other_agent_authorizations(request.user.pk, request.client.pk):
-                    raise InvalidRequestError(description=agent_authorization_conflict_message(), request=request)
+                    raise InvalidRequestError(
+                        description=agent_authorization_conflict_message(), request=request
+                    )
                 # Different clients can authorize concurrently. Serialize the
                 # per-user check before reserving a slot with the grant binding.
-                if not get_user_model().objects.select_for_update().filter(pk=request.user.pk).exists():
-                    raise InvalidRequestError(description='User is no longer available', request=request)
+                if (
+                    not get_user_model()
+                    .objects.select_for_update()
+                    .filter(pk=request.user.pk)
+                    .exists()
+                ):
+                    raise InvalidRequestError(
+                        description='User is no longer available', request=request
+                    )
                 if user_agent_client_limit_reached(request.user, request.client.client_id):
-                    raise InvalidRequestError(description=user_agent_client_limit_message(), request=request)
+                    raise InvalidRequestError(
+                        description=user_agent_client_limit_message(), request=request
+                    )
                 # An inactive registration can be reused after its previous
                 # authorization ends, without retaining another user's entry.
                 agent_oauth_bindings().filter(application=request.client, is_live=False).exclude(
@@ -135,7 +159,12 @@ class AgentOAuth2Validator(ClientOAuth2Validator):
         if SCOPE in token.get('scope', '').split():
             # Lock before the provider locks token rows, matching client deletion.
             # A request validated before deletion must not recreate its grants.
-            application = get_application_model().objects.select_for_update().filter(pk=request.client.pk).first()
+            application = (
+                get_application_model()
+                .objects.select_for_update()
+                .filter(pk=request.client.pk)
+                .first()
+            )
             if application is None or self.registration(application) is None:
                 raise InvalidGrantError(request=request)
         if not self.valid_authorization_binding(request):
@@ -203,7 +232,9 @@ class AgentAwareAuthorizationView(ClientAuthorizationView):
         return context
 
     def get(self, request, *args, **kwargs):
-        if AgentApplication.objects.filter(application__client_id=request.GET.get('client_id')).exists():
+        if AgentApplication.objects.filter(
+            application__client_id=request.GET.get('client_id')
+        ).exists():
             request.GET = request.GET.copy()
             request.GET['approval_prompt'] = 'force'
         return super().get(request, *args, **kwargs)
@@ -250,7 +281,9 @@ class AgentAuthorizationServerView(OAuthAuthorizationServerView):
             'revocation_endpoint_auth_methods_supported': ['none'],
             'code_challenge_methods_supported': ['S256'],
         }
-        from .agent_registration import configured_resource
+        from authentication.backends.oauth2_provider.agent_registration import configured_resource
         if configured_resource():
-            metadata['registration_endpoint'] = base + reverse('authentication:oauth2-provider:agent-register')
+            metadata['registration_endpoint'] = base + reverse(
+                'authentication:oauth2-provider:agent-register'
+            )
         return metadata

@@ -30,7 +30,16 @@ class AgentSessionAuditFilterSet(BaseFilterSet):
 
     class Meta:
         model = AgentSession
-        fields = ['id', 'user_id', 'user_display', 'status', 'client_id', 'asset_id', 'account', 'protocol']
+        fields = [
+            'id',
+            'user_id',
+            'user_display',
+            'status',
+            'client_id',
+            'asset_id',
+            'account',
+            'protocol',
+        ]
 
 
 class AgentActionAuditFilterSet(AgentSessionAuditFilterSet):

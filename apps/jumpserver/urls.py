@@ -7,11 +7,12 @@ import uuid
 import private_storage.urls
 from django.conf import settings
 from django.conf.urls.static import static
-from django.urls import path, include, re_path
+from django.urls import include, path, re_path
 from django.views.i18n import JavaScriptCatalog
 
-from . import views, api
 from authentication.backends.oauth2_provider.agent import AgentAuthorizationServerView
+
+from . import api, views
 
 resource_api = [
     path('index/', api.IndexApi.as_view()),

@@ -319,10 +319,11 @@ capability declaration; client-selected organization fields are rejected.
 
 Koko supplies `capabilities` during component-authenticated introspection:
 version `1` and a `protocols` mapping from adapter names to `shell`, `process`,
-`pipeline`, `database` or `files`. Declarations allow 1–32 protocol names of at most 16 characters;
-unknown versions, modes and malformed names are rejected. MCP clients cannot
-supply this declaration. Core signs it into the node-bound context and returns
-only protocols in both the declaration and current asset/account permissions.
+`pipeline`, `database` or `files`. Declarations allow 1–32 protocol names of at
+most 16 characters; unknown versions, modes and malformed names are rejected.
+MCP clients cannot supply this declaration. Core signs it into the node-bound
+context and returns only protocols in both the declaration and current
+asset/account permissions.
 
 Session creation applies the same intersection and stores the derived execution
 mode in the existing request JSON. Refreshing capabilities cannot reinterpret
@@ -467,10 +468,11 @@ Native session closure uses the existing terminal-session update flow, including
 configured end-of-session credential rotation. Repeated closure does not repeat
 that transition.
 
-Limits include 16 live sessions per user in an organization, a two-hour session lifetime, 32 pending
-actions per session, 64 KiB requests (512 KiB encoded JSON for `file_write`, whose
-UTF-8 content is separately limited to 64 KiB), 128 KiB events and 16 MiB evidence per action,
-with space reserved for final evidence. Command approval validity is 15 minutes.
+Limits include 16 live sessions per user in an organization, a two-hour session
+lifetime, 32 pending actions per session, 64 KiB requests (512 KiB encoded JSON for
+`file_write`, whose UTF-8 content is separately limited to 64 KiB), 128 KiB events
+and 16 MiB evidence per action, with space reserved for final evidence. Command
+approval validity is 15 minutes.
 The single-node release does not fail over uncertain actions to another worker.
 
 The existing daily audit cleanup applies `TERMINAL_SESSION_KEEP_DURATION` to
@@ -491,12 +493,14 @@ Run the relevant tests with an isolated PostgreSQL database and Redis and bounde
 parallelism:
 
 ```sh
-python apps/manage.py test terminal.test_agent terminal.test_agent_oauth authentication.tests.test_agent_registration settings.test_mcp_settings --parallel 1
+python apps/manage.py test terminal.test_agent terminal.test_agent_oauth \
+  authentication.tests.test_agent_registration settings.test_mcp_settings \
+  --parallel 1
 python apps/manage.py check
 python apps/manage.py makemigrations --check --dry-run
 ```
 
 These checks cover Core's execution, organization-bound OAuth, registration and
 settings contracts. Deployment acceptance separately exercises browser login,
-multi-organization authorization, asset authorization, approvals, handoff, audit access and
-reverse-proxy behavior against isolated assets.
+multi-organization authorization, asset authorization, approvals, handoff, audit
+access and reverse-proxy behavior against isolated assets.

@@ -22,8 +22,20 @@ from rest_framework.exceptions import PermissionDenied, ValidationError, APIExce
 
 from orgs.models import Organization
 from orgs.utils import tmp_to_org, tmp_to_root_org
-from terminal.agent_policy import ACTION_POLICIES, allowed_actions, context_protocols, execution_mode, node_capabilities
-from terminal.models import AgentApplication, AgentOAuthBinding, AgentSession, AgentAction, AgentEvent
+from terminal.agent_policy import (
+    ACTION_POLICIES,
+    allowed_actions,
+    context_protocols,
+    execution_mode,
+    node_capabilities,
+)
+from terminal.models import (
+    AgentApplication,
+    AgentOAuthBinding,
+    AgentSession,
+    AgentAction,
+    AgentEvent,
+)
 from users.models import User
 
 SCOPE = 'agent:access'
@@ -51,7 +63,9 @@ class ResultExpired(APIException):
 
 
 def canonical(value):
-    return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(',', ':'), allow_nan=False)
+    return json.dumps(
+        value, ensure_ascii=False, sort_keys=True, separators=(',', ':'), allow_nan=False
+    )
 
 
 def fingerprint(value):
@@ -76,8 +90,8 @@ def text_field(value, name, maximum=128, empty=False):
 def identifier(value):
     try:
         return uuid.UUID(str(value))
-    except (ValueError, TypeError, AttributeError):
-        raise ValidationError('Invalid identifier')
+    except (ValueError, TypeError, AttributeError) as exc:
+        raise ValidationError('Invalid identifier') from exc
 
 
 def integer(value, name, minimum, maximum):
@@ -87,7 +101,9 @@ def integer(value, name, minimum, maximum):
 
 
 def available_agent_organizations(user):
-    organizations = Organization.objects.exclude(id__in=(Organization.ROOT_ID, Organization.SYSTEM_ID))
+    organizations = Organization.objects.exclude(
+        id__in=(Organization.ROOT_ID, Organization.SYSTEM_ID)
+    )
     if not user.is_valid:
         return organizations.none()
     if not user.is_superuser:
@@ -114,7 +130,9 @@ def authorized_agent_org_ids(user):
 
 
 def token_authorization_binding(token, refresh=None):
-    bindings = AgentOAuthBinding.objects.filter(user_id=token.user_id, application_id=token.application_id)
+    bindings = AgentOAuthBinding.objects.filter(
+        user_id=token.user_id, application_id=token.application_id
+    )
     binding = bindings.filter(access_token=token).first()
     if binding:
         return binding
@@ -149,15 +167,23 @@ def agent_token_authority(raw, resource):
 
 
 def introspect(node, data):
-    require_keys(data, ('access_token', 'resource', 'capabilities'), ('access_token', 'resource', 'capabilities'))
+    require_keys(
+        data,
+        ('access_token', 'resource', 'capabilities'),
+        ('access_token', 'resource', 'capabilities'),
+    )
     token, refresh = agent_token_authority(data['access_token'], data['resource'])
     org_id = ALL_AGENT_ORGANIZATIONS
     resource = token.resource[0]
     payload = {
-        'user_id': str(token.user_id), 'application_id': token.application_id,
-        'client_id': token.application.client_id, 'org_id': org_id,
-        'token_id': token.pk, 'family': str(refresh.token_family) if refresh and refresh.token_family else '',
-        'node_id': str(node.id), 'resource': resource,
+        'user_id': str(token.user_id),
+        'application_id': token.application_id,
+        'client_id': token.application.client_id,
+        'org_id': org_id,
+        'token_id': token.pk,
+        'family': str(refresh.token_family) if refresh and refresh.token_family else '',
+        'node_id': str(node.id),
+        'resource': resource,
         'capabilities': node_capabilities(data['capabilities']),
     }
     expires = min(token.expires, timezone.now() + timedelta(seconds=CONTEXT_TTL))
@@ -172,7 +198,9 @@ def introspect(node, data):
 
 def context_identity(node, value):
     try:
-        context = signing.loads(text_field(value, 'context_token', 8192), salt=CONTEXT_SALT, max_age=CONTEXT_TTL)
+        context = signing.loads(
+            text_field(value, 'context_token', 8192), salt=CONTEXT_SALT, max_age=CONTEXT_TTL
+        )
         if context['node_id'] != str(node.id) or context['expires'] <= timezone.now().timestamp():
             raise PermissionDenied('Execution context expired or belongs to another node')
         user = User.objects.get(pk=context['user_id'])
@@ -184,11 +212,20 @@ def context_identity(node, value):
             application_id=context['application_id'], resource=context['resource'],
         ).exists():
             raise PermissionDenied('Agent client registration is no longer available')
-        if not authority_exists(user.id, context['application_id'], context['token_id'], context['family']):
+        if not authority_exists(
+            user.id, context['application_id'], context['token_id'], context['family']
+        ):
             raise PermissionDenied('OAuth authorization revoked')
         return context, user
-    except (signing.BadSignature, User.DoesNotExist, KeyError, TypeError, ValueError, ValidationError):
-        raise PermissionDenied('Invalid execution context')
+    except (
+        signing.BadSignature,
+        User.DoesNotExist,
+        KeyError,
+        TypeError,
+        ValueError,
+        ValidationError,
+    ) as exc:
+        raise PermissionDenied('Invalid execution context') from exc
 
 
 def authority_exists(user_id, application_id, token_id, family):
@@ -206,22 +243,33 @@ def authority_exists(user_id, application_id, token_id, family):
 
 
 def session_capability(session):
-    return signing.dumps({
-        'session_id': str(session.id), 'node_id': str(session.terminal_id), 'capability': str(session.capability),
-    }, salt=SESSION_SALT)
+    return signing.dumps(
+        {
+            'session_id': str(session.id),
+            'node_id': str(session.terminal_id),
+            'capability': str(session.capability),
+        },
+        salt=SESSION_SALT,
+    )
 
 
 def owned_session(node, session_id, capability, *, lock=False, check=True):
     try:
         decoded = signing.loads(text_field(capability, 'session_token', 8192), salt=SESSION_SALT)
-    except signing.BadSignature:
-        raise PermissionDenied('Invalid session capability')
+    except signing.BadSignature as exc:
+        raise PermissionDenied('Invalid session capability') from exc
     with tmp_to_root_org():
-        qs = AgentSession.objects.select_related('user', 'application', 'connection_token__asset', 'terminal_session')
+        qs = AgentSession.objects.select_related(
+            'user', 'application', 'connection_token__asset', 'terminal_session'
+        )
         if lock:
             qs = qs.select_related(None).select_for_update()
         session = get_object_or_404(qs, pk=identifier(session_id), terminal=node)
-    expected = {'session_id': str(session.id), 'node_id': str(node.id), 'capability': str(session.capability)}
+    expected = {
+        'session_id': str(session.id),
+        'node_id': str(node.id),
+        'capability': str(session.capability),
+    }
     if decoded != expected:
         raise PermissionDenied('Session capability mismatch')
     if check:
@@ -245,8 +293,11 @@ def check_session_grant(session):
         raise PermissionDenied('Agent session owner no longer exists')
     check_agent_organization(session.user, session.org_id)
     if not AgentApplication.objects.filter(
-        application=session.application, resource=session.resource,
-    ).exists() or not authority_exists(session.user_id, session.application_id, session.oauth_token_id, session.oauth_family):
+        application=session.application,
+        resource=session.resource,
+    ).exists() or not authority_exists(
+        session.user_id, session.application_id, session.oauth_token_id, session.oauth_family
+    ):
         raise PermissionDenied('OAuth authorization revoked')
 
 
@@ -287,8 +338,13 @@ def check_handoff_authority(session):
         protocol = session.requested['protocol']
         if execution_mode(session.requested) not in ACTION_POLICIES['open_terminal'].modes:
             raise ValidationError('This operation requires a command session')
-        account = PermAssetDetailUtil(session.user, asset).validate_permission(session.requested['account'], protocol)
-        if not ConnectionToken.has_account_permission(account, protocol) or account.date_expired <= timezone.now():
+        account = PermAssetDetailUtil(session.user, asset).validate_permission(
+            session.requested['account'], protocol
+        )
+        if (
+            not ConnectionToken.has_account_permission(account, protocol)
+            or account.date_expired <= timezone.now()
+        ):
             raise PermissionDenied('Asset account or protocol is not authorized')
 
 
@@ -307,8 +363,11 @@ def session_capabilities(session):
         check_session_authority(session, connection=False)
         mode = execution_mode(session.requested)
         with tmp_to_org(session.org_id):
-            account = PermAssetDetailUtil(session.user, session.requested['asset_id']).validate_permission(
-                session.requested['account'], session.requested['protocol'],
+            account = PermAssetDetailUtil(
+                session.user, session.requested['asset_id']
+            ).validate_permission(
+                session.requested['account'],
+                session.requested['protocol'],
             )
             if not account or account.date_expired <= timezone.now():
                 return result
@@ -325,10 +384,16 @@ def session_capabilities(session):
 def session_data(session, *, include_capabilities=False):
     action = session.actions.filter(kind='connect_asset').first()
     result = {
-        'id': str(session.id), 'status': session.status,
+        'id': str(session.id),
+        'status': session.status,
         'action_id': str(action.id) if action else None,
-        'connection_token_id': str(session.connection_token_id) if session.connection_token_id else None, 'session_token': session_capability(session),
-        'terminal_session_id': str(session.terminal_session_id) if session.terminal_session_id else None,
+        'connection_token_id': (
+            str(session.connection_token_id) if session.connection_token_id else None
+        ),
+        'session_token': session_capability(session),
+        'terminal_session_id': (
+            str(session.terminal_session_id) if session.terminal_session_id else None
+        ),
         'approval_url': f'/core/auth/agent/session/{session.id}/',
         'expires_at': session.date_expires.isoformat(),
         'protocol': session.requested.get('protocol', ''),
@@ -342,8 +407,11 @@ def session_data(session, *, include_capabilities=False):
 def create_session(node, data):
     from assets.models import Asset
 
-    require_keys(data, ('context_token', 'asset_id', 'account', 'protocol', 'idempotency_key', 'remote_addr'),
-                 ('context_token', 'asset_id', 'account', 'protocol', 'idempotency_key'))
+    require_keys(
+        data,
+        ('context_token', 'asset_id', 'account', 'protocol', 'idempotency_key', 'remote_addr'),
+        ('context_token', 'asset_id', 'account', 'protocol', 'idempotency_key'),
+    )
     context, user = context_identity(node, data['context_token'])
     key = text_field(data['idempotency_key'], 'idempotency_key')
     account = text_field(data['account'], 'account')
@@ -351,7 +419,11 @@ def create_session(node, data):
     mode = context_protocols(context).get(protocol)
     if mode is None:
         raise ValidationError('Protocol does not have an Agent execution adapter')
-    requested = {'asset_id': str(identifier(data['asset_id'])), 'account': account, 'protocol': protocol}
+    requested = {
+        'asset_id': str(identifier(data['asset_id'])),
+        'account': account,
+        'protocol': protocol,
+    }
     request_hash = fingerprint(requested)
     with tmp_to_root_org():
         org_id = get_object_or_404(
@@ -362,7 +434,11 @@ def create_session(node, data):
         # Serialize a user's creation requests, including the first request for
         # an idempotency key. Unique constraints remain the final DB boundary.
         User.objects.select_for_update().get(pk=user.pk)
-        existing = AgentSession.objects.select_for_update().filter(user=user, application_id=context['application_id'], idempotency_key=key).first()
+        existing = (
+            AgentSession.objects.select_for_update()
+            .filter(user=user, application_id=context['application_id'], idempotency_key=key)
+            .first()
+        )
         if existing:
             if (existing.request_hash != request_hash or existing.terminal_id != node.id
                     or execution_mode(existing.requested) != mode):
@@ -370,7 +446,12 @@ def create_session(node, data):
             check_session_authority(existing, connection=False)
             refresh_connection_status(existing)
             return session_data(existing, include_capabilities=True)
-        if AgentSession.objects.filter(user=user, date_closed__isnull=True, date_expires__gt=timezone.now()).count() >= 16:
+        if (
+            AgentSession.objects.filter(
+                user=user, date_closed__isnull=True, date_expires__gt=timezone.now()
+            ).count()
+            >= 16
+        ):
             raise Conflict('Agent session quota reached', code='capacity_exceeded')
         asset = get_object_or_404(Asset, pk=requested['asset_id'], is_active=True)
         remote_addr = text_field(data.get('remote_addr', ''), 'remote_addr', 128, empty=True)
@@ -396,16 +477,30 @@ def create_session(node, data):
                 # the logical session so it can request a fresh human handoff.
                 connection_request['requires_terminal'] = True
         session = AgentSession.objects.create(
-            user=user, application_id=context['application_id'], terminal=node, connection_token=token, requested=connection_request,
-            oauth_token_id=context['token_id'], oauth_family=context['family'] or None, resource=context['resource'],
-            org_id=asset.org_id, idempotency_key=key, request_hash=request_hash,
+            user=user,
+            application_id=context['application_id'],
+            terminal=node,
+            connection_token=token,
+            requested=connection_request,
+            oauth_token_id=context['token_id'],
+            oauth_family=context['family'] or None,
+            resource=context['resource'],
+            org_id=asset.org_id,
+            idempotency_key=key,
+            request_hash=request_hash,
             status='ready' if token and token.acl_ready else 'awaiting_approval',
             date_expires=timezone.now() + timedelta(seconds=SESSION_TTL),
         )
         AgentAction.objects.create(
-            session=session, user=user, application_id=session.application_id, org_id=session.org_id,
-            kind='connect_asset', idempotency_key='connect:' + str(session.id), request=requested,
-            request_hash=request_hash, status='queued' if token and token.acl_ready else 'awaiting_approval',
+            session=session,
+            user=user,
+            application_id=session.application_id,
+            org_id=session.org_id,
+            kind='connect_asset',
+            idempotency_key='connect:' + str(session.id),
+            request=requested,
+            request_hash=request_hash,
+            status='queued' if token and token.acl_ready else 'awaiting_approval',
         )
         return session_data(session, include_capabilities=True)
 
@@ -421,8 +516,12 @@ def refresh_connection_status(session):
         session.connection_token = token
     if token.acl_context.get('cancelled') or token.acl_context.get('error'):
         session.status = 'rejected'
-        session.actions.filter(kind='connect_asset', status__in=('accepted', 'queued', 'awaiting_approval')).update(
-            status='rejected', date_finished=timezone.now(), result={'error': 'Connection controls rejected or cancelled'},
+        session.actions.filter(
+            kind='connect_asset', status__in=('accepted', 'queued', 'awaiting_approval')
+        ).update(
+            status='rejected',
+            date_finished=timezone.now(),
+            result={'error': 'Connection controls rejected or cancelled'},
         )
     elif token.acl_ready:
         token.is_valid(check_expiration=not session.credentials_released)
@@ -442,7 +541,9 @@ def create_connection_token(user, requested, credentials=None, *, face_monitor_t
     if face_monitor_token:
         request.query_params['face_monitor_token'] = face_monitor_token
     values = {
-        'asset': requested['asset_id'], 'account': requested['account'], 'protocol': requested['protocol'],
+        'asset': requested['asset_id'],
+        'account': requested['account'],
+        'protocol': requested['protocol'],
         'connect_method': 'web_sftp' if execution_mode(requested) == 'files' else 'web_cli',
     }
     if credentials:
@@ -454,7 +555,9 @@ def create_connection_token(user, requested, credentials=None, *, face_monitor_t
     serializer = ConnectionTokenSerializer(data=values, context={'request': request})
     serializer.is_valid(raise_exception=True)
     if credentials and credentials.get('input_secret'):
-        serializer.validated_data['input_secret'] = text_field(credentials['input_secret'], 'input_secret', 40960)
+        serializer.validated_data['input_secret'] = text_field(
+            credentials['input_secret'], 'input_secret', 40960
+        )
     token = ConnectionTokenService.for_request(
         request, verified_remote_addr=requested.get('remote_addr', ''),
     ).create_token(serializer)
@@ -469,8 +572,8 @@ def validate_action_request(kind, request):
     maximum = 512 * 1024 if kind == 'file_write' else 65536
     try:
         size = len(canonical(request).encode())
-    except (UnicodeError, ValueError, TypeError):
-        raise ValidationError('Invalid action encoding', code='invalid_action_request')
+    except (UnicodeError, ValueError, TypeError) as exc:
+        raise ValidationError('Invalid action encoding', code='invalid_action_request') from exc
     if size > maximum:
         raise ValidationError('Action request exceeds its encoded size limit', code='request_too_large')
     if kind == 'execute_command':
@@ -522,7 +625,11 @@ def create_action(node, data):
         ).org_id
     with tmp_to_org(org_id), transaction.atomic():
         User.objects.select_for_update().get(pk=user.pk)
-        session = get_object_or_404(AgentSession.objects.select_for_update(), pk=identifier(data['session_id']), terminal=node)
+        session = get_object_or_404(
+            AgentSession.objects.select_for_update(),
+            pk=identifier(data['session_id']),
+            terminal=node,
+        )
         same_principal(context, session)
         if kind == 'open_terminal':
             check_handoff_authority(session)
@@ -535,10 +642,18 @@ def create_action(node, data):
             raise ValidationError('Working directory and environment apply only to SSH execution', code='shell_context_required')
         if kind == 'execute_command' and mode not in ACTION_POLICIES[kind].modes:
             raise ValidationError('This operation requires a command session', code='shell_session_required')
-        if kind != 'open_terminal' and (session.status != 'ready' or not session.credentials_released or not session.actions.filter(kind='connect_asset', status='succeeded').exists()):
+        if kind != 'open_terminal' and (
+            session.status != 'ready'
+            or not session.credentials_released
+            or not session.actions.filter(kind='connect_asset', status='succeeded').exists()
+        ):
             raise Conflict('Asset connection is not ready', code='connection_not_ready')
-        request_hash = fingerprint({'session_id': str(session.id), 'kind': kind, 'request': data['request']})
-        existing = AgentAction.objects.filter(user=user, application_id=session.application_id, idempotency_key=key).first()
+        request_hash = fingerprint(
+            {'session_id': str(session.id), 'kind': kind, 'request': data['request']}
+        )
+        existing = AgentAction.objects.filter(
+            user=user, application_id=session.application_id, idempotency_key=key
+        ).first()
         if existing:
             if existing.request_hash != request_hash:
                 raise Conflict('Idempotency key was already used for different parameters', code='idempotency_conflict')
@@ -547,8 +662,14 @@ def create_action(node, data):
         if session.actions.exclude(status__in=FINAL_STATES).count() >= 32:
             raise Conflict('Agent action queue is full', code='capacity_exceeded')
         action = AgentAction.objects.create(
-            session=session, user=user, application_id=session.application_id, org_id=session.org_id,
-            kind=kind, idempotency_key=key, request=data['request'], request_hash=request_hash,
+            session=session,
+            user=user,
+            application_id=session.application_id,
+            org_id=session.org_id,
+            kind=kind,
+            idempotency_key=key,
+            request=data['request'],
+            request_hash=request_hash,
         )
         return action_data(action)
 

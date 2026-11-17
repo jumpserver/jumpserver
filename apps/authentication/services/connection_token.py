@@ -123,6 +123,7 @@ class ConnectionTokenService(AuthFaceMixin):
     and administrator variants. Non-HTTP callers supply a request context and
     a validated serializer without constructing an API view.
     """
+
     input_username = ''
     need_face_verify = False
     face_monitor_token = ''
@@ -139,8 +140,8 @@ class ConnectionTokenService(AuthFaceMixin):
         if verified_remote_addr:
             try:
                 verified_remote_addr = str(ip_address(verified_remote_addr))
-            except ValueError:
-                raise ValidationError({'remote_addr': _('Invalid IP address')})
+            except ValueError as exc:
+                raise ValidationError({'remote_addr': _('Invalid IP address')}) from exc
         service.verified_remote_addr = verified_remote_addr
         return service
 
@@ -344,8 +345,14 @@ class ConnectionTokenService(AuthFaceMixin):
         if 'push_account' in data.get('acl_context', {}).get('requirements', {}):
             supplied = {
                 field: _('Same-name account provisioning uses server-managed credentials.')
-                for field in ('input_username', 'input_secret', 'input_secret_type',
-                              'personal_credential_id', 'personal_credential_version', 'save_personal_credential')
+                for field in (
+                    'input_username',
+                    'input_secret',
+                    'input_secret_type',
+                    'personal_credential_id',
+                    'personal_credential_version',
+                    'save_personal_credential',
+                )
                 if self.request.data.get(field)
             }
             if supplied:
@@ -445,7 +452,9 @@ class ConnectionTokenService(AuthFaceMixin):
         data['is_active'] = not data['acl_context'].get('requirements')
         if self.face_monitor_token and data['acl_context'].get('face_online'):
             from authentication.api.face import FaceMonitorContext
-            context = FaceMonitorContext.get_or_create_context(self.face_monitor_token, self.request.user.id)
+            context = FaceMonitorContext.get_or_create_context(
+                self.face_monitor_token, self.request.user.id
+            )
             if str(context.user_id) != str(user.id):
                 raise PermissionDenied(_('Face monitoring context belongs to a different user'))
             data['face_monitor_token'] = self.face_monitor_token
@@ -490,38 +499,63 @@ class ConnectionTokenService(AuthFaceMixin):
         if account.username == AliasAccount.INPUT:
             kwargs['account_username'] = self.input_username
         ip = self.get_remote_addr()
-        policy = LoginAssetACL.get_match_rule_acls(user, ip, LoginAssetACL.filter_queryset(**kwargs))
+        policy = LoginAssetACL.get_match_rule_acls(
+            user, ip, LoginAssetACL.filter_queryset(**kwargs)
+        )
         if not policy:
             return {}
         self._record_operate_log(policy.decision_rule, asset)
         if policy.action == policy.ActionChoices.reject:
-            raise JMSException(code='acl_reject', detail=_('ACL action is reject: {}({})').format(policy.name, policy.id))
-        username = self.input_username if account.username == AliasAccount.INPUT else account.username
+            raise JMSException(
+                code='acl_reject',
+                detail=_('ACL action is reject: {}({})').format(policy.name, policy.id),
+            )
+        username = (
+            self.input_username if account.username == AliasAccount.INPUT else account.username
+        )
         reviews = policy.pending_reviews(user, asset, username)
         requirements = {}
         for control in ('reason', 'mfa'):
             if policy.enabled(f'{control}_enabled'):
                 requirements[control] = 'pending'
-        self.need_face_verify = policy.enabled('face_verify_enabled') or policy.enabled('face_online_enabled')
+        self.need_face_verify = policy.enabled('face_verify_enabled') or policy.enabled(
+            'face_online_enabled'
+        )
         if self.need_face_verify:
             if user != self.request.user:
-                raise JMSException(code='acl_face_verify', detail=_('Use Web Terminal to complete face verification'))
+                raise JMSException(
+                    code='acl_face_verify',
+                    detail=_('Use Web Terminal to complete face verification'),
+                )
             requirements['face'] = 'pending'
         if reviews:
             requirements['review'] = 'pending'
-        if policy.enabled('push_account_enabled') and LoginAssetACL.is_same_account(user, account, username):
+        if policy.enabled('push_account_enabled') and LoginAssetACL.is_same_account(
+            user, account, username
+        ):
             from accounts.provisioning import needs_account_preparation
             if needs_account_preparation(account):
                 requirements['push_account'] = 'pending'
         if policy.enabled('face_online_enabled'):
             if connect_method not in [WebMethod.web_cli, WebMethod.web_gui]:
-                raise JMSException(code='acl_face_online_not_supported', detail=_('Online face verification requires Web Terminal'))
-            self.face_monitor_token = self.request.query_params.get('face_monitor_token', self.face_monitor_token)
+                raise JMSException(
+                    code='acl_face_online_not_supported',
+                    detail=_('Online face verification requires Web Terminal'),
+                )
+            self.face_monitor_token = self.request.query_params.get(
+                'face_monitor_token', self.face_monitor_token
+            )
             if not self.face_monitor_token:
-                raise JMSException(code='acl_face_online', detail=_('Online face monitoring context is required'))
+                raise JMSException(
+                    code='acl_face_online', detail=_('Online face monitoring context is required')
+                )
             from authentication.serializers.face import FaceMonitorContextSerializer
             try:
-                self.face_monitor_token = FaceMonitorContextSerializer().fields['face_monitor_token'].run_validation(self.face_monitor_token)
+                self.face_monitor_token = (
+                    FaceMonitorContextSerializer()
+                    .fields['face_monitor_token']
+                    .run_validation(self.face_monitor_token)
+                )
             except ValidationError as error:
                 raise ValidationError({'face_monitor_token': error.detail}) from error
         # Preserve the existing request/validation trigger, including while
@@ -535,7 +569,9 @@ class ConnectionTokenService(AuthFaceMixin):
         method = ConnectMethodUtil.get_connect_method(connect_method, protocol=protocol, os=os_name)
         login_from = method['label'] if method else connect_method
         for recipient, rule in recipients.values():
-            AssetLoginReminderMsg(recipient, asset, user, account, rule, ip, self.input_username, login_from).publish_async()
+            AssetLoginReminderMsg(
+                recipient, asset, user, account, rule, ip, self.input_username, login_from
+            ).publish_async()
         return {
             'requirements': requirements, 'username': username,
             'review_acls': [str(rule.id) for rule in reviews],
@@ -551,7 +587,9 @@ class ConnectionTokenService(AuthFaceMixin):
             if (token.acl_context.get('cancelled') or token.is_expired
                     or token.user_id != self.request.user.id or states.get('face') != 'pending'):
                 raise PermissionDenied(_('Face verification is no longer available'))
-            if self.request.data.get('retry_face') and any(states.get(key, 'passed') != 'passed' for key in ('reason', 'mfa')):
+            if self.request.data.get('retry_face') and any(
+                states.get(key, 'passed') != 'passed' for key in ('reason', 'mfa')
+            ):
                 raise ValidationError({'step': _('Complete the current connection step first')})
         context_data = {
             "action": "login_asset",
@@ -566,7 +604,9 @@ class ConnectionTokenService(AuthFaceMixin):
             for item in tokens or [token]:
                 item = ConnectionToken.objects.select_for_update().get(pk=item.pk)
                 if item.acl_context.get('cancelled'):
-                    raise PermissionDenied(_('Connection is no longer available'), code='connection_unavailable')
+                    raise PermissionDenied(
+                        _('Connection is no longer available'), code='connection_unavailable'
+                    )
                 item.acl_context['face_token'] = face_verify_token
                 item.save(update_fields=['acl_context'])
                 if item.pk == token.pk:

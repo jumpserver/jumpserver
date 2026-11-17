@@ -250,7 +250,11 @@ JUMPSERVER_UPTIME = int(time.time())
 # OAuth2 Provider settings
 OAUTH2_PROVIDER = {
     'OAUTH2_VALIDATOR_CLASS': 'authentication.backends.oauth2_provider.agent.AgentOAuth2Validator',
-    'SCOPES': {'read': 'Read scope', 'write': 'Write scope', 'agent:access': 'Execute authorized asset operations'},
+    'SCOPES': {
+        'read': 'Read scope',
+        'write': 'Write scope',
+        'agent:access': 'Execute authorized asset operations',
+    },
     'DEFAULT_SCOPES': ['read', 'write'],
     'ALLOWED_REDIRECT_URI_SCHEMES': ['https', 'jms2'],
     'PKCE_REQUIRED': True,

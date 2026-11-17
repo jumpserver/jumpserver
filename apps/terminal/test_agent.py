@@ -7,12 +7,22 @@ from unittest.mock import patch
 
 from django.core import signing
 from django.core.cache import cache
-from django.test import TestCase, TransactionTestCase, SimpleTestCase, RequestFactory, override_settings
+from django.test import (
+    TestCase,
+    TransactionTestCase,
+    SimpleTestCase,
+    RequestFactory,
+    override_settings,
+)
 from django.http import Http404
 from django.utils import timezone
 from oauthlib.common import Request as OAuthRequest
 from oauthlib.oauth2 import InvalidRequestError
-from oauth2_provider.models import get_application_model, get_access_token_model, get_refresh_token_model
+from oauth2_provider.models import (
+    get_application_model,
+    get_access_token_model,
+    get_refresh_token_model,
+)
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from authentication.backends.oauth2_provider.agent import AgentOAuth2Validator
@@ -20,7 +30,14 @@ from common.sessions.cache import SessionStore
 from orgs.models import Organization
 from orgs.utils import tmp_to_org
 from terminal import agent_service as service
-from terminal.models import AgentApplication, AgentOAuthBinding, AgentSession, AgentAction, AgentEvent, Terminal
+from terminal.models import (
+    AgentApplication,
+    AgentOAuthBinding,
+    AgentSession,
+    AgentAction,
+    AgentEvent,
+    Terminal,
+)
 from users.models import User
 
 
@@ -71,14 +88,19 @@ class AgentRequestContractTests(SimpleTestCase):
     def test_text_content_uses_utf8_bytes_and_separate_json_budget(self):
         for content in ('a' * 65536, '\n' * 65536, '\x00' * 65536, '中' * 21845):
             service.validate_action_request('file_write', {'path': '/file', 'content': content})
-        for content, code in (('a' * 65537, 'file_content_too_large'),
-                              ('中' * 21846, 'file_content_too_large'), ('\ud800', 'invalid_action_request')):
+        for content, code in (
+            ('a' * 65537, 'file_content_too_large'),
+            ('中' * 21846, 'file_content_too_large'),
+            ('\ud800', 'invalid_action_request'),
+        ):
             with self.subTest(code=code), self.assertRaises(ValidationError) as raised:
                 service.validate_action_request('file_write', {'path': '/file', 'content': content})
             self.assertEqual(raised.exception.get_codes(), [code])
 
     def test_directory_cursor_does_not_expand_other_action_fields(self):
-        service.validate_action_request('file_list', {'path': '/', 'limit': 200, 'cursor': 'position'})
+        service.validate_action_request(
+            'file_list', {'path': '/', 'limit': 200, 'cursor': 'position'}
+        )
         for kind in ('file_read', 'file_write'):
             with self.assertRaises(ValidationError):
                 service.validate_action_request(kind, {'path': '/', 'cursor': 'position'})
@@ -102,14 +124,19 @@ class AgentBoundaryTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = User.objects.create(username='agent-boundary-user', name='Agent boundary user')
-        cls.org, _ = Organization.objects.get_or_create(id=Organization.DEFAULT_ID, defaults={'name': 'Default'})
+        cls.org, _ = Organization.objects.get_or_create(
+            id=Organization.DEFAULT_ID, defaults={'name': 'Default'}
+        )
         cls.org.add_member(cls.user)
         cls.node = Terminal.objects.create(name='agent-boundary-node', type='koko')
         cls.other_node = Terminal.objects.create(name='agent-boundary-other', type='koko')
-        Application = get_application_model()
-        cls.app = Application.objects.create(
-            name='Agent boundary client', client_id='agent-boundary', client_type='public',
-            authorization_grant_type='authorization-code', redirect_uris='http://127.0.0.1/callback',
+        application_model = get_application_model()
+        cls.app = application_model.objects.create(
+            name='Agent boundary client',
+            client_id='agent-boundary',
+            client_type='public',
+            authorization_grant_type='authorization-code',
+            redirect_uris='http://127.0.0.1/callback',
             registration_source='dcr',
         )
         cls.resource = 'https://jumpserver.example/koko/mcp'
@@ -134,17 +161,37 @@ class AgentBoundaryTests(TestCase):
             user=self.user, application=self.app, access_token=self.token,
             token=uuid.uuid4().hex, token_family=uuid.uuid4(), resource=[self.resource],
         )
-        for subject in ({'access_token': self.token}, {'refresh_family': self.refresh.token_family}):
+        for subject in (
+            {'access_token': self.token},
+            {'refresh_family': self.refresh.token_family},
+        ):
             AgentOAuthBinding.objects.create(user=self.user, application=self.app, **subject)
         self.session = AgentSession.objects.create(
-            user=self.user, application=self.app, terminal=self.node, oauth_token=self.token,
-            oauth_family=self.refresh.token_family, resource=self.resource, idempotency_key='connection',
-            request_hash='0' * 64, date_expires=timezone.now() + timedelta(hours=1),
-            requested={'protocol': 'ssh', 'execution_mode': 'shell', 'asset_id': str(uuid.uuid4()), 'account': 'root'},
+            user=self.user,
+            application=self.app,
+            terminal=self.node,
+            oauth_token=self.token,
+            oauth_family=self.refresh.token_family,
+            resource=self.resource,
+            idempotency_key='connection',
+            request_hash='0' * 64,
+            date_expires=timezone.now() + timedelta(hours=1),
+            requested={
+                'protocol': 'ssh',
+                'execution_mode': 'shell',
+                'asset_id': str(uuid.uuid4()),
+                'account': 'root',
+            },
         )
         self.action = AgentAction.objects.create(
-            session=self.session, user=self.user, application=self.app, kind='file_read',
-            idempotency_key='read', request={'path': '/file'}, request_hash='1' * 64, status='dispatching',
+            session=self.session,
+            user=self.user,
+            application=self.app,
+            kind='file_read',
+            idempotency_key='read',
+            request={'path': '/file'},
+            request_hash='1' * 64,
+            status='dispatching',
         )
 
     def test_user_deletion_preserves_audit_and_revokes_execution(self):
@@ -160,7 +207,9 @@ class AgentBoundaryTests(TestCase):
         with self.assertRaises(PermissionDenied):
             service.check_session_authority(self.session, connection=False)
         # Component-bound receipts still deliver evidence after the owner is gone.
-        receipt = service.owned_session(self.node, self.session.id, service.session_capability(self.session), check=False)
+        receipt = service.owned_session(
+            self.node, self.session.id, service.session_capability(self.session), check=False
+        )
         service.append_event(self.action, {'session_token': service.session_capability(receipt),
             'event_id': str(uuid.uuid4()), 'sequence': 1, 'state': 'failed', 'payload': {'error': 'owner deleted'}})
         self.assertEqual(self.action.events.count(), 1)
@@ -376,7 +425,12 @@ class AgentBoundaryTests(TestCase):
         with self.assertRaises(PermissionDenied):
             service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource + '/other', 'capabilities': self.capabilities})
         with self.assertRaises(Http404):
-            service.owned_session(self.other_node, self.session.id, service.session_capability(self.session), check=False)
+            service.owned_session(
+                self.other_node,
+                self.session.id,
+                service.session_capability(self.session),
+                check=False,
+            )
         invalid_context = {**context, 'org_id': str(self.org.pk)}
         with self.assertRaises(PermissionDenied):
             service.context_identity(self.node, signing.dumps(invalid_context, salt=service.CONTEXT_SALT))
@@ -391,7 +445,9 @@ class AgentBoundaryTests(TestCase):
         context, _ = service.context_identity(self.node, principal['context_token'])
         self.assertEqual(service.context_protocols(context), capabilities['protocols'])
         with self.assertRaises(ValidationError):
-            service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource})
+            service.introspect(
+                self.node, {'access_token': self.token.token, 'resource': self.resource}
+            )
         context.pop('capabilities')
         with self.assertRaises(PermissionDenied):
             service.context_identity(self.node, signing.dumps(context, salt=service.CONTEXT_SALT))
@@ -505,9 +561,16 @@ class AgentBoundaryTests(TestCase):
         # The signed receipt capability still permits delayed, bounded evidence.
         self.session.date_closed = timezone.now()
         self.session.save(update_fields=['date_closed'])
-        receipt = service.owned_session(self.node, self.session.id, service.session_capability(self.session), check=False)
-        event = {'session_token': service.session_capability(receipt), 'event_id': str(uuid.uuid4()),
-                 'sequence': 1, 'state': 'failed', 'payload': {'error': 'connection lost'}}
+        receipt = service.owned_session(
+            self.node, self.session.id, service.session_capability(self.session), check=False
+        )
+        event = {
+            'session_token': service.session_capability(receipt),
+            'event_id': str(uuid.uuid4()),
+            'sequence': 1,
+            'state': 'failed',
+            'payload': {'error': 'connection lost'},
+        }
         service.append_event(self.action, event)
         service.append_event(self.action, event)
         self.assertEqual(AgentEvent.objects.filter(action=self.action).count(), 1)
@@ -522,7 +585,10 @@ class AgentBoundaryTests(TestCase):
         event['sequence'] = 1
         service.append_event(self.action, event)
         with self.assertRaises(ValidationError):
-            service.append_event(self.action, {**event, 'event_id': str(uuid.uuid4()), 'sequence': 2, 'state': 'cancelled'})
+            service.append_event(
+                self.action,
+                {**event, 'event_id': str(uuid.uuid4()), 'sequence': 2, 'state': 'cancelled'},
+            )
         service.append_event(self.action, {**event, 'event_id': str(uuid.uuid4()), 'sequence': 2,
                                           'state': 'unknown', 'payload': {'stop_confirmed': False}})
         service.append_event(self.action, {**event, 'event_id': str(uuid.uuid4()), 'sequence': 3})
@@ -629,7 +695,9 @@ class AgentBoundaryTests(TestCase):
             api.action_operation(self.node, self.action.id, {**event, 'state': 'running'})
         first = api.action_operation(self.node, self.action.id, event)
         self.assertEqual(first['status'], 'unknown')
-        self.assertEqual(api.action_operation(self.node, self.action.id, event)['status'], 'unknown')
+        self.assertEqual(
+            api.action_operation(self.node, self.action.id, event)['status'], 'unknown'
+        )
         self.action.refresh_from_db()
         self.assertEqual(self.action.events.count(), 1)
         self.assertIsNotNone(self.action.date_finished)
@@ -664,15 +732,24 @@ class AgentBoundaryTests(TestCase):
         from oauth2_provider.models import get_grant_model
         from authentication.backends.oauth2_provider.agent import AgentAwareAuthorizationView
 
-        self.app.redirect_uris = 'http://127.0.0.1/callback/client?channel=pc http://[::1]/callback/client?channel=pc'
+        self.app.redirect_uris = (
+            'http://127.0.0.1/callback/client?channel=pc http://[::1]/callback/client?channel=pc'
+        )
         self.app.save(update_fields=['redirect_uris'])
         factory, view = RequestFactory(), AgentAwareAuthorizationView.as_view()
         for secure, host in ((False, '127.0.0.1'), (True, '[::1]')):
             with self.subTest(secure=secure, host=host):
                 callback = f'http://{host}:48751/callback/client?channel=pc'
-                body = {'client_id': self.app.client_id, 'redirect_uri': callback, 'response_type': 'code',
-                        'scope': service.SCOPE, 'resource': self.resource, 'state': 'client-state',
-                        'code_challenge': 'x' * 43, 'code_challenge_method': 'S256'}
+                body = {
+                    'client_id': self.app.client_id,
+                    'redirect_uri': callback,
+                    'response_type': 'code',
+                    'scope': service.SCOPE,
+                    'resource': self.resource,
+                    'state': 'client-state',
+                    'code_challenge': 'x' * 43,
+                    'code_challenge_method': 'S256',
+                }
                 request = factory.get('/authorize/', body, secure=secure)
                 request.user = self.user
                 request.session = SessionStore()
@@ -733,15 +810,31 @@ class AgentBoundaryTests(TestCase):
         from oauth2_provider.models import get_grant_model
         from oauth2_provider.views import TokenView, RevokeTokenView
         verifier = 'a' * 64
-        challenge = base64.urlsafe_b64encode(hashlib.sha256(verifier.encode()).digest()).decode().rstrip('=')
+        challenge = (
+            base64.urlsafe_b64encode(hashlib.sha256(verifier.encode()).digest())
+            .decode()
+            .rstrip('=')
+        )
         grant = get_grant_model().objects.create(
-            user=self.user, application=self.app, code=uuid.uuid4().hex,
-            expires=timezone.now() + timedelta(minutes=1), redirect_uri='http://127.0.0.1:45678/callback',
-            scope=service.SCOPE, code_challenge=challenge, code_challenge_method='S256', resource=[self.resource],
+            user=self.user,
+            application=self.app,
+            code=uuid.uuid4().hex,
+            expires=timezone.now() + timedelta(minutes=1),
+            redirect_uri='http://127.0.0.1:45678/callback',
+            scope=service.SCOPE,
+            code_challenge=challenge,
+            code_challenge_method='S256',
+            resource=[self.resource],
         )
         AgentOAuthBinding.objects.create(user=self.user, application=self.app, grant=grant)
-        body = {'grant_type': 'authorization_code', 'code': grant.code, 'client_id': self.app.client_id,
-                'redirect_uri': grant.redirect_uri, 'resource': self.resource, 'code_verifier': 'b' * 64}
+        body = {
+            'grant_type': 'authorization_code',
+            'code': grant.code,
+            'client_id': self.app.client_id,
+            'redirect_uri': grant.redirect_uri,
+            'resource': self.resource,
+            'code_verifier': 'b' * 64,
+        }
         factory = RequestFactory()
         view = TokenView.as_view()
         bad = view(factory.post('/token/', body, secure=secure))
@@ -750,7 +843,9 @@ class AgentBoundaryTests(TestCase):
         response = view(factory.post('/token/', body, secure=secure))
         self.assertEqual(response.status_code, 200, response.content)
         result = json.loads(response.content)
-        issued = get_access_token_model().objects.get(token_checksum=hashlib.sha256(result['access_token'].encode()).hexdigest())
+        issued = get_access_token_model().objects.get(
+            token_checksum=hashlib.sha256(result['access_token'].encode()).hexdigest()
+        )
         self.assertEqual(issued.resource, [self.resource])
         refresh = get_refresh_token_model().objects.get(access_token=issued)
         rotated_response = view(factory.post('/token/', {
@@ -759,12 +854,24 @@ class AgentBoundaryTests(TestCase):
         }, secure=secure))
         self.assertEqual(rotated_response.status_code, 200, rotated_response.content)
         rotated = json.loads(rotated_response.content)
-        self.assertTrue(service.authority_exists(self.user.id, self.app.id, issued.id, refresh.token_family))
-        response = RevokeTokenView.as_view()(factory.post('/revoke/', {
-            'client_id': self.app.client_id, 'token': rotated['refresh_token'], 'token_type_hint': 'refresh_token',
-        }, secure=secure))
+        self.assertTrue(
+            service.authority_exists(self.user.id, self.app.id, issued.id, refresh.token_family)
+        )
+        response = RevokeTokenView.as_view()(
+            factory.post(
+                '/revoke/',
+                {
+                    'client_id': self.app.client_id,
+                    'token': rotated['refresh_token'],
+                    'token_type_hint': 'refresh_token',
+                },
+                secure=secure,
+            )
+        )
         self.assertEqual(response.status_code, 200)
-        self.assertFalse(service.authority_exists(self.user.id, self.app.id, issued.id, refresh.token_family))
+        self.assertFalse(
+            service.authority_exists(self.user.id, self.app.id, issued.id, refresh.token_family)
+        )
 
     def test_all_organizations_discovery_pagination_execution_and_membership_revocation(self):
         from accounts.models import Account
@@ -783,7 +890,9 @@ class AgentBoundaryTests(TestCase):
             with tmp_to_org(org):
                 asset = Asset.objects.create(name='Same asset name', address='192.0.2.2', platform=platform)
                 asset.protocols.create(name='ssh', port=22)
-                account = Account.objects.create(name='root', username='root', asset=asset, secret='test-only-secret')
+                account = Account.objects.create(
+                    name='root', username='root', asset=asset, secret='test-only-secret'
+                )
                 permission = AssetPermission.objects.create(name='Agent multi access', accounts=['root'], protocols=['ssh'])
                 permission.users.add(self.user)
                 permission.assets.add(asset)
@@ -840,10 +949,16 @@ class AgentBoundaryTests(TestCase):
         from terminal.models import Session
         platform = Platform.objects.create(name='Agent test Linux', category='host', type='linux')
         platform.protocols.create(name='ssh', port=22)
-        asset = Asset.objects.create(name='Agent test asset', address='192.0.2.1', platform=platform)
+        asset = Asset.objects.create(
+            name='Agent test asset', address='192.0.2.1', platform=platform
+        )
         asset.protocols.create(name='ssh', port=22)
-        account = Account.objects.create(name='root', username='root', asset=asset, secret='test-only-secret')
-        permission = AssetPermission.objects.create(name='Agent test access', accounts=['root'], protocols=['ssh'])
+        account = Account.objects.create(
+            name='root', username='root', asset=asset, secret='test-only-secret'
+        )
+        permission = AssetPermission.objects.create(
+            name='Agent test access', accounts=['root'], protocols=['ssh']
+        )
         permission.users.add(self.user)
         permission.assets.add(asset)
         principal = service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource, 'capabilities': self.capabilities})
@@ -993,7 +1108,9 @@ class AgentBoundaryTests(TestCase):
         platform.protocols.create(name='ssh', port=22)
         asset = Asset.objects.create(name='Agent handoff asset', address='192.0.2.2', platform=platform)
         asset.protocols.create(name='ssh', port=22)
-        account = Account.objects.create(name='root', username='root', asset=asset, secret='test-only-secret')
+        account = Account.objects.create(
+            name='root', username='root', asset=asset, secret='test-only-secret'
+        )
         permission = AssetPermission.objects.create(name='Agent handoff access', accounts=['root'], protocols=['ssh'])
         permission.users.add(self.user)
         permission.assets.add(asset)

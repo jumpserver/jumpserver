@@ -202,15 +202,22 @@ def clean_expired_agent_sessions(expire_date, batch_size=100):
                     continue
                 actions = AgentAction.objects.filter(session=session)
                 # Serialize late evidence without loading request/result JSON.
-                for _ in actions.select_for_update().values_list('pk', flat=True).iterator(chunk_size=batch_size):
+                for _action_id in (
+                    actions.select_for_update()
+                    .values_list('pk', flat=True)
+                    .iterator(chunk_size=batch_size)
+                ):
                     pass
                 events = AgentEvent.objects.filter(action__session=session)
                 recent_actions = actions.filter(
                     Q(date_created__gte=expire_date) | Q(date_started__gte=expire_date)
                     | Q(date_finished__gte=expire_date),
                 )
-                if (recent_actions.exists() or actions.filter(interactive_session__is_finished=False).exists()
-                        or events.filter(date_received__gte=expire_date).exists()):
+                if (
+                    recent_actions.exists()
+                    or actions.filter(interactive_session__is_finished=False).exists()
+                    or events.filter(date_received__gte=expire_date).exists()
+                ):
                     continue
                 delete_audit_records_in_batches(events, batch_size=batch_size)
                 delete_audit_records_in_batches(actions, batch_size=batch_size)

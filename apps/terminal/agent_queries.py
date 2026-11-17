@@ -34,9 +34,13 @@ def scoped_queryset(node, context, user, model):
             | (Q(**{path + 'oauth_family__isnull': True}) & Exists(access))
         )
         if model is AgentSession:
-            queryset = queryset.prefetch_related(Prefetch(
-                'actions', queryset=AgentAction.objects.filter(kind='connect_asset'), to_attr='connect_actions',
-            ))
+            queryset = queryset.prefetch_related(
+                Prefetch(
+                    'actions',
+                    queryset=AgentAction.objects.filter(kind='connect_asset'),
+                    to_attr='connect_actions',
+                )
+            )
         else:
             queryset = queryset.select_related('session__user', 'session__application')
     return queryset
@@ -45,13 +49,19 @@ def scoped_queryset(node, context, user, model):
 def public_session(session, *, capabilities=False):
     deadline = service.result_deadline(session)
     result = {
-        'session_id': str(session.id), 'status': session.status,
+        'session_id': str(session.id),
+        'status': session.status,
         'action_id': str(session.connect_actions[0].id) if session.connect_actions else None,
-        'asset_id': session.requested.get('asset_id'), 'account': session.requested.get('account'),
-        'org_id': session.org_id, 'protocol': session.requested.get('protocol', ''),
-        'expires_at': session.date_expires.isoformat(), 'closed': bool(session.date_closed),
+        'asset_id': session.requested.get('asset_id'),
+        'account': session.requested.get('account'),
+        'org_id': session.org_id,
+        'protocol': session.requested.get('protocol', ''),
+        'expires_at': session.date_expires.isoformat(),
+        'closed': bool(session.date_closed),
         'requires_terminal': session.requested.get('requires_terminal', False),
-        'terminal_session_id': str(session.terminal_session_id) if session.terminal_session_id else None,
+        'terminal_session_id': (
+            str(session.terminal_session_id) if session.terminal_session_id else None
+        ),
         'approval_url': f'/core/auth/agent/session/{session.id}/',
         'result_expires_at': deadline.isoformat() if deadline else None,
     }
@@ -82,7 +92,9 @@ def query(node, operation, data):
     if not sessions and data.get('session_id'):
         queryset = queryset.filter(session_id=service.identifier(data['session_id']))
     if data.get('idempotency_key'):
-        queryset = queryset.filter(idempotency_key=service.text_field(data['idempotency_key'], 'idempotency_key'))
+        queryset = queryset.filter(
+            idempotency_key=service.text_field(data['idempotency_key'], 'idempotency_key')
+        )
     if listing:
         now = timezone.now()
         cutoff = now - service.RESULT_TTL
@@ -93,7 +105,10 @@ def query(node, operation, data):
                 raise ValidationError('Action lists require session_id', code='invalid_lookup')
             queryset = queryset.filter(
                 (Q(status__in=service.FINAL_STATES) & Q(date_finished__gt=cutoff))
-                | (~Q(status__in=service.FINAL_STATES) & Q(session__date_closed__isnull=True, session__date_expires__gt=now))
+                | (
+                    ~Q(status__in=service.FINAL_STATES)
+                    & Q(session__date_closed__isnull=True, session__date_expires__gt=now)
+                )
             )
         offset = service.integer(data.get('offset', 0), 'offset', 0, 100000)
         limit = service.integer(data.get('limit', 20), 'limit', 1, 100)
@@ -101,8 +116,11 @@ def query(node, operation, data):
             queryset = queryset.filter(status=service.text_field(data['status'], 'status', 32))
         rows = list(queryset.order_by('-date_created', '-id')[offset:offset + limit + 1])
         serialize = public_session if sessions else public_action
-        return {'results': [serialize(row) for row in rows[:limit]],
-                'next_offset': offset + limit if len(rows) > limit else None, 'has_more': len(rows) > limit}
+        return {
+            'results': [serialize(row) for row in rows[:limit]],
+            'next_offset': offset + limit if len(rows) > limit else None,
+            'has_more': len(rows) > limit,
+        }
     has_id = sessions and bool(data.get('session_id'))
     if has_id == bool(data.get('idempotency_key')):
         raise ValidationError('Provide either an ID or an idempotency key', code='invalid_lookup')
@@ -111,7 +129,9 @@ def query(node, operation, data):
     else:
         matches = list(queryset[:2])
         if len(matches) > 1:
-            raise service.Conflict('Key matches more than one organization; use a resource ID', code='ambiguous_lookup')
+            raise service.Conflict(
+                'Key matches more than one organization; use a resource ID', code='ambiguous_lookup'
+            )
         instance = matches[0] if matches else get_object_or_404(queryset.none())
     service.check_result_read(instance, context)
     return public_session(instance, capabilities=True) if sessions else public_action(instance)
