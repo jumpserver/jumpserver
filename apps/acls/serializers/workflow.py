@@ -48,5 +48,7 @@ class WorkflowACLSerializerMixin(serializers.Serializer):
                 is_system=False, enabled=True, active_version__published_at__isnull=False,
             ).first()
         if not workflow:
-            raise serializers.ValidationError('Select an enabled workflow for this ACL type and organization.')
+            raise serializers.ValidationError(
+                'Select an enabled workflow for this ACL type and organization.'
+            )
         return workflow

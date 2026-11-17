@@ -121,7 +121,9 @@ class BaseUserAssetAccountACLSerializer(BaseUserACLSerializer):
         action = self.initial_data.get('action')
         if not action and self.instance:
             action = self.instance.action
-        workflow = self.initial_data.get('workflow', getattr(self.instance, 'workflow_id', None))
+        workflow = self.initial_data.get(
+            'workflow', getattr(self.instance, 'workflow_id', None),
+        )
         if action != ActionChoices.review or (not reviewers and workflow):
             return reviewers
         org_id = self.fields["org_id"].default()
