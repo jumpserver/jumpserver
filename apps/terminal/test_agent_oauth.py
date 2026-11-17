@@ -204,12 +204,52 @@ class AgentOAuthOrganizationTests(TestCase):
         from authentication.backends.oauth2_provider.agent import AgentOAuth2Validator
         result = self.issued()
         self.assertNotIn('sub', result)
-        self.assertFalse(AgentOAuth2Validator().validate_bearer_token(
-            result['access_token'], [], OAuthRequest('http://localhost/api/v1/users/profile/'),
-        ))
+        for uri in ('http://localhost/api/v1/users/profile/', self.resource):
+            request = OAuthRequest(uri)
+            with self.assertNumQueries(1):
+                self.assertFalse(AgentOAuth2Validator().validate_bearer_token(
+                    result['access_token'], [], request,
+                ))
+            self.assertIsNone(request.user)
+            self.assertIsNone(request.access_token)
         for credential in (self.app.client_id, result['access_token']):
             response = self.client.get('/api/v1/users/profile/', HTTP_AUTHORIZATION=f'Bearer {credential}')
             self.assertIn(response.status_code, (401, 403))
+
+    def test_ordinary_bearer_authentication_loads_the_token_once(self):
+        from oauthlib.common import Request as OAuthRequest
+        from authentication.backends.oauth2_provider.agent import AgentOAuth2Validator
+
+        application = get_application_model().objects.create(name='Ordinary bearer client')
+        token = get_access_token_model().objects.create(
+            user=self.user, application=application, token=uuid.uuid4().hex,
+            scope='read write', expires=timezone.now() + timedelta(hours=1),
+        )
+        request = OAuthRequest('http://localhost/api/v1/users/profile/')
+        with self.assertNumQueries(1):
+            self.assertTrue(AgentOAuth2Validator().validate_bearer_token(token.token, ['read'], request))
+        self.assertEqual(request.user.pk, self.user.pk)
+        self.assertEqual(request.access_token.pk, token.pk)
+
+    def test_registration_reuse_is_request_scoped_and_issuance_rechecks_deletion(self):
+        from oauthlib.common import Request as OAuthRequest
+        from oauthlib.oauth2 import InvalidGrantError
+        from authentication.backends.oauth2_provider.agent import AgentOAuth2Validator
+
+        validator = AgentOAuth2Validator()
+        ordinary = get_application_model().objects.create(name='Ordinary registration lookup')
+        request = OAuthRequest('http://localhost/token?_agent_registration=')
+        request.client, request.scopes = self.app, [service.SCOPE]
+        for client in (ordinary, self.app):
+            with self.assertNumQueries(1):
+                registration = validator.registration(client, request)
+                self.assertIs(validator.registration(client, request), registration)
+            self.assertEqual(registration is not None, client.pk == self.app.pk)
+        AgentApplication.objects.filter(application=self.app).delete()
+        with self.assertNumQueries(1):
+            self.assertIsNone(validator.registration(self.app, OAuthRequest('http://localhost/token')))
+        with self.assertRaises(InvalidGrantError):
+            validator.save_bearer_token({'scope': service.SCOPE}, request)
 
     def test_introspection_rechecks_resource_scope_expiry_revocation_binding_and_user(self):
         for invalid in ('client_id', 'resource', 'scope', 'expired', 'revoked', 'unbound', 'inactive_user'):

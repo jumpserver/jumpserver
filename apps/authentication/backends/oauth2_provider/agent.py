@@ -32,13 +32,19 @@ SCOPE = 'agent:access'
 
 class AgentOAuth2Validator(ClientOAuth2Validator):
     @staticmethod
-    def registration(client):
+    def registration(client, request=None):
         if client is None:
             return None
-        return AgentApplication.objects.filter(application=client).first()
+        cached = vars(request).get('_agent_registration') if request is not None else None
+        if cached is not None and cached[0] == client.pk:
+            return cached[1]
+        registration = AgentApplication.objects.filter(application=client).first()
+        if request is not None:
+            request._agent_registration = (client.pk, registration)
+        return registration
 
     def validate_scopes(self, client_id, scopes, client, request, *args, **kwargs):
-        registration = self.registration(client)
+        registration = self.registration(client, request)
         if registration:
             if set(scopes) != {SCOPE}:
                 return False
@@ -47,12 +53,12 @@ class AgentOAuth2Validator(ClientOAuth2Validator):
         return super().validate_scopes(client_id, scopes, client, request, *args, **kwargs)
 
     def get_default_scopes(self, client_id, request, *args, **kwargs):
-        if self.registration(request.client):
+        if self.registration(request.client, request):
             return [SCOPE]
         return super().get_default_scopes(client_id, request, *args, **kwargs)
 
     def save_authorization_code(self, client_id, code, request, *args, **kwargs):
-        registration = self.registration(request.client)
+        registration = self.registration(request.client, request)
         if SCOPE in request.scopes and registration is None:
             raise InvalidScopeError(request=request)
         if registration:
@@ -130,7 +136,7 @@ class AgentOAuth2Validator(ClientOAuth2Validator):
         return None
 
     def valid_authorization_binding(self, request):
-        registration = self.registration(request.client)
+        registration = self.registration(request.client, request)
         if not registration:
             return True
         if not request.user or not request.user.is_valid:
@@ -165,11 +171,12 @@ class AgentOAuth2Validator(ClientOAuth2Validator):
                 .filter(pk=request.client.pk)
                 .first()
             )
+            # The locked application must bypass request-local registration reuse.
             if application is None or self.registration(application) is None:
                 raise InvalidGrantError(request=request)
         if not self.valid_authorization_binding(request):
             raise InvalidGrantError(request=request)
-        binding = self.authorization_binding(request) if self.registration(request.client) else None
+        binding = self.authorization_binding(request) if self.registration(request.client, request) else None
         result = super()._save_bearer_token(token, request, *args, **kwargs)
         if binding:
             access = self._load_access_token(token['access_token'])
@@ -191,7 +198,7 @@ class AgentOAuth2Validator(ClientOAuth2Validator):
 
     def _check_and_set_request_resource(self, request):
         super()._check_and_set_request_resource(request)
-        registration = self.registration(request.client)
+        registration = self.registration(request.client, request)
         if registration and request.resource != [registration.resource]:
             raise CustomOAuth2Error(error='invalid_target', request=request)
 
@@ -199,10 +206,13 @@ class AgentOAuth2Validator(ClientOAuth2Validator):
         # Agent tokens are resource capabilities, never general Core API logins.
         # Component introspection validates them directly. Only
         # component-authenticated introspection issues execution capabilities.
-        access_token = self._load_access_token(token) if token else None
-        if access_token and SCOPE in access_token.scope.split():
+        if not super().validate_bearer_token(token, scopes, request):
             return False
-        return super().validate_bearer_token(token, scopes, request)
+        if SCOPE in request.access_token.scope.split():
+            request.client = request.user = request.access_token = None
+            request.scopes = []
+            return False
+        return True
 
 
 class AgentAwareAuthorizationView(ClientAuthorizationView):
