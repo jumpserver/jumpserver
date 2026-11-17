@@ -55,7 +55,13 @@ class WorkflowInitializationTests(TestCase):
             self.assertIsNotNone(workflow.active_version.published_at)
             config = workflow.active_version.nodes.get(type='approval').config
             self.assertEqual(config['strategy'], 'any')
-            self.assertEqual(config['approvers'], {'type': 'role', 'value': [BuiltinRole.system_admin.id]})
+            expected = {'type': 'role', 'value': [BuiltinRole.system_admin.id]}
+            if workflow.legacy_flow_id:
+                expected = {'type': 'user_selector', 'value': {
+                    'type': 'attrs', 'attrs': [{'name': 'system_roles', 'match': 'm2m',
+                                              'value': [BuiltinRole.system_admin.id]}],
+                }}
+            self.assertEqual(config['approvers'], expected)
         initialize_workflows()
         with tmp_to_root_org():
             self.assertEqual(list(Workflow.objects.values_list('id', 'enabled', 'active_version_id')), before)
@@ -151,16 +157,17 @@ class WorkflowInitializationTests(TestCase):
         with self.assertRaises(WorkflowConfigurationError):
             WorkflowEngine().start(ticket, inherited, {})
 
-    def test_complex_legacy_selector_is_not_silently_enabled_as_fixed_users(self):
+    def test_legacy_attribute_selector_is_enabled_without_fixed_users(self):
         selector = {'type': 'attrs', 'attrs': [{'name': 'username', 'match': 'exact', 'value': self.alice.username}]}
         flow = TicketFlow.objects.create(type='general', name='Complex custom rule')
         flow.rules.add(ApprovalRule.objects.create(users=selector))
-        with self.assertLogs('tickets.migrations.0010_ticket_workflow_refactor', level='WARNING'):
-            initialize_workflows()
+        initialize_workflows()
         workflow = Workflow.objects.get(legacy_flow_id=flow.pk)
-        self.assertFalse(workflow.enabled)
-        self.assertTrue(workflow.migration_notes['requires_review'])
+        self.assertTrue(workflow.enabled)
+        self.assertFalse(workflow.migration_notes['requires_review'])
         self.assertEqual(workflow.migration_notes['rules'][0]['legacy_selector'], selector)
+        self.assertEqual(workflow.active_version.nodes.get(type='approval').config['approvers'],
+                         {'type': 'user_selector', 'value': selector})
 
     def test_local_flow_overrides_only_same_named_global_flow(self):
         with tmp_to_root_org():

@@ -783,7 +783,7 @@ class WorkflowTests(TestCase):
         self.assertIsNone(event.actor_id)
         self.assertEqual(event.actor_snapshot['username'], 'workflow-alice')
 
-    def test_legacy_import_is_previewable_idempotent_and_disabled(self):
+    def test_legacy_import_is_previewable_idempotent_and_enabled(self):
         flow = TicketFlow.objects.create(name='Legacy test flow', type='general')
         rule = ApprovalRule.objects.create(users={'type': 'ids', 'ids': [str(self.alice.pk)]})
         flow.rules.add(rule)
@@ -794,9 +794,9 @@ class WorkflowTests(TestCase):
         for _ in range(2):
             call_command('migrate_ticket_workflows', flow_id=str(flow.pk), apply=True, stdout=StringIO())
         workflow = Workflow.objects.get(legacy_flow_id=flow.pk)
-        self.assertFalse(workflow.enabled)
+        self.assertTrue(workflow.enabled)
         self.assertEqual(workflow.versions.count(), 1)
-        self.assertTrue(workflow.migration_notes['requires_review'])
+        self.assertFalse(workflow.migration_notes['requires_review'])
         self.assertTrue(TicketFlow.objects.filter(pk=flow.pk).exists())
 
 

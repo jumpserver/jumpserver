@@ -17,7 +17,9 @@ from orgs.utils import current_org, tmp_to_org
 from tickets.models import (
     Ticket, Workflow, WorkflowInstance, WorkflowNodeInstance, ApprovalTask, WorkflowEvent,
 )
-from .approvers import available_users, resolve_approvers, user_snapshot, excluded_approver_ids
+from .approvers import (
+    available_users, resolve_approvers, user_snapshot, excluded_approver_ids, selected_users,
+)
 from .conditions import evaluate_condition
 from .const import InstanceState, NodeState, TaskState
 from .definition import json_snapshot
@@ -79,6 +81,19 @@ class WorkflowEngine:
             raise WorkflowConfigurationError(gettext('A workflow requires an applicant.'))
         # Identity is authoritative; adapters may add department/manager metadata.
         applicant.update(user_snapshot(ticket.applicant))
+        selections = {}
+        for node in version.nodes.filter(type='approval', config__approvers__type='user_selector'):
+            users = selected_users(node.config['approvers']['value'], ticket.org_id)
+            ids = [str(pk) for pk in users.order_by('id').values_list('pk', flat=True)[:1001]]
+            if not 1 <= len(ids) <= 1000:
+                raise WorkflowConfigurationError(gettext(
+                    'An approval node must resolve between 1 and 1000 eligible approvers.'
+                ))
+            selections[node.key] = ids
+        snapshot.pop('approver_selections', None)
+        if selections:
+            snapshot['approver_selections'] = selections
+            snapshot = json_snapshot(snapshot)
         with tmp_to_org(ticket.org_id):
             instance = WorkflowInstance.objects.create(
                 ticket=ticket, version=version, applicant=ticket.applicant,
