@@ -34,6 +34,8 @@ ARG PIP_MIRROR=https://pypi.org/simple
 RUN set -ex \
     && uv pip install -i${PIP_MIRROR} --extra-index-url https://pypi.org/simple/ --group xpack \
     && python -c "import cv2" \
+    && python -c "import dmPython, clickhouse_driver, pymysql" \
+    && python -c "import importlib, platform; importlib.import_module('ibm_db') if platform.machine() != 'aarch64' else None" \
     && rm -rf /root/.cache/
 
 COPY --from=gmssl-builder /usr/local/lib/libgmssl.so* /usr/local/lib/

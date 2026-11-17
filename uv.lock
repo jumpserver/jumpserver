@@ -1003,6 +1003,30 @@ wheels = [
 ]
 
 [[package]]
+name = "clickhouse-driver"
+version = "0.2.11"
+source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
+dependencies = [
+    { name = "pytz" },
+    { name = "tzlocal" },
+]
+sdist = { url = "https://mirrors.aliyun.com/pypi/packages/da/75/42c6c0f1e0b84213ff096f913ac0ff82037da6f06754bff28685b2d1e23a/clickhouse_driver-0.2.11.tar.gz", hash = "sha256:1bec70343bde9e9a55c2254c5960d34c682ff7d60256589226d96c67a112f95a" }
+wheels = [
+    { url = "https://mirrors.aliyun.com/pypi/packages/0d/3b/47c4143d003011aa3977b3ab3eafa2ae338cb483387886700c384488226a/clickhouse_driver-0.2.11-cp314-cp314-macosx_10_15_x86_64.whl", hash = "sha256:3e1c3b08907e836de894054d4c66bcf1415cd0a3fe94e3e2c865abe43a635c82" },
+    { url = "https://mirrors.aliyun.com/pypi/packages/2d/10/b1ba901d7c71360cafa594130ac43b65f5574e1b03a6fb0c3000c28b68ae/clickhouse_driver-0.2.11-cp314-cp314-macosx_11_0_arm64.whl", hash = "sha256:eb88ef5ed671e260a6493d7f16f12e21a4f2d04afcfb58c3200324f9621dc553" },
+    { url = "https://mirrors.aliyun.com/pypi/packages/6c/cb/68508736b1a537b48a64b053ffbd5b62bd7384ddee97e77efb392164cac7/clickhouse_driver-0.2.11-cp314-cp314-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:47b72c26343a2b946e589a4d5de259c3705f6969facfd4b283a6c5015fc67c92" },
+    { url = "https://mirrors.aliyun.com/pypi/packages/9e/a8/8e4d7cb2ae58919313c6f4d8641a49c41dc15540572efbd88a46893c0f36/clickhouse_driver-0.2.11-cp314-cp314-manylinux2014_ppc64le.manylinux_2_17_ppc64le.manylinux_2_28_ppc64le.whl", hash = "sha256:fd3b1af7c7174428007b20bbec4c60699758e20cf6beba45c61039762a06116a" },
+    { url = "https://mirrors.aliyun.com/pypi/packages/58/85/ae1be44941e46660aebd70d2ce05729a7edffa42663e31892c4a98910fb7/clickhouse_driver-0.2.11-cp314-cp314-manylinux2014_s390x.manylinux_2_17_s390x.manylinux_2_28_s390x.whl", hash = "sha256:5540cfbae18997e625c4fd8ec9875da46c816143c6456cab9a11adfaed38cc34" },
+    { url = "https://mirrors.aliyun.com/pypi/packages/ae/a9/52d086fa76adee9961434b7672706e0403ee09a0c3c49d5c713391d15e36/clickhouse_driver-0.2.11-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:d7c9152bfdfd4ebe0fb3b1c4320f39e3b88c8f4f3c6b3db625a5c0cb5b86f955" },
+    { url = "https://mirrors.aliyun.com/pypi/packages/2f/0e/6aafbe06ac73d061554bdbc7dae28b564c0e17619b266e661e235a71b297/clickhouse_driver-0.2.11-cp314-cp314-musllinux_1_2_aarch64.whl", hash = "sha256:2fa0a4a72618f06c0ee308117253fe351161a562aea8b31641fcbf7d9ad6080d" },
+    { url = "https://mirrors.aliyun.com/pypi/packages/f9/3a/97593f51c0ead217705c46e90f6f23522fd9f252a3f27c84acc38c04113b/clickhouse_driver-0.2.11-cp314-cp314-musllinux_1_2_ppc64le.whl", hash = "sha256:94593758fa36195fe56199422fe8188cabd6403c3950140cd8cffbd89af34f24" },
+    { url = "https://mirrors.aliyun.com/pypi/packages/c9/d3/9c4a2b7d589e86ea635d85137ed3c5228069cdb780c1919be0f533728b72/clickhouse_driver-0.2.11-cp314-cp314-musllinux_1_2_s390x.whl", hash = "sha256:aa3961a892b94aaa83571e773347d7f36ab5e1334c6711bfd63f611b88c4c541" },
+    { url = "https://mirrors.aliyun.com/pypi/packages/76/58/005fa6ae82131404a1a0053043f7711332c01cf0c0e6863268f0be104e12/clickhouse_driver-0.2.11-cp314-cp314-musllinux_1_2_x86_64.whl", hash = "sha256:0e09e4f2cff823027a222c5bd8d9b3b3ca7d70f26ef0dccd2e496820280333ed" },
+    { url = "https://mirrors.aliyun.com/pypi/packages/0b/0e/334868a895896fc83262200f06b8e25c0573f2e5a7299ebbdb1fdbbb3230/clickhouse_driver-0.2.11-cp314-cp314-win32.whl", hash = "sha256:688a2cd31a7fd87a9f2a1bb669a04874b5ae17bbca22a373610e84aa241b1e9a" },
+    { url = "https://mirrors.aliyun.com/pypi/packages/7b/51/900211ab9390f64edef10564a206e2dca89fc49a4191aee870d2c18002f6/clickhouse_driver-0.2.11-cp314-cp314-win_amd64.whl", hash = "sha256:0a67ce59def2e08cbda1cf12d9e8a7a6879cee8048ee46bbd415e9111033f775" },
+]
+
+[[package]]
 name = "colorama"
 version = "0.4.6"
 source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
@@ -1451,6 +1475,15 @@ dependencies = [
     { name = "setuptools" },
 ]
 sdist = { url = "https://mirrors.aliyun.com/pypi/packages/32/f8/79fd8c1919fd1e033eedc04fea3396e978eb20c9cda49a0c538e9c5d8127/djangorestframework-bulk-0.2.1.tar.gz", hash = "sha256:39230d8379acebd86d313df6c9150cafecb636eae1d097c30a26389ab9fee5b1" }
+
+[[package]]
+name = "dmpython"
+version = "2.6.1"
+source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
+wheels = [
+    { url = "https://mirrors.aliyun.com/pypi/packages/1c/b5/2289fb7d72d808e13b1fadf5afe0c661ffc2709d23ac54ade7b65d4a7210/dmpython-2.6.1-cp314-cp314-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:d6e11e8fde6f12b4c1558fc4be77831bc6516a3789a6c4dba53f1bf8e0fc7952" },
+    { url = "https://mirrors.aliyun.com/pypi/packages/34/bf/44b6687478dc46e2d4f25aa19e094cd490aa0b9baa35a6d23e9ade4d9f47/dmpython-2.6.1-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:14153a9678c9227b00753a82e0f304be4497aeea2426a189e137a9aeebc03a9f" },
+]
 
 [[package]]
 name = "dnspython"
@@ -2025,6 +2058,20 @@ wheels = [
 ]
 
 [[package]]
+name = "ibm-db"
+version = "3.3.0"
+source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
+sdist = { url = "https://mirrors.aliyun.com/pypi/packages/dc/9d/9f31efe9462a220d3e4e19dc96839b97a8dcd4203e9245a0497cfae6f683/ibm_db-3.3.0.tar.gz", hash = "sha256:75c6749957d202e0b6b37e1e823583bfc37b65293ee123fb287e409d7426b53d" }
+wheels = [
+    { url = "https://mirrors.aliyun.com/pypi/packages/30/05/ab600ea4f0f363a718301538d5486e78d8fe161cf43e54a11158894a829c/ibm_db-3.3.0-cp314-cp314-macosx_10_15_x86_64.whl", hash = "sha256:ca2b883ff25917e8d4dfed803237fbc4338f410c02a9903dfa7f520200949917" },
+    { url = "https://mirrors.aliyun.com/pypi/packages/c8/0b/de56a5604863271d02e8ec9d0678624e539a16ada629b7e51099abc079a6/ibm_db-3.3.0-cp314-cp314-macosx_14_0_arm64.whl", hash = "sha256:d581fb7ee2f530c201421885449ec006f5aaf7f75777dece784fe814b837464a" },
+    { url = "https://mirrors.aliyun.com/pypi/packages/e1/ff/d98118f15ba99833ac06ba5fac971b55ec4fdbf884bd41ccd616de6f0a20/ibm_db-3.3.0-cp314-cp314-manylinux_2_34_i686.whl", hash = "sha256:0a636f497ef04f91539f74f9fd87565ed5fdcbadfc0bfbb23f25cfafd9074c75" },
+    { url = "https://mirrors.aliyun.com/pypi/packages/86/03/01f4e2b5c24c215c617bcd7847fa2b1589af956ff54cbf2df647355db21b/ibm_db-3.3.0-cp314-cp314-manylinux_2_34_x86_64.whl", hash = "sha256:298601d9398e5607e0c5a6ff8e199c62f8022f40ef0539d7d0d049023027bb68" },
+    { url = "https://mirrors.aliyun.com/pypi/packages/59/40/b51baa290894a1a03cda1bc9dcc2fa894646d6667104a2c5e20403a96cc3/ibm_db-3.3.0-cp314-cp314-win32.whl", hash = "sha256:5388f49c02b8c0a85b4185dda769c4c235bde834a4226c7702cf346c082d84cb" },
+    { url = "https://mirrors.aliyun.com/pypi/packages/8e/c6/56cd5755b4d8d8ada62892ae3e857242fe1c497f6e1ca8484c351e6cb728/ibm_db-3.3.0-cp314-cp314-win_amd64.whl", hash = "sha256:c546059d68a032f960b0e26208877cd79b1e3102928034998c5d40093be61dc9" },
+]
+
+[[package]]
 name = "idna"
 version = "3.19"
 source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
@@ -2459,10 +2506,13 @@ xpack = [
     { name = "azure-mgmt-network" },
     { name = "azure-mgmt-subscription" },
     { name = "bce-python-sdk" },
+    { name = "clickhouse-driver" },
     { name = "django-vastbase-backend" },
+    { name = "dmpython", marker = "sys_platform == 'linux'" },
     { name = "google-cloud-compute" },
     { name = "huaweicloudsdkcore" },
     { name = "huaweicloudsdkecs" },
+    { name = "ibm-db", marker = "platform_machine != 'aarch64'" },
     { name = "insightface" },
     { name = "keystoneauth1" },
     { name = "numpy" },
@@ -2470,10 +2520,12 @@ xpack = [
     { name = "opencv-python" },
     { name = "oracledb" },
     { name = "protobuf" },
+    { name = "pymysql" },
     { name = "python-keystoneclient" },
     { name = "python-novaclient" },
     { name = "qingcloud-sdk" },
     { name = "requests-unixsocket" },
+    { name = "sqlparse" },
     { name = "tencentcloud-sdk-python" },
     { name = "ucloud-sdk-python3" },
     { name = "volcengine-python-sdk" },
@@ -2644,10 +2696,13 @@ xpack = [
     { name = "azure-mgmt-network", specifier = "==23.1.0" },
     { name = "azure-mgmt-subscription", specifier = "==3.1.1" },
     { name = "bce-python-sdk", specifier = "==0.8.87" },
+    { name = "clickhouse-driver", specifier = "==0.2.11" },
     { name = "django-vastbase-backend", specifier = "==0.1.1" },
+    { name = "dmpython", marker = "sys_platform == 'linux'", specifier = "==2.6.1" },
     { name = "google-cloud-compute", specifier = "==1.47.0" },
     { name = "huaweicloudsdkcore", specifier = "==3.1.52" },
     { name = "huaweicloudsdkecs", specifier = "==3.1.52" },
+    { name = "ibm-db", marker = "platform_machine != 'aarch64'", specifier = "==3.3.0" },
     { name = "insightface", specifier = ">=1.0.1" },
     { name = "keystoneauth1", specifier = "==5.2.1" },
     { name = "numpy", specifier = ">=2.0" },
@@ -2655,10 +2710,12 @@ xpack = [
     { name = "opencv-python", specifier = ">=5.0.0" },
     { name = "oracledb", specifier = "==3.4.2" },
     { name = "protobuf", specifier = ">=5.29.6" },
+    { name = "pymysql", specifier = "==1.2.4" },
     { name = "python-keystoneclient", specifier = "==5.1.0" },
     { name = "python-novaclient", specifier = "==18.3.0" },
     { name = "qingcloud-sdk", specifier = "==1.2.15" },
     { name = "requests-unixsocket", specifier = "==0.4.1" },
+    { name = "sqlparse", specifier = "==0.6.0" },
     { name = "tencentcloud-sdk-python", specifier = "==3.0.941" },
     { name = "ucloud-sdk-python3", specifier = "==0.11.50" },
     { name = "volcengine-python-sdk", specifier = "==1.0.71" },
@@ -3973,6 +4030,15 @@ wheels = [
     { url = "https://mirrors.aliyun.com/pypi/packages/e4/df/7c16584f9b043939cb4b331fde6cf47f4ba62454e023e941cb63a8b13653/pymssql-2.3.10-cp314-cp314-musllinux_1_2_x86_64.whl", hash = "sha256:cb37a6bcba5bb8627163b7907187153bb8336961b80a5324a2e2e2d83e6c8c09" },
     { url = "https://mirrors.aliyun.com/pypi/packages/3f/51/6de17208de0a9e1ae01353d99faa1eb9a03ebfc2d714ae1a00546e0b81f3/pymssql-2.3.10-cp314-cp314-win32.whl", hash = "sha256:aa141499a40f8a97488e8020c39566a6e6fe742911fa79e016e2f0e134e546ad" },
     { url = "https://mirrors.aliyun.com/pypi/packages/27/6c/43424b256d72541672803c16a6e0b8d4cd739436a3f474dae6e668379ba0/pymssql-2.3.10-cp314-cp314-win_amd64.whl", hash = "sha256:8a4e5f104db516840415774b24a465d171ba923fbb6cd865eff94b0c176d918a" },
+]
+
+[[package]]
+name = "pymysql"
+version = "1.2.4"
+source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
+sdist = { url = "https://mirrors.aliyun.com/pypi/packages/c8/69/808dc3d9bcc7d2841cdc2909b978c64eb1c450b7cd7b42d5907f7de7567d/pymysql-1.2.4.tar.gz", hash = "sha256:491558165b8e11f3644c5f9cfb30cc9c9111ffd54e53d3aa91b9a0a20be2294f" }
+wheels = [
+    { url = "https://mirrors.aliyun.com/pypi/packages/a3/60/acffa1e7261fdc68fadf6f196b66058e03dcb3df239f2c0acbfd11165845/pymysql-1.2.4-py3-none-any.whl", hash = "sha256:e169bed906168fffd0088925f45b3df024c2775c6fd128da0df773d47c458840" },
 ]
 
 [[package]]

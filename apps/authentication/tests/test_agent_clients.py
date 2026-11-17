@@ -1,6 +1,6 @@
 import uuid
 from datetime import timedelta
-from unittest.mock import patch
+from unittest.mock import ANY, patch
 
 from django.conf import settings
 from django.test import SimpleTestCase, TestCase
@@ -39,7 +39,7 @@ class AgentClientPrivacyTests(SimpleTestCase):
             return_value={'scanned': 0, 'deleted': 0, 'skipped': 0},
         ) as clients:
             clear_oauth2_provider_expired_tokens()
-            logins.assert_called_once_with()
+            logins.assert_called_once_with(task_log=ANY)
             tokens.assert_called_once_with()
             bindings.assert_called_once_with()
             clients.assert_called_once_with()

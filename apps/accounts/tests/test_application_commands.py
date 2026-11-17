@@ -14,7 +14,7 @@ from accounts.models import (
 )
 from accounts.tests.base import CredentialTestCase
 from django.db import transaction
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, override_settings
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 
 
@@ -169,6 +169,19 @@ class ApplicationCommandTests(CredentialTestCase):
         self.assertEqual(response.status_code, 403, response.data)
         self.assertFalse(ApplicationCommand.objects.exists())
 
+    @override_settings(XPACK_LICENSE_IS_VALID=False)
+    def test_switch_request_requires_a_license(self):
+        view = IntegrationApplicationViewSet.as_view({'post': 'send_event'})
+        with transaction.atomic():
+            response = view(self.request('post', '/', {
+                'event': commands.SWITCH, 'credential_id': str(self.credential.id),
+                'client_ids': [str(self.client.id)],
+            }), pk=self.application.id)
+        self.assertEqual(response.status_code, 403, response.data)
+        self.assertEqual(response.data['code'], 'license_required')
+        self.assertFalse(ApplicationCommand.objects.exists())
+
+    @override_settings(XPACK_LICENSE_IS_VALID=False)
     def test_admin_send_and_history_and_client_poll_result_endpoints(self):
         send_view = IntegrationApplicationViewSet.as_view({'post': 'send_event'})
         response = send_view(self.request('post', '/', {

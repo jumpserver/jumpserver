@@ -201,7 +201,7 @@ class Applet(JMSBaseModel):
     def filter_available_hosts(self):
         hosts = self.hosts.filter(is_active=True)
 
-        if not hosts:
+        if not hosts.exists():
             logger.info("No active host for applet: {}".format(self.name))
             return None
 

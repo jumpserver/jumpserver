@@ -6,7 +6,7 @@ from celery import shared_task
 from celery.exceptions import SoftTimeLimitExceeded
 from django.conf import settings
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 from django_celery_beat.models import PeriodicTask
 
 from common.const.crontab import CRONTAB_AT_AM_TWO
@@ -18,6 +18,7 @@ from orgs.utils import tmp_to_org, tmp_to_root_org
 from .celery.decorator import (
     register_as_period_task, after_app_ready_start
 )
+from .celery.task_logging import TaskLog
 from .celery.utils import (
     create_or_update_celery_periodic_tasks, get_celery_periodic_task,
     disable_celery_periodic_task, delete_celery_periodic_task
@@ -120,21 +121,31 @@ def run_ops_job_execution(execution_id, **kwargs):
 @after_app_ready_start
 def clean_celery_periodic_tasks():
     """清除celery定时任务"""
-    logger.info('Start clean celery periodic tasks.')
+    logger.info(gettext('Checking periodic tasks; tasks still registered in the worker will be kept.'))
     register_tasks = PeriodicTask.objects.all()
+    checked = cleaned = kept = failed = 0
     for task in register_tasks:
+        checked += 1
         if task.task in app.tasks:
+            kept += 1
             continue
 
         task_name = task.name
-        logger.info('Start clean task: {}'.format(task_name))
+        logger.info(gettext('Removing periodic task %(name)s: its task is no longer registered.'), {
+            'name': task_name,
+        })
         disable_celery_periodic_task(task_name)
         delete_celery_periodic_task(task_name)
         task = get_celery_periodic_task(task_name)
         if task is None:
-            logger.info('Clean task success: {}'.format(task_name))
+            cleaned += 1
         else:
-            logger.info('Clean task failure: {}'.format(task))
+            failed += 1
+            logger.warning(gettext('Periodic task %(name)s still exists after cleanup.'), {'name': task_name})
+    logger.info(gettext(
+        'Periodic tasks checked: %(checked)s; deleted: %(cleaned)s; '
+        'kept because still registered: %(kept)s; cleanup failures: %(failed)s.'
+    ), {'checked': checked, 'cleaned': cleaned, 'kept': kept, 'failed': failed})
 
 
 @shared_task(
@@ -148,8 +159,21 @@ def clean_celery_periodic_tasks():
 @after_app_ready_start
 def create_or_update_registered_periodic_tasks():
     from .celery.decorator import get_register_period_tasks
+    logger.info(gettext('Starting periodic task registration.'))
+    checked = created = updated = skipped = 0
     for task in get_register_period_tasks():
-        create_or_update_celery_periodic_tasks(task)
+        checked += 1
+        result = create_or_update_celery_periodic_tasks(task)
+        if result is None:
+            skipped += 1
+        elif result[1]:
+            created += 1
+        else:
+            updated += 1
+    logger.info(gettext(
+        'Periodic tasks checked: %(checked)s; created: %(created)s; '
+        'updated: %(updated)s; skipped: %(skipped)s.'
+    ), {'checked': checked, 'created': created, 'updated': updated, 'skipped': skipped})
 
 
 @shared_task(
@@ -161,9 +185,20 @@ def create_or_update_registered_periodic_tasks():
 )
 @register_as_period_task(interval=300)
 def check_server_performance_period():
-    if os.environ.get('SKIP_SERVER_PERFORMANCE_CHECK', False):
-        return
-    ServerPerformanceCheckUtil().check_and_publish()
+    with TaskLog(logger, gettext('Periodic check service performance')) as log:
+        if os.environ.get('SKIP_SERVER_PERFORMANCE_CHECK', False):
+            log.skip(gettext('Service performance checks are disabled by configuration.'), 0)
+            return
+        checker = ServerPerformanceCheckUtil()
+        checker.check()
+        log.checked = len(checker._terminals) + checker.inactive_count
+        log.processed = len(checker._terminals)
+        if checker.inactive_count:
+            log.skip(gettext('The component is inactive.'), checker.inactive_count)
+        log.metric(gettext('Components with health alerts'), len(checker.terms_with_errors))
+        checker.publish()
+        if not checker.terms_with_errors:
+            logger.info(gettext('No health alerts to send.'))
 
 
 @shared_task(
@@ -177,8 +212,17 @@ def check_server_performance_period():
 )
 @register_as_period_task(interval=3600)
 def clean_up_unexpected_jobs():
+    logger.info(gettext('Checking running jobs; jobs older than %(hours)s hours will be marked failed.'), {
+        'hours': 3,
+    })
     with tmp_to_root_org():
-        JobExecution.clean_unexpected_execution()
+        checked, cleaned = JobExecution.clean_unexpected_execution()
+    logger.info(gettext(
+        'Jobs checked: %(checked)s; marked failed: %(cleaned)s; '
+        'skipped because within the time limit: %(skipped)s.'
+    ), {'checked': checked, 'cleaned': cleaned, 'skipped': checked - cleaned})
+    if not checked:
+        logger.info(gettext('Nothing to process: no running jobs.'))
 
 
 @shared_task(
@@ -192,14 +236,19 @@ def clean_up_unexpected_jobs():
 )
 @register_as_period_task(crontab=CRONTAB_AT_AM_TWO)
 def clean_job_execution_period():
-    logger.info("Start clean job_execution db record")
     now = timezone.now()
     days = get_log_keep_day('JOB_EXECUTION_KEEP_DAYS')
+    logger.info(gettext('Checking job execution records older than %(days)s days.'), {'days': days})
     expired_day = now - datetime.timedelta(days=days)
     with tmp_to_root_org():
-        del_res = JobExecution.objects.filter(date_created__lt=expired_day).delete()
-        logger.info(
-            f"clean job_execution db record success! delete {days} days {del_res[0]} records")
+        expired = JobExecution.objects.filter(date_created__lt=expired_day)
+        checked = expired.count()
+        _, deleted = expired.delete()
+    logger.info(gettext('Expired records matched: %(checked)s; deleted: %(deleted)s.'), {
+        'checked': checked, 'deleted': deleted.get(JobExecution._meta.label, 0),
+    })
+    if not checked:
+        logger.info(gettext('Nothing to clean: no records exceeded the retention period.'))
 
 # 测试使用，注释隐藏
 # @shared_task

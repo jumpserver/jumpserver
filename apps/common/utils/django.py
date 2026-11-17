@@ -75,7 +75,7 @@ def union_queryset(*args, base_queryset=None):
     args = [q.order_by() for q in args]
     sub_query = args[0].union(*args[1:])
     queryset_id = list(sub_query.values_list('id', flat=True))
-    if not base_queryset:
+    if base_queryset is None:
         base_queryset = args[0].model.objects
     queryset = base_queryset.filter(id__in=queryset_id)
     return queryset

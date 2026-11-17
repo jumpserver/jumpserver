@@ -1,0 +1,19 @@
+- hosts: all
+  gather_facts: false
+  vars:
+    ansible_python_interpreter: "{{ local_python_interpreter }}"
+  tasks:
+    - name: Database account removal
+      database_automation:
+        database_type: "{{ jms_asset.type }}"
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        login_user: "{{ jms_account.username }}"
+        login_password: "{{ jms_account.secret }}"
+        login_database: "{{ jms_asset.spec_info.db_name | default('') }}"
+        connection_options: "{{ jms_asset.database_options }}"
+        connect_timeout: 15
+        action: remove_account
+        name: "{{ account.username }}"
+        secret_type: "{{ account.secret_type | default('password') }}"
+        host: "{{ (params | default({})).account_host | default('%') }}"

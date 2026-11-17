@@ -31,10 +31,8 @@ def is_ip_network(ip):
 
 def is_ip_segment(ip):
     """ 10.1.1.1-10.1.1.20 """
-    if '-' not in ip:
-        return False
-    ip_address1, ip_address2 = ip.split('-')
-    return is_ip_address(ip_address1) and is_ip_address(ip_address2)
+    endpoints = ip.split('-')
+    return len(endpoints) == 2 and all(is_ip_address(endpoint) for endpoint in endpoints)
 
 
 def in_ip_segment(ip, ip_segment):

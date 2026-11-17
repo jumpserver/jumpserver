@@ -1,4 +1,5 @@
 """Bounded, on-demand monitoring; no event consumer or task argument storage."""
+import math
 import socket
 import time
 from datetime import datetime, timezone
@@ -10,7 +11,7 @@ from kombu import Consumer, Producer, Queue
 from . import app
 
 
-CACHE_KEY = 'ops:celery-monitor:v2'
+CACHE_KEY = 'ops:celery-monitor:v3'
 LOCK_KEY = 'ops:celery-monitor:refresh'
 REFRESH_SECONDS = 15
 SNAPSHOT_SECONDS = 300
@@ -18,13 +19,28 @@ TASK_LIMIT = 100
 WORKER_LIMIT = 100
 INSPECT_TIMEOUT = 0.75
 QUEUE_LIMIT = 100
+WORKER_COUNTERS = ('processed', 'succeeded', 'failed', 'retried')
+
+
+def safe_count(value):
+    return value if type(value) is int and value >= 0 else None
+
+
+def safe_load_average(value):
+    if not isinstance(value, (list, tuple)) or len(value) != 3:
+        return None
+    if not all(type(item) in (int, float) and math.isfinite(item) and item >= 0 for item in value):
+        return None
+    return list(value)
 
 
 def empty_snapshot(error):
     return {
         'sampled_at': None, 'stale': True, 'task_limit': TASK_LIMIT,
         'workers': [], 'queues': [], 'errors': [error],
-        'summary': dict.fromkeys(('online_workers', 'active', 'reserved', 'scheduled', 'queued')),
+        'summary': dict.fromkeys((
+            'online_workers', 'active', 'reserved', 'scheduled', 'queued', *WORKER_COUNTERS,
+        )),
     }
 
 
@@ -178,15 +194,26 @@ def collect_snapshot(previous=None):
     names = sorted(online)[:WORKER_LIMIT]
     names += sorted(set(previous_workers) - online)[:max(0, WORKER_LIMIT - len(names))]
     workers = []
-    totals = {'online_workers': len(online), 'active': 0, 'reserved': 0, 'scheduled': 0}
+    totals = {
+        'online_workers': len(online), 'active': 0, 'reserved': 0, 'scheduled': 0,
+        **dict.fromkeys(WORKER_COUNTERS, 0),
+    }
     for name in names:
         snapshot = replies.get(name, {})
         worker = {
             'name': name, 'status': 'online' if name in online else 'unavailable',
-            'concurrency': snapshot.get('concurrency'), 'processed': snapshot.get('processed'),
+            'concurrency': snapshot.get('concurrency'),
+            'load_average': safe_load_average(snapshot.get('load_average')),
             'pool': snapshot.get('pool') if snapshot.get('pool') in ('threads', 'prefork') else 'unknown',
             'queues': snapshot.get('queues', [])[:QUEUE_LIMIT], 'truncated': {},
         }
+        for field in WORKER_COUNTERS:
+            value = worker[field] = safe_count(snapshot.get(field))
+            if name in online:
+                if value is None:
+                    totals[field] = None
+                elif totals[field] is not None:
+                    totals[field] += value
         for field in ('active', 'reserved', 'scheduled'):
             tasks = snapshot.get(field, [])
             count = snapshot.get(field + '_count')
@@ -205,9 +232,11 @@ def collect_snapshot(previous=None):
     if not online:
         errors.append('no_workers')
         totals.update(active=None, reserved=None, scheduled=None)
+        totals.update(dict.fromkeys(WORKER_COUNTERS))
     if len(online) >= WORKER_LIMIT:
         errors.append('inspection_failed')
         totals.update(online_workers=None, active=None, reserved=None, scheduled=None)
+        totals.update(dict.fromkeys(WORKER_COUNTERS))
     totals['queued'] = sum(q['pending'] for q in queues) if queues and 'queue_depth_failed' not in errors and all(
         isinstance(q['pending'], int) for q in queues
     ) else None

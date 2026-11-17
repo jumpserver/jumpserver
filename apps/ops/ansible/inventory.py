@@ -150,8 +150,18 @@ class JMSInventory:
 
     @staticmethod
     def make_protocol_setting_vars(host, protocols):
+        spec = host['jms_asset'].get('spec_info', {})
+        options = {key: spec.get(key) for key in (
+            'use_ssl', 'allow_invalid_cert', 'ca_cert', 'client_cert', 'client_key',
+        ) if spec.get(key) is not None}
+        options['server_name'] = host['jms_asset'].get('origin_address', host['jms_asset']['address'])
+        options['tenant_mode'] = 'mysql'
+        host['jms_asset']['database_options'] = options
         # 针对协议的特殊处理
         for p in protocols:
+            if p.name == 'mysql':
+                setting = getattr(p, 'setting', {}) or {}
+                options['tenant_mode'] = setting.get('tenant_mode', 'mysql')
             if p.name == 'ssh':
                 if hasattr(p, 'setting'):
                     setting = getattr(p, 'setting')
@@ -335,6 +345,7 @@ class JMSInventory:
                 host['jms_asset'].get('oracle_sysdba', False)
             )
             host['jms_account']['mode'] = 'sysdba' if use_sysdba else None
+            host['jms_asset']['database_options']['sysdba'] = bool(use_sysdba)
 
         ansible_config = self.fill_ansible_config(ansible_config, protocol)
         host.update(ansible_config)

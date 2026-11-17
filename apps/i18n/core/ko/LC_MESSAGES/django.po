@@ -18187,3 +18187,652 @@ msgstr "세션 정책"
 
 msgid "Log in again when the browser closes"
 msgstr "브라우저를 닫으면 다시 로그인"
+
+#: terminal/tasks.py:42
+#, python-format
+msgid "Checking terminal status records older than %(days)s days."
+msgstr "%(days)s 일이 지난 터미널 상태 레코드를 확인합니다."
+
+#: terminal/tasks.py:47 ops/tasks.py:235
+#, python-format
+msgid "Expired records matched: %(checked)s; deleted: %(deleted)s."
+msgstr "조건에 맞는 만료 레코드: %(checked)s개, 삭제: %(deleted)s개."
+
+#: terminal/tasks.py:65
+msgid "Checking unfinished sessions; active sessions will be kept."
+msgstr "종료되지 않은 세션을 확인합니다. 활성 세션은 유지합니다."
+
+#: terminal/tasks.py:82
+#, python-format
+msgid "Sessions checked: %(checked)s; marked finished: %(finished)s; skipped because still active: %(active)s; related tasks marked finished: %(tasks)s."
+msgstr "확인한 세션: %(checked)s개, 종료 처리: %(finished)s개, 활성 상태로 건너뜀: %(active)s개, 완료 처리한 관련 작업: %(tasks)s개."
+
+#: terminal/tasks.py:51 ops/tasks.py:239
+msgid "Nothing to clean: no records exceeded the retention period."
+msgstr "정리할 항목 없음: 보관 기간이 지난 레코드가 없습니다."
+
+#: terminal/tasks.py:87
+msgid "Nothing to process: no unfinished sessions."
+msgstr "처리할 항목 없음: 종료되지 않은 세션이 없습니다."
+
+#: ops/celery/utils.py:38
+#, python-format
+msgid "Checking periodic task: %(name)s."
+msgstr "주기 작업 확인 중: %(name)s."
+
+#: ops/celery/utils.py:61
+#, python-format
+msgid "Schedule: every %(seconds)s seconds."
+msgstr "실행 일정: %(seconds)s초마다."
+
+#: ops/celery/utils.py:46
+#, python-format
+msgid "Skipped periodic task %(name)s: the scheduling database is unavailable."
+msgstr "주기 작업 %(name)s 건너뜀: 스케줄 데이터베이스를 사용할 수 없습니다."
+
+#: ops/celery/utils.py:77
+#, python-format
+msgid "Schedule (cron): %(cron)s; time zone: %(timezone)s."
+msgstr "실행 일정(cron): %(cron)s, 시간대: %(timezone)s."
+
+#: ops/celery/utils.py:81
+#, python-format
+msgid "Skipped periodic task %(name)s: no valid interval or cron expression is configured."
+msgstr "주기 작업 %(name)s 건너뜀: 유효한 실행 간격 또는 cron 표현식이 설정되지 않았습니다."
+
+#: ops/celery/utils.py:66
+#, python-format
+msgid "Skipped periodic task %(name)s: the cron expression must contain five fields."
+msgstr "주기 작업 %(name)s 건너뜀: cron 표현식에는 필드 5개가 필요합니다."
+
+#: ops/tasks.py:123
+msgid "Checking periodic tasks; tasks still registered in the worker will be kept."
+msgstr "주기 작업을 확인합니다. Worker에 등록된 작업은 유지합니다."
+
+#: ops/tasks.py:144
+#, python-format
+msgid "Periodic tasks checked: %(checked)s; deleted: %(cleaned)s; kept because still registered: %(kept)s; cleanup failures: %(failed)s."
+msgstr "확인한 주기 작업: %(checked)s개, 삭제: %(cleaned)s개, 등록 상태로 유지: %(kept)s개, 정리 실패: %(failed)s개."
+
+#: ops/tasks.py:161
+msgid "Starting periodic task registration."
+msgstr "주기 작업 등록을 시작합니다."
+
+#: ops/tasks.py:172
+#, python-format
+msgid "Periodic tasks checked: %(checked)s; created: %(created)s; updated: %(updated)s; skipped: %(skipped)s."
+msgstr "확인한 주기 작업: %(checked)s개, 생성: %(created)s개, 업데이트: %(updated)s개, 건너뜀: %(skipped)s개."
+
+#: ops/tasks.py:203
+#, python-format
+msgid "Checking running jobs; jobs older than %(hours)s hours will be marked failed."
+msgstr "실행 중인 작업을 확인합니다. %(hours)s시간이 지난 작업은 실패로 처리합니다."
+
+#: ops/tasks.py:208
+#, python-format
+msgid "Jobs checked: %(checked)s; marked failed: %(cleaned)s; skipped because within the time limit: %(skipped)s."
+msgstr "확인한 작업: %(checked)s개, 실패 처리: %(cleaned)s개, 제한 시간 이내로 건너뜀: %(skipped)s개."
+
+#: ops/tasks.py:229
+#, python-format
+msgid "Checking job execution records older than %(days)s days."
+msgstr "%(days)s일이 지난 작업 실행 레코드를 확인합니다."
+
+#: ops/tasks.py:133
+#, python-format
+msgid "Removing periodic task %(name)s: its task is no longer registered."
+msgstr "주기 작업 %(name)s 삭제 중: 해당 작업이 더 이상 등록되어 있지 않습니다."
+
+#: ops/tasks.py:213
+msgid "Nothing to process: no running jobs."
+msgstr "처리할 항목 없음: 실행 중인 작업이 없습니다."
+
+#: ops/tasks.py:143
+#, python-format
+msgid "Periodic task %(name)s still exists after cleanup."
+msgstr "정리 후에도 주기 작업 %(name)s이(가) 존재합니다."
+
+#: settings/tasks/ldap.py:88
+#, python-format
+msgid "Checking LDAP periodic sync configuration: %(name)s."
+msgstr "LDAP 주기 동기화 설정 확인 중: %(name)s."
+
+#: settings/tasks/ldap.py:95
+#, python-format
+msgid "Skipped registration: LDAP periodic sync is disabled; schedules kept disabled: %(count)s."
+msgstr "등록 건너뜀: LDAP 주기 동기화가 비활성화되어 있습니다. 비활성 상태로 유지한 일정: %(count)s개."
+
+#: users/tasks.py:97
+msgid "Checking active local users with unexpired accounts and passwords."
+msgstr "계정과 비밀번호가 만료되지 않은 활성 로컬 사용자를 확인합니다."
+
+#: users/tasks.py:113 users/tasks.py:187
+#, python-format
+msgid "Users checked: %(checked)s; reminders queued: %(notified)s; skipped because inactive or expired: %(invalid)s; skipped because outside the reminder window: %(outside)s."
+msgstr "확인한 사용자: %(checked)s명, 알림 대기열 등록: %(notified)s건, 비활성 또는 만료로 건너뜀: %(invalid)s명, 알림 기간 밖으로 건너뜀: %(outside)s명."
+
+#: users/tasks.py:156
+#, python-format
+msgid "Checking active local users expiring within %(first)s days; remind %(first)s days before expiry and daily within %(daily)s days."
+msgstr "%(first)s일 이내에 만료되는 활성 로컬 사용자를 확인합니다. 만료 %(first)s일 전과 마지막 %(daily)s일 동안 매일 알립니다."
+
+#: users/tasks.py:107
+#, python-format
+msgid "Queuing a password expiration reminder for %(user)s: %(days)s days remaining."
+msgstr "%(user)s 사용자의 비밀번호 만료 알림을 대기열에 등록합니다. 남은 기간: %(days)s일."
+
+#: users/tasks.py:119 users/tasks.py:193
+msgid "Nothing to process: no users matched the check criteria."
+msgstr "처리할 항목 없음: 확인 조건에 맞는 사용자가 없습니다."
+
+#: users/tasks.py:181
+#, python-format
+msgid "Queuing an account expiration reminder for %(user)s: %(days)s days remaining."
+msgstr "%(user)s 사용자의 계정 만료 알림을 대기열에 등록합니다. 남은 기간: %(days)s일."
+
+#: accounts/tasks/openbao.py:114
+#, python-format
+msgid "OpenBao tokens checked: 1; rotated: 1; new TTL: %(ttl)s seconds."
+msgstr "확인한 OpenBao 토큰: 1개, 교체: 1개, 새 유효 기간: %(ttl)s초."
+
+#: accounts/tasks/openbao.py:124
+msgid "Checking OpenBao token rotation configuration."
+msgstr "OpenBao 토큰 교체 설정을 확인합니다."
+
+#: accounts/tasks/openbao.py:126
+msgid "Skipped token rotation: the OpenBao vault backend is not enabled."
+msgstr "토큰 교체 건너뜀: OpenBao Vault 백엔드가 활성화되어 있지 않습니다."
+
+#: accounts/tasks/openbao.py:130
+msgid "Skipped token rotation: no enabled rotation AppRole is configured."
+msgstr "토큰 교체 건너뜀: 활성화된 교체용 AppRole이 설정되지 않았습니다."
+
+#: accounts/tasks/openbao.py:137
+msgid "Skipped token rotation: another rotation task is running."
+msgstr "토큰 교체 건너뜀: 다른 교체 작업이 실행 중입니다."
+
+#: accounts/tasks/openbao.py:82
+#, python-format
+msgid "OpenBao tokens checked: 1; rotated: 0; skipped: 1. The token is still valid for %(ttl)s seconds, above the rotation threshold of %(threshold)s seconds."
+msgstr "확인한 OpenBao 토큰: 1개, 교체: 0개, 건너뜀: 1개. 남은 유효 기간은 %(ttl)s초로, 교체 기준인 %(threshold)s초를 초과합니다."
+
+#: ops/celery/utils.py
+#, python-format
+msgid "Created periodic task %(name)s; enabled: %(enabled)s."
+msgstr "주기 작업 %(name)s을(를) 생성했습니다. 활성화: %(enabled)s."
+
+#: ops/celery/utils.py
+#, python-format
+msgid "Updated periodic task %(name)s; enabled: %(enabled)s."
+msgstr "주기 작업 %(name)s을(를) 업데이트했습니다. 활성화: %(enabled)s."
+
+#: tickets/tasks.py perms/tasks.py tickets/plugins/file_transfer/execution.py
+msgid "The batch limit was reached; remaining records will be checked next time."
+msgstr "이번 처리 한도에 도달했습니다. 나머지 레코드는 다음 실행에서 확인합니다."
+
+#: perms/tasks.py
+msgid "No reminder was queued; recipients are missing or publication failed."
+msgstr "알림이 대기열에 등록되지 않았습니다. 수신자가 없거나 등록에 실패했습니다."
+
+#: perms/tasks.py
+msgid "No users or administrators are available to receive reminders."
+msgstr "알림을 받을 사용자 또는 관리자가 없습니다."
+
+#: perms/tasks.py authentication/tasks.py
+msgid "Notifications queued"
+msgstr "대기열에 등록한 알림"
+
+#: perms/tasks.py
+msgid "The permission is outside the reminder window."
+msgstr "권한이 알림 기간 밖에 있습니다."
+
+#: perms/tasks.py
+msgid "Unable to queue a notification."
+msgstr "알림을 대기열에 등록할 수 없습니다."
+
+#: terminal/tasks.py
+msgid "Alert notifications queued"
+msgstr "대기열에 등록한 경고 알림"
+
+#: terminal/tasks.py
+#, python-format
+msgid "Storage check failed: %(name)s (%(type)s)."
+msgstr "스토리지 확인 실패: %(name)s (%(type)s)."
+
+#: terminal/tasks.py
+msgid "Storage connectivity or credential validation failed."
+msgstr "스토리지 연결 또는 자격 증명 검증에 실패했습니다."
+
+#: users/tasks.py
+msgid "Automatic disabling of unused users is not enabled."
+msgstr "미사용 사용자 자동 비활성화 기능이 활성화되지 않았습니다."
+
+#: users/tasks.py
+#, python-format
+msgid "Checking users with no login or API key use for %(days)s days; admin is excluded."
+msgstr "%(days)s일 동안 로그인하거나 API 키를 사용하지 않은 사용자를 확인합니다. admin은 제외합니다."
+
+#: users/tasks.py ops/celery/task_logging.py accounts/tasks/automation.py tickets/plugins/file_transfer/execution.py
+msgid "The record was already handled by another task."
+msgstr "다른 작업이 이미 이 레코드를 처리했습니다."
+
+#: users/tasks.py
+msgid "The unused-user threshold is outside the enabled range of 1–998 days."
+msgstr "미사용 사용자 기준이 활성 범위인 1~998일 밖에 있습니다."
+
+#: users/tasks.py
+msgid "Users disabled"
+msgstr "비활성화한 사용자"
+
+#: users/signal_handlers.py
+msgid "Sessions deleted"
+msgstr "삭제한 세션"
+
+#: ops/tasks.py
+msgid "Components with health alerts"
+msgstr "상태 경고가 있는 구성 요소"
+
+#: ops/tasks.py
+msgid "No health alerts to send."
+msgstr "전송할 상태 경고가 없습니다."
+
+#: ops/tasks.py
+msgid "Service performance checks are disabled by configuration."
+msgstr "설정에 따라 서비스 성능 확인이 비활성화되었습니다."
+
+#: ops/tasks.py
+msgid "The component is inactive."
+msgstr "구성 요소가 비활성 상태입니다."
+
+#: authentication/tasks.py
+msgid "Client login session cleanup"
+msgstr "클라이언트 로그인 세션 정리"
+
+#: authentication/tasks.py
+msgid "Credential activity records included"
+msgstr "요약에 포함된 자격 증명 활동 레코드"
+
+#: authentication/tasks.py
+msgid "No recent credential activity matched this user."
+msgstr "이 사용자에게 해당하는 최근 자격 증명 활동이 없습니다."
+
+#: authentication/tasks.py
+msgid "OAuth credential cleanup categories"
+msgstr "OAuth 자격 증명 범주 정리"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Expired ID tokens deleted"
+msgstr "삭제한 만료 ID 토큰"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Expired access tokens deleted"
+msgstr "삭제한 만료 액세스 토큰"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Expired grant tokens deleted"
+msgstr "삭제한 만료 인가 코드"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Expired refresh tokens deleted"
+msgstr "삭제한 만료 갱신 토큰"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "No expired records in this credential category."
+msgstr "이 자격 증명 범주에는 만료된 레코드가 없습니다."
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Orphaned refresh tokens deleted"
+msgstr "삭제한 고아 갱신 토큰"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Refresh-token retention settings require these tokens to be kept."
+msgstr "갱신 토큰 보관 설정에 따라 이 토큰을 유지해야 합니다."
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Revoked refresh tokens deleted"
+msgstr "삭제한 취소된 갱신 토큰"
+
+#: notifications/notifications.py
+#, python-format
+msgid "Channel %(channel)s: matched recipients %(matched)s; recipients with a channel account %(bound)s; unbound %(unbound)s."
+msgstr "채널 %(channel)s: 일치하는 수신자 %(matched)s명, 채널 계정 연결됨 %(bound)s명, 연결되지 않음 %(unbound)s명."
+
+#: notifications/notifications.py
+msgid "No recipients have an account for this notification channel."
+msgstr "이 알림 채널의 계정을 가진 수신자가 없습니다."
+
+#: notifications/notifications.py
+msgid "Notification channel calls completed"
+msgstr "완료한 알림 채널 호출"
+
+#: notifications/notifications.py
+msgid "The notification channel does not support this message."
+msgstr "이 알림 채널은 해당 메시지를 지원하지 않습니다."
+
+#: notifications/notifications.py
+msgid "The notification channel raised an error."
+msgstr "알림 채널에서 오류가 발생했습니다."
+
+#: authentication/services/client_login_session.py
+msgid "Client sessions revoked"
+msgstr "취소한 클라이언트 세션"
+
+#: authentication/services/client_login_session.py
+msgid "The client login session is still valid."
+msgstr "클라이언트 로그인 세션이 아직 유효합니다."
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Failed %(count)s: %(reason)s"
+msgstr "실패 %(count)s: %(reason)s"
+
+#: ops/celery/task_logging.py
+msgid "No matching records to process."
+msgstr "처리할 조건에 맞는 레코드가 없습니다."
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Result count — %(name)s: %(count)s."
+msgstr "처리 결과 — %(name)s: %(count)s."
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Skipped %(count)s: %(reason)s"
+msgstr "건너뜀 %(count)s: %(reason)s"
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Task interrupted after %(checked)s checks; changes may have been rolled back. See the task error for details."
+msgstr "%(checked)s건을 확인한 후 작업이 중단되었습니다. 변경 사항이 롤백되었을 수 있습니다. 자세한 내용은 작업 오류 로그를 확인하세요."
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Task started: %(name)s."
+msgstr "작업 시작: %(name)s."
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Task summary: checked %(checked)s; processed %(processed)s; skipped %(skipped)s; failed %(failed)s."
+msgstr "작업 요약: 확인 %(checked)s, 처리 %(processed)s, 건너뜀 %(skipped)s, 실패 %(failed)s."
+
+#: accounts/tasks/remove_account.py
+msgid "History cleanup is disabled by the retention limit."
+msgstr "보관 한도 설정에 따라 이력 정리가 비활성화되었습니다."
+
+#: accounts/tasks/remove_account.py
+#, python-format
+msgid "Keeping %(count)s history records per account, including the current version."
+msgstr "현재 버전을 포함하여 계정당 이력 %(count)s개를 보관합니다."
+
+#: accounts/tasks/automation.py
+msgid "Another instance of this maintenance task is running."
+msgstr "동일한 유지보수 작업의 다른 인스턴스가 실행 중입니다."
+
+#: accounts/tasks/automation.py
+msgid "Records belong to a credential rotation that is still running."
+msgstr "레코드가 아직 실행 중인 자격 증명 교체 작업에 속합니다."
+
+#: accounts/tasks/automation.py xpack/plugins/cloud/tasks.py
+#, python-format
+msgid "Retention period: %(days)s days."
+msgstr "보관 기간: %(days)s일."
+
+#: accounts/tasks/automation.py
+msgid "The latest unsuccessful first-login result must be retained."
+msgstr "가장 최근의 실패한 최초 로그인 결과를 유지해야 합니다."
+
+#: accounts/tasks/automation.py
+msgid "The owning worker has not replied and the hard timeout has not elapsed."
+msgstr "담당 Worker가 응답하지 않았고 최대 실행 시간이 아직 지나지 않았습니다."
+
+#: accounts/tasks/automation.py
+msgid "The task is still running on a worker."
+msgstr "작업이 Worker에서 아직 실행 중입니다."
+
+#: accounts/tasks/automation.py
+msgid "The task is still within the startup grace period."
+msgstr "작업이 시작 유예 기간 내에 있습니다."
+
+#: accounts/tasks/automation.py
+msgid "Unable to acquire the task lock."
+msgstr "작업 잠금을 획득할 수 없습니다."
+
+#: accounts/tasks/automation.py
+msgid "Unable to release the task lock."
+msgstr "작업 잠금을 해제할 수 없습니다."
+
+#: accounts/tasks/automation.py
+msgid "Waiting for repeated confirmation that the task is missing."
+msgstr "작업이 사라졌는지 다시 확인하기를 기다립니다."
+
+#: accounts/tasks/automation.py
+msgid "Worker status is unavailable; recovery cannot be confirmed."
+msgstr "Worker 상태를 확인할 수 없어 복구 필요 여부를 판단할 수 없습니다."
+
+#: accounts/tasks/application_events.py
+msgid "Deliveries marked expired"
+msgstr "만료로 표시한 전송"
+
+#: accounts/tasks/application_events.py tickets/plugins/change_secret/execution.py tickets/plugins/file_transfer/execution.py
+msgid "Executions queued"
+msgstr "대기열에 등록한 실행 작업"
+
+#: accounts/tasks/application_events.py tickets/plugins/change_secret/execution.py tickets/plugins/file_transfer/execution.py
+msgid "Unable to queue an execution; it will be retried later."
+msgstr "실행 작업을 대기열에 등록할 수 없습니다. 나중에 재시도합니다."
+
+#: accounts/tasks/credential_preparation.py
+msgid "Unable to check credential rotation readiness."
+msgstr "자격 증명 교체 준비 상태를 확인할 수 없습니다."
+
+#: accounts/tasks/credential_preparation.py
+msgid "Waiting for client confirmation or the source-account quiet period."
+msgstr "클라이언트 확인 또는 원본 계정의 무활동 기간 종료를 기다립니다."
+
+#: tickets/workflow/engine.py
+msgid "The workflow has changed or its approval deadline has not elapsed."
+msgstr "워크플로 상태가 변경되었거나 승인 기한이 아직 지나지 않았습니다."
+
+#: tickets/plugins/change_secret/execution.py tickets/plugins/file_transfer/execution.py
+msgid "The execution is no longer eligible for dispatch."
+msgstr "실행 레코드가 더 이상 배포 조건을 충족하지 않습니다."
+
+#: tickets/plugins/file_transfer/execution.py
+msgid "Clean ticket transfer files"
+msgstr "티켓 전송 파일 정리"
+
+#: tickets/plugins/file_transfer/execution.py
+msgid "Files belong to a transfer that is still running."
+msgstr "파일이 아직 실행 중인 전송 작업에 속합니다."
+
+#: tickets/plugins/file_transfer/execution.py
+msgid "Interrupted transfers marked for verification"
+msgstr "검증 필요로 표시한 중단된 전송"
+
+#: tickets/plugins/file_transfer/execution.py
+msgid "Maintain ticket file transfers"
+msgstr "티켓 파일 전송 유지보수"
+
+#: tickets/plugins/file_transfer/execution.py
+msgid "Unable to remove a temporary file; it will be retried later."
+msgstr "임시 파일을 삭제할 수 없습니다. 나중에 재시도합니다."
+
+#: xpack/plugins/cloud/tasks.py
+msgid "Cleanup is disabled because the retention period is not positive."
+msgstr "보관 기간이 양수가 아니므로 정리가 비활성화되었습니다."
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Reason: %(reason)s"
+msgstr "설명: %(reason)s"
+
+#: notifications/notifications.py
+msgid "No notification channels are configured."
+msgstr "알림 채널이 설정되지 않았습니다."
+
+#: accounts/tasks/application_events.py:46
+#, python-format
+msgid "Unable to dispatch application webhook delivery %(delivery)s."
+msgstr "애플리케이션 Webhook 전달 %(delivery)s을(를) 예약할 수 없습니다."
+
+#: accounts/tasks/application_events.py:167 accounts/tasks/application_events.py:170
+msgid "Expire application event deliveries"
+msgstr "애플리케이션 이벤트 전달 만료 처리"
+
+#: accounts/tasks/automation.py:139
+msgid "Skipped interrupted account task inspection: no Celery worker replied."
+msgstr "Celery Worker가 응답하지 않아 중단된 계정 작업 확인을 건너뛰었습니다."
+
+#: accounts/tasks/automation.py:132
+msgid "Unable to inspect active Celery tasks."
+msgstr "실행 중인 Celery 작업을 확인할 수 없습니다."
+
+#: accounts/tasks/automation.py:169
+#, python-format
+msgid "Unable to confirm interrupted task status: execution=%(execution)s."
+msgstr "중단된 작업 상태를 확인할 수 없습니다: 실행=%(execution)s."
+
+#: accounts/tasks/automation.py:180
+#, python-format
+msgid "Unable to clear the interrupted task confirmation marker: execution=%(execution)s."
+msgstr "중단된 작업 확인 표시를 지울 수 없습니다: 실행=%(execution)s."
+
+#: accounts/tasks/automation.py:202
+msgid "Unable to acquire the interrupted account task recovery lock."
+msgstr "중단된 계정 작업 복구 잠금을 획득할 수 없습니다."
+
+#: accounts/tasks/automation.py:218
+msgid "Unable to release the interrupted account task recovery lock."
+msgstr "중단된 계정 작업 복구 잠금을 해제할 수 없습니다."
+
+#: accounts/tasks/credential_preparation.py:12 accounts/tasks/credential_preparation.py:15
+msgid "Check credential rotation readiness"
+msgstr "자격 증명 교체 준비 상태 확인"
+
+#: accounts/tasks/credential_preparation.py:33
+#, python-format
+msgid "Unable to check rotation readiness: credential=%(credential)s."
+msgstr "교체 준비 상태를 확인할 수 없습니다: 자격 증명=%(credential)s."
+
+#: accounts/tasks/openbao.py:28
+msgid "JumpServer must use the OpenBao vault backend."
+msgstr "JumpServer는 OpenBao 볼트 백엔드를 사용해야 합니다."
+
+#: accounts/tasks/openbao.py:30
+msgid "OpenBao token rotation requires HTTPS with TLS verification."
+msgstr "OpenBao 토큰 교체에는 TLS 검증이 활성화된 HTTPS가 필요합니다."
+
+#: accounts/tasks/openbao.py:62
+#, python-format
+msgid "OpenBao token lookup returned HTTP %(status)s."
+msgstr "OpenBao 토큰 조회에서 HTTP %(status)s을(를) 반환했습니다."
+
+#: accounts/tasks/openbao.py:70
+msgid "OpenBao address changed. Reconfigure the rotation AppRole."
+msgstr "OpenBao 주소가 변경되었습니다. 교체용 AppRole을 다시 구성하세요."
+
+#: accounts/tasks/openbao.py:98
+msgid "OpenBao did not issue a distinct token."
+msgstr "OpenBao가 기존 토큰과 다른 새 토큰을 발급하지 않았습니다."
+
+#: accounts/tasks/openbao.py:102
+msgid "The new OpenBao token must support self lookup and last over seven days."
+msgstr "새 OpenBao 토큰은 자체 조회를 지원하고 유효 기간이 7일을 초과해야 합니다."
+
+#: accounts/tasks/openbao.py:104
+msgid "The new token failed the JumpServer OpenBao operation check."
+msgstr "새 토큰이 JumpServer OpenBao 작업 검사에 실패했습니다."
+
+#: accounts/tasks/openbao.py:94
+#, python-format
+msgid "OpenBao AppRole login returned HTTP %(status)s."
+msgstr "OpenBao AppRole 로그인에서 HTTP %(status)s을(를) 반환했습니다."
+
+#: accounts/tasks/openbao.py:109
+msgid "The configured OpenBao token changed during rotation."
+msgstr "교체 중에 구성된 OpenBao 토큰이 변경되었습니다."
+
+#: accounts/tasks/openbao.py:120
+msgid "Check and rotate the OpenBao vault token"
+msgstr "OpenBao 볼트 토큰 확인 및 교체"
+
+#: accounts/tasks/openbao.py:133
+msgid "OpenBao rotation requires encrypted AppRole credentials."
+msgstr "OpenBao 교체에는 암호화된 AppRole 자격 증명이 필요합니다."
+
+#: authentication/services/client_login_session.py:411
+msgid "Access tokens deleted"
+msgstr "삭제된 액세스 토큰"
+
+#: authentication/services/client_login_session.py:412
+msgid "Refresh tokens deleted"
+msgstr "삭제된 갱신 토큰"
+
+#: authentication/services/client_login_session.py:419
+msgid "Client login sessions deleted"
+msgstr "삭제된 클라이언트 로그인 세션"
+
+#: perms/tasks.py:141
+#, python-format
+msgid "Unable to queue an asset permission expiration reminder: permission=%(permission)s; user=%(user)s."
+msgstr "자산 권한 만료 알림을 대기열에 추가할 수 없습니다: 권한=%(permission)s; 사용자=%(user)s."
+
+#: terminal/tasks.py:268
+#, python-brace-format
+msgid "Test failure: {error}"
+msgstr "테스트 실패: {error}"
+
+#: tickets/plugins/change_secret/execution.py:100
+#, python-format
+msgid "Unable to queue password change for ticket %(ticket)s (%(error)s)."
+msgstr "티켓 %(ticket)s의 비밀번호 변경을 대기열에 추가할 수 없습니다(%(error)s)."
+
+#: tickets/plugins/file_transfer/execution.py:50
+#, python-format
+msgid "Unable to queue ticket transfer %(ticket)s (%(error)s)."
+msgstr "티켓 전송 %(ticket)s을(를) 대기열에 추가할 수 없습니다(%(error)s)."
+
+#: tickets/plugins/file_transfer/execution.py:249
+#, python-format
+msgid "Unable to purge ticket transfer file %(file)s (%(error)s)."
+msgstr "티켓 전송 파일 %(file)s을(를) 삭제할 수 없습니다(%(error)s)."
+
+#: tickets/tasks.py:16 tickets/tasks.py:21
+msgid "Expire overdue ticket approvals"
+msgstr "기한이 지난 티켓 승인 처리"
+
+#: tickets/tasks.py:17
+msgid "Check approval deadlines every minute and apply the configured timeout action."
+msgstr "매분 승인 기한을 확인하고 구성된 시간 초과 작업을 수행합니다."
+
+#: tickets/tasks.py:47 tickets/tasks.py:52
+msgid "Dispatch ticket password changes"
+msgstr "티켓 비밀번호 변경 예약"
+
+#: tickets/tasks.py:48
+msgid "Dispatch pending password change executions every minute."
+msgstr "매분 대기 중인 비밀번호 변경 실행을 예약합니다."
+
+#: accounts/automations/recovery.py:38
+msgid "Invalid interrupted automation runtime path."
+msgstr "중단된 자동화 작업의 실행 디렉터리 경로가 잘못되었습니다."
+
+#: accounts/automations/recovery.py:269
+#, python-format
+msgid "Interrupted account automation finalized: execution=%(execution)s; status=%(status)s; password change records=%(changes)s; password push records=%(pushes)s."
+msgstr "중단된 계정 자동화 마무리 완료: 실행=%(execution)s; 상태=%(status)s; 비밀번호 변경 기록=%(changes)s; 비밀번호 푸시 기록=%(pushes)s."
+
+#: accounts/automations/recovery.py:264
+#, python-format
+msgid "Unable to clean the interrupted automation runtime: execution=%(execution)s."
+msgstr "중단된 자동화 작업의 실행 디렉터리를 정리할 수 없습니다: 실행=%(execution)s."
+
+#: accounts/automations/recovery.py:244
+#, python-format
+msgid "Unable to clear interrupted account task status: execution=%(execution)s; account=%(account)s."
+msgstr "중단된 계정 작업 상태를 지울 수 없습니다: 실행=%(execution)s; 계정=%(account)s."
+
+#: accounts/automations/recovery.py:257
+#, python-format
+msgid "Unable to release the interrupted account lock: execution=%(execution)s; account=%(account)s."
+msgstr "중단된 계정 잠금을 해제할 수 없습니다: 실행=%(execution)s; 계정=%(account)s."

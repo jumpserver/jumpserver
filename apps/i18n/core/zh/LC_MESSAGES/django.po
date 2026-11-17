@@ -20523,3 +20523,649 @@ msgstr "撤销登录申请失败，请重试。"
 #: authentication/serializers/connection_token.py
 msgid "Account preparation required"
 msgstr "需要准备账号"
+
+
+msgid "ClickHouse HTTP backend port for DBX and the default DBeaver driver. The protocol port remains the Native TCP port."
+msgstr "DBX 和 DBeaver 默认驱动使用的 ClickHouse HTTP 后端端口。协议端口仍用于 Native TCP。"
+
+#: terminal/tasks.py:42
+#, python-format
+msgid "Checking terminal status records older than %(days)s days."
+msgstr "正在检查超过 %(days)s 天的终端状态记录。"
+
+#: terminal/tasks.py:47 ops/tasks.py:235
+#, python-format
+msgid "Expired records matched: %(checked)s; deleted: %(deleted)s."
+msgstr "匹配的过期记录：%(checked)s 条；实际删除：%(deleted)s 条。"
+
+#: terminal/tasks.py:65
+msgid "Checking unfinished sessions; active sessions will be kept."
+msgstr "正在检查未结束的会话，仍活跃的会话将保留。"
+
+#: terminal/tasks.py:82
+#, python-format
+msgid "Sessions checked: %(checked)s; marked finished: %(finished)s; skipped because still active: %(active)s; related tasks marked finished: %(tasks)s."
+msgstr "检查会话：%(checked)s 个；标记结束：%(finished)s 个；仍活跃而跳过：%(active)s 个；关联任务标记完成：%(tasks)s 个。"
+
+#: terminal/tasks.py:51 ops/tasks.py:239
+msgid "Nothing to clean: no records exceeded the retention period."
+msgstr "无需清理：没有超过保留期限的记录。"
+
+#: terminal/tasks.py:87
+msgid "Nothing to process: no unfinished sessions."
+msgstr "无需处理：没有未结束的会话。"
+
+#: ops/celery/utils.py:38
+#, python-format
+msgid "Checking periodic task: %(name)s."
+msgstr "正在检查定时任务：%(name)s。"
+
+#: ops/celery/utils.py:61
+#, python-format
+msgid "Schedule: every %(seconds)s seconds."
+msgstr "执行计划：每 %(seconds)s 秒一次。"
+
+#: ops/celery/utils.py:46
+#, python-format
+msgid "Skipped periodic task %(name)s: the scheduling database is unavailable."
+msgstr "跳过定时任务 %(name)s：调度数据库不可用。"
+
+#: ops/celery/utils.py:77
+#, python-format
+msgid "Schedule (cron): %(cron)s; time zone: %(timezone)s."
+msgstr "执行计划（cron）：%(cron)s；时区：%(timezone)s。"
+
+#: ops/celery/utils.py:81
+#, python-format
+msgid "Skipped periodic task %(name)s: no valid interval or cron expression is configured."
+msgstr "跳过定时任务 %(name)s：未配置有效的执行间隔或 cron 表达式。"
+
+#: ops/celery/utils.py:66
+#, python-format
+msgid "Skipped periodic task %(name)s: the cron expression must contain five fields."
+msgstr "跳过定时任务 %(name)s：cron 表达式必须包含五个字段。"
+
+#: ops/tasks.py:123
+msgid "Checking periodic tasks; tasks still registered in the worker will be kept."
+msgstr "正在检查定时任务，Worker 中仍已注册的任务将保留。"
+
+#: ops/tasks.py:144
+#, python-format
+msgid "Periodic tasks checked: %(checked)s; deleted: %(cleaned)s; kept because still registered: %(kept)s; cleanup failures: %(failed)s."
+msgstr "检查定时任务：%(checked)s 个；删除：%(cleaned)s 个；仍已注册而保留：%(kept)s 个；清理失败：%(failed)s 个。"
+
+#: ops/tasks.py:161
+msgid "Starting periodic task registration."
+msgstr "开始注册定时任务。"
+
+#: ops/tasks.py:172
+#, python-format
+msgid "Periodic tasks checked: %(checked)s; created: %(created)s; updated: %(updated)s; skipped: %(skipped)s."
+msgstr "检查定时任务：%(checked)s 个；创建：%(created)s 个；更新：%(updated)s 个；跳过：%(skipped)s 个。"
+
+#: ops/tasks.py:203
+#, python-format
+msgid "Checking running jobs; jobs older than %(hours)s hours will be marked failed."
+msgstr "正在检查运行中的作业，超过 %(hours)s 小时的作业将标记为失败。"
+
+#: ops/tasks.py:208
+#, python-format
+msgid "Jobs checked: %(checked)s; marked failed: %(cleaned)s; skipped because within the time limit: %(skipped)s."
+msgstr "检查作业：%(checked)s 个；标记失败：%(cleaned)s 个；未超过时限而跳过：%(skipped)s 个。"
+
+#: ops/tasks.py:229
+#, python-format
+msgid "Checking job execution records older than %(days)s days."
+msgstr "正在检查超过 %(days)s 天的作业执行记录。"
+
+#: ops/tasks.py:133
+#, python-format
+msgid "Removing periodic task %(name)s: its task is no longer registered."
+msgstr "正在删除定时任务 %(name)s：对应任务已不再注册。"
+
+#: ops/tasks.py:213
+msgid "Nothing to process: no running jobs."
+msgstr "无需处理：没有运行中的作业。"
+
+#: ops/tasks.py:143
+#, python-format
+msgid "Periodic task %(name)s still exists after cleanup."
+msgstr "清理后定时任务 %(name)s 仍然存在。"
+
+#: settings/tasks/ldap.py:88
+#, python-format
+msgid "Checking LDAP periodic sync configuration: %(name)s."
+msgstr "正在检查 LDAP 定期同步配置：%(name)s。"
+
+#: settings/tasks/ldap.py:95
+#, python-format
+msgid "Skipped registration: LDAP periodic sync is disabled; schedules kept disabled: %(count)s."
+msgstr "跳过注册：LDAP 定期同步未启用；保持禁用的执行计划：%(count)s 个。"
+
+#: users/tasks.py:97
+msgid "Checking active local users with unexpired accounts and passwords."
+msgstr "正在检查账号和密码均未过期的已启用本地用户。"
+
+#: users/tasks.py:113 users/tasks.py:187
+#, python-format
+msgid "Users checked: %(checked)s; reminders queued: %(notified)s; skipped because inactive or expired: %(invalid)s; skipped because outside the reminder window: %(outside)s."
+msgstr "检查用户：%(checked)s 个；提醒已提交：%(notified)s 个；未启用或已过期而跳过：%(invalid)s 个；未到提醒时间而跳过：%(outside)s 个。"
+
+#: users/tasks.py:156
+#, python-format
+msgid "Checking active local users expiring within %(first)s days; remind %(first)s days before expiry and daily within %(daily)s days."
+msgstr "正在检查 %(first)s 天内到期的已启用本地用户；在到期前 %(first)s 天提醒，并在最后 %(daily)s 天内每日提醒。"
+
+#: users/tasks.py:107
+#, python-format
+msgid "Queuing a password expiration reminder for %(user)s: %(days)s days remaining."
+msgstr "正在提交用户 %(user)s 的密码到期提醒：剩余 %(days)s 天。"
+
+#: users/tasks.py:119 users/tasks.py:193
+msgid "Nothing to process: no users matched the check criteria."
+msgstr "无需处理：没有符合检查条件的用户。"
+
+#: users/tasks.py:181
+#, python-format
+msgid "Queuing an account expiration reminder for %(user)s: %(days)s days remaining."
+msgstr "正在提交用户 %(user)s 的账号到期提醒：剩余 %(days)s 天。"
+
+#: accounts/tasks/openbao.py:114
+#, python-format
+msgid "OpenBao tokens checked: 1; rotated: 1; new TTL: %(ttl)s seconds."
+msgstr "检查 OpenBao 令牌：1 个；轮换：1 个；新令牌有效期：%(ttl)s 秒。"
+
+#: accounts/tasks/openbao.py:124
+msgid "Checking OpenBao token rotation configuration."
+msgstr "正在检查 OpenBao 令牌轮换配置。"
+
+#: accounts/tasks/openbao.py:126
+msgid "Skipped token rotation: the OpenBao vault backend is not enabled."
+msgstr "跳过令牌轮换：未启用 OpenBao 密钥保管库后端。"
+
+#: accounts/tasks/openbao.py:130
+msgid "Skipped token rotation: no enabled rotation AppRole is configured."
+msgstr "跳过令牌轮换：未配置已启用的轮换 AppRole。"
+
+#: accounts/tasks/openbao.py:137
+msgid "Skipped token rotation: another rotation task is running."
+msgstr "跳过令牌轮换：另一个轮换任务正在运行。"
+
+#: accounts/tasks/openbao.py:82
+#, python-format
+msgid "OpenBao tokens checked: 1; rotated: 0; skipped: 1. The token is still valid for %(ttl)s seconds, above the rotation threshold of %(threshold)s seconds."
+msgstr "检查 OpenBao 令牌：1 个；轮换：0 个；跳过：1 个。令牌剩余有效期为 %(ttl)s 秒，超过轮换阈值 %(threshold)s 秒。"
+
+#: ops/celery/utils.py
+#, python-format
+msgid "Created periodic task %(name)s; enabled: %(enabled)s."
+msgstr "已创建定时任务 %(name)s；是否启用：%(enabled)s。"
+
+#: ops/celery/utils.py
+#, python-format
+msgid "Updated periodic task %(name)s; enabled: %(enabled)s."
+msgstr "已更新定时任务 %(name)s；是否启用：%(enabled)s。"
+
+#: tickets/tasks.py perms/tasks.py tickets/plugins/file_transfer/execution.py
+msgid "The batch limit was reached; remaining records will be checked next time."
+msgstr "已达到本次处理上限，剩余记录将在下一次检查。"
+
+#: perms/tasks.py
+msgid "No reminder was queued; recipients are missing or publication failed."
+msgstr "未提交提醒：没有接收人或消息提交失败。"
+
+#: perms/tasks.py
+msgid "No users or administrators are available to receive reminders."
+msgstr "没有可接收提醒的用户或管理员。"
+
+#: perms/tasks.py authentication/tasks.py
+msgid "Notifications queued"
+msgstr "已提交的通知"
+
+#: perms/tasks.py
+msgid "The permission is outside the reminder window."
+msgstr "授权尚未到提醒时间。"
+
+#: perms/tasks.py
+msgid "Unable to queue a notification."
+msgstr "通知提交失败。"
+
+#: terminal/tasks.py
+msgid "Alert notifications queued"
+msgstr "已提交的告警通知"
+
+#: terminal/tasks.py
+#, python-format
+msgid "Storage check failed: %(name)s (%(type)s)."
+msgstr "存储检查失败：%(name)s（%(type)s）。"
+
+#: terminal/tasks.py
+msgid "Storage connectivity or credential validation failed."
+msgstr "存储连通性或凭据验证失败。"
+
+#: users/tasks.py
+msgid "Automatic disabling of unused users is not enabled."
+msgstr "未启用长期未使用用户的自动禁用功能。"
+
+#: users/tasks.py
+#, python-format
+msgid "Checking users with no login or API key use for %(days)s days; admin is excluded."
+msgstr "正在检查 %(days)s 天内未登录且未使用 API 密钥的用户，不包含 admin。"
+
+#: users/tasks.py ops/celery/task_logging.py accounts/tasks/automation.py tickets/plugins/file_transfer/execution.py
+msgid "The record was already handled by another task."
+msgstr "记录已被其他任务处理。"
+
+#: users/tasks.py
+msgid "The unused-user threshold is outside the enabled range of 1–998 days."
+msgstr "长期未使用用户的阈值不在启用范围内（1–998 天）。"
+
+#: users/tasks.py
+msgid "Users disabled"
+msgstr "已禁用的用户"
+
+#: users/signal_handlers.py
+msgid "Sessions deleted"
+msgstr "已删除的会话"
+
+#: ops/tasks.py
+msgid "Components with health alerts"
+msgstr "存在健康告警的组件"
+
+#: ops/tasks.py
+msgid "No health alerts to send."
+msgstr "没有需要发送的健康告警。"
+
+#: ops/tasks.py
+msgid "Service performance checks are disabled by configuration."
+msgstr "配置已关闭服务性能检查。"
+
+#: ops/tasks.py
+msgid "The component is inactive."
+msgstr "组件未启用。"
+
+#: authentication/tasks.py
+msgid "Client login session cleanup"
+msgstr "客户端登录会话清理"
+
+#: authentication/tasks.py
+msgid "Credential activity records included"
+msgstr "汇总包含的凭据活动记录"
+
+#: authentication/tasks.py
+msgid "No recent credential activity matched this user."
+msgstr "该用户没有符合条件的近期凭据活动。"
+
+#: authentication/tasks.py
+msgid "OAuth credential cleanup categories"
+msgstr "OAuth 凭据分类清理"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Expired ID tokens deleted"
+msgstr "已删除的过期 ID 令牌"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Expired access tokens deleted"
+msgstr "已删除的过期访问令牌"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Expired grant tokens deleted"
+msgstr "已删除的过期授权码"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Expired refresh tokens deleted"
+msgstr "已删除的过期刷新令牌"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "No expired records in this credential category."
+msgstr "该凭据类别没有过期记录。"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Orphaned refresh tokens deleted"
+msgstr "已删除的孤立刷新令牌"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Refresh-token retention settings require these tokens to be kept."
+msgstr "刷新令牌保留策略要求保留这些令牌。"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Revoked refresh tokens deleted"
+msgstr "已删除的已撤销刷新令牌"
+
+#: notifications/notifications.py
+#, python-format
+msgid "Channel %(channel)s: matched recipients %(matched)s; recipients with a channel account %(bound)s; unbound %(unbound)s."
+msgstr "渠道 %(channel)s：匹配接收人 %(matched)s 个；已绑定渠道账号 %(bound)s 个；未绑定 %(unbound)s 个。"
+
+#: notifications/notifications.py
+msgid "No recipients have an account for this notification channel."
+msgstr "接收人未绑定该通知渠道的账号，或已不存在。"
+
+#: notifications/notifications.py
+msgid "Notification channel calls completed"
+msgstr "已完成的通知渠道调用"
+
+#: notifications/notifications.py
+msgid "The notification channel does not support this message."
+msgstr "该通知渠道不支持此类消息。"
+
+#: notifications/notifications.py
+msgid "The notification channel raised an error."
+msgstr "通知渠道处理出错。"
+
+#: authentication/services/client_login_session.py
+msgid "Client sessions revoked"
+msgstr "已撤销的客户端会话"
+
+#: authentication/services/client_login_session.py
+msgid "The client login session is still valid."
+msgstr "客户端登录会话仍然有效。"
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Failed %(count)s: %(reason)s"
+msgstr "失败 %(count)s：%(reason)s"
+
+#: ops/celery/task_logging.py
+msgid "No matching records to process."
+msgstr "没有符合条件的待处理记录。"
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Result count — %(name)s: %(count)s."
+msgstr "处理结果 — %(name)s：%(count)s。"
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Skipped %(count)s: %(reason)s"
+msgstr "跳过 %(count)s：%(reason)s"
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Task interrupted after %(checked)s checks; changes may have been rolled back. See the task error for details."
+msgstr "任务在完成 %(checked)s 次检查后中断，修改可能已回滚。具体原因请查看任务错误日志。"
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Task started: %(name)s."
+msgstr "开始任务：%(name)s。"
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Task summary: checked %(checked)s; processed %(processed)s; skipped %(skipped)s; failed %(failed)s."
+msgstr "任务汇总：检查 %(checked)s；处理 %(processed)s；跳过 %(skipped)s；失败 %(failed)s。"
+
+#: accounts/tasks/remove_account.py
+msgid "History cleanup is disabled by the retention limit."
+msgstr "保留上限配置已禁用历史记录清理。"
+
+#: accounts/tasks/remove_account.py
+#, python-format
+msgid "Keeping %(count)s history records per account, including the current version."
+msgstr "每个账号保留 %(count)s 条历史记录，包含当前版本。"
+
+#: accounts/tasks/automation.py
+msgid "Another instance of this maintenance task is running."
+msgstr "另一个相同的维护任务正在运行。"
+
+#: accounts/tasks/automation.py
+msgid "Records belong to a credential rotation that is still running."
+msgstr "记录属于仍在运行的凭据轮换任务。"
+
+#: accounts/tasks/automation.py xpack/plugins/cloud/tasks.py
+#, python-format
+msgid "Retention period: %(days)s days."
+msgstr "保留期限：%(days)s 天。"
+
+#: accounts/tasks/automation.py
+msgid "The latest unsuccessful first-login result must be retained."
+msgstr "必须保留最近一次未成功的首次登录结果。"
+
+#: accounts/tasks/automation.py
+msgid "The owning worker has not replied and the hard timeout has not elapsed."
+msgstr "所属 Worker 未回复，且尚未超过最长执行时限。"
+
+#: accounts/tasks/automation.py
+msgid "The task is still running on a worker."
+msgstr "任务仍在 Worker 上运行。"
+
+#: accounts/tasks/automation.py
+msgid "The task is still within the startup grace period."
+msgstr "任务仍处于启动宽限期内。"
+
+#: accounts/tasks/automation.py
+msgid "Unable to acquire the task lock."
+msgstr "无法获取任务锁。"
+
+#: accounts/tasks/automation.py
+msgid "Unable to release the task lock."
+msgstr "无法释放任务锁。"
+
+#: accounts/tasks/automation.py
+msgid "Waiting for repeated confirmation that the task is missing."
+msgstr "等待再次确认任务是否已消失。"
+
+#: accounts/tasks/automation.py
+msgid "Worker status is unavailable; recovery cannot be confirmed."
+msgstr "无法获取 Worker 状态，暂不能确认是否需要恢复。"
+
+#: accounts/tasks/application_events.py
+msgid "Deliveries marked expired"
+msgstr "已标记过期的投递"
+
+#: accounts/tasks/application_events.py tickets/plugins/change_secret/execution.py tickets/plugins/file_transfer/execution.py
+msgid "Executions queued"
+msgstr "已提交到队列的执行任务"
+
+#: accounts/tasks/application_events.py tickets/plugins/change_secret/execution.py tickets/plugins/file_transfer/execution.py
+msgid "Unable to queue an execution; it will be retried later."
+msgstr "执行任务入队失败，将在后续重试。"
+
+#: accounts/tasks/credential_preparation.py
+msgid "Unable to check credential rotation readiness."
+msgstr "无法检查凭据轮换准备状态。"
+
+#: accounts/tasks/credential_preparation.py
+msgid "Waiting for client confirmation or the source-account quiet period."
+msgstr "等待客户端确认或源账号静默期结束。"
+
+#: tickets/workflow/engine.py
+msgid "The workflow has changed or its approval deadline has not elapsed."
+msgstr "审批流程状态已变化，或尚未超过审批截止时间。"
+
+#: tickets/plugins/change_secret/execution.py tickets/plugins/file_transfer/execution.py
+msgid "The execution is no longer eligible for dispatch."
+msgstr "执行记录已不符合调度条件。"
+
+#: tickets/plugins/file_transfer/execution.py
+msgid "Files belong to a transfer that is still running."
+msgstr "文件属于仍在运行的传输任务。"
+
+#: tickets/plugins/file_transfer/execution.py
+msgid "Interrupted transfers marked for verification"
+msgstr "已标记待核验的中断传输"
+
+#: tickets/plugins/file_transfer/execution.py
+msgid "Unable to remove a temporary file; it will be retried later."
+msgstr "无法删除临时文件，将在后续重试。"
+
+#: xpack/plugins/cloud/tasks.py
+msgid "Cleanup is disabled because the retention period is not positive."
+msgstr "保留期限不大于零，已禁用清理。"
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Reason: %(reason)s"
+msgstr "说明：%(reason)s"
+
+#: notifications/notifications.py
+msgid "No notification channels are configured."
+msgstr "没有配置通知渠道。"
+
+#: accounts/tasks/application_events.py:46
+#, python-format
+msgid "Unable to dispatch application webhook delivery %(delivery)s."
+msgstr "无法调度应用 Webhook 投递 %(delivery)s。"
+
+#: accounts/tasks/automation.py:139
+msgid "Skipped interrupted account task inspection: no Celery worker replied."
+msgstr "跳过中断账号任务检查：没有 Celery Worker 响应。"
+
+#: accounts/tasks/automation.py:132
+msgid "Unable to inspect active Celery tasks."
+msgstr "无法检查正在执行的 Celery 任务。"
+
+#: accounts/tasks/automation.py:169
+#, python-format
+msgid "Unable to confirm interrupted task status: execution=%(execution)s."
+msgstr "无法确认中断任务状态：执行记录=%(execution)s。"
+
+#: accounts/tasks/automation.py:180
+#, python-format
+msgid "Unable to clear the interrupted task confirmation marker: execution=%(execution)s."
+msgstr "无法清除中断任务确认标记：执行记录=%(execution)s。"
+
+#: accounts/tasks/automation.py:202
+msgid "Unable to acquire the interrupted account task recovery lock."
+msgstr "无法获取中断账号任务恢复锁。"
+
+#: accounts/tasks/automation.py:218
+msgid "Unable to release the interrupted account task recovery lock."
+msgstr "无法释放中断账号任务恢复锁。"
+
+#: accounts/tasks/credential_preparation.py:12 accounts/tasks/credential_preparation.py:15
+msgid "Check credential rotation readiness"
+msgstr "检查凭据轮换准备状态"
+
+#: accounts/tasks/credential_preparation.py:33
+#, python-format
+msgid "Unable to check rotation readiness: credential=%(credential)s."
+msgstr "无法检查轮换准备状态：凭据=%(credential)s。"
+
+#: accounts/tasks/openbao.py:28
+msgid "JumpServer must use the OpenBao vault backend."
+msgstr "JumpServer 必须使用 OpenBao 密钥库后端。"
+
+#: accounts/tasks/openbao.py:30
+msgid "OpenBao token rotation requires HTTPS with TLS verification."
+msgstr "OpenBao 令牌轮换要求使用 HTTPS 并启用 TLS 验证。"
+
+#: accounts/tasks/openbao.py:62
+#, python-format
+msgid "OpenBao token lookup returned HTTP %(status)s."
+msgstr "OpenBao 令牌查询返回 HTTP %(status)s。"
+
+#: accounts/tasks/openbao.py:70
+msgid "OpenBao address changed. Reconfigure the rotation AppRole."
+msgstr "OpenBao 地址已变更，请重新配置轮换 AppRole。"
+
+#: accounts/tasks/openbao.py:98
+msgid "OpenBao did not issue a distinct token."
+msgstr "OpenBao 未签发不同于原令牌的新令牌。"
+
+#: accounts/tasks/openbao.py:102
+msgid "The new OpenBao token must support self lookup and last over seven days."
+msgstr "新的 OpenBao 令牌必须支持自身查询，且有效期超过七天。"
+
+#: accounts/tasks/openbao.py:104
+msgid "The new token failed the JumpServer OpenBao operation check."
+msgstr "新令牌未通过 JumpServer OpenBao 操作检查。"
+
+#: accounts/tasks/openbao.py:94
+#, python-format
+msgid "OpenBao AppRole login returned HTTP %(status)s."
+msgstr "OpenBao AppRole 登录返回 HTTP %(status)s。"
+
+#: accounts/tasks/openbao.py:109
+msgid "The configured OpenBao token changed during rotation."
+msgstr "已配置的 OpenBao 令牌在轮换期间发生变更。"
+
+#: accounts/tasks/openbao.py:120
+msgid "Check and rotate the OpenBao vault token"
+msgstr "检查并轮换 OpenBao 密钥库令牌"
+
+#: accounts/tasks/openbao.py:133
+msgid "OpenBao rotation requires encrypted AppRole credentials."
+msgstr "OpenBao 轮换要求加密存储 AppRole 凭据。"
+
+#: authentication/services/client_login_session.py:411
+msgid "Access tokens deleted"
+msgstr "已删除的访问令牌"
+
+#: authentication/services/client_login_session.py:412
+msgid "Refresh tokens deleted"
+msgstr "已删除的刷新令牌"
+
+#: authentication/services/client_login_session.py:419
+msgid "Client login sessions deleted"
+msgstr "已删除的客户端登录会话"
+
+#: perms/tasks.py:141
+#, python-format
+msgid "Unable to queue an asset permission expiration reminder: permission=%(permission)s; user=%(user)s."
+msgstr "资产授权到期提醒入队失败：授权=%(permission)s；用户=%(user)s。"
+
+#: terminal/tasks.py:268
+#, python-brace-format
+msgid "Test failure: {error}"
+msgstr "测试失败：{error}"
+
+#: tickets/plugins/change_secret/execution.py:100
+#, python-format
+msgid "Unable to queue password change for ticket %(ticket)s (%(error)s)."
+msgstr "工单 %(ticket)s 的改密任务入队失败（%(error)s）。"
+
+#: tickets/plugins/file_transfer/execution.py:50
+#, python-format
+msgid "Unable to queue ticket transfer %(ticket)s (%(error)s)."
+msgstr "工单传输 %(ticket)s 入队失败（%(error)s）。"
+
+#: tickets/plugins/file_transfer/execution.py:249
+#, python-format
+msgid "Unable to purge ticket transfer file %(file)s (%(error)s)."
+msgstr "无法清理工单传输文件 %(file)s（%(error)s）。"
+
+#: accounts/automations/recovery.py:38
+msgid "Invalid interrupted automation runtime path."
+msgstr "中断自动化任务的运行目录路径无效。"
+
+#: accounts/automations/recovery.py:269
+#, python-format
+msgid "Interrupted account automation finalized: execution=%(execution)s; status=%(status)s; password change records=%(changes)s; password push records=%(pushes)s."
+msgstr "已完成中断账号自动化任务的收尾：执行记录=%(execution)s；状态=%(status)s；改密记录=%(changes)s；密码推送记录=%(pushes)s。"
+
+#: accounts/automations/recovery.py:264
+#, python-format
+msgid "Unable to clean the interrupted automation runtime: execution=%(execution)s."
+msgstr "无法清理中断自动化任务的运行目录：执行记录=%(execution)s。"
+
+#: accounts/automations/recovery.py:244
+#, python-format
+msgid "Unable to clear interrupted account task status: execution=%(execution)s; account=%(account)s."
+msgstr "无法清除中断账号任务状态：执行记录=%(execution)s；账号=%(account)s。"
+
+#: accounts/automations/recovery.py:257
+#, python-format
+msgid "Unable to release the interrupted account lock: execution=%(execution)s; account=%(account)s."
+msgstr "无法释放中断账号锁：执行记录=%(execution)s；账号=%(account)s。"
+
+#: accounts/models/application.py:56
+msgid "The application account scope exceeds the configured limit."
+msgstr "应用的账号范围超出配置上限，请缩小账号范围后重试。"
+
+#: accounts/serializers/account/service.py:127
+#, python-format
+msgid ""
+"The application account scope has %(count)s accounts; the configured limit "
+"is %(limit)s."
+msgstr ""
+"当前应用的账号范围包含 %(count)s 个账号，超过配置上限 %(limit)s 个。"
+"请缩小账号范围后重试。"
+
+#: accounts/serializers/account/service.py
+msgid "Select at least one account."
+msgstr "请至少选择一个账号。"
+
+#: tickets/workflow/definition.py tickets/workflow/approvers.py
+msgid "Invalid user filter."
+msgstr "用户筛选规则无效。"

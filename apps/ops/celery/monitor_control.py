@@ -1,9 +1,12 @@
 """Bounded worker snapshots and targeted task control without task arguments."""
+import os
 from itertools import islice
 
 from celery.worker import state as worker_state
 from celery.worker.control import control_command, inspect_command
 from celery.worker.request import Request
+
+from .monitor_stats import get_outcome_counts
 
 
 TASK_LIMIT = 100
@@ -131,7 +134,12 @@ def jms_monitor_snapshot(state, **kwargs):
         'queues': [q.name for q in islice(consumer.task_consumer.queues, QUEUE_LIMIT)],
         'queues_truncated': len(consumer.task_consumer.queues) > QUEUE_LIMIT,
         'truncated': {},
+        **get_outcome_counts(),
     }
+    try:
+        result['load_average'] = list(os.getloadavg())
+    except (AttributeError, OSError):
+        result['load_average'] = None
     sources = {
         'active': (active, False, None),
         'reserved': (worker_state.reserved_requests, False, active),

@@ -14,6 +14,7 @@ from django.utils.dateparse import parse_datetime
 from django.utils.translation import gettext
 
 import tickets.plugins.registry
+from tickets.workflow.definition import validate_user_selector
 
 
 ROOT_ID = '00000000-0000-0000-0000-000000000000'
@@ -92,9 +93,12 @@ def publish_workflow(apps, db, workflow, definition):
         kind, config = item['type'], dict(item.get('config', {}))
         if kind == 'approval':
             selector = config.get('approvers', {})
-            if selector.get('type') not in ('user', 'role'):
+            if selector.get('type') not in ('user', 'role', 'user_selector'):
                 raise ValueError('Unsupported legacy approver selector.')
-            config['approvers'] = {'type': selector['type'], 'value': uuid_list(selector.get('value'))}
+            if selector['type'] == 'user_selector':
+                validate_user_selector(selector.get('value'))
+            else:
+                config['approvers'] = {'type': selector['type'], 'value': uuid_list(selector.get('value'))}
             config.update(strategy='any', allow_transfer=False, allow_add_approver=False,
                           timeout=0, timeout_action='expire')
             config.setdefault('exclude_applicant', True)
@@ -144,8 +148,12 @@ def selected_users(apps, db, org_id, selector):
         name, value, match = attr['name'], attr['value'], attr.get('match', 'exact')
         if name in ('system_roles', 'org_roles'):
             ids = uuid_list(value)
+            scope = 'system' if name == 'system_roles' else 'org'
+            roles = apps.get_model('rbac', 'Role')._base_manager.using(db).filter(pk__in=ids, scope=scope)
+            if roles.count() != len(ids):
+                raise ValueError('A legacy approver role is missing or has a different scope.')
             bindings = apps.get_model('rbac', 'RoleBinding')._base_manager.using(db).filter(
-                scope='system' if name == 'system_roles' else 'org', role_id__in=ids,
+                scope=scope, role_id__in=ids,
             )
             if name == 'system_roles':
                 bindings = bindings.filter(org__isnull=True)
@@ -156,6 +164,12 @@ def selected_users(apps, db, org_id, selector):
             users = users.filter(pk__in=bindings.values('user_id'))
         elif match in ('m2m', 'm2m_all', 'in'):
             values = value if isinstance(value, list) else [value]
+            if name in ('groups', 'labels'):
+                app, model = ('users', 'UserGroup') if name == 'groups' else ('labels', 'Label')
+                resources = apps.get_model(app, model)._base_manager.using(db).filter(
+                    pk__in=values, org_id=org_id)
+                if resources.count() != len(set(values)):
+                    raise ValueError('A legacy approver filter references missing or foreign resources.')
             if match == 'in' and '*' in values:
                 continue
             for values in ([[v] for v in values] if match == 'm2m_all' else [values]):
@@ -173,7 +187,7 @@ def selected_users(apps, db, org_id, selector):
 
 def convert_flow(apps, db, flow):
     nodes = [{'id': 'start', 'type': 'start'}]
-    notes, preserved = [], True
+    notes = []
     cc = [str(pk) for pk in flow.cc_users.using(db).values_list('pk', flat=True)]
     if cc:
         nodes.append({'id': 'cc_legacy', 'type': 'cc', 'name': 'CC', 'config': {'users': cc}})
@@ -182,29 +196,23 @@ def convert_flow(apps, db, flow):
         raise ValueError('The legacy flow has no approval rules.')
     for index, rule in enumerate(rules, 1):
         selector = getattr(rule.users, 'value', rule.users) or {}
-        attrs = selector.get('attrs', []) if selector.get('type') == 'attrs' else []
-        role = attrs[0] if len(attrs) == 1 else {}
-        if isinstance(role, dict) and role.get('name') in ('system_roles', 'org_roles') and role.get('match') == 'm2m':
-            ids = uuid_list(role.get('value'))
-            scope = 'system' if role['name'] == 'system_roles' else 'org'
-            roles = apps.get_model('rbac', 'Role')._base_manager.using(db).filter(pk__in=ids, scope=scope)
-            if roles.count() != len(ids):
-                raise ValueError('A legacy approver role is missing or has a different scope.')
-            approvers = {'type': 'role', 'value': ids}
-            count = None
-        else:
+        if selector.get('type') == 'ids':
             users = list(selected_users(apps, db, flow.org_id, selector).order_by('id')[:1001])
             if not 1 <= len(users) <= 1000:
                 raise ValueError(f'Legacy level {rule.level} has no eligible approvers or exceeds 1000 users.')
             approvers = {'type': 'user', 'value': [str(user.pk) for user in users]}
             count = len(users)
-            preserved = preserved and selector.get('type') == 'ids'
+        else:
+            validate_user_selector(selector)
+            selected_users(apps, db, flow.org_id, selector).exists()
+            approvers = {'type': 'user_selector', 'value': selector}
+            count = None
         nodes.append({'id': f'approval_{index}', 'type': 'approval', 'name': f'Approval {index}',
                       'config': {'approvers': approvers}})
         notes.append({'level': rule.level, 'legacy_selector': selector, 'resolved_user_count': count})
     nodes.append({'id': 'end', 'type': 'end'})
     return {'nodes': nodes, 'edges': [[a['id'], b['id']] for a, b in zip(nodes, nodes[1:])]}, {
-        'rules': notes, 'cc_user_ids': cc, 'requires_review': not preserved,
+        'rules': notes, 'cc_user_ids': cc, 'requires_review': False,
     }
 
 
@@ -229,10 +237,10 @@ def import_flow(apps, db, flow):
         return [reason]
     workflow = workflows.create(
         org_id=flow.org_id, type=flow.type, name=name, legacy_flow_id=flow.pk,
-        enabled=not notes['requires_review'], created_by='Legacy workflow import', migration_notes=notes,
+        enabled=True, created_by='Legacy workflow import', migration_notes=notes,
     )
     publish_workflow(apps, db, workflow, definition)
-    return ['Complex legacy selector requires review.'] if notes['requires_review'] else []
+    return []
 
 
 def default_workflows(apps, db):
@@ -303,9 +311,9 @@ def asset_request_context(apps, db, ticket):
         ids.update(str(pk) for pk in Asset.objects.using(db).filter(
             descendants, org_id=ticket.org_id, nodes__org_id=ticket.org_id,
         ).values_list('pk', flat=True))
-    assets = asset_snapshots(apps, db, ticket.org_id, ids)
-    selectors = data.get('apply_accounts') or []
-    if not isinstance(selectors, list) or not selectors or any(not isinstance(s, str) for s in selectors):
+    assets = asset_snapshots(apps, db, ticket.org_id, ids) if ids else []
+    selectors = data.get('apply_accounts', [])
+    if not isinstance(selectors, list) or any(not isinstance(s, str) for s in selectors):
         raise ValueError('Select valid accounts before submitting the request.')
     start = parse_datetime(data['apply_date_start']) if data.get('apply_date_start') else None
     end = parse_datetime(data['apply_date_expired']) if data.get('apply_date_expired') else None
@@ -321,11 +329,6 @@ def asset_request_context(apps, db, ticket):
     if '@ALL' not in selectors:
         accounts = accounts.filter(username__in=selectors)
     accounts = list(accounts)
-    grant_selectors = sorted(set([s for s in selectors if s != '@ALL'] + (
-        [account['username'] for account in accounts] if '@ALL' in selectors else []
-    )))
-    if not grant_selectors:
-        raise ValueError('No accounts matched the request.')
     snapshots = [{**a, 'id': str(a['id']), 'asset_id': str(a['asset_id'])} for a in accounts]
     known = {a['username'] for a in accounts}
     for selector in dict.fromkeys(selectors):
@@ -349,7 +352,7 @@ def asset_request_context(apps, db, ticket):
             'permission_name': data.get('apply_permission_name') or f'Ticket {ticket.pk}',
             'users': [user_snapshot(user) for user in users],
             'is_on_behalf': len(users) != 1 or users[0].pk != ticket.applicant_id,
-            'account_selectors': grant_selectors, 'actions': actions,
+            'account_selectors': selectors, 'actions': actions,
             'date_start': start.isoformat(), 'date_expired': end.isoformat(),
             'expire_soon_notice_minutes': data.get('apply_expire_soon_notice_minutes'),
         },

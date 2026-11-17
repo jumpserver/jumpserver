@@ -36,6 +36,10 @@ from ops.ansible.exception import CommandInBlackListException
 from ops.mixin import PeriodTaskModelMixin
 from ops.variables import *
 from ops.const import Types, RunasPolicies, JobStatus, JobModules, LOGIN_ASSET_ACL_DENIED
+from ops.database import (
+    DATABASE_JOB_MODULES, DATABASE_JOB_PROTOCOLS, NATIVE_DATABASE_JOB_MODULES,
+    database_module_matches,
+)
 from ops.utils import merge_nodes_and_assets
 from orgs.mixins.models import JMSOrgBaseModel
 from perms.models import AssetPermission
@@ -140,22 +144,32 @@ class JMSPermedInventory(JMSInventory):
             'winrm': ['win_shell', 'shell'],
         }
 
-        if self.module not in protocol_supported_modules_mapping.get(protocol.name, []):
+        database_options = host['jms_asset'].get('database_options', {})
+        is_database = database_module_matches(self.module, asset.type, protocol.name, database_options)
+        if not is_database and self.module not in protocol_supported_modules_mapping.get(protocol.name, []):
             host['error'] = _("Module {} is not suitable for this asset").format(self.module)
             return host
 
-        if protocol.name in ('mariadb', 'mysql', 'postgresql', 'sqlserver'):
-            host['login_host'] = asset.address
+        if asset.type == 'oceanbase' and database_options.get('tenant_mode') == 'oracle' and self.module != 'oceanbase':
+            host['error'] = _("Oracle-mode OceanBase assets require the OceanBase module")
+            return host
+
+        if is_database:
+            host['ansible_connection'] = 'local'
+            host['login_host'] = escape_jinja2_syntax(asset.address)
             host['login_port'] = protocol.port
-            host['login_user'] = account.username
-            host['login_password'] = account.secret
-            host['login_db'] = asset.spec_info.get('db_name', '')
+            host['login_user'] = escape_jinja2_syntax(account.username)
+            host['login_password'] = escape_jinja2_syntax(account.secret)
+            host['login_db'] = escape_jinja2_syntax(asset.spec_info.get('db_name', ''))
+            # Job parameters are jms_* namespaced. Keep trusted TLS/tenant
+            # options outside that namespace, like the existing login_* vars.
+            host['login_options'] = database_options
             host['ansible_python_interpreter'] = '{{ local_python_interpreter }}'
             if gateway:
                 host['jms_gateway'] = {
                     'address': gateway.address, 'port': gateway.port,
                     'username': gateway.username, 'secret': gateway.password,
-                    'private_key_path': gateway.private_key_path
+                    'private_key_path': gateway.get_private_key_path(path_dir)
                 }
                 host['jms_asset']['port'] = protocol.port
             return host
@@ -323,9 +337,13 @@ class JobExecution(JMSOrgBaseModel):
 
     @classmethod
     def clean_unexpected_execution(cls):
+        checked = cleaned = 0
         for execution in cls.objects.filter(status__in=[JobStatus.running]).all():
+            checked += 1
             if execution.date_created < (timezone.now() - timedelta(hours=3)):
                 execution.set_error(zombie_task_exception)
+                cleaned += 1
+        return checked, cleaned
 
     @property
     def current_job(self):
@@ -366,9 +384,22 @@ class JobExecution(JMSOrgBaseModel):
         module = self.current_job.module
         args = escape_jinja2_syntax(self.rendered_args)
 
-        db_modules = ('mysql', 'postgresql', 'sqlserver', 'oracle')
+        if module in NATIVE_DATABASE_JOB_MODULES:
+            # SQL remains one literal argument; trusted connection arguments
+            # follow it so user SQL cannot override the inventory endpoint.
+            shell = 'query="{}" action=query database_type={} '.format(
+                quote_ansible_module_arg(args), module,
+            )
+            shell += ('login_host={{login_host}} login_port={{login_port}} '
+                      'login_user={{login_user}} login_password={{login_password}} '
+                      'login_database={{login_db}} '
+                      'connection_options={{login_options}}')
+            return 'database_automation', shell
+
+        db_modules = DATABASE_JOB_MODULES
         db_module_name_map = {
             'mysql': 'community.mysql.mysql_query',
+            'mariadb': 'community.mysql.mysql_query',
             'postgresql': 'community.postgresql.postgresql_query',
             'sqlserver': 'mssql_script',
         }
@@ -643,7 +674,7 @@ class JobExecution(JMSOrgBaseModel):
                 account_username=self.current_job.runas
             )
             protocols = [p.name for p in asset.protocols.all()]
-            if acls and set(protocols) & {'mariadb', 'mysql', 'postgresql', 'sqlserver'}:
+            if acls and set(protocols) & DATABASE_JOB_PROTOCOLS:
                 print(
                     "\033[31mcommand \'{}\' on asset {}({}) and account {} is rejected by data masking rules acl {}\033[0m"
                     .format(self.current_job.args, asset.name, asset.address, self.current_job.runas, list(acls))

@@ -45,6 +45,7 @@ from orgs.models import Organization
 from orgs.utils import set_to_root_org, tmp_to_org
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import AllowAny
+from rest_framework.test import force_authenticate
 
 
 class ApplicationAccessTests(CredentialTestCase):
@@ -225,17 +226,56 @@ class ApplicationAccessTests(CredentialTestCase):
         self.assertEqual(application.accounts.value, {'type': 'ids', 'ids': []})
         self.assertFalse(application.get_accounts().exists())
 
-        serializer = IntegrationApplicationSerializer(data={'name': 'API empty pull scope'})
-        serializer.is_valid(raise_exception=True)
-        created = serializer.save()
-        self.assertEqual(created.accounts.value, {'type': 'ids', 'ids': []})
-        self.assertFalse(created.get_accounts().exists())
+        for data in (
+            {'name': 'API default pull scope'},
+            {'name': 'API empty pull scope', 'accounts': {}},
+        ):
+            with self.subTest(data=data):
+                serializer = IntegrationApplicationSerializer(data=data)
+                serializer.is_valid(raise_exception=True)
+                created = serializer.save()
+                self.assertEqual(created.accounts.value, {'type': 'ids', 'ids': []})
+                self.assertFalse(created.get_accounts().exists())
 
-        serializer = IntegrationApplicationSerializer(data={
-            'name': 'Explicit empty pull scope', 'accounts': {'type': 'ids', 'ids': []},
-        })
-        serializer.is_valid(raise_exception=True)
-        self.assertFalse(serializer.save().get_accounts().exists())
+    def test_create_application_reports_invalid_ip_and_empty_selected_accounts(self):
+        path = '/api/v1/accounts/integration-applications/'
+        view = IntegrationApplicationViewSet.as_view({'post': 'create'})
+        name = 'Invalid application configuration'
+        request = self.factory.post(path, {
+            'name': name,
+            'ip_group': ['*', '256.0.0.1', '192.0.2.1-192.0.2.2-192.0.2.3'],
+            'accounts': json.dumps({'type': 'ids', 'ids': []}),
+        }, format='multipart', HTTP_X_JMS_ORG=str(self.org.id), HTTP_ACCEPT='application/json')
+        force_authenticate(request, user=self.admin)
+        with transaction.atomic():
+            response = view(request)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('256.0.0.1', response.data['ip_group'][1][0])
+        self.assertIn('192.0.2.1-192.0.2.2-192.0.2.3', response.data['ip_group'][2][0])
+        self.assertEqual(response.data['accounts'][0].code, 'required')
+        self.assertFalse(IntegrationApplication.objects.filter(name=name).exists())
+
+    def test_update_application_rejects_empty_selected_accounts(self):
+        path = f'/api/v1/accounts/integration-applications/{self.application.pk}/'
+        view = IntegrationApplicationViewSet.as_view({'put': 'update', 'patch': 'partial_update'})
+        for method, existing_ids in (('put', [str(self.primary.id)]), ('patch', [])):
+            with self.subTest(method=method):
+                scope = {'type': 'ids', 'ids': existing_ids}
+                self.application.accounts = scope
+                self.application.save(update_fields=['accounts'])
+                name = self.application.name
+                request = getattr(self.factory, method)(path, {
+                    'name': 'Rejected application update',
+                    'accounts': json.dumps({'type': 'ids', 'ids': []}),
+                }, format='multipart', HTTP_X_JMS_ORG=str(self.org.id))
+                force_authenticate(request, user=self.admin)
+                with transaction.atomic():
+                    response = view(request, pk=self.application.pk)
+                self.assertEqual(response.status_code, 400, response.data)
+                self.assertEqual(response.data['accounts'][0].code, 'required')
+                self.application.refresh_from_db()
+                self.assertEqual(self.application.name, name)
+                self.assertEqual(self.application.accounts.value, scope)
 
     def test_application_pull_scope_limit_applies_to_every_scope_type(self):
         rejected_scopes = [

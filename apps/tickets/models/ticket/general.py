@@ -53,7 +53,7 @@ class TicketStep(JMSBaseModel):
     def change_state(self, state, processor):
         if state != StepState.closed:
             assignees = self.ticket_assignees.filter(assignee=processor)
-            if not assignees:
+            if not assignees.exists():
                 raise PermissionError('Only assignees can do this')
             assignees.update(state=state)
         self.status = StepStatus.closed

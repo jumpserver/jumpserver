@@ -76,7 +76,10 @@ class IntegrationApplicationSerializer(BulkOrgResourceModelSerializer):
         return super().update(instance, validated_data)
 
     def validate_accounts(self, value):
-        value = value or empty_application_accounts()
+        if not value:
+            return empty_application_accounts()
+        if value['type'] == 'ids' and not value['ids']:
+            raise serializers.ValidationError(_('Select at least one account.'), code='required')
         if self.instance and value == self.instance.accounts.value:
             return value
         if value['type'] == 'ids':
@@ -228,8 +231,10 @@ class ApplicationWebhookSerializer(serializers.ModelSerializer):
         events = attrs.get('events', getattr(instance, 'events', []))
         applications = attrs.get('applications')
         if applications is None and instance and instance.pk:
-            applications = instance.applications.all()
-        if not applications:
+            has_applications = instance.applications.exists()
+        else:
+            has_applications = bool(applications)
+        if not has_applications:
             raise serializers.ValidationError({'applications': _('Select at least one application.')})
         if enabled and not url:
             raise serializers.ValidationError({'url': _('URL is required when webhook is enabled.')})

@@ -88,6 +88,19 @@ class ResourceAdjustmentTests(TestCase):
             'expected_revision': revision, 'reason': 'Matched the requested production host',
             'resources': resources or self.resources(instance.ticket.type)}, user=user)
 
+    def test_adjusting_resources_keeps_the_selected_approvers(self):
+        self.create_account()
+        self.grant_query()
+        selector = {'type': 'attrs', 'attrs': [{'name': 'name', 'value': self.alice.name}]}
+        definition = approval_definition([], approvers={'type': 'user_selector', 'value': selector})
+        _, instance = self.deferred(definition=definition)
+        selections = instance.context['approver_selections']
+        User.objects.filter(pk=self.alice.pk).update(name='Changed after submission')
+        self.assertEqual(self.save(instance).status_code, 200)
+        instance.refresh_from_db()
+        self.assertEqual(instance.context['approver_selections'], selections)
+        self.assertEqual(self.task(instance).assignee_id, self.alice.pk)
+
     def test_both_types_save_separately_then_approve_and_preserve_original_description(self):
         self.create_account()
         self.grant_query()

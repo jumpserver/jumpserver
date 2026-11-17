@@ -18604,3 +18604,652 @@ msgstr "Política de sesión"
 
 msgid "Log in again when the browser closes"
 msgstr "Volver a iniciar sesión al cerrar el navegador"
+
+#: terminal/tasks.py:42
+#, python-format
+msgid "Checking terminal status records older than %(days)s days."
+msgstr "Comprobando registros de estado de terminales con más de %(days)s días."
+
+#: terminal/tasks.py:47 ops/tasks.py:235
+#, python-format
+msgid "Expired records matched: %(checked)s; deleted: %(deleted)s."
+msgstr "Registros caducados coincidentes: %(checked)s; eliminados: %(deleted)s."
+
+#: terminal/tasks.py:65
+msgid "Checking unfinished sessions; active sessions will be kept."
+msgstr "Comprobando sesiones sin finalizar; se conservarán las sesiones activas."
+
+#: terminal/tasks.py:82
+#, python-format
+msgid "Sessions checked: %(checked)s; marked finished: %(finished)s; skipped because still active: %(active)s; related tasks marked finished: %(tasks)s."
+msgstr "Sesiones comprobadas: %(checked)s; marcadas como finalizadas: %(finished)s; omitidas por seguir activas: %(active)s; tareas relacionadas marcadas como finalizadas: %(tasks)s."
+
+#: terminal/tasks.py:51 ops/tasks.py:239
+msgid "Nothing to clean: no records exceeded the retention period."
+msgstr "No hay nada que limpiar: ningún registro supera el período de retención."
+
+#: terminal/tasks.py:87
+msgid "Nothing to process: no unfinished sessions."
+msgstr "No hay nada que procesar: no hay sesiones sin finalizar."
+
+#: ops/celery/utils.py:38
+#, python-format
+msgid "Checking periodic task: %(name)s."
+msgstr "Comprobando tarea periódica: %(name)s."
+
+#: ops/celery/utils.py:61
+#, python-format
+msgid "Schedule: every %(seconds)s seconds."
+msgstr "Programación: cada %(seconds)s segundos."
+
+#: ops/celery/utils.py:46
+#, python-format
+msgid "Skipped periodic task %(name)s: the scheduling database is unavailable."
+msgstr "Tarea periódica %(name)s omitida: la base de datos de programación no está disponible."
+
+#: ops/celery/utils.py:77
+#, python-format
+msgid "Schedule (cron): %(cron)s; time zone: %(timezone)s."
+msgstr "Programación (cron): %(cron)s; zona horaria: %(timezone)s."
+
+#: ops/celery/utils.py:81
+#, python-format
+msgid "Skipped periodic task %(name)s: no valid interval or cron expression is configured."
+msgstr "Tarea periódica %(name)s omitida: no se ha configurado un intervalo ni una expresión cron válidos."
+
+#: ops/celery/utils.py:66
+#, python-format
+msgid "Skipped periodic task %(name)s: the cron expression must contain five fields."
+msgstr "Tarea periódica %(name)s omitida: la expresión cron debe contener cinco campos."
+
+#: ops/tasks.py:123
+msgid "Checking periodic tasks; tasks still registered in the worker will be kept."
+msgstr "Comprobando tareas periódicas; se conservarán las tareas que siguen registradas en el Worker."
+
+#: ops/tasks.py:144
+#, python-format
+msgid "Periodic tasks checked: %(checked)s; deleted: %(cleaned)s; kept because still registered: %(kept)s; cleanup failures: %(failed)s."
+msgstr "Tareas periódicas comprobadas: %(checked)s; eliminadas: %(cleaned)s; conservadas por seguir registradas: %(kept)s; errores de limpieza: %(failed)s."
+
+#: ops/tasks.py:161
+msgid "Starting periodic task registration."
+msgstr "Iniciando el registro de tareas periódicas."
+
+#: ops/tasks.py:172
+#, python-format
+msgid "Periodic tasks checked: %(checked)s; created: %(created)s; updated: %(updated)s; skipped: %(skipped)s."
+msgstr "Tareas periódicas comprobadas: %(checked)s; creadas: %(created)s; actualizadas: %(updated)s; omitidas: %(skipped)s."
+
+#: ops/tasks.py:203
+#, python-format
+msgid "Checking running jobs; jobs older than %(hours)s hours will be marked failed."
+msgstr "Comprobando trabajos en ejecución; los que superen %(hours)s horas se marcarán como fallidos."
+
+#: ops/tasks.py:208
+#, python-format
+msgid "Jobs checked: %(checked)s; marked failed: %(cleaned)s; skipped because within the time limit: %(skipped)s."
+msgstr "Trabajos comprobados: %(checked)s; marcados como fallidos: %(cleaned)s; omitidos por estar dentro del límite de tiempo: %(skipped)s."
+
+#: ops/tasks.py:229
+#, python-format
+msgid "Checking job execution records older than %(days)s days."
+msgstr "Comprobando registros de ejecución de trabajos con más de %(days)s días."
+
+#: ops/tasks.py:133
+#, python-format
+msgid "Removing periodic task %(name)s: its task is no longer registered."
+msgstr "Eliminando tarea periódica %(name)s: su tarea ya no está registrada."
+
+#: ops/tasks.py:213
+msgid "Nothing to process: no running jobs."
+msgstr "No hay nada que procesar: no hay trabajos en ejecución."
+
+#: ops/tasks.py:143
+#, python-format
+msgid "Periodic task %(name)s still exists after cleanup."
+msgstr "La tarea periódica %(name)s sigue existiendo después de la limpieza."
+
+#: settings/tasks/ldap.py:88
+#, python-format
+msgid "Checking LDAP periodic sync configuration: %(name)s."
+msgstr "Comprobando la configuración de sincronización periódica LDAP: %(name)s."
+
+#: settings/tasks/ldap.py:95
+#, python-format
+msgid "Skipped registration: LDAP periodic sync is disabled; schedules kept disabled: %(count)s."
+msgstr "Registro omitido: la sincronización periódica LDAP está deshabilitada; programaciones que se mantienen deshabilitadas: %(count)s."
+
+#: users/tasks.py:97
+msgid "Checking active local users with unexpired accounts and passwords."
+msgstr "Comprobando usuarios locales activos cuyas cuentas y contraseñas no han caducado."
+
+#: users/tasks.py:113 users/tasks.py:187
+#, python-format
+msgid "Users checked: %(checked)s; reminders queued: %(notified)s; skipped because inactive or expired: %(invalid)s; skipped because outside the reminder window: %(outside)s."
+msgstr "Usuarios comprobados: %(checked)s; recordatorios en cola: %(notified)s; omitidos por inactividad o caducidad: %(invalid)s; omitidos por estar fuera del período de recordatorio: %(outside)s."
+
+#: users/tasks.py:156
+#, python-format
+msgid "Checking active local users expiring within %(first)s days; remind %(first)s days before expiry and daily within %(daily)s days."
+msgstr "Comprobando usuarios locales activos que caducan en %(first)s días; se recuerda %(first)s días antes de la caducidad y a diario durante los últimos %(daily)s días."
+
+#: users/tasks.py:107
+#, python-format
+msgid "Queuing a password expiration reminder for %(user)s: %(days)s days remaining."
+msgstr "Añadiendo a la cola un recordatorio de caducidad de contraseña para %(user)s: quedan %(days)s días."
+
+#: users/tasks.py:119 users/tasks.py:193
+msgid "Nothing to process: no users matched the check criteria."
+msgstr "No hay nada que procesar: ningún usuario cumple los criterios de comprobación."
+
+#: users/tasks.py:181
+#, python-format
+msgid "Queuing an account expiration reminder for %(user)s: %(days)s days remaining."
+msgstr "Añadiendo a la cola un recordatorio de caducidad de cuenta para %(user)s: quedan %(days)s días."
+
+#: accounts/tasks/openbao.py:114
+#, python-format
+msgid "OpenBao tokens checked: 1; rotated: 1; new TTL: %(ttl)s seconds."
+msgstr "Tokens OpenBao comprobados: 1; rotados: 1; nuevo período de validez: %(ttl)s segundos."
+
+#: accounts/tasks/openbao.py:124
+msgid "Checking OpenBao token rotation configuration."
+msgstr "Comprobando la configuración de rotación de tokens OpenBao."
+
+#: accounts/tasks/openbao.py:126
+msgid "Skipped token rotation: the OpenBao vault backend is not enabled."
+msgstr "Rotación de token omitida: el backend de almacén OpenBao no está habilitado."
+
+#: accounts/tasks/openbao.py:130
+msgid "Skipped token rotation: no enabled rotation AppRole is configured."
+msgstr "Rotación de token omitida: no se ha configurado un AppRole de rotación habilitado."
+
+#: accounts/tasks/openbao.py:137
+msgid "Skipped token rotation: another rotation task is running."
+msgstr "Rotación de token omitida: hay otra tarea de rotación en ejecución."
+
+#: accounts/tasks/openbao.py:82
+#, python-format
+msgid "OpenBao tokens checked: 1; rotated: 0; skipped: 1. The token is still valid for %(ttl)s seconds, above the rotation threshold of %(threshold)s seconds."
+msgstr "Tokens OpenBao comprobados: 1; rotados: 0; omitidos: 1. El token sigue siendo válido durante %(ttl)s segundos, por encima del umbral de rotación de %(threshold)s segundos."
+
+#: ops/celery/utils.py
+#, python-format
+msgid "Created periodic task %(name)s; enabled: %(enabled)s."
+msgstr "Tarea periódica %(name)s creada; habilitada: %(enabled)s."
+
+#: ops/celery/utils.py
+#, python-format
+msgid "Updated periodic task %(name)s; enabled: %(enabled)s."
+msgstr "Tarea periódica %(name)s actualizada; habilitada: %(enabled)s."
+
+#: tickets/tasks.py perms/tasks.py tickets/plugins/file_transfer/execution.py
+msgid "The batch limit was reached; remaining records will be checked next time."
+msgstr "Se alcanzó el límite del lote; los registros restantes se comprobarán en la próxima ejecución."
+
+#: perms/tasks.py
+msgid "No reminder was queued; recipients are missing or publication failed."
+msgstr "No se puso ningún recordatorio en cola: faltan destinatarios o falló la publicación."
+
+#: perms/tasks.py
+msgid "No users or administrators are available to receive reminders."
+msgstr "No hay usuarios ni administradores disponibles para recibir recordatorios."
+
+#: perms/tasks.py authentication/tasks.py
+msgid "Notifications queued"
+msgstr "Notificaciones en cola"
+
+#: perms/tasks.py
+msgid "The permission is outside the reminder window."
+msgstr "El permiso está fuera del período de recordatorio."
+
+#: perms/tasks.py
+msgid "Unable to queue a notification."
+msgstr "No se pudo poner una notificación en cola."
+
+#: terminal/tasks.py
+msgid "Alert notifications queued"
+msgstr "Notificaciones de alerta en cola"
+
+#: terminal/tasks.py
+#, python-format
+msgid "Storage check failed: %(name)s (%(type)s)."
+msgstr "Error al comprobar el almacenamiento: %(name)s (%(type)s)."
+
+#: terminal/tasks.py
+msgid "Storage connectivity or credential validation failed."
+msgstr "Falló la conexión al almacenamiento o la validación de credenciales."
+
+#: users/tasks.py
+msgid "Automatic disabling of unused users is not enabled."
+msgstr "La desactivación automática de usuarios sin uso no está habilitada."
+
+#: users/tasks.py
+#, python-format
+msgid "Checking users with no login or API key use for %(days)s days; admin is excluded."
+msgstr "Comprobando usuarios sin inicio de sesión ni uso de claves API durante %(days)s días; se excluye admin."
+
+#: users/tasks.py ops/celery/task_logging.py accounts/tasks/automation.py tickets/plugins/file_transfer/execution.py
+msgid "The record was already handled by another task."
+msgstr "Otro proceso ya ha tratado el registro."
+
+#: users/tasks.py
+msgid "The unused-user threshold is outside the enabled range of 1–998 days."
+msgstr "El umbral de usuarios sin uso está fuera del rango habilitado de 1 a 998 días."
+
+#: users/tasks.py
+msgid "Users disabled"
+msgstr "Usuarios deshabilitados"
+
+#: users/signal_handlers.py
+msgid "Sessions deleted"
+msgstr "Sesiones eliminadas"
+
+#: ops/tasks.py
+msgid "Components with health alerts"
+msgstr "Componentes con alertas de estado"
+
+#: ops/tasks.py
+msgid "No health alerts to send."
+msgstr "No hay alertas de estado que enviar."
+
+#: ops/tasks.py
+msgid "Service performance checks are disabled by configuration."
+msgstr "Las comprobaciones de rendimiento del servicio están deshabilitadas por configuración."
+
+#: ops/tasks.py
+msgid "The component is inactive."
+msgstr "El componente está inactivo."
+
+#: authentication/tasks.py
+msgid "Client login session cleanup"
+msgstr "Limpieza de sesiones de inicio de sesión de clientes"
+
+#: authentication/tasks.py
+msgid "Credential activity records included"
+msgstr "Registros de actividad de credenciales incluidos"
+
+#: authentication/tasks.py
+msgid "No recent credential activity matched this user."
+msgstr "No hay actividad reciente de credenciales que coincida con este usuario."
+
+#: authentication/tasks.py
+msgid "OAuth credential cleanup categories"
+msgstr "Categorías de limpieza de credenciales OAuth"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Expired ID tokens deleted"
+msgstr "Tokens de ID caducados eliminados"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Expired access tokens deleted"
+msgstr "Tokens de acceso caducados eliminados"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Expired grant tokens deleted"
+msgstr "Códigos de autorización caducados eliminados"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Expired refresh tokens deleted"
+msgstr "Tokens de actualización caducados eliminados"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "No expired records in this credential category."
+msgstr "No hay registros caducados en esta categoría de credenciales."
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Orphaned refresh tokens deleted"
+msgstr "Tokens de actualización huérfanos eliminados"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Refresh-token retention settings require these tokens to be kept."
+msgstr "La configuración de retención de tokens de actualización exige conservar estos tokens."
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Revoked refresh tokens deleted"
+msgstr "Tokens de actualización revocados eliminados"
+
+#: notifications/notifications.py
+#, python-format
+msgid "Channel %(channel)s: matched recipients %(matched)s; recipients with a channel account %(bound)s; unbound %(unbound)s."
+msgstr "Canal %(channel)s: destinatarios coincidentes %(matched)s; con cuenta vinculada %(bound)s; sin cuenta vinculada %(unbound)s."
+
+#: notifications/notifications.py
+msgid "No recipients have an account for this notification channel."
+msgstr "Ningún destinatario tiene una cuenta para este canal de notificación."
+
+#: notifications/notifications.py
+msgid "Notification channel calls completed"
+msgstr "Llamadas a canales de notificación completadas"
+
+#: notifications/notifications.py
+msgid "The notification channel does not support this message."
+msgstr "El canal de notificación no admite este mensaje."
+
+#: notifications/notifications.py
+msgid "The notification channel raised an error."
+msgstr "Se produjo un error en el canal de notificación."
+
+#: authentication/services/client_login_session.py
+msgid "Client sessions revoked"
+msgstr "Sesiones de cliente revocadas"
+
+#: authentication/services/client_login_session.py
+msgid "The client login session is still valid."
+msgstr "La sesión de inicio de sesión del cliente sigue siendo válida."
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Failed %(count)s: %(reason)s"
+msgstr "Fallidos %(count)s: %(reason)s"
+
+#: ops/celery/task_logging.py
+msgid "No matching records to process."
+msgstr "No hay registros coincidentes que procesar."
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Result count — %(name)s: %(count)s."
+msgstr "Resultado — %(name)s: %(count)s."
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Skipped %(count)s: %(reason)s"
+msgstr "Omitidos %(count)s: %(reason)s"
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Task interrupted after %(checked)s checks; changes may have been rolled back. See the task error for details."
+msgstr "La tarea se interrumpió tras %(checked)s comprobaciones; los cambios pueden haberse revertido. Consulte el error de la tarea para obtener más información."
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Task started: %(name)s."
+msgstr "Tarea iniciada: %(name)s."
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Task summary: checked %(checked)s; processed %(processed)s; skipped %(skipped)s; failed %(failed)s."
+msgstr "Resumen: comprobados %(checked)s; procesados %(processed)s; omitidos %(skipped)s; fallidos %(failed)s."
+
+#: accounts/tasks/remove_account.py
+msgid "History cleanup is disabled by the retention limit."
+msgstr "La limpieza del historial está deshabilitada por el límite de retención."
+
+#: accounts/tasks/remove_account.py
+#, python-format
+msgid "Keeping %(count)s history records per account, including the current version."
+msgstr "Se conservan %(count)s registros de historial por cuenta, incluida la versión actual."
+
+#: accounts/tasks/automation.py
+msgid "Another instance of this maintenance task is running."
+msgstr "Hay otra instancia de esta tarea de mantenimiento en ejecución."
+
+#: accounts/tasks/automation.py
+msgid "Records belong to a credential rotation that is still running."
+msgstr "Los registros pertenecen a una rotación de credenciales que sigue en ejecución."
+
+#: accounts/tasks/automation.py xpack/plugins/cloud/tasks.py
+#, python-format
+msgid "Retention period: %(days)s days."
+msgstr "Período de retención: %(days)s días."
+
+#: accounts/tasks/automation.py
+msgid "The latest unsuccessful first-login result must be retained."
+msgstr "Debe conservarse el último resultado fallido del primer inicio de sesión."
+
+#: accounts/tasks/automation.py
+msgid "The owning worker has not replied and the hard timeout has not elapsed."
+msgstr "El Worker responsable no respondió y no se ha agotado el tiempo máximo."
+
+#: accounts/tasks/automation.py
+msgid "The task is still running on a worker."
+msgstr "La tarea sigue ejecutándose en un Worker."
+
+#: accounts/tasks/automation.py
+msgid "The task is still within the startup grace period."
+msgstr "La tarea sigue dentro del período de gracia de inicio."
+
+#: accounts/tasks/automation.py
+msgid "Unable to acquire the task lock."
+msgstr "No se pudo obtener el bloqueo de la tarea."
+
+#: accounts/tasks/automation.py
+msgid "Unable to release the task lock."
+msgstr "No se pudo liberar el bloqueo de la tarea."
+
+#: accounts/tasks/automation.py
+msgid "Waiting for repeated confirmation that the task is missing."
+msgstr "Esperando una nueva confirmación de que la tarea ha desaparecido."
+
+#: accounts/tasks/automation.py
+msgid "Worker status is unavailable; recovery cannot be confirmed."
+msgstr "El estado de los Workers no está disponible; no se puede confirmar si es necesaria la recuperación."
+
+#: accounts/tasks/application_events.py
+msgid "Deliveries marked expired"
+msgstr "Entregas marcadas como caducadas"
+
+#: accounts/tasks/application_events.py tickets/plugins/change_secret/execution.py tickets/plugins/file_transfer/execution.py
+msgid "Executions queued"
+msgstr "Ejecuciones en cola"
+
+#: accounts/tasks/application_events.py tickets/plugins/change_secret/execution.py tickets/plugins/file_transfer/execution.py
+msgid "Unable to queue an execution; it will be retried later."
+msgstr "No se pudo poner una ejecución en cola; se reintentará más adelante."
+
+#: accounts/tasks/credential_preparation.py
+msgid "Unable to check credential rotation readiness."
+msgstr "No se pudo comprobar si la rotación de credenciales está lista."
+
+#: accounts/tasks/credential_preparation.py
+msgid "Waiting for client confirmation or the source-account quiet period."
+msgstr "Esperando la confirmación del cliente o el fin del período de inactividad de la cuenta de origen."
+
+#: tickets/workflow/engine.py
+msgid "The workflow has changed or its approval deadline has not elapsed."
+msgstr "El flujo de trabajo cambió o el plazo de aprobación aún no ha vencido."
+
+#: tickets/plugins/change_secret/execution.py tickets/plugins/file_transfer/execution.py
+msgid "The execution is no longer eligible for dispatch."
+msgstr "La ejecución ya no cumple los requisitos para su distribución."
+
+#: tickets/plugins/file_transfer/execution.py
+msgid "Clean ticket transfer files"
+msgstr "Limpiar archivos de transferencia de tickets"
+
+#: tickets/plugins/file_transfer/execution.py
+msgid "Files belong to a transfer that is still running."
+msgstr "Los archivos pertenecen a una transferencia que sigue en ejecución."
+
+#: tickets/plugins/file_transfer/execution.py
+msgid "Interrupted transfers marked for verification"
+msgstr "Transferencias interrumpidas marcadas para verificación"
+
+#: tickets/plugins/file_transfer/execution.py
+msgid "Maintain ticket file transfers"
+msgstr "Mantener las transferencias de archivos de tickets"
+
+#: tickets/plugins/file_transfer/execution.py
+msgid "Unable to remove a temporary file; it will be retried later."
+msgstr "No se pudo eliminar un archivo temporal; se reintentará más adelante."
+
+#: xpack/plugins/cloud/tasks.py
+msgid "Cleanup is disabled because the retention period is not positive."
+msgstr "La limpieza está deshabilitada porque el período de retención no es positivo."
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Reason: %(reason)s"
+msgstr "Motivo: %(reason)s"
+
+#: notifications/notifications.py
+msgid "No notification channels are configured."
+msgstr "No hay canales de notificación configurados."
+
+#: accounts/tasks/application_events.py:46
+#, python-format
+msgid "Unable to dispatch application webhook delivery %(delivery)s."
+msgstr "No se pudo programar la entrega del webhook de aplicación %(delivery)s."
+
+#: accounts/tasks/application_events.py:167 accounts/tasks/application_events.py:170
+msgid "Expire application event deliveries"
+msgstr "Marcar como caducadas las entregas de eventos de aplicación"
+
+#: accounts/tasks/automation.py:139
+msgid "Skipped interrupted account task inspection: no Celery worker replied."
+msgstr "Se omitió la inspección de tareas de cuenta interrumpidas: ningún worker de Celery respondió."
+
+#: accounts/tasks/automation.py:132
+msgid "Unable to inspect active Celery tasks."
+msgstr "No se pudieron inspeccionar las tareas activas de Celery."
+
+#: accounts/tasks/automation.py:169
+#, python-format
+msgid "Unable to confirm interrupted task status: execution=%(execution)s."
+msgstr "No se pudo confirmar el estado de la tarea interrumpida: ejecución=%(execution)s."
+
+#: accounts/tasks/automation.py:180
+#, python-format
+msgid "Unable to clear the interrupted task confirmation marker: execution=%(execution)s."
+msgstr "No se pudo borrar el marcador de confirmación de la tarea interrumpida: ejecución=%(execution)s."
+
+#: accounts/tasks/automation.py:202
+msgid "Unable to acquire the interrupted account task recovery lock."
+msgstr "No se pudo adquirir el bloqueo de recuperación de tareas de cuenta interrumpidas."
+
+#: accounts/tasks/automation.py:218
+msgid "Unable to release the interrupted account task recovery lock."
+msgstr "No se pudo liberar el bloqueo de recuperación de tareas de cuenta interrumpidas."
+
+#: accounts/tasks/credential_preparation.py:12 accounts/tasks/credential_preparation.py:15
+msgid "Check credential rotation readiness"
+msgstr "Comprobar la preparación para la rotación de credenciales"
+
+#: accounts/tasks/credential_preparation.py:33
+#, python-format
+msgid "Unable to check rotation readiness: credential=%(credential)s."
+msgstr "No se pudo comprobar la preparación para la rotación: credencial=%(credential)s."
+
+#: accounts/tasks/openbao.py:28
+msgid "JumpServer must use the OpenBao vault backend."
+msgstr "JumpServer debe utilizar el backend de bóveda OpenBao."
+
+#: accounts/tasks/openbao.py:30
+msgid "OpenBao token rotation requires HTTPS with TLS verification."
+msgstr "La rotación de tokens de OpenBao requiere HTTPS con verificación TLS."
+
+#: accounts/tasks/openbao.py:62
+#, python-format
+msgid "OpenBao token lookup returned HTTP %(status)s."
+msgstr "La consulta del token de OpenBao devolvió HTTP %(status)s."
+
+#: accounts/tasks/openbao.py:70
+msgid "OpenBao address changed. Reconfigure the rotation AppRole."
+msgstr "La dirección de OpenBao ha cambiado. Vuelva a configurar el AppRole de rotación."
+
+#: accounts/tasks/openbao.py:98
+msgid "OpenBao did not issue a distinct token."
+msgstr "OpenBao no emitió un token diferente del anterior."
+
+#: accounts/tasks/openbao.py:102
+msgid "The new OpenBao token must support self lookup and last over seven days."
+msgstr "El nuevo token de OpenBao debe permitir consultarse a sí mismo y tener una validez superior a siete días."
+
+#: accounts/tasks/openbao.py:104
+msgid "The new token failed the JumpServer OpenBao operation check."
+msgstr "El nuevo token no superó la comprobación de operaciones de OpenBao de JumpServer."
+
+#: accounts/tasks/openbao.py:94
+#, python-format
+msgid "OpenBao AppRole login returned HTTP %(status)s."
+msgstr "El inicio de sesión de AppRole de OpenBao devolvió HTTP %(status)s."
+
+#: accounts/tasks/openbao.py:109
+msgid "The configured OpenBao token changed during rotation."
+msgstr "El token de OpenBao configurado cambió durante la rotación."
+
+#: accounts/tasks/openbao.py:120
+msgid "Check and rotate the OpenBao vault token"
+msgstr "Comprobar y renovar el token de la bóveda OpenBao"
+
+#: accounts/tasks/openbao.py:133
+msgid "OpenBao rotation requires encrypted AppRole credentials."
+msgstr "La rotación de OpenBao requiere credenciales de AppRole cifradas."
+
+#: authentication/services/client_login_session.py:411
+msgid "Access tokens deleted"
+msgstr "Tokens de acceso eliminados"
+
+#: authentication/services/client_login_session.py:412
+msgid "Refresh tokens deleted"
+msgstr "Tokens de actualización eliminados"
+
+#: authentication/services/client_login_session.py:419
+msgid "Client login sessions deleted"
+msgstr "Sesiones de inicio de sesión de cliente eliminadas"
+
+#: perms/tasks.py:141
+#, python-format
+msgid "Unable to queue an asset permission expiration reminder: permission=%(permission)s; user=%(user)s."
+msgstr "No se pudo poner en cola el recordatorio de caducidad del permiso de activo: permiso=%(permission)s; usuario=%(user)s."
+
+#: terminal/tasks.py:268
+#, python-brace-format
+msgid "Test failure: {error}"
+msgstr "Error de prueba: {error}"
+
+#: tickets/plugins/change_secret/execution.py:100
+#, python-format
+msgid "Unable to queue password change for ticket %(ticket)s (%(error)s)."
+msgstr "No se pudo poner en cola el cambio de contraseña del ticket %(ticket)s (%(error)s)."
+
+#: tickets/plugins/file_transfer/execution.py:50
+#, python-format
+msgid "Unable to queue ticket transfer %(ticket)s (%(error)s)."
+msgstr "No se pudo poner en cola la transferencia del ticket %(ticket)s (%(error)s)."
+
+#: tickets/plugins/file_transfer/execution.py:249
+#, python-format
+msgid "Unable to purge ticket transfer file %(file)s (%(error)s)."
+msgstr "No se pudo eliminar el archivo de transferencia del ticket %(file)s (%(error)s)."
+
+#: tickets/tasks.py:16 tickets/tasks.py:21
+msgid "Expire overdue ticket approvals"
+msgstr "Procesar aprobaciones de tickets vencidas"
+
+#: tickets/tasks.py:17
+msgid "Check approval deadlines every minute and apply the configured timeout action."
+msgstr "Comprobar cada minuto los plazos de aprobación y aplicar la acción configurada al vencer."
+
+#: tickets/tasks.py:47 tickets/tasks.py:52
+msgid "Dispatch ticket password changes"
+msgstr "Programar cambios de contraseña de tickets"
+
+#: tickets/tasks.py:48
+msgid "Dispatch pending password change executions every minute."
+msgstr "Programar cada minuto las ejecuciones pendientes de cambio de contraseña."
+
+#: accounts/automations/recovery.py:38
+msgid "Invalid interrupted automation runtime path."
+msgstr "La ruta del directorio de ejecución de la automatización interrumpida no es válida."
+
+#: accounts/automations/recovery.py:269
+#, python-format
+msgid "Interrupted account automation finalized: execution=%(execution)s; status=%(status)s; password change records=%(changes)s; password push records=%(pushes)s."
+msgstr "Automatización de cuenta interrumpida finalizada: ejecución=%(execution)s; estado=%(status)s; registros de cambio de contraseña=%(changes)s; registros de envío de contraseña=%(pushes)s."
+
+#: accounts/automations/recovery.py:264
+#, python-format
+msgid "Unable to clean the interrupted automation runtime: execution=%(execution)s."
+msgstr "No se pudo limpiar el directorio de ejecución de la automatización interrumpida: ejecución=%(execution)s."
+
+#: accounts/automations/recovery.py:244
+#, python-format
+msgid "Unable to clear interrupted account task status: execution=%(execution)s; account=%(account)s."
+msgstr "No se pudo borrar el estado de la tarea de cuenta interrumpida: ejecución=%(execution)s; cuenta=%(account)s."
+
+#: accounts/automations/recovery.py:257
+#, python-format
+msgid "Unable to release the interrupted account lock: execution=%(execution)s; account=%(account)s."
+msgstr "No se pudo liberar el bloqueo de la cuenta interrumpida: ejecución=%(execution)s; cuenta=%(account)s."

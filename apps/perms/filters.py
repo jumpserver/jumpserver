@@ -247,10 +247,9 @@ class AssetPermissionFilter(PermissionBaseFilter):
             _nodes = Node.objects.filter(value=node_name)
         else:
             return queryset
-        if not _nodes:
-            return queryset.none()
-
         node = _nodes.first()
+        if node is None:
+            return queryset.none()
 
         if not is_query_all:
             queryset = queryset.filter(nodes=node)
@@ -277,9 +276,9 @@ class AssetPermissionFilter(PermissionBaseFilter):
             assets = Asset.objects.filter(address=address)
         else:
             return queryset
-        if not assets:
-            return queryset.none()
         asset_ids = list(assets.values_list('id', flat=True))
+        if not asset_ids:
+            return queryset.none()
 
         if not is_query_all:
             queryset = queryset.filter(assets__in=asset_ids)

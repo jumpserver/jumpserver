@@ -9,6 +9,9 @@ from accounts.serializers.account.credential import (
     ApplicationCredentialSerializer, CredentialAccessWizardSerializer,
 )
 from accounts.tests.base import CredentialTestCase
+from django.db import transaction
+from django.test import override_settings
+from rest_framework.exceptions import PermissionDenied
 
 
 class ApplicationIntegrationSimplificationTests(CredentialTestCase):
@@ -88,14 +91,16 @@ class ApplicationIntegrationSimplificationTests(CredentialTestCase):
         self.assertEqual(result['foreground_unix_command'], '')
         self.assertEqual(result['foreground_windows_command'], '')
 
-    def test_rotation_wizard_requires_business_check_and_enables_switch(self):
+    def test_rotation_wizard_enables_switch_with_optional_business_check(self):
         config = self.wizard(agent_setup='rotation', application_check='/usr/local/libexec/check-orders')
         rule = config['services'][0]
         self.assertTrue(rule['allow_account_switch'])
         self.assertEqual(rule['app_check'], {
             'path': '/usr/local/libexec/check-orders', 'confirm_on_success': True,
         })
-        self.assertNotIn('app_check', self.wizard()['services'][0])
+        rule_without_check = self.wizard(agent_setup='rotation')['services'][0]
+        self.assertTrue(rule_without_check['allow_account_switch'])
+        self.assertNotIn('app_check', rule_without_check)
 
     def test_script_action_does_not_add_global_systemd_restart(self):
         config = self.wizard(service_action_type='script', service_script='/usr/local/libexec/recreate-orders')
@@ -105,7 +110,7 @@ class ApplicationIntegrationSimplificationTests(CredentialTestCase):
     def test_invalid_wizard_materials_are_rejected(self):
         for overrides in (
             {'account_id': str(uuid4())}, {'config_file': 'config.yml'},
-            {'agent_setup': 'rotation'}, {'secret_field': 'DB_USER'},
+            {'agent_setup': 'rotation', 'application_check': 'relative/check'}, {'secret_field': 'DB_USER'},
             {'service_action_type': 'script', 'service_script': 'relative/script'},
         ):
             with self.subTest(overrides=overrides):
@@ -124,3 +129,30 @@ class ApplicationIntegrationSimplificationTests(CredentialTestCase):
         response = view(self.request('get', '/api/v1/accounts/application-credentials/', data={'mode': 'subscription', 'limit': 10}))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['results'], [])
+
+    @override_settings(XPACK_LICENSE_IS_VALID=False)
+    def test_community_edition_cannot_manage_rotation_policies(self):
+        path = '/api/v1/accounts/application-credentials/'
+        list_view = ApplicationCredentialViewSet.as_view({'get': 'list', 'post': 'create'})
+        start_view = ApplicationCredentialViewSet.as_view({'post': 'start_cycle'})
+        with transaction.atomic():
+            response = list_view(self.request('get', path))
+        self.assertEqual(response.status_code, 403)
+        with transaction.atomic():
+            response = list_view(self.request('post', path))
+        self.assertEqual(response.status_code, 403)
+        with transaction.atomic():
+            response = start_view(
+                self.request('post', f'{path}{self.credential.id}/start-cycle/'), pk=self.credential.id,
+            )
+        self.assertEqual(response.status_code, 403)
+        self.credential.refresh_from_db()
+        self.assertEqual(self.credential.status, ApplicationCredential.Status.idle)
+
+    @override_settings(XPACK_LICENSE_IS_VALID=False)
+    def test_community_wizard_allows_config_updates_but_requires_a_license_for_rotation(self):
+        self.assertFalse(self.wizard()['services'][0]['allow_account_switch'])
+        for options in ({'agent_setup': 'rotation'}, {'allow_account_switch': True}):
+            with self.subTest(options=options), self.assertRaises(PermissionDenied) as exc:
+                self.wizard(**options)
+            self.assertEqual(exc.exception.get_codes(), 'license_required')

@@ -1,0 +1,24 @@
+id: push_account_database_native
+name: "{{ 'Database account provisioning' | trans }}"
+category: database
+type:
+  - dameng
+  - oceanbase
+  - clickhouse
+method: push_account
+params:
+  - name: account_host
+    type: str
+    label: "{{ 'OceanBase MySQL account host' | trans }}"
+    default: "%"
+    help_text: "{{ 'Only used by OceanBase MySQL tenants' | trans }}"
+i18n:
+  OceanBase MySQL account host:
+    en: OceanBase MySQL account host
+    zh: OceanBase MySQL 租户账号的主机部分
+  Only used by OceanBase MySQL tenants:
+    en: Only used by OceanBase MySQL tenants
+    zh: 只对 OceanBase MySQL 租户生效，达梦和 ClickHouse 忽略此参数
+  Database account provisioning:
+    en: Database account provisioning
+    zh: 数据库账号推送

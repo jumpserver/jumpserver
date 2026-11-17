@@ -11,11 +11,13 @@ from accounts.models import (
     IntegrationApplication,
 )
 from common.serializers.fields import ObjectRelatedField
+from django.conf import settings
 from django.db import transaction
 from django.db.models import Count, Prefetch
 from django.utils.translation import gettext_lazy as _
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from rest_framework import serializers
+from rest_framework.exceptions import PermissionDenied
 
 __all__ = [
     'ApplicationCredentialSerializer', 'ApplicationCredentialListSerializer',
@@ -758,14 +760,18 @@ class CredentialAccessWizardSerializer(serializers.Serializer):
         application = self.context['application']
         if not application.is_active:
             raise serializers.ValidationError(_('The application is disabled.'))
-        if attrs['type'] == CredentialClientInstance.Type.agent and not attrs['app_user']:
+        is_agent = attrs['type'] == CredentialClientInstance.Type.agent
+        if is_agent and not attrs['app_user']:
             raise serializers.ValidationError({'app_user': _('This field is required for Agent access.')})
+        configured_rule = is_agent and attrs['agent_setup'] != 'delivery'
+        follows_rotation = attrs['agent_setup'] == 'rotation' or attrs['allow_account_switch']
+        if configured_rule and follows_rotation and not settings.XPACK_LICENSE_IS_VALID:
+            raise PermissionDenied(_('A valid license is required'), code='license_required')
         path = attrs['install_path']
         if not path.startswith('/') or path == '/' or any(char in path for char in '\n\r\x00'):
             raise serializers.ValidationError({'install_path': _('Enter an absolute installation directory.')})
         unit = attrs['systemd_unit'].strip()
-        configured_rule = attrs['type'] == 'agent' and attrs['agent_setup'] != 'delivery'
-        if attrs['type'] == 'agent':
+        if is_agent:
             application.assert_account_limit()
             if attrs['store_scope'] == 'selected':
                 selected = attrs['store_accounts']

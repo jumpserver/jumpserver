@@ -61,6 +61,8 @@ def create_serializer_class(serializer_name, fields_info):
         else:
             data['required'] = False
         data = set_default_by_type(field_type, data, field_info)
+        if field_type == 'int':
+            data.update({k: field_info[k] for k in ('min_value', 'max_value') if k in field_info})
         data = set_default_if_need(data, i)
         if field_type in ['int', 'bool', 'list'] and "allow_blank" in data.keys():
             data.pop('allow_blank')

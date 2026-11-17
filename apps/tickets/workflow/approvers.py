@@ -4,11 +4,14 @@ from uuid import UUID
 from django.db.models import Q
 from django.utils import timezone
 
+from common.db.fields import RelatedManager
+from labels.models import Label
 from orgs.models import Organization
 from orgs.utils import tmp_to_org
 from rbac.builtin import BuiltinRole
-from rbac.models import RoleBinding
+from rbac.models import Role, RoleBinding
 from users.models import User, UserGroup
+from .definition import validate_user_selector
 from .errors import WorkflowConfigurationError
 
 
@@ -49,6 +52,29 @@ def excluded_approver_ids(config, context, applicant_id):
     return ids
 
 
+def selected_users(selector, org_id):
+    try:
+        validate_user_selector(selector)
+    except (ValueError, TypeError) as exc:
+        raise WorkflowConfigurationError(gettext('Invalid user filter.')) from exc
+    with tmp_to_org(org_id):
+        for attr in selector.get('attrs', []):
+            name, ids = attr['name'], attr['value']
+            if name in ('system_roles', 'org_roles'):
+                resources = Role.objects.filter(scope='system' if name == 'system_roles' else 'org')
+            elif name in ('groups', 'labels'):
+                model = UserGroup if name == 'groups' else Label
+                resources = model.objects.filter(org_id=org_id)
+            else:
+                continue
+            if resources.filter(pk__in=ids).count() != len(set(ids)):
+                raise WorkflowConfigurationError(gettext('A configured approver is inactive, missing, or outside the organization.'))
+        users = available_users(org_id)
+        for query in RelatedManager.get_to_filter_qs(selector, User):
+            users = users.filter(query)
+        return users.distinct()
+
+
 def resolve_approvers(node_instance, context, org_id, applicant_id):
     config = node_instance.node.config
     spec = config['approvers']
@@ -57,6 +83,8 @@ def resolve_approvers(node_instance, context, org_id, applicant_id):
     explicit_ids = None
     if kind == 'user':
         explicit_ids = set(spec['value'])
+    elif kind == 'user_selector':
+        explicit_ids = set(context.get('approver_selections', {}).get(node_instance.node.key, []))
     elif kind == 'user_group':
         with tmp_to_org(org_id):
             groups = UserGroup.objects.filter(pk__in=spec['value'], org_id=org_id)

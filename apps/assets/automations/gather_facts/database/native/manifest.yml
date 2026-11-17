@@ -1,0 +1,13 @@
+id: gather_facts_database_native
+name: "{{ 'Database version collection' | trans }}"
+category: database
+type:
+  - dameng
+  - oceanbase
+  - clickhouse
+  - db2
+method: gather_facts
+i18n:
+  Database version collection:
+    en: Database version collection
+    zh: 数据库版本采集
