@@ -6,26 +6,26 @@ from django.test import TestCase, override_settings
 from rest_framework.exceptions import ValidationError
 from rest_framework.test import APIRequestFactory, force_authenticate
 
-from assets.models import Asset, Platform
 from acls.models import LoginACL, LoginAssetACL, CommandFilterACL
 from acls.serializers.login_acl import LoginACLSerializer
 from acls.serializers.login_asset_acl import LoginAssetACLSerializer
 from acls.serializers.command_acl import CommandFilterACLSerializer
+from assets.models import Asset, Platform
+from authentication.services.connection_acl import get_review_group_key
 from orgs.models import Organization
 from orgs.utils import tmp_to_org, tmp_to_root_org
 from rbac.builtin import BuiltinRole
 from rbac.models import Role, RoleBinding
-from tickets.api.workflow import WorkflowViewSet
 from terminal.models import Session
+from tickets.api.workflow import WorkflowViewSet
 from tickets.models import Ticket, Workflow, WorkflowInstance, ApprovalTask
-from tickets.workflow.errors import WorkflowConfigurationError
-from authentication.services.connection_acl import get_review_group_key
 from tickets.serializers.ticket.ticket import TicketApplySerializer
 from tickets.serializers.workflow import WorkflowInstanceDetailSerializer
 from tickets.tests import test_workflow as fixtures
 from tickets.workflow.engine import WorkflowEngine
 from tickets.workflow.context import snapshot_assets
 from tickets.workflow.business import get_system_workflow
+from tickets.workflow.errors import WorkflowConfigurationError
 from tickets.workflow.publication import publish_workflow
 from users.models import User
 
