@@ -201,3 +201,185 @@ class ACLApprovalTests(TestCase):
         with tmp_to_root_org():
             response = self.request('create', data=data, method='post')
             self.assertEqual(response.status_code, 403, response.data)
+
+
+@override_settings(XPACK_LICENSE_IS_VALID=True)
+class ACLReviewerSourceTests(TestCase):
+    setUpTestData = fixtures.WorkflowTests.__dict__['setUpTestData']
+    setUp = fixtures.WorkflowTests.setUp
+    cases = ACLApprovalTests.cases
+
+    def workflow(self, ticket_type, *, levels=1):
+        org = Organization.root() if ticket_type == 'login_confirm' else self.org
+        flow = Workflow.objects.create(name='ACL reviewer flow', type=ticket_type, org_id=org.pk)
+        publish_workflow(flow, fixtures.approval_definition(
+            [], levels=levels, approvers={'type': 'acl_reviewers'},
+        ))
+        flow.refresh_from_db()
+        flow.enabled = True
+        flow.save(update_fields=['enabled'])
+        return flow
+
+    def acl(self, model, flow, name='ACL', reviewers=None):
+        acl = model.objects.create(
+            name=name, workflow=flow,
+            **({'action': 'accept', 'review_enabled': True, 'review_duration': 1}
+               if model is LoginAssetACL else {'action': 'review'}),
+        )
+        acl.reviewers.set(reviewers if reviewers is not None else [self.alice])
+        return acl
+
+    def test_source_is_limited_to_acl_ticket_types(self):
+        from tickets.workflow.errors import WorkflowConfigurationError
+        for ticket_type in ('general', 'apply_asset'):
+            with self.subTest(ticket_type=ticket_type), transaction.atomic():
+                with self.assertRaises(WorkflowConfigurationError):
+                    self.workflow(ticket_type)
+
+    def test_each_acl_requires_eligible_reviewers_for_the_published_source(self):
+        User.objects.filter(pk=self.bob.pk).update(is_active=False)
+        for model, serializer_class, ticket_type in self.cases:
+            org = Organization.root() if model is LoginACL else self.org
+            with self.subTest(ticket_type=ticket_type), tmp_to_org(org):
+                flow = self.workflow(ticket_type)
+                acl = self.acl(model, flow)
+                self.assertTrue(serializer_class(acl).data['workflow_requires_reviewers'])
+                invalid = [[], [str(self.bob.pk)]]
+                if model is not LoginACL:
+                    invalid.append([str(self.outsider.pk)])
+                for reviewers in invalid:
+                    serializer = serializer_class(acl, data={'reviewers': reviewers}, partial=True)
+                    self.assertFalse(serializer.is_valid())
+                    self.assertIn('reviewers', serializer.errors)
+                serializer = serializer_class(acl, data={'reviewers': [str(self.alice.pk)]}, partial=True)
+                self.assertTrue(serializer.is_valid(), serializer.errors)
+                serializer.save()
+                acl.reviewers.clear()
+                serializer = serializer_class(acl, data={'comment': 'Keep approval enabled'}, partial=True)
+                self.assertFalse(serializer.is_valid())
+                self.assertIn('reviewers', serializer.errors)
+
+    def test_login_and_command_entries_freeze_reviewers_and_workflow_version(self):
+        for model, ticket_type in ((LoginACL, 'login_confirm'), (CommandFilterACL, 'command_confirm')):
+            org = Organization.root() if model is LoginACL else self.org
+            with self.subTest(ticket_type=ticket_type), tmp_to_org(org):
+                flow = self.workflow(ticket_type, levels=2)
+                acl = self.acl(model, flow)
+                if model is LoginACL:
+                    ticket = acl.create_confirm_ticket(None, self.applicant)
+                else:
+                    from terminal.models import Session
+                    asset = Asset.objects.create(name='Server', address='192.0.2.12', platform=self.platform)
+                    session = Session.objects.create(user=str(self.applicant), user_id=str(self.applicant.pk),
+                                                     asset=asset.name, asset_id=str(asset.pk), account='root')
+                    ticket = acl.create_command_review_ticket('whoami', session, acl, self.org.pk)
+                instance = ticket.workflow_instance
+                original_version = instance.version_id
+                acl.reviewers.set([self.bob])
+                publish_workflow(flow, fixtures.approval_definition([self.carol]))
+                for _ in range(2):
+                    task = ApprovalTask.objects.get(node_instance__instance=instance, state='pending')
+                    self.assertEqual(task.assignee_id, self.alice.pk)
+                    self.engine.approve(task, self.alice)
+                instance.refresh_from_db()
+                self.assertEqual(instance.state, 'approved')
+                self.assertEqual(instance.version_id, original_version)
+
+    def test_same_flow_on_two_asset_acls_keeps_both_approvals_and_simple_approval(self):
+        from tickets.models import WorkflowInstance
+        flow = self.workflow('login_asset_confirm')
+        first = self.acl(LoginAssetACL, flow, 'A')
+        second = self.acl(LoginAssetACL, flow, 'B', [self.bob])
+        simple = self.acl(LoginAssetACL, None, 'C', [self.carol])
+        asset = Asset.objects.create(name='Server', address='192.0.2.10', platform=self.platform)
+        ticket = first.create_login_asset_review_ticket(
+            self.applicant, asset, 'root', [], self.org.pk, review_acls=[first, second, simple],
+        )
+        instance = WorkflowInstance.objects.get(ticket=ticket)
+        self.assertEqual(len(instance.context['acl_reviewers']), 2)
+        second.reviewers.set([self.carol])
+        for reviewer in (self.alice, self.bob, self.carol):
+            task = ApprovalTask.objects.get(node_instance__instance=instance, state='pending')
+            self.assertEqual(task.assignee_id, reviewer.pk)
+            self.engine.approve(task, reviewer)
+        instance.refresh_from_db()
+        self.assertEqual(instance.state, 'approved')
+
+    def test_missing_or_forged_bindings_cannot_skip_approval(self):
+        from tickets.workflow.errors import WorkflowConfigurationError
+        flow = self.workflow('command_confirm')
+        ticket = Ticket.objects.create(type=flow.type, title='Untrusted binding', applicant=self.applicant)
+        with self.assertRaises(WorkflowConfigurationError):
+            self.engine.start(ticket, flow, {'acl_reviewers': {'approval_0': [str(self.alice.pk)]}})
+        with self.assertRaises(WorkflowConfigurationError):
+            self.engine.start(ticket, flow, {}, acl_reviewers={'approval_0': [str(self.outsider.pk)]})
+        self.assertFalse(ApprovalTask.objects.filter(node_instance__instance__ticket=ticket).exists())
+
+    def test_asset_grouping_and_exemptions_include_acl_bound_reviewers(self):
+        from django.core.cache import cache
+        from authentication.services.connection_acl import get_review_group_key
+        flow = self.workflow('login_asset_confirm')
+        acl = self.acl(LoginAssetACL, flow)
+        second = self.acl(LoginAssetACL, flow, 'Second', [self.bob])
+        asset = Asset.objects.create(name='Server', address='192.0.2.11', platform=self.platform)
+        key = acl.get_review_cache_key(self.applicant.pk, asset.pk, 'root')
+        group = get_review_group_key(self.org.pk, [], [acl], self.applicant.pk)
+        self.assertNotEqual(group, get_review_group_key(self.org.pk, [], [second], self.applicant.pk))
+        cache.set(key, 'original-approval', 60)
+        self.addCleanup(cache.delete, key)
+        self.assertTrue(acl.is_review_exempt(self.applicant, asset, 'root'))
+        acl.reviewers.set([self.bob])
+        self.assertFalse(acl.is_review_exempt(self.applicant, asset, 'root'))
+        self.assertNotEqual(group, get_review_group_key(self.org.pk, [], [acl], self.applicant.pk))
+        acl.reviewers.set([self.alice])
+        publish_workflow(flow, fixtures.approval_definition([], approvers={'type': 'acl_reviewers'}, levels=2))
+        acl.refresh_from_db()
+        self.assertFalse(acl.is_review_exempt(self.applicant, asset, 'root'))
+
+    def test_multi_acl_cache_is_written_only_after_all_approvals(self):
+        from django.core.cache import cache
+        flow = self.workflow('login_asset_confirm')
+        first = self.acl(LoginAssetACL, flow, 'A')
+        second = self.acl(LoginAssetACL, flow, 'B', [self.bob])
+        asset = Asset.objects.create(name='Server', address='192.0.2.13', platform=self.platform)
+        for rule in (first, second):
+            key = rule.get_review_cache_key(self.applicant.pk, asset.pk, 'root')
+            cache.delete(key)
+            self.addCleanup(cache.delete, key)
+        ticket = first.create_login_asset_review_ticket(
+            self.applicant, asset, 'root', [], self.org.pk, review_acls=[first, second],
+        )
+        instance = ticket.workflow_instance
+        for reviewer in (self.alice, self.bob):
+            task = ApprovalTask.objects.get(node_instance__instance=instance, state='pending')
+            with self.captureOnCommitCallbacks(execute=True):
+                self.engine.approve(task, reviewer)
+            for rule in (first, second):
+                self.assertEqual(rule.is_review_exempt(self.applicant, asset, 'root'), reviewer == self.bob)
+        second.reviewers.set([self.carol])
+        self.assertTrue(first.is_review_exempt(self.applicant, asset, 'root'))
+        self.assertFalse(second.is_review_exempt(self.applicant, asset, 'root'))
+
+    def test_empty_acl_binding_cannot_borrow_another_rules_reviewers(self):
+        from tickets.workflow.errors import WorkflowConfigurationError
+        flow = self.workflow('login_asset_confirm')
+        first = self.acl(LoginAssetACL, flow, 'A')
+        second = self.acl(LoginAssetACL, flow, 'B', [])
+        asset = Asset.objects.create(name='Server', address='192.0.2.14', platform=self.platform)
+        with self.assertRaises(WorkflowConfigurationError):
+            first.create_login_asset_review_ticket(
+                self.applicant, asset, 'root', [], self.org.pk, review_acls=[first, second],
+            )
+        self.assertFalse(Ticket.objects.exists())
+
+    def test_workflow_options_describe_the_active_version(self):
+        flow = self.workflow('command_confirm')
+        request = self.factory.get('/api/v1/tickets/workflows/options/', {'type': flow.type, 'org_id': str(self.org.pk)})
+        force_authenticate(request, self.alice)
+        view = WorkflowViewSet.as_view({'get': 'options_list'}, **WorkflowViewSet.options_list.kwargs)
+        response = view(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(next(row for row in response.data if row['id'] == str(flow.pk))['requires_acl_reviewers'])
+        publish_workflow(flow, fixtures.approval_definition([self.alice]))
+        response = view(request)
+        self.assertFalse(next(row for row in response.data if row['id'] == str(flow.pk))['requires_acl_reviewers'])

@@ -45,6 +45,7 @@ class CommandACLFilter(ACLUserAssetFilterMixin):
 
 class CommandFilterACLViewSet(OrgBulkModelViewSet):
     model = models.CommandFilterACL
+    queryset = models.CommandFilterACL.objects.select_related('workflow__active_version').prefetch_related('workflow__active_version__nodes')
     filterset_class = CommandACLFilter
     search_fields = ['name']
     serializer_classes = {

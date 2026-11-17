@@ -189,7 +189,13 @@ def get_review_group_key(org_id, assignees, rules=(), user_id=None):
     """Use the same final assignee set for preview and ticket creation."""
     reviewer_ids = sorted({str(user.pk) for user in assignees})
     versions = sorted({str(rule.workflow.active_version_id) for rule in rules if rule.workflow_id})
-    return sha256(json.dumps([str(org_id), str(user_id), reviewer_ids, versions]).encode()).hexdigest()
+    bindings = LoginAssetACL.review_configuration(
+        rule for rule in rules if rule.workflow_id and rule.workflow.requires_acl_reviewers
+    )
+    identity = [str(org_id), str(user_id), reviewer_ids, versions]
+    if bindings:
+        identity.append(bindings)
+    return sha256(json.dumps(identity, sort_keys=True).encode()).hexdigest()
 
 
 def get_pending_review_assignees(token):

@@ -46,7 +46,7 @@ class WorkflowEngine:
         return event
 
     @transaction.atomic
-    def start(self, ticket, workflow, context):
+    def start(self, ticket, workflow, context, *, acl_reviewers=None):
         self._check_org(ticket.org_id, allow_root=get_ticket_plugin(ticket.type).allow_global)
         # Serialize duplicate submission independently of which definition was selected.
         ticket = Ticket.objects.select_for_update().get(pk=ticket.pk)
@@ -93,7 +93,18 @@ class WorkflowEngine:
         snapshot.pop('approver_selections', None)
         if selections:
             snapshot['approver_selections'] = selections
-            snapshot = json_snapshot(snapshot)
+        # ACL identities come from the matched server-side rules, never request context.
+        snapshot.pop('acl_reviewers', None)
+        bindings = {}
+        for key in version.acl_reviewer_keys:
+            ids = set((acl_reviewers or {}).get(key, []))
+            valid = {str(pk) for pk in available_users(ticket.org_id).filter(pk__in=ids).values_list('pk', flat=True)}
+            if not 1 <= len(ids) <= 1000 or ids != valid:
+                raise WorkflowConfigurationError(gettext('Select at least one active, unexpired reviewer from this organization.'))
+            bindings[key] = sorted(ids)
+        if bindings:
+            snapshot['acl_reviewers'] = bindings
+        snapshot = json_snapshot(snapshot)
         with tmp_to_org(ticket.org_id):
             instance = WorkflowInstance.objects.create(
                 ticket=ticket, version=version, applicant=ticket.applicant,

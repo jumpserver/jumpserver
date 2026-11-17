@@ -85,6 +85,8 @@ def resolve_approvers(node_instance, context, org_id, applicant_id):
         explicit_ids = set(spec['value'])
     elif kind == 'user_selector':
         explicit_ids = set(context.get('approver_selections', {}).get(node_instance.node.key, []))
+    elif kind == 'acl_reviewers':
+        explicit_ids = set(context.get('acl_reviewers', {}).get(node_instance.node.key, []))
     elif kind == 'user_group':
         with tmp_to_org(org_id):
             groups = UserGroup.objects.filter(pk__in=spec['value'], org_id=org_id)

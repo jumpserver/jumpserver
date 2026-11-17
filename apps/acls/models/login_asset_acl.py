@@ -152,15 +152,24 @@ class LoginAssetACL(UserAssetAccountBaseACL):
 
     @staticmethod
     def review_configuration(rules):
-        return {
-            str(rule.pk): ({'workflow': str(rule.workflow_id), 'version': str(rule.workflow.active_version_id)}
-                           if rule.workflow_id else {'reviewers': sorted(str(user.pk) for user in rule.reviewers.all())})
-            for rule in rules
-        }
+        config = {}
+        for rule in rules:
+            value = {}
+            if rule.workflow_id:
+                value.update(workflow=str(rule.workflow_id), version=str(rule.workflow.active_version_id))
+            if not rule.workflow_id or rule.workflow.requires_acl_reviewers:
+                value['reviewers'] = sorted(str(user.pk) for user in rule.reviewers.all())
+            config[str(rule.pk)] = value
+        return config
 
     def get_review_cache_key(self, user_id, asset_id, account_username):
         account_digest = sha256(account_username.encode('utf-8')).hexdigest()
-        return f'asset-review:v1:{self.org_id}:{self.id}:{user_id}:{asset_id}:{account_digest}'
+        key = f'asset-review:v1:{self.org_id}:{self.id}:{user_id}:{asset_id}:{account_digest}'
+        if self.workflow_id and self.workflow.requires_acl_reviewers:
+            config = self.review_configuration([self])[str(self.pk)]
+            digest = sha256(str(sorted(config.items())).encode()).hexdigest()
+            key += f':{digest}'
+        return key
 
     def is_review_exempt(self, user, asset, account_username):
         if not self.is_active or not self.review_enabled:
@@ -263,14 +272,22 @@ class LoginAssetACL(UserAssetAccountBaseACL):
             rules.update((str(rule.pk), rule) for rule in connection_rules)
         ordered_rules = sorted(rules.values(), key=lambda rule: (rule.priority, rule.name, str(rule.pk)))
         data['meta']['login_asset_review_config'] = self.review_configuration(ordered_rules)
+        acl_reviewers = None
         if workflow is None:
             assignees = self.get_review_assignees(ordered_rules)
-            workflows = [rule.workflow for rule in ordered_rules if rule.workflow_id]
+            workflow_rules = [rule for rule in ordered_rules if rule.workflow_id]
+            workflows = [rule.workflow for rule in workflow_rules]
+            reviewers = {
+                index: [str(user.pk) for user in self.filter_available_reviewers(rule.reviewers.all(), rule.org_id)]
+                for index, rule in enumerate(workflow_rules) if rule.workflow.requires_acl_reviewers
+            }
             if assignees:
                 workflows.append(get_system_workflow(org_id, TicketType.login_asset_confirm, assignees))
-            workflow = compose_workflows(workflows, org_id, TicketType.login_asset_confirm)
+            workflow, acl_reviewers = compose_workflows(
+                workflows, org_id, TicketType.login_asset_confirm, acl_reviewers=reviewers,
+            )
         ticket = Ticket.objects.create(**data)
-        ticket.open_by_system(assignees, workflow=workflow)
+        ticket.open_by_system(assignees, workflow=workflow, acl_reviewers=acl_reviewers)
         return ticket
 
 

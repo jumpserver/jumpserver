@@ -127,7 +127,7 @@ class LoginAssetACLSerializer(WorkflowACLSerializerMixin, BaseSerializer, BulkOr
         action = attrs.get('action', getattr(self.instance, 'action', ActionChoices.reject))
         review_enabled = attrs.get('review_enabled', getattr(self.instance, 'review_enabled', False))
         workflow = attrs.get('workflow', getattr(self.instance, 'workflow', None))
-        if action == ActionChoices.accept and review_enabled and not workflow:
+        if action == ActionChoices.accept and review_enabled and (not workflow or workflow.requires_acl_reviewers):
             reviewers = attrs.get('reviewers')
             if reviewers is None:
                 reviewers = self.instance.reviewers.all() if self.instance else []
