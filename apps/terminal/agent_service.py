@@ -17,11 +17,12 @@ from django.db.models import CharField
 from django.db.models.functions import Cast
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 from oauth2_provider.models import get_access_token_model, get_refresh_token_model
 from rest_framework.exceptions import PermissionDenied, ValidationError, APIException
 
 from orgs.models import Organization
-from orgs.utils import tmp_to_org, tmp_to_root_org
+from orgs.utils import get_current_org, tmp_to_org, tmp_to_root_org
 from terminal.agent_policy import (
     ACTION_POLICIES,
     allowed_actions,
@@ -860,7 +861,6 @@ def append_event(action, data):
     if not isinstance(payload, dict):
         raise ValidationError('Invalid event payload')
     if data.get('occurred_at'):
-        from django.utils.dateparse import parse_datetime
         occurred = text_field(data['occurred_at'], 'occurred_at', 64)
         if not parse_datetime(occurred):
             raise ValidationError('Invalid event occurrence time')
@@ -884,7 +884,11 @@ def append_event(action, data):
     # evidence in order without allowing it to replace Core's terminal state.
     # A crash after the executor's intent may leave its claim undelivered.
     # Unknown closes that uncertainty; it never grants permission to execute.
-    if not already_final and action.status not in ('dispatching', 'running', 'awaiting_input') and state not in ('rejected', 'failed', 'expired', 'cancelled', 'unknown'):
+    if (
+        not already_final
+        and action.status not in ('dispatching', 'running', 'awaiting_input')
+        and state not in ('rejected', 'failed', 'expired', 'cancelled', 'unknown')
+    ):
         raise Conflict('Execution has not been claimed')
     if state == 'awaiting_input' and action.kind != 'open_terminal':
         raise ValidationError('Only a controlled terminal handoff can await user input')
@@ -892,7 +896,10 @@ def append_event(action, data):
         raise Conflict('Execution state cannot move backwards')
     if action.status == 'dispatching' and state not in FINAL_STATES | {'running', 'dispatching', 'awaiting_input'}:
         raise Conflict('Execution state cannot move backwards')
-    if state == 'cancelled' and action.status in ('dispatching', 'running') and payload.get('stop_confirmed') is not True:
+    if (
+        state == 'cancelled' and action.status in ('dispatching', 'running')
+        and payload.get('stop_confirmed') is not True
+    ):
         raise ValidationError('Cancellation requires remote stop confirmation; otherwise report unknown')
     if state == 'succeeded' and action.kind == 'execute_command':
         mode = execution_mode(action.session.requested)
@@ -923,7 +930,6 @@ def append_event(action, data):
 
 
 def audit_queryset(user, model):
-    from orgs.utils import get_current_org
     from rbac.models import RoleBinding
     permission = f'terminal.view_{model.__name__.lower()}'
     if not user.has_perm(permission):
