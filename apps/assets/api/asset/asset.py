@@ -14,6 +14,7 @@ from rest_framework.status import HTTP_200_OK
 from accounts.serializers import AccountSerializer
 from accounts.tasks import push_accounts_to_assets_task, verify_accounts_connectivity_task
 from assets import serializers
+from assets.clickhouse import CLICKHOUSE_HTTP_PROTOCOL
 from assets.exceptions import NotSupportedTemporarilyError
 from assets.filters import IpInFilterBackend, NodeFilterBackend
 from assets.models import Asset, Gateway, Platform, Protocol
@@ -272,7 +273,8 @@ class AssetViewSet(SuggestionMixin, BaseAssetViewSet):
 
         with transaction.atomic():
             if asset_ids:
-                Protocol.objects.filter(asset_id__in=asset_ids).delete()
+                # The ClickHouse HTTP endpoint belongs to each asset, not the platform.
+                Protocol.objects.filter(asset_id__in=asset_ids).exclude(name=CLICKHOUSE_HTTP_PROTOCOL).delete()
             if asset_ids and platform_protocols:
                 objs = []
                 for aid in asset_ids:

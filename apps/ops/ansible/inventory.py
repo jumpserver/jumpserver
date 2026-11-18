@@ -10,6 +10,7 @@ from collections import defaultdict
 from django.utils.translation import gettext as _
 
 from assets import const
+from assets.clickhouse import CLICKHOUSE_HTTP_PROTOCOL
 from .utils import escape_jinja2_syntax
 
 __all__ = ['JMSInventory']
@@ -279,7 +280,10 @@ class JMSInventory:
         protocol_priority = {'ssh': 10, 'winrm': 9, ansible_connection: 1}
         if self.protocol:
             protocol_priority.update({self.protocol: 0})
-        protocol_sorted = sorted(protocols, key=lambda x: protocol_priority.get(x.name, 999))
+        protocol_sorted = sorted(
+            (p for p in protocols if p.name != CLICKHOUSE_HTTP_PROTOCOL),
+            key=lambda p: protocol_priority.get(p.name, 999),
+        )
         protocol = protocol_sorted[0] if protocol_sorted else invalid_protocol
         return protocol
 
