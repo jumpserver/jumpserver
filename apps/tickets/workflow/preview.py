@@ -52,7 +52,9 @@ def upcoming_nodes(instance):
         if node.type == 'approval' and state != 'skipped':
             run = WorkflowNodeInstance(instance=instance, node=node)
             try:
-                users = resolve_approvers(run, instance.context, instance.org_id, instance.applicant_id)
+                users = resolve_approvers(
+                    run, instance.context, instance.org_id, instance.applicant_id,
+                )
             except WorkflowConfigurationError:
                 # Unavailable future approvers must not prevent reading the current task.
                 users = []
