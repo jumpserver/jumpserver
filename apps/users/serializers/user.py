@@ -135,22 +135,10 @@ class UserBulkListSerializer(UniqueBulkListSerializer):
 
     def to_internal_value(self, data):
         validated_data = super().to_internal_value(data)
-        seen = {}
-        errors = [{} for _ in validated_data]
-        for index, item in enumerate(validated_data):
-            email = item.get('email')
-            # Generated default addresses depend on each username; the database checks them.
-            if not email or '@' not in email:
-                continue
-            lookup = text_hmac_sha256(email)
-            if lookup in seen:
-                error = {'email': [_('This field must be unique.')]}
-                errors[seen[lookup]] = error
-                errors[index] = error
-            else:
-                seen[lookup] = index
-        if any(errors):
-            raise serializers.ValidationError(errors, code='unique')
+        # The database checks default addresses generated from the username at save time.
+        emails = (item.get('email') or '' for item in validated_data)
+        lookups = (text_hmac_sha256(email) if '@' in email else None for email in emails)
+        self.validate_unique_keys('email', lookups)
         return validated_data
 
 

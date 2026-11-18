@@ -37,48 +37,45 @@ __all__ = [
 
 
 def _email_lookup(email):
-    if not isinstance(email, str) or not email.strip():
-        raise ValueError('A non-empty email is required to compute its lookup.')
+    if not isinstance(email, str) or '@' not in email:
+        raise ValueError('Email updates require a concrete email; use User.save() otherwise.')
     lookup = text_hmac_sha256(email)
     if not lookup:
         raise ValueError('Unable to compute the email lookup.')
     return lookup
 
 
+def _email_update_fields(fields):
+    if fields is None:
+        return None
+    fields = set(fields)
+    if 'email' in fields:
+        fields.add('email_lookup')
+    elif 'email_lookup' in fields:
+        raise ValueError('Update email together with its derived lookup.')
+    return fields
+
+
 class UserQuerySet(models.QuerySet):
+    """Keep the email lookup in sync for writes that skip User.save()."""
+
     def bulk_create(self, objs, batch_size=None, ignore_conflicts=False,
                     update_conflicts=False, update_fields=None, unique_fields=None):
         objs = list(objs)
         for obj in objs:
-            obj.set_required_attr_if_need()
-            obj.email_lookup = _email_lookup(obj.email)
-        if update_fields is not None:
-            update_fields = set(update_fields)
-            if 'email' in update_fields:
-                update_fields.add('email_lookup')
-            elif 'email_lookup' in update_fields:
-                raise ValueError('Update email together with its derived lookup.')
+            obj.prepare_for_save()
         return super().bulk_create(
             objs, batch_size=batch_size, ignore_conflicts=ignore_conflicts,
-            update_conflicts=update_conflicts, update_fields=update_fields,
+            update_conflicts=update_conflicts, update_fields=_email_update_fields(update_fields),
             unique_fields=unique_fields,
         )
 
     def update(self, **kwargs):
         if 'email' in kwargs:
-            email = kwargs['email']
-            if not isinstance(email, str) or '@' not in email:
-                raise ValueError('Email updates require a concrete email; use User.save() otherwise.')
-            kwargs['email_lookup'] = _email_lookup(email)
+            kwargs['email_lookup'] = _email_lookup(kwargs['email'])
         elif 'email_lookup' in kwargs:
             raise ValueError('Update email together with its derived lookup.')
         return super().update(**kwargs)
-
-    def bulk_update(self, objs, fields, batch_size=None):
-        fields = tuple(fields)
-        if {'email', 'email_lookup'} & set(fields):
-            raise ValueError('Use User.save() to update each email and its lookup together.')
-        return super().bulk_update(objs, fields, batch_size=batch_size)
 
 
 class UserManager(_UserManager.from_queryset(UserQuerySet)):
@@ -294,25 +291,21 @@ class User(
             return True
         return False
 
-    def set_required_attr_if_need(self):
+    def prepare_for_save(self, update_fields=None):
         if not self.name:
             self.name = self.username
+        if update_fields is not None and 'email' not in update_fields:
+            return
         if not self.email or "@" not in self.email:
-            email = "{}@{}".format(self.username, settings.EMAIL_SUFFIX)
             if "@" in self.username:
-                email = self.username
-            self.email = email
+                self.email = self.username
+            else:
+                self.email = f"{self.username}@{settings.EMAIL_SUFFIX}"
+        self.email_lookup = _email_lookup(self.email)
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
-        if update_fields is not None:
-            update_fields = set(update_fields)
-            if 'email_lookup' in update_fields and 'email' not in update_fields:
-                raise ValueError('Update email together with its derived lookup.')
-        self.set_required_attr_if_need()
-        if update_fields is None or 'email' in update_fields:
-            self.email_lookup = _email_lookup(self.email)
-            if update_fields is not None:
-                update_fields.add('email_lookup')
+        update_fields = _email_update_fields(update_fields)
+        self.prepare_for_save(update_fields)
         if self.username == "admin":
             self.role = "Admin"
             self.is_active = True
