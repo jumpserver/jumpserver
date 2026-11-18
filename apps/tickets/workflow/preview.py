@@ -1,8 +1,12 @@
 from graphlib import TopologicalSorter
 
+from tickets.models import WorkflowNodeInstance
+from .approvers import resolve_approvers, user_snapshot
+from .errors import WorkflowConfigurationError
+
 
 def upcoming_nodes(instance):
-    """Describe the remaining graph without entering nodes or resolving approvers."""
+    """Preview the remaining graph and approvers without entering nodes."""
     if instance.state != 'running':
         return []
     visited = set()
@@ -40,9 +44,18 @@ def upcoming_nodes(instance):
         state = 'not_started' if key in certain[current] else (
             'branch_pending' if key in possible[current] else 'skipped'
         )
-        preview.append({
+        item = {
             'id': f'preview-{node.pk}', 'key': node.key, 'type': node.type,
             'name': str(instance.version.workflow.node_display_name(node)),
             'config': node.config, 'state': state, 'required': node.config.get('required', 1),
-        })
+        }
+        if node.type == 'approval' and state != 'skipped':
+            run = WorkflowNodeInstance(instance=instance, node=node)
+            try:
+                users = resolve_approvers(run, instance.context, instance.org_id, instance.applicant_id)
+            except WorkflowConfigurationError:
+                # Unavailable future approvers must not prevent reading the current task.
+                users = []
+            item['approvers'] = [user_snapshot(user) for user in users]
+        preview.append(item)
     return preview

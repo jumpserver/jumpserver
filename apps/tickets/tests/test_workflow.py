@@ -558,19 +558,82 @@ class WorkflowTests(TestCase):
         workflow = self.create_workflow(definition)
         instance = self.start(workflow)
         publish_workflow(workflow, approval_definition([self.bob]), expected_version=1)
-        response = self.request(WorkflowInstanceViewSet, 'retrieve', self.applicant, instance.pk, method='get')
+        event_count = instance.events.count()
+        with patch('tickets.workflow.signals.workflow_event.send') as notify:
+            response = self.request(WorkflowInstanceViewSet, 'retrieve', self.applicant, instance.pk, method='get')
+        notify.assert_not_called()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['version_number'], 1)
         self.assertEqual([(n['key'], n['state']) for n in response.data['upcoming_nodes']], [
             ('approval_1', 'not_started'), ('approval_2', 'not_started'), ('end', 'not_started'),
         ])
         self.assertEqual(response.data['approver_role_names'], {str(self.role.pk): self.role.name})
+        self.assertEqual({user['id'] for user in response.data['upcoming_nodes'][0]['approvers']},
+                         {str(user.pk) for user in (self.alice, self.bob, self.carol)})
+        self.assertEqual(response.data['upcoming_nodes'][1]['approvers'], [
+            {'id': str(self.alice.pk), 'name': self.alice.name, 'username': self.alice.username},
+        ])
+        self.assertNotIn('approvers', response.data['upcoming_nodes'][2])
+        self.assertEqual(instance.events.count(), event_count)
         self.assertEqual(instance.node_instances.count(), 2)
         self.assertEqual(ApprovalTask.objects.filter(node_instance__instance=instance).count(), 1)
         self.engine.approve(self.task(instance, self.alice), self.alice)
         response = self.request(WorkflowInstanceViewSet, 'retrieve', self.applicant, instance.pk, method='get')
         self.assertEqual([n['key'] for n in response.data['upcoming_nodes']], ['approval_2', 'end'])
         self.assertEqual([n['key'] for n in response.data['nodes']], ['start', 'approval_0', 'approval_1'])
+
+    def test_instance_preview_uses_existing_resolvers_and_saved_user_selections(self):
+        group = UserGroup.objects.create(name='Preview reviewers')
+        group.users.add(self.applicant, self.bob, self.outsider)
+        RoleBinding.objects_raw.create(
+            user=self.bob, role=BuiltinRole.org_admin.get_role(), org=self.org, scope='org',
+        )
+        sources = [
+            ({'type': 'user', 'value': [str(self.applicant.pk), str(self.bob.pk)]}, {self.bob.pk}),
+            ({'type': 'user_group', 'value': [str(group.pk)]}, {self.bob.pk}),
+            ({'type': 'role', 'value': [str(self.role.pk)]}, {self.alice.pk, self.bob.pk, self.carol.pk}),
+            ({'type': 'org_admin'}, {self.bob.pk}),
+            ({'type': 'asset_owner'}, {self.bob.pk}),
+            ({'type': 'user_selector', 'value': {
+                'type': 'attrs', 'attrs': [{'name': 'name', 'value': self.bob.name}],
+            }}, {self.bob.pk}),
+        ]
+        for source, expected in sources:
+            with self.subTest(source=source['type']):
+                definition = approval_definition([self.alice], levels=2)
+                definition['nodes'][2]['config']['approvers'] = source
+                instance = self.start(self.create_workflow(definition), {
+                    'assets': [{'id': str(uuid4()), 'name': 'Host', 'owner_ids': [str(self.bob.pk)]}],
+                })
+                if source['type'] == 'user_selector':
+                    User.objects.filter(pk=self.bob.pk).update(name='Changed after submission')
+                response = self.request(WorkflowInstanceViewSet, 'retrieve', self.applicant, instance.pk, method='get')
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual({user['id'] for user in response.data['upcoming_nodes'][0]['approvers']},
+                                 {str(pk) for pk in expected})
+                if source['type'] == 'user_group':
+                    group.users.remove(self.bob)
+                    group.users.add(self.carol)
+                    response = self.request(WorkflowInstanceViewSet, 'retrieve', self.applicant, instance.pk, method='get')
+                    self.assertEqual({user['id'] for user in response.data['upcoming_nodes'][0]['approvers']},
+                                     {str(self.carol.pk)})
+                self.assertEqual(instance.node_instances.count(), 2)
+                self.assertEqual(ApprovalTask.objects.filter(node_instance__instance=instance).count(), 1)
+
+    def test_unavailable_preview_approvers_do_not_break_details_or_relax_runtime_validation(self):
+        User.objects.filter(pk=self.bob.pk).update(is_active=False)
+        User.objects.filter(pk=self.carol.pk).update(date_expired=timezone.now() - timedelta(days=1))
+        for user_id in (self.bob.pk, self.carol.pk, self.outsider.pk, self.applicant.pk, uuid4()):
+            with self.subTest(user_id=user_id):
+                definition = approval_definition([self.alice], levels=2)
+                definition['nodes'][2]['config']['approvers']['value'] = [str(user_id)]
+                instance = self.start(self.create_workflow(definition))
+                response = self.request(WorkflowInstanceViewSet, 'retrieve', self.applicant, instance.pk, method='get')
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.data['upcoming_nodes'][0]['approvers'], [])
+                self.assertEqual(response.data['state'], 'running')
+                self.assertEqual(instance.node_instances.count(), 2)
+                self.assertEqual(self.engine.approve(self.task(instance, self.alice), self.alice).state, 'error')
 
     def test_instance_preview_distinguishes_undecided_branches_and_shared_successors(self):
         definition = approval_definition([self.alice], levels=4)
@@ -589,12 +652,15 @@ class WorkflowTests(TestCase):
             'approval_3': 'not_started', 'end': 'not_started',
         })
         self.assertFalse(instance.events.filter(type='condition.evaluated').exists())
+        self.assertTrue(all(node['approvers'] for node in response.data['upcoming_nodes']
+                            if node['type'] == 'approval'))
         self.engine.approve(self.task(instance, self.alice), self.alice)
         response = self.request(WorkflowInstanceViewSet, 'retrieve', self.applicant, instance.pk, method='get')
         self.assertEqual({n['key']: n['state'] for n in response.data['upcoming_nodes']}, {
             'approval_2': 'skipped', 'approval_3': 'not_started', 'end': 'not_started',
         })
         self.assertEqual(instance.node_instances.filter(node__key='approval_2').count(), 0)
+        self.assertNotIn('approvers', response.data['upcoming_nodes'][0])
 
     def test_instance_preview_stops_after_rejection_without_changing_skipped_records(self):
         instance = self.start(self.create_workflow(approval_definition([self.alice], levels=2)))
