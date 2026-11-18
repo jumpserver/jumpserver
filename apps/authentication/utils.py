@@ -56,10 +56,13 @@ def check_different_city_login_if_need(user, request):
     login_logs = UserLoginLog.objects.filter(
         username__in=usernames, status=True,
     ).exclude(city__in=city_white)
-    if not login_logs.exists():
+    last_login = login_logs.only('city').first()
+    if last_login is None:
         return
 
     city = get_ip_city(ip)
+    if city == last_login.city:
+        return
     if login_logs.filter(
         datetime__gte=timezone.now() - timedelta(days=7),
         city=city,
