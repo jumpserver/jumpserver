@@ -3,6 +3,7 @@ from dataclasses import dataclass
 
 from accounts.const import AliasAccount
 from accounts.models import Account, VirtualAccount
+from assets.clickhouse import CLICKHOUSE_HTTP_PROTOCOL
 from assets.models import Asset, MyAsset, Node, Protocol
 from common.utils import lazyproperty, get_logger
 from orgs.utils import tmp_to_org, tmp_to_root_org
@@ -333,7 +334,7 @@ class PermAssetDetailUtil:
             names |= set(perm.protocols)
         if only_name:
             return names
-        protocols = self.asset.protocols.all()
+        protocols = self.asset.protocols.exclude(name=CLICKHOUSE_HTTP_PROTOCOL)
         if 'all' not in names:
             protocols = protocols.filter(name__in=names)
         return protocols

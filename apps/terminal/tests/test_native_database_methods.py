@@ -85,3 +85,7 @@ class NativeDatabaseConnectMethodTests(SimpleTestCase):
                 self.assertEqual(data['endpoint'], {'host': 'gateway.example.com', 'port': 15525})
                 self.assertEqual(data['token'], {'id': 'selector-token', 'value': 'access-secret'})
                 self.assertEqual(data['asset']['info']['db_name'], 'ANALYTICS')
+                if protocol == Protocol.clickhouse:
+                    self.assertEqual(data['connect_options'], {'clickhouse_http': True})
+                else:
+                    self.assertNotIn('connect_options', data)

@@ -5,6 +5,10 @@ from accounts.const import SecretType
 from accounts.models import Account
 from acls.const import ActionChoices as ACLActionChoices
 from acls.models import CommandGroup, CommandFilterACL, DataMaskingRule
+from assets.clickhouse import (
+    CLICKHOUSE_HTTP_DEFAULT_PORT, CLICKHOUSE_HTTP_PROTOCOL, parse_clickhouse_http_port,
+)
+from assets.const import Protocol
 from assets.models import Asset, Platform, Gateway, Zone
 from assets.serializers.asset import AssetProtocolsSerializer
 from assets.serializers.platform import PlatformSerializer
@@ -183,6 +187,27 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
             'face_monitor_token': {'read_only': True},
             'value': {'read_only': True},
         }
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        asset = data.get('asset') or {}
+        protocols = asset.get('protocols', [])
+        http = next((p for p in protocols if p['name'] == CLICKHOUSE_HTTP_PROTOCOL), {})
+
+        # HTTP is a second backend port, not a protocol to authorize or audit.
+        # Keep the one-protocol token and the existing Wisp/Magnus settings contract.
+        if http:
+            asset['protocols'] = [p for p in protocols if p['name'] != CLICKHOUSE_HTTP_PROTOCOL]
+        if instance.protocol != Protocol.clickhouse:
+            return data
+        for protocol in (data.get('platform') or {}).get('protocols', []):
+            if protocol['name'] != Protocol.clickhouse:
+                continue
+            setting = protocol.get('setting') or {}
+            port = parse_clickhouse_http_port(http.get('port')) or CLICKHOUSE_HTTP_DEFAULT_PORT
+            protocol['setting'] = {**setting, 'http_port': port}
+            break
+        return data
 
     @staticmethod
     def get_ssh_certificate(token):
