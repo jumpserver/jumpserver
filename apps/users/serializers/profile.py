@@ -80,6 +80,7 @@ class UserProfileSerializer(UserSerializer):
         read_only_fields = [
             'date_joined', 'last_login', 'created_by', 'source',
             'receive_backends', 'has_jdmc', 'allowed_mfa_types',
+            'is_service_account',
         ]
         fields_mini = [
             'id', 'name', 'username', 'email',
@@ -103,6 +104,7 @@ class UserProfileSerializer(UserSerializer):
             'date_expired': {'read_only': True},
             'date_joined': {'read_only': True},
             'last_login': {'read_only': True},
+            'is_service_account': {'read_only': True},
         })
 
         if 'password' in fields:

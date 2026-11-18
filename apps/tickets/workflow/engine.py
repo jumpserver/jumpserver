@@ -19,6 +19,7 @@ from tickets.models import (
 )
 from .approvers import (
     available_users, resolve_approvers, user_snapshot, excluded_approver_ids, selected_users,
+    bind_acl_reviewers,
 )
 from .conditions import evaluate_condition
 from .const import InstanceState, NodeState, TaskState
@@ -46,7 +47,7 @@ class WorkflowEngine:
         return event
 
     @transaction.atomic
-    def start(self, ticket, workflow, context):
+    def start(self, ticket, workflow, context, *, acl_reviewers=None):
         self._check_org(ticket.org_id, allow_root=get_ticket_plugin(ticket.type).allow_global)
         # Serialize duplicate submission independently of which definition was selected.
         ticket = Ticket.objects.select_for_update().get(pk=ticket.pk)
@@ -93,7 +94,8 @@ class WorkflowEngine:
         snapshot.pop('approver_selections', None)
         if selections:
             snapshot['approver_selections'] = selections
-            snapshot = json_snapshot(snapshot)
+        bind_acl_reviewers(snapshot, version, acl_reviewers, ticket.org_id)
+        snapshot = json_snapshot(snapshot)
         with tmp_to_org(ticket.org_id):
             instance = WorkflowInstance.objects.create(
                 ticket=ticket, version=version, applicant=ticket.applicant,

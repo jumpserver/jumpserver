@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+import re
 from functools import partial
 
 from django.conf import settings
@@ -39,6 +40,21 @@ __all__ = [
 ]
 
 logger = get_logger(__file__)
+
+
+def is_email_unique_error(error):
+    """Recognize only the email lookup constraint, without querying a stale snapshot."""
+    cause = error.__cause__ or error
+    constraint = 'users_user_email_lookup_uniq'
+    diagnostic = getattr(cause, 'diag', None)
+    if diagnostic is not None:
+        return getattr(diagnostic, 'constraint_name', None) == constraint
+    if str(cause) == f'UNIQUE constraint failed: {User._meta.db_table}.email_lookup':
+        return True
+    return (
+        len(cause.args) > 1 and cause.args[0] == 1062
+        and re.search(r"for key ['`](?:[^'`]+\.)?" + constraint + r"['`]$", str(cause.args[1])) is not None
+    )
 
 
 def default_system_roles():
@@ -117,6 +133,14 @@ class RolesSerializerMixin(serializers.Serializer):
 class UserBulkListSerializer(UniqueBulkListSerializer):
     unique_field = 'username'
 
+    def to_internal_value(self, data):
+        validated_data = super().to_internal_value(data)
+        # The database checks default addresses generated from the username at save time.
+        emails = (item.get('email') or '' for item in validated_data)
+        lookups = (text_hmac_sha256(email) if '@' in email else None for email in emails)
+        self.validate_unique_keys('email', lookups)
+        return validated_data
+
 
 class UserSerializer(
     RolesSerializerMixin, ResourceLabelsMixin, CommonBulkModelSerializer
@@ -143,6 +167,9 @@ class UserSerializer(
     )
     is_org_admin = serializers.BooleanField(
         read_only=True, label=_("Organization Administrator")
+    )
+    is_service_account = serializers.BooleanField(
+        read_only=True, label=_("Is service account")
     )
     can_public_key_auth = serializers.BooleanField(
         source="can_use_ssh_key_login",
@@ -281,7 +308,7 @@ class UserSerializer(
             "is_first_login": {"label": _("Is first login"), "read_only": True},
             "is_active": {"label": _("Is active"), "help_text": ""},
             "is_valid": {"label": _("Is valid")},
-            "is_service_account": {"label": _("Is service account")},
+            "is_service_account": {"label": _("Is service account"), "read_only": True},
             "is_org_admin": {"label": _("Is org admin")},
             "is_expired": {"label": _("Is expired")},
             "avatar_url": {"label": _("Avatar url")},
@@ -410,7 +437,11 @@ class UserSerializer(
                     field = getattr(instance, field_name)
                     field.set(value)
                 return instance
-        except IntegrityError:
+        except IntegrityError as error:
+            if is_email_unique_error(error):
+                raise serializers.ValidationError(
+                    {'email': [_('This field must be unique.')]}, code='unique',
+                ) from error
             # Query after the savepoint rolls back to keep the transaction usable.
             username = validated_data.get('username', getattr(instance, 'username', None))
             users = User.objects.filter(username=username)
@@ -538,5 +569,13 @@ class ServiceAccountSerializer(serializers.ModelSerializer):
         name = validated_data["name"]
         email = self.get_email()
         comment = validated_data.get("comment", "")
-        user, ak = User.create_service_account(name, email, comment)
+        try:
+            with transaction.atomic():
+                user, ak = User.create_service_account(name, email, comment)
+        except IntegrityError as error:
+            if is_email_unique_error(error):
+                raise serializers.ValidationError(
+                    {'name': [_('name not unique')]}, code='unique',
+                ) from error
+            raise
         return user

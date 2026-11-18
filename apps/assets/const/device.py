@@ -69,7 +69,10 @@ class DeviceTypes(BaseType):
     @classmethod
     def internal_platforms(cls):
         return {
-            cls.GENERAL: [{'name': 'General'}, {'name': 'Cisco'}, {'name': 'Huawei'}, {'name': 'H3C'}],
+            cls.GENERAL: [{'name': 'General'}],
+            cls.CISCO: [{'name': 'Cisco'}],
+            cls.HUAWEI: [{'name': 'Huawei'}],
+            cls.H3C: [{'name': 'H3C'}],
             cls.SWITCH: [],
             cls.ROUTER: [],
             cls.FIREWALL: []
@@ -78,5 +81,5 @@ class DeviceTypes(BaseType):
     @classmethod
     def get_community_types(cls):
         return [
-            cls.GENERAL, cls.SWITCH, cls.ROUTER, cls.FIREWALL
+            cls.GENERAL, cls.CISCO, cls.HUAWEI, cls.H3C, cls.SWITCH, cls.ROUTER, cls.FIREWALL
         ]

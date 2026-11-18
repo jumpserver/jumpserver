@@ -92,7 +92,7 @@ class PlaybookFileInputTests(SimpleTestCase):
         response = self.call('post', {'name': 'tasks.yml', 'content': content})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, {
-            'name': 'tasks.yml', 'title': 'tasks.yml', 'id': str(Path.cwd() / 'tasks.yml'),
+            'name': 'tasks.yml', 'title': 'tasks.yml', 'id': 'tasks.yml',
             'isParent': False, 'pId': 'root', 'open': True, 'iconSkin': 'file',
         })
         self.assertEqual((self.directory / 'tasks.yml').read_text(), content)

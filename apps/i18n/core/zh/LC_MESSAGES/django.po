@@ -21169,3 +21169,7 @@ msgstr "请至少选择一个账号。"
 #: tickets/workflow/definition.py tickets/workflow/approvers.py
 msgid "Invalid user filter."
 msgstr "用户筛选规则无效。"
+
+#: tickets/workflow/publication.py
+msgid "ACL reviewers are only available for ACL approval workflows."
+msgstr "ACL 指定审批人仅适用于 ACL 审批流程。"

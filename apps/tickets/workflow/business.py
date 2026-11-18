@@ -29,7 +29,7 @@ def build_context(ticket):
 
 
 @transaction.atomic
-def submit_ticket(ticket):
+def submit_ticket(ticket, *, acl_reviewers=None):
     from .engine import WorkflowEngine
     if not ticket.workflow_id:
         raise WorkflowConfigurationError(gettext('Select a published workflow.'))
@@ -39,7 +39,7 @@ def submit_ticket(ticket):
     ticket.set_rel_snapshot()
     context = build_context(ticket)
     get_ticket_plugin(ticket.type).validate_submission(ticket, context)
-    instance = WorkflowEngine().start(ticket, ticket.workflow, context)
+    instance = WorkflowEngine().start(ticket, ticket.workflow, context, acl_reviewers=acl_reviewers)
     # Configuration failures on submission must not leave unusable open tickets.
     if instance.state == 'error':
         event = instance.events.filter(type='workflow.error').last()
@@ -77,14 +77,17 @@ def get_system_workflow(org_id, ticket_type, assignees):
 
 
 @transaction.atomic
-def submit_system_ticket(ticket, assignees, workflow=None):
+def submit_system_ticket(ticket, assignees, workflow=None, *, acl_reviewers=None):
     if workflow is None:
         workflow = get_system_workflow(ticket.org_id, ticket.type, assignees)
+    if acl_reviewers is None and workflow.requires_acl_reviewers:
+        ids = sorted(str(user.pk) for user in assignees)
+        acl_reviewers = {key: ids for key in workflow.active_version.acl_reviewer_keys}
     ticket.workflow = workflow
     ticket.origin = TicketOrigin.system
     ticket.save(update_fields=['workflow', 'origin'])
     with tmp_to_org(ticket.org_id):
-        return submit_ticket(ticket)
+        return submit_ticket(ticket, acl_reviewers=acl_reviewers)
 
 
 @transaction.atomic

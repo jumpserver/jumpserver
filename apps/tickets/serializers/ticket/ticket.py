@@ -310,7 +310,8 @@ class TicketApplySerializer(TicketSerializer):
         with tmp_to_root_org():
             workflow = Workflow.objects.filter(
                 pk=workflow_id, org_id__in=[org_id, Organization.ROOT_ID],
-                type=attrs['type'], enabled=True, active_version__published_at__isnull=False,
+                type=attrs['type'], is_system=False, enabled=True,
+                active_version__published_at__isnull=False,
             ).first()
         if not workflow:
             raise serializers.ValidationError({'workflow_id': gettext('Select an enabled, published workflow for this organization and type.')})

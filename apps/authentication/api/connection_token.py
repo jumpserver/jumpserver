@@ -479,6 +479,10 @@ class RDPFileClientProtocolURLMixin:
                     token.connect_options, token.protocol, token.asset
                 )
             }
+        elif token.protocol == Protocol.clickhouse and connect_method_name == NativeClient.db_client:
+            # Core supplies an HTTP backend port for old and new assets alike.
+            # The desktop client still connects to Magnus, not the backend port.
+            data['connect_options'] = {'clickhouse_http': True}
 
         if connect_method_name == NativeClient.mstsc or connect_method_dict['type'] == 'applet':
             filename, content = self.get_rdp_file_info(token)

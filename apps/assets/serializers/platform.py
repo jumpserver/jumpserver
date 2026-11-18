@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
+from assets.clickhouse import CLICKHOUSE_HTTP_PROTOCOL
 from assets.models import Asset
 from common.serializers import (
     WritableNestedModelSerializer, type_field_map, MethodSerializer,
@@ -92,15 +93,11 @@ class PlatformProtocolSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         attrs = super().validate(attrs)
         name = attrs.get('name', getattr(self.instance, 'name', None))
-        setting = attrs.get('setting', {})
-        # Nested platform forms have no ?name= query parameter, so their
-        # MethodSerializer may use the generic dict rather than typed fields.
-        if name == 'clickhouse' and 'http_port' in setting:
-            try:
-                field = serializers.IntegerField(min_value=1, max_value=65535)
-                setting['http_port'] = field.run_validation(setting['http_port'])
-            except serializers.ValidationError as exc:
-                raise serializers.ValidationError({'setting': {'http_port': exc.detail}})
+        if name == CLICKHOUSE_HTTP_PROTOCOL:
+            raise serializers.ValidationError({'name': _('Configure the ClickHouse HTTP port on the asset.')})
+        if name == Protocol.clickhouse and 'setting' in attrs:
+            # Ignore obsolete input from older clients/imports; ports now belong to assets.
+            attrs['setting'] = {key: value for key, value in attrs['setting'].items() if key != 'http_port'}
         return attrs
 
     class Meta:

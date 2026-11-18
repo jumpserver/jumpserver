@@ -103,7 +103,7 @@ class WorkflowBusinessTests(TestCase):
             with override('en'):
                 english = str(workflow.get_type_display())
             workflows.append((workflow, label, english))
-        combined = compose_workflows(
+        combined, _ = compose_workflows(
             [workflows[1][0], self.workflow('login_asset_confirm')], self.org.id, 'login_asset_confirm',
         )
         workflows.append((combined, '组合审批流程', 'Combined approval workflow'))
@@ -132,7 +132,7 @@ class WorkflowBusinessTests(TestCase):
 
         generated = get_system_workflow(self.org.id, 'login_asset_confirm', [self.alice])
         custom = self.workflow('login_asset_confirm', definition=generated.active_version.as_definition())
-        combined = compose_workflows([custom, generated], self.org.id, 'login_asset_confirm')
+        combined, _ = compose_workflows([custom, generated], self.org.id, 'login_asset_confirm')
         version = combined.active_version
         original = version.as_definition()
         approvals = list(version.nodes.filter(type='approval').order_by('key'))
