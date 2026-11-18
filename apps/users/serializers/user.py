@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+import re
 from functools import partial
 
 from django.conf import settings
@@ -39,6 +40,21 @@ __all__ = [
 ]
 
 logger = get_logger(__file__)
+
+
+def is_email_unique_error(error):
+    """Recognize only the email lookup constraint, without querying a stale snapshot."""
+    cause = error.__cause__ or error
+    constraint = 'users_user_email_lookup_uniq'
+    diagnostic = getattr(cause, 'diag', None)
+    if diagnostic is not None:
+        return getattr(diagnostic, 'constraint_name', None) == constraint
+    if str(cause) == f'UNIQUE constraint failed: {User._meta.db_table}.email_lookup':
+        return True
+    return (
+        len(cause.args) > 1 and cause.args[0] == 1062
+        and re.search(r"for key ['`](?:[^'`]+\.)?" + constraint + r"['`]$", str(cause.args[1])) is not None
+    )
 
 
 def default_system_roles():
@@ -116,6 +132,26 @@ class RolesSerializerMixin(serializers.Serializer):
 
 class UserBulkListSerializer(UniqueBulkListSerializer):
     unique_field = 'username'
+
+    def to_internal_value(self, data):
+        validated_data = super().to_internal_value(data)
+        seen = {}
+        errors = [{} for _ in validated_data]
+        for index, item in enumerate(validated_data):
+            email = item.get('email')
+            # Generated default addresses depend on each username; the database checks them.
+            if not email or '@' not in email:
+                continue
+            lookup = text_hmac_sha256(email)
+            if lookup in seen:
+                error = {'email': [_('This field must be unique.')]}
+                errors[seen[lookup]] = error
+                errors[index] = error
+            else:
+                seen[lookup] = index
+        if any(errors):
+            raise serializers.ValidationError(errors, code='unique')
+        return validated_data
 
 
 class UserSerializer(
@@ -413,7 +449,11 @@ class UserSerializer(
                     field = getattr(instance, field_name)
                     field.set(value)
                 return instance
-        except IntegrityError:
+        except IntegrityError as error:
+            if is_email_unique_error(error):
+                raise serializers.ValidationError(
+                    {'email': [_('This field must be unique.')]}, code='unique',
+                ) from error
             # Query after the savepoint rolls back to keep the transaction usable.
             username = validated_data.get('username', getattr(instance, 'username', None))
             users = User.objects.filter(username=username)
@@ -541,5 +581,13 @@ class ServiceAccountSerializer(serializers.ModelSerializer):
         name = validated_data["name"]
         email = self.get_email()
         comment = validated_data.get("comment", "")
-        user, ak = User.create_service_account(name, email, comment)
+        try:
+            with transaction.atomic():
+                user, ak = User.create_service_account(name, email, comment)
+        except IntegrityError as error:
+            if is_email_unique_error(error):
+                raise serializers.ValidationError(
+                    {'name': [_('name not unique')]}, code='unique',
+                ) from error
+            raise
         return user

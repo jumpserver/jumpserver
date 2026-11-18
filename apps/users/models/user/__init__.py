@@ -36,7 +36,52 @@ __all__ = [
 ]
 
 
-class UserManager(_UserManager):
+def _email_lookup(email):
+    if not isinstance(email, str) or not email.strip():
+        raise ValueError('A non-empty email is required to compute its lookup.')
+    lookup = text_hmac_sha256(email)
+    if not lookup:
+        raise ValueError('Unable to compute the email lookup.')
+    return lookup
+
+
+class UserQuerySet(models.QuerySet):
+    def bulk_create(self, objs, batch_size=None, ignore_conflicts=False,
+                    update_conflicts=False, update_fields=None, unique_fields=None):
+        objs = list(objs)
+        for obj in objs:
+            obj.set_required_attr_if_need()
+            obj.email_lookup = _email_lookup(obj.email)
+        if update_fields is not None:
+            update_fields = set(update_fields)
+            if 'email' in update_fields:
+                update_fields.add('email_lookup')
+            elif 'email_lookup' in update_fields:
+                raise ValueError('Update email together with its derived lookup.')
+        return super().bulk_create(
+            objs, batch_size=batch_size, ignore_conflicts=ignore_conflicts,
+            update_conflicts=update_conflicts, update_fields=update_fields,
+            unique_fields=unique_fields,
+        )
+
+    def update(self, **kwargs):
+        if 'email' in kwargs:
+            email = kwargs['email']
+            if not isinstance(email, str) or '@' not in email:
+                raise ValueError('Email updates require a concrete email; use User.save() otherwise.')
+            kwargs['email_lookup'] = _email_lookup(email)
+        elif 'email_lookup' in kwargs:
+            raise ValueError('Update email together with its derived lookup.')
+        return super().update(**kwargs)
+
+    def bulk_update(self, objs, fields, batch_size=None):
+        fields = tuple(fields)
+        if {'email', 'email_lookup'} & set(fields):
+            raise ValueError('Use User.save() to update each email and its lookup together.')
+        return super().bulk_update(objs, fields, batch_size=batch_size)
+
+
+class UserManager(_UserManager.from_queryset(UserQuerySet)):
     def get_by_natural_key(self, username_or_mail):
         email_lookup = text_hmac_sha256(username_or_mail)
         q = (models.Q(username=username_or_mail) | models.Q(email_lookup=email_lookup))
@@ -67,10 +112,10 @@ class User(
     name = models.CharField(max_length=128, verbose_name=_("Name"))
     # 256 UTF-8 characters need up to 1440 base64 characters with AES-GCM metadata.
     email = fields.EncryptCharField(
-        max_length=256, storage_max_length=1536, unique=True, verbose_name=_("Email")
+        max_length=256, storage_max_length=1536, verbose_name=_("Email")
     )
     email_lookup = models.CharField(
-        max_length=128, blank=True, null=True, verbose_name=_("Email lookup")
+        max_length=128, verbose_name=_("Email lookup")
     )
     groups = models.ManyToManyField(
         "users.UserGroup",
@@ -258,12 +303,23 @@ class User(
                 email = self.username
             self.email = email
 
-    def save(self, *args, **kwargs):
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        if update_fields is not None:
+            update_fields = set(update_fields)
+            if 'email_lookup' in update_fields and 'email' not in update_fields:
+                raise ValueError('Update email together with its derived lookup.')
         self.set_required_attr_if_need()
+        if update_fields is None or 'email' in update_fields:
+            self.email_lookup = _email_lookup(self.email)
+            if update_fields is not None:
+                update_fields.add('email_lookup')
         if self.username == "admin":
             self.role = "Admin"
             self.is_active = True
-        return super().save(*args, **kwargs)
+        return super().save(
+            force_insert=force_insert, force_update=force_update,
+            using=using, update_fields=update_fields,
+        )
 
     def is_member_of(self, user_group):
         if user_group in self.groups.all():
@@ -312,6 +368,9 @@ class User(
     class Meta:
         ordering = ["username"]
         verbose_name = _("User")
+        constraints = [
+            models.UniqueConstraint(fields=['email_lookup'], name='users_user_email_lookup_uniq'),
+        ]
         unique_together = (
             ("dingtalk_id",),
             ("wecom_id",),
