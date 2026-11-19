@@ -19253,3 +19253,11 @@ msgstr "No se pudo borrar el estado de la tarea de cuenta interrumpida: ejecuci�
 #, python-format
 msgid "Unable to release the interrupted account lock: execution=%(execution)s; account=%(account)s."
 msgstr "No se pudo liberar el bloqueo de la cuenta interrumpida: ejecución=%(execution)s; cuenta=%(account)s."
+
+#: assets/api/asset/asset.py
+msgid "Not accessed for over three months"
+msgstr "Sin acceso desde hace más de tres meses"
+
+#: assets/api/asset/asset.py
+msgid "No valid permission"
+msgstr "Sin autorización válida"

@@ -18836,3 +18836,11 @@ msgstr "중단된 계정 작업 상태를 지울 수 없습니다: 실행=%(exec
 #, python-format
 msgid "Unable to release the interrupted account lock: execution=%(execution)s; account=%(account)s."
 msgstr "중단된 계정 잠금을 해제할 수 없습니다: 실행=%(execution)s; 계정=%(account)s."
+
+#: assets/api/asset/asset.py
+msgid "Not accessed for over three months"
+msgstr "3개월 넘게 접속하지 않음"
+
+#: assets/api/asset/asset.py
+msgid "No valid permission"
+msgstr "유효한 권한 없음"

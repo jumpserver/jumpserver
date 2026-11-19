@@ -19024,3 +19024,11 @@ msgstr "Không thể xóa trạng thái tác vụ tài khoản bị gián đoạ
 #, python-format
 msgid "Unable to release the interrupted account lock: execution=%(execution)s; account=%(account)s."
 msgstr "Không thể giải phóng khóa tài khoản bị gián đoạn: lần thực thi=%(execution)s; tài khoản=%(account)s."
+
+#: assets/api/asset/asset.py
+msgid "Not accessed for over three months"
+msgstr "Không truy cập trong hơn ba tháng"
+
+#: assets/api/asset/asset.py
+msgid "No valid permission"
+msgstr "Không có quyền hợp lệ"

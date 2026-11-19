@@ -18885,3 +18885,11 @@ msgstr "無法釋放中斷帳號鎖定：執行記錄=%(execution)s；帳號=%(a
 #: accounts/serializers/account/service.py
 msgid "Select at least one account."
 msgstr "請至少選擇一個帳號。"
+
+#: assets/api/asset/asset.py
+msgid "Not accessed for over three months"
+msgstr "超過3個月未存取"
+
+#: assets/api/asset/asset.py
+msgid "No valid permission"
+msgstr "無有效授權"
