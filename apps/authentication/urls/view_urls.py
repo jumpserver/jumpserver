@@ -2,15 +2,18 @@
 #
 
 from django.db.transaction import non_atomic_requests
-from django.urls import path, include
+from django.urls import include, path
 
-
+from terminal.agent_views import AgentInstallView, AgentSessionView
 from users import views as users_view
+
 from .. import views
 
 app_name = 'authentication'
 
 urlpatterns = [
+    path('agent/install.md', AgentInstallView.as_view(), name='agent-install'),
+    path('agent/session/<uuid:session_id>/', AgentSessionView.as_view(), name='agent-session'),
     # login
     path('login/', non_atomic_requests(views.UserLoginView.as_view()), name='login'),
     path('login/mfa/', views.UserLoginMFAView.as_view(), name='login-mfa'),

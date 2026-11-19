@@ -65,6 +65,7 @@ from .serializers import (
     OperateLogFullSerializer, ServiceAccessLogSerializer
 )
 from .utils import construct_userlogin_usernames, record_operate_log_and_activity_log
+from .ftp import ftp_log_sources
 
 logger = get_logger(__name__)
 
@@ -163,6 +164,17 @@ class FTPLogViewSet(ReportExportMixin, OrgModelViewSet):
     rbac_perms = {
         'download': 'audits.view_ftplog',
     }
+
+    def get_serializer(self, *args, **kwargs):
+        context = kwargs.setdefault('context', self.get_serializer_context())
+        if args and args[0] is not None:
+            if kwargs.get('many'):
+                rows = list(args[0])
+                args = (rows, *args[1:])
+            else:
+                rows = [args[0]]
+            context['ftp_sources'] = ftp_log_sources(rows)
+        return super().get_serializer(*args, **kwargs)
 
     def get_storage(self):
         return FTPFileStorageHandler(self.get_object())
