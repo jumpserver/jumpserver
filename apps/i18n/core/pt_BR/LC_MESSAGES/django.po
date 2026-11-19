@@ -19139,3 +19139,11 @@ msgstr "Não foi possível limpar o estado da tarefa de conta interrompida: exec
 #, python-format
 msgid "Unable to release the interrupted account lock: execution=%(execution)s; account=%(account)s."
 msgstr "Não foi possível liberar o bloqueio da conta interrompida: execução=%(execution)s; conta=%(account)s."
+
+#: assets/api/asset/asset.py
+msgid "Not accessed for over three months"
+msgstr "Sem acesso há mais de três meses"
+
+#: assets/api/asset/asset.py
+msgid "No valid permission"
+msgstr "Sem autorização válida"

@@ -19026,3 +19026,11 @@ msgstr "中断されたアカウントタスクの状態を削除できません
 #, python-format
 msgid "Unable to release the interrupted account lock: execution=%(execution)s; account=%(account)s."
 msgstr "中断されたアカウントのロックを解放できません：実行=%(execution)s、アカウント=%(account)s。"
+
+#: assets/api/asset/asset.py
+msgid "Not accessed for over three months"
+msgstr "3か月を超えてアクセスなし"
+
+#: assets/api/asset/asset.py
+msgid "No valid permission"
+msgstr "有効な権限なし"

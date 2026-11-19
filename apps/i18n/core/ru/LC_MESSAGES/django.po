@@ -19157,3 +19157,11 @@ msgstr "Не удалось очистить состояние прерванн
 #, python-format
 msgid "Unable to release the interrupted account lock: execution=%(execution)s; account=%(account)s."
 msgstr "Не удалось снять блокировку прерванной учётной записи: выполнение=%(execution)s; учётная запись=%(account)s."
+
+#: assets/api/asset/asset.py
+msgid "Not accessed for over three months"
+msgstr "Нет обращений более трёх месяцев"
+
+#: assets/api/asset/asset.py
+msgid "No valid permission"
+msgstr "Нет действующих разрешений"

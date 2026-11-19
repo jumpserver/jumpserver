@@ -19251,3 +19251,11 @@ msgstr "Unable to clear interrupted account task status: execution=%(execution)s
 #, python-format
 msgid "Unable to release the interrupted account lock: execution=%(execution)s; account=%(account)s."
 msgstr "Unable to release the interrupted account lock: execution=%(execution)s; account=%(account)s."
+
+#: assets/api/asset/asset.py
+msgid "Not accessed for over three months"
+msgstr "Not accessed for over three months"
+
+#: assets/api/asset/asset.py
+msgid "No valid permission"
+msgstr "No valid permission"
