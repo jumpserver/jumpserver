@@ -7360,6 +7360,9 @@ msgstr "MariaDB"
 msgid "Oracle"
 msgstr "Oracle"
 
+msgid "OceanBase tenant mode"
+msgstr "OceanBase 租户模式"
+
 #: ops/const.py:76 settings/serializers/feature.py:103
 msgid "Timeout"
 msgstr "超时"
@@ -21173,3 +21176,11 @@ msgstr "用户筛选规则无效。"
 #: tickets/workflow/publication.py
 msgid "ACL reviewers are only available for ACL approval workflows."
 msgstr "ACL 指定审批人仅适用于 ACL 审批流程。"
+
+#: assets/api/asset/asset.py
+msgid "Not accessed for over three months"
+msgstr "超过3个月未访问"
+
+#: assets/api/asset/asset.py
+msgid "No valid permission"
+msgstr "无有效授权"

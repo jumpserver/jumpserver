@@ -112,6 +112,18 @@ class DatabaseTypes(BaseType):
                     'protocols_setting': {
                         'redis': {'auth_username': True}
                     }
+                },
+                {
+                    'name': 'Redis-Cluster',
+                    'protocols_setting': {
+                        'redis': {'auth_username': False, 'enable_cluster_mode': True}
+                    }
+                },
+                {
+                    'name': 'Redis-Cluster-ACL',
+                    'protocols_setting': {
+                        'redis': {'auth_username': True, 'enable_cluster_mode': True}
+                    }
                 }
             ]
         }
@@ -120,7 +132,7 @@ class DatabaseTypes(BaseType):
     def get_community_types(cls):
         return [
             cls.MYSQL, cls.MARIADB, cls.POSTGRESQL,
-            cls.MONGODB, cls.REDIS,
+            cls.MONGODB, cls.REDIS, cls.CLICKHOUSE,
         ]
 
 

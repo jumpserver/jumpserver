@@ -98,6 +98,9 @@ class PlatformProtocolSerializer(serializers.ModelSerializer):
         if name == Protocol.clickhouse and 'setting' in attrs:
             # Ignore obsolete input from older clients/imports; ports now belong to assets.
             attrs['setting'] = {key: value for key, value in attrs['setting'].items() if key != 'http_port'}
+        if name == Protocol.mysql and 'tenant_mode' in attrs.get('setting', {}):
+            if attrs['setting']['tenant_mode'] not in ('mysql', 'oracle'):
+                raise serializers.ValidationError({'setting': {'tenant_mode': _('Invalid choice.')}})
         return attrs
 
     class Meta:
@@ -143,6 +146,14 @@ class PlatformProtocolSerializer(serializers.ModelSerializer):
 
         protocol_settings = Protocol.settings()
         setting_fields = protocol_settings.get(protocol, {}).get('setting')
+        if protocol == Protocol.mysql and request.query_params.get('asset_type') == 'oceanbase':
+            setting_fields = {
+                **(setting_fields or {}),
+                'tenant_mode': {
+                    'type': 'choice', 'default': 'mysql', 'label': _('OceanBase tenant mode'),
+                    'choices': [('mysql', 'MySQL'), ('oracle', 'Oracle')],
+                },
+            }
         if not setting_fields:
             return default_field
 
@@ -280,6 +291,12 @@ class PlatformSerializer(ResourceLabelsMixin, CommonSerializerMixin, WritableNes
         # objects have been validated and converted to their scalar values.
         category = attrs.get('category', getattr(self.instance, 'category', None))
         tp = attrs.get('type', getattr(self.instance, 'type', None))
+        if tp == 'oceanbase' and self.instance is None:
+            # Creating without opening the protocol dialog must agree with its
+            # MySQL default. Do not rewrite an existing platform on PATCH.
+            for protocol in attrs.get('protocols', []):
+                if protocol.get('name') == Protocol.mysql:
+                    protocol.setdefault('setting', {}).setdefault('tenant_mode', 'mysql')
         constraints = AllTypes.get_constraints(category, tp)
         for name in ('su_enabled', 'gateway_enabled'):
             if name in attrs:
