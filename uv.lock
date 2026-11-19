@@ -2285,12 +2285,12 @@ wheels = [
 [[package]]
 name = "jms-ansible-executor"
 version = "0.1.0"
-source = { url = "https://github.com/jumpserver/ansible-executor/archive/refs/tags/v0.1.0.zip" }
+source = { url = "https://github.com/jumpserver/ansible-executor/archive/abb4aeb14c7161bee2f58192b789d570ca2b6cd3.zip" }
 dependencies = [
     { name = "ansible-runner" },
     { name = "paramiko" },
 ]
-sdist = { hash = "sha256:2b873eefe07e8acb2ec3e034c63752159fd95c3999e6ebe9ff9887d2a4790928" }
+sdist = { hash = "sha256:22ff8a799339fa9060bc7a9b562724b82ab65f87fe3590edf9f74ebd7add9ac9" }
 
 [package.metadata]
 requires-dist = [
@@ -2603,7 +2603,7 @@ requires-dist = [
     { name = "itsdangerous", specifier = "==1.1.0" },
     { name = "itypes", specifier = "==1.2.0" },
     { name = "jinja2", specifier = "==3.1.6" },
-    { name = "jms-ansible-executor", url = "https://github.com/jumpserver/ansible-executor/archive/refs/tags/v0.1.0.zip" },
+    { name = "jms-ansible-executor", url = "https://github.com/jumpserver/ansible-executor/archive/abb4aeb14c7161bee2f58192b789d570ca2b6cd3.zip" },
     { name = "jsonfield2", specifier = "==4.0.0.post0" },
     { name = "kombu", specifier = "==5.6.0" },
     { name = "ldap3", specifier = "==2.9.1" },

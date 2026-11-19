@@ -52,7 +52,7 @@ def default_panda_image():
 
 
 def stage_resources(run_dir, image):
-    """Keep offline resources inside the directory already mounted into Ansible EE."""
+    """Keep offline resources inside the task directory sent to the executor."""
     root = (Path(settings.DATA_DIR) / 'virtualapp').resolve()
     manifest = load_manifest()
     resources = {}

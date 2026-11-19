@@ -100,7 +100,7 @@
 
         - name: Transfer offline Docker package
           ansible.builtin.copy:
-            src: '{{ DOCKER_RESOURCE.file }}'
+            src: '{{ playbook_dir }}/../offline/{{ DOCKER_RESOURCE.file | basename }}'
             dest: '{{ docker_installer.path }}/docker.tar.gz'
             mode: '0600'
 
@@ -126,7 +126,7 @@
 
         - name: Install Docker service
           ansible.builtin.copy:
-            src: '{{ DOCKER_RESOURCE.service }}'
+            src: '{{ playbook_dir }}/../offline/{{ DOCKER_RESOURCE.service | basename }}'
             dest: /etc/systemd/system/docker.service
             mode: '0644'
 
@@ -221,7 +221,7 @@
 
             - name: Transfer offline image
               ansible.builtin.copy:
-                src: '{{ PANDA_RESOURCE.file }}'
+                src: '{{ playbook_dir }}/../offline/{{ PANDA_RESOURCE.file | basename }}'
                 dest: '{{ image_import.path }}/image.archive'
                 mode: '0600'
 
