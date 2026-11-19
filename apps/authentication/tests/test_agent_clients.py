@@ -32,7 +32,7 @@ class AgentClientPrivacyTests(SimpleTestCase):
             with self.subTest(path=path), self.assertRaises(Resolver404):
                 resolve(base + path)
 
-    def test_periodic_oauth_cleanup_reuses_client_maintenance(self):
+    def test_periodic_oauth_cleanup_keeps_its_existing_scope(self):
         from authentication.tasks import clear_oauth2_provider_expired_tokens
         with (
             patch(
@@ -53,8 +53,53 @@ class AgentClientPrivacyTests(SimpleTestCase):
             clear_oauth2_provider_expired_tokens()
             logins.assert_called_once_with(task_log=ANY)
             tokens.assert_called_once_with()
-            bindings.assert_called_once_with()
-            clients.assert_called_once_with()
+            bindings.assert_not_called()
+            clients.assert_not_called()
+
+    def test_agent_cleanup_stops_at_batch_time_and_progress_limits(self):
+        from authentication.tasks import clear_agent_oauth_clients
+        for name, scanned, deleted, clock, expected in (
+            ('backlog', 100, 100, 0, 10),
+            ('time budget', 100, 100, 6, 1),
+            ('empty', 0, 0, 0, 1),
+            ('no progress', 100, 0, 0, 1),
+        ):
+            with (
+                self.subTest(name=name),
+                patch('authentication.tasks.monotonic', side_effect=[0] + [clock] * 10),
+                patch(
+                    'authentication.services.agent_clients.cleanup_agent_oauth_bindings',
+                    return_value={'scanned': scanned * 5, 'deleted': deleted * 5},
+                ) as bindings,
+                patch(
+                    'authentication.services.agent_clients.cleanup_agent_oauth_clients',
+                    return_value={'scanned': scanned, 'deleted': deleted, 'skipped': 0},
+                ) as clients,
+            ):
+                clear_agent_oauth_clients()
+                self.assertEqual(bindings.call_count, expected)
+                self.assertEqual(clients.call_count, expected)
+                bindings.assert_called_with(limit=500)
+                clients.assert_called_with(limit=100)
+
+    def test_agent_cleanup_defers_when_registration_coordination_is_unavailable(self):
+        from authentication.services.agent_clients import AgentClientCleanupBusy, AgentClientCleanupUnavailable
+        from authentication.tasks import clear_agent_oauth_clients
+        for error in (AgentClientCleanupBusy, AgentClientCleanupUnavailable):
+            with (
+                self.subTest(error=error),
+                patch(
+                    'authentication.services.agent_clients.cleanup_agent_oauth_bindings',
+                    return_value={'scanned': 500, 'deleted': 500},
+                ) as bindings,
+                patch(
+                    'authentication.services.agent_clients.cleanup_agent_oauth_clients',
+                    side_effect=error('retry later'),
+                ) as clients,
+            ):
+                clear_agent_oauth_clients()
+                bindings.assert_called_once_with(limit=500)
+                clients.assert_called_once_with(limit=100)
 
 
 class AgentOAuthBindingCleanupTests(TestCase):

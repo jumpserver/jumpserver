@@ -26,8 +26,6 @@ from terminal.models import AgentApplication
 SCOPE = 'agent:access'
 MAX_BODY_BYTES = 8192
 MAX_REDIRECTS = 4
-MAX_CLIENTS = 4096
-REGISTRATIONS_PER_MINUTE = 30
 
 
 def configured_resource():
@@ -132,7 +130,7 @@ class AgentClientRegistrationView(View):
             count = 1 if cache.add(key, 1, timeout=120) else cache.incr(key)
         except (RedisError, ValueError):
             return _error('temporarily_unavailable', 'Registration capacity is unavailable', 503)
-        if count > REGISTRATIONS_PER_MINUTE:
+        if count > settings.MCP_DCR_REGISTRATIONS_PER_MINUTE:
             return _error('temporarily_unavailable', 'Registration rate exceeded', 429, 60)
         if request.content_type != 'application/json':
             return _error('invalid_client_metadata', 'Content-Type must be application/json', 415)
@@ -154,10 +152,11 @@ class AgentClientRegistrationView(View):
                 return _error('temporarily_unavailable', 'Registration is busy', 429, 1)
             with transaction.atomic():
                 if (
-                    AgentApplication.objects.filter(
+                    settings.MCP_DCR_MAX_CLIENTS > 0
+                    and AgentApplication.objects.filter(
                         application__registration_source=application_model.RegistrationSource.DCR
                     ).count()
-                    >= MAX_CLIENTS
+                    >= settings.MCP_DCR_MAX_CLIENTS
                 ):
                     return _error(
                         'temporarily_unavailable', 'Registered client capacity reached', 429, 60

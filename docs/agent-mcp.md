@@ -77,11 +77,19 @@ to this tab. The MCP page uses
 | `MCP_ENABLED` | Defaults to `false`; controls MCP access on Koko through the component configuration. Disabling stops new MCP requests after Koko synchronizes, while accepted operations and audit delivery finish |
 | `MCP_PUBLIC_URL` | The exact external HTTP or HTTPS MCP URL; Core is the sole configuration source. A nonempty value must have a path, with no credentials, trailing slash, query or fragment |
 | `MCP_DCR_ENABLED` | Defaults to `false`; allows controlled automatic client registration while MCP access is enabled. The preference can remain saved while MCP is disabled |
+| `MCP_DCR_MAX_CLIENTS` | Defaults to `0` (no global client-count limit); a positive integer limits retained dynamically registered Agent clients, including registrations awaiting authorization or whose credentials have expired |
+| `MCP_DCR_REGISTRATIONS_PER_MINUTE` | Defaults to `30`; deployment-wide limit on anonymous registration attempts per fixed minute window, shared through Redis |
 | `SITE_URL` | The existing **Basic settings > Site URL**, set to the Core address reachable by client browsers. Its HTTP or HTTPS origin, including any port, is used for Agent OAuth and is sent to Koko as `MCP_AUTHORIZATION_SERVER`; a site path is not part of the origin |
 
-Configuration files and environment variables provide initial values. Page
-settings override them through Core's normal database settings mechanism, and
-Core workers receive updates through the existing settings notification path.
+The two DCR capacity limits are configured in `config.yml` or environment variables
+and take effect after Core restarts. The client-count limit accepts a non-negative
+integer, with zero disabling this limit; the rate limit must be a positive integer.
+Invalid values stop startup. They are independent of
+the existing limit of ten authorized clients per user.
+
+Configuration files and environment variables provide initial values for the page
+settings. Page settings override them through Core's normal database settings
+mechanism, and Core workers receive updates through the existing settings notification path.
 The URL remains editable independently of registration. Enabling MCP requires a
 valid nonempty MCP URL and an HTTP or HTTPS Site URL. To clear the MCP URL,
 disable MCP access in the same request or beforehand.
@@ -101,8 +109,10 @@ the last valid configuration; an explicit disable stops new MCP requests.
 No initial enabled configuration leaves MCP waiting. Accepted work and
 audit storage remain subject to their normal authorization and lifecycle rules.
 
-Koko needs no MCP-specific deployment settings. It retains built-in capacity
-protection (128 sessions, 20 concurrent operations, 64 pending operations).
+MCP enablement and addresses remain controlled by Core. Per-node capacities and
+queue timeouts are Koko deployment settings; see Koko's MCP documentation for
+their defaults and configuration keys. Accepted operations wait for execution
+slots, while query, cancellation and disconnect calls have reserved capacity.
 Agent OAuth metadata and Koko use the same Site URL origin; the internal
 component `CORE_HOST` and incoming Host header do not select that origin.
 TLS belongs to docker-web/Nginx; it may forward HTTP to Core and Koko. Clients
@@ -149,7 +159,9 @@ registration's validated callback; the redirect policies of other OAuth clients
 are unchanged. CIMD and dynamic client management are not enabled.
 
 Registration accepts at most 8 KiB of JSON and four callback URIs. Shared limits
-allow 30 attempts per minute and 4,096 dynamic Agent clients per deployment.
+default to 30 attempts per minute, configurable through
+`MCP_DCR_REGISTRATIONS_PER_MINUTE`. There is no global client-count limit by default;
+set `MCP_DCR_MAX_CLIENTS` to a positive integer to enable one.
 Redis coordination failures reject registration. Clients persist and reuse the
 issued client ID.
 
@@ -234,16 +246,19 @@ and closes connections on explicit authorization denial or missing sessions.
 Transient service failures are retried; new dispatch still requires Core.
 Batching and network delays mean this is not a five-second node-wide guarantee.
 
-The existing scheduled OAuth token cleanup also removes at most 500 stale
-subject bindings per run, preserving unexpired grants, usable access tokens and
-live refresh families. While expired bindings remain, the newest one is kept
+Agent client maintenance runs every ten minutes, with at most ten batches and
+a five-second budget checked between batches. Each batch considers up to 500
+stale subject bindings and 100 eligible registrations. The run stops when both
+backlogs are exhausted or no progress is made. The ordinary daily OAuth token
+cleanup is unchanged.
+Maintenance preserves unexpired grants, usable access tokens and live refresh
+families. While expired bindings remain, the newest one is kept
 when a client has no effective authorization, so the personal entry can still
 be removed. A new user's consent removes the previous users' inactive bindings
 under the same application lock. None of this cleanup deletes execution audits.
 
-It also removes bounded batches of never-authorized dynamic registrations older
-than seven days, considering at most 100 eligible clients per run and recording
-its summary in task logs.
+It also removes never-authorized dynamic registrations older than seven days,
+releasing the registration lock after each batch and recording a summary in task logs.
 Related grants, tokens, sessions or audit records prevent deletion; references
 are rechecked under the authorization lock order. No manual cleanup API, extra
 deployment schedule or management command is needed. Registration coordination

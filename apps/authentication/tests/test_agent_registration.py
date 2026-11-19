@@ -167,10 +167,32 @@ class AgentClientRegistrationTests(TestCase):
         self.assertEqual(response.status_code, 404)
         self.assertEqual(self.application_model.objects.count(), before)
 
-    def test_rate_capacity_and_coordination_fail_closed(self):
+    def test_configured_client_capacity_can_be_increased(self):
+        with self.settings(MCP_DCR_MAX_CLIENTS=1):
+            self.application()
+            response = self.register()
+            self.assertEqual(response.status_code, 429)
+            self.assertEqual(response['Retry-After'], '60')
+        with self.settings(MCP_DCR_MAX_CLIENTS=2):
+            self.application()
+        with self.settings(MCP_DCR_MAX_CLIENTS=0):
+            self.application()
+        self.assertEqual(self.application_model.objects.count(), 3)
+
+    def test_configured_registration_rate_can_be_increased(self):
+        now = time.time()
+        with patch.object(registration.time, 'time', return_value=now):
+            with self.settings(MCP_DCR_REGISTRATIONS_PER_MINUTE=1):
+                self.application()
+                response = self.register()
+                self.assertEqual(response.status_code, 429)
+                self.assertEqual(response['Retry-After'], '60')
+            with self.settings(MCP_DCR_REGISTRATIONS_PER_MINUTE=3):
+                self.application()
+        self.assertEqual(self.application_model.objects.count(), 2)
+
+    def test_registration_coordination_fail_closed(self):
         before = self.application_model.objects.count()
-        with patch.object(registration, 'MAX_CLIENTS', 0):
-            self.assertEqual(self.register().status_code, 429)
         lock = DistributedLock(agent_clients.REGISTRATION_LOCK, expire=5)
         self.assertTrue(lock.acquire(blocking=False))
         try:
@@ -179,10 +201,6 @@ class AgentClientRegistrationTests(TestCase):
             lock.release()
         with patch.object(registration.cache, 'add', side_effect=RedisError):
             self.assertEqual(self.register().status_code, 503)
-        with patch.object(registration, 'REGISTRATIONS_PER_MINUTE', 0):
-            response = self.register()
-            self.assertEqual(response.status_code, 429)
-            self.assertEqual(response['Retry-After'], '60')
         self.assertEqual(self.application_model.objects.count(), before)
 
     def test_cleanup_retains_authorized_referenced_other_and_recent_clients(self):

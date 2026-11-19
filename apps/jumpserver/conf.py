@@ -890,6 +890,8 @@ class Config(dict):
         'MCP_ENABLED': False,
         'MCP_DCR_ENABLED': False,
         'MCP_PUBLIC_URL': '',
+        'MCP_DCR_MAX_CLIENTS': 0,
+        'MCP_DCR_REGISTRATIONS_PER_MINUTE': 30,
         'VENDOR': 'JumpServer',
 
         # JDMC

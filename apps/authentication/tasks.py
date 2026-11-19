@@ -3,6 +3,7 @@
 import datetime
 import logging
 from collections import defaultdict
+from time import monotonic
 
 from celery import shared_task
 from django.conf import settings
@@ -229,10 +230,6 @@ def clean_expire_token():
 def clear_oauth2_provider_expired_tokens():
     """Reclaim obsolete credentials; request-time checks enforce login expiry."""
     from oauth2_provider.models import clear_expired
-    from authentication.services.agent_clients import (
-        AgentClientCleanupBusy, AgentClientCleanupUnavailable, cleanup_agent_oauth_clients,
-        cleanup_agent_oauth_bindings,
-    )
     from authentication.services.client_login_session import clear_client_login_sessions
 
     from .oauth_cleanup_logging import OAuthCleanupLog
@@ -242,10 +239,35 @@ def clear_oauth2_provider_expired_tokens():
     with TaskLog(logger, gettext('OAuth credential cleanup categories')) as log:
         with OAuthCleanupLog(log):
             clear_expired()
-    logging.info('Agent OAuth binding cleanup: %s', cleanup_agent_oauth_bindings())
-    try:
-        result = cleanup_agent_oauth_clients()
-    except (AgentClientCleanupBusy, AgentClientCleanupUnavailable) as exc:
-        logging.warning('Skipped unused Agent OAuth client cleanup: %s', exc)
-        return
-    logging.info('Unused Agent OAuth client cleanup: %s', result)
+
+
+@shared_task(expires=600)
+@register_as_period_task(interval=600)
+def clear_agent_oauth_clients():
+    """Drain bounded Agent batches without changing normal OAuth token cleanup."""
+    from authentication.services.agent_clients import (
+        AgentClientCleanupBusy, AgentClientCleanupUnavailable, cleanup_agent_oauth_bindings,
+        cleanup_agent_oauth_clients,
+    )
+
+    deadline = monotonic() + 5
+    bindings = {'scanned': 0, 'deleted': 0}
+    clients = {'scanned': 0, 'deleted': 0, 'skipped': 0}
+    for _ in range(10):
+        binding_batch = cleanup_agent_oauth_bindings(limit=500)
+        for key in bindings:
+            bindings[key] += binding_batch[key]
+        try:
+            # Each batch releases the registration lock before the next one.
+            client_batch = cleanup_agent_oauth_clients(limit=100)
+        except (AgentClientCleanupBusy, AgentClientCleanupUnavailable) as exc:
+            logger.warning('Skipped unused Agent OAuth client cleanup: %s', exc)
+            break
+        for key in clients:
+            clients[key] += client_batch[key]
+        if (monotonic() >= deadline
+                or (binding_batch['scanned'] < 500 and client_batch['scanned'] < 100)
+                or (binding_batch['deleted'] == 0 and client_batch['deleted'] == 0)):
+            break
+    logger.info('Agent OAuth binding cleanup: %s', bindings)
+    logger.info('Unused Agent OAuth client cleanup: %s', clients)
