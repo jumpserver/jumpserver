@@ -12,7 +12,7 @@ RUN --mount=type=cache,target=/root/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
     python distribution.py --output /out
 
-FROM jumpserver/core-base:20261116_103036 AS stage-build
+FROM jumpserver/core-base:20261119_030707 AS stage-build
 
 ARG VERSION
 
