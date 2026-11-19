@@ -5,11 +5,8 @@ from django_filters import rest_framework as filters
 
 from common.drf.filters import BaseFilterSet, LookupFilterBackend
 from orgs.utils import filter_org_queryset
-from terminal.const import RiskLevelChoices
+from terminal.const import AgentActionKind, AgentActionStatus, AgentSessionStatus, RiskLevelChoices
 from terminal.models import AgentAction, AgentSession, Command, CommandStorage, Session
-from terminal.serializers.agent import (
-    ACTION_KIND_CHOICES, ACTION_STATUS_CHOICES, SESSION_STATUS_CHOICES,
-)
 
 
 class AgentAuditFilterBackend(LookupFilterBackend):
@@ -26,7 +23,7 @@ class AgentSessionAuditFilterSet(BaseFilterSet):
     asset_id = filters.CharFilter(lookup_expr='iexact', label=_('Asset ID'))
     account = filters.CharFilter(lookup_expr='icontains', label=_('Account'))
     protocol = filters.CharFilter(max_length=16, label=_('Protocol'))
-    status = filters.ChoiceFilter(choices=SESSION_STATUS_CHOICES, label=_('Status'))
+    status = filters.ChoiceFilter(choices=AgentSessionStatus.choices, label=_('Status'))
 
     class Meta:
         model = AgentSession
@@ -43,8 +40,8 @@ class AgentSessionAuditFilterSet(BaseFilterSet):
 
 
 class AgentActionAuditFilterSet(AgentSessionAuditFilterSet):
-    kind = filters.ChoiceFilter(choices=ACTION_KIND_CHOICES, label=_('Operation'))
-    status = filters.ChoiceFilter(choices=ACTION_STATUS_CHOICES, label=_('Status'))
+    kind = filters.ChoiceFilter(choices=AgentActionKind.choices, label=_('Operation'))
+    status = filters.ChoiceFilter(choices=AgentActionStatus.choices, label=_('Status'))
     session_id = filters.UUIDFilter(label=_('Session ID'))
 
     class Meta:

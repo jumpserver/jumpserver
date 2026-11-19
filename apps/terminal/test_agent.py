@@ -30,6 +30,7 @@ from common.sessions.cache import SessionStore
 from orgs.models import Organization
 from orgs.utils import tmp_to_org
 from terminal import agent_service as service
+from terminal.const import AgentActionKind, AgentActionStatus, AgentSessionStatus
 from terminal.models import (
     AgentApplication,
     AgentOAuthBinding,
@@ -1664,17 +1665,21 @@ class AgentBoundaryTests(TestCase):
         return response.data
 
     def test_audit_metadata_exposes_search_filters_and_sorting(self):
-        for kind in ('sessions', 'actions'):
+        for kind, statuses in (
+            ('sessions', AgentSessionStatus.values), ('actions', AgentActionStatus.values),
+        ):
             data = self.audit_api(kind, method='options')
             self.assertIn('status', data['filters'])
             self.assertIn('account', data['filters'])
             self.assertIn('icontains_any', data['filters']['account']['operators'])
-            self.assertTrue(data['filters']['status']['choices'])
+            self.assertEqual([item['value'] for item in data['filters']['status']['choices']], statuses)
             self.assertEqual(data['search']['param'], 'search')
             self.assertIn('date_created', [field['name'] for field in data['ordering']['fields']])
             self.assertNotIn('capability', data['actions']['GET'])
         self.assertIn('kind', data['filters'])
         self.assertIn('session_id', data['filters'])
+        self.assertEqual([item['value'] for item in data['filters']['kind']['choices']], AgentActionKind.values)
+        self.assertEqual(set(AgentActionKind.values), service.ACTION_KINDS | {'connect_asset'})
 
     def test_audit_action_queries_filter_before_ordering_and_pagination(self):
         older = timezone.now() - timedelta(days=2)

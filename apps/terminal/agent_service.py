@@ -30,6 +30,7 @@ from terminal.agent_policy import (
     execution_mode,
     node_capabilities,
 )
+from terminal.const import AgentActionStatus
 from terminal.models import (
     AgentApplication,
     AgentOAuthBinding,
@@ -45,7 +46,10 @@ SESSION_SALT = 'jumpserver.agent.session.v1'
 CONTEXT_TTL = 300
 SESSION_TTL = 7200
 RESULT_TTL = timedelta(minutes=15)
-FINAL_STATES = frozenset(('succeeded', 'failed', 'rejected', 'expired', 'cancelled', 'unknown'))
+FINAL_STATES = frozenset((
+    AgentActionStatus.succeeded, AgentActionStatus.failed, AgentActionStatus.rejected,
+    AgentActionStatus.expired, AgentActionStatus.cancelled, AgentActionStatus.unknown,
+))
 ACTION_KINDS = frozenset(ACTION_POLICIES)
 
 

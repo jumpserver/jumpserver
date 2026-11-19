@@ -5,6 +5,7 @@ from typing import NamedTuple
 from rest_framework.exceptions import ValidationError
 
 from perms.const import ActionChoices
+from terminal.const import AgentActionKind
 
 
 EXECUTION_MODES = frozenset(('shell', 'process', 'pipeline', 'database', 'files'))
@@ -29,24 +30,24 @@ class ActionPolicy(NamedTuple):
 COMMAND_MODES = frozenset(('shell', 'process', 'pipeline', 'database'))
 FILE_MODES = frozenset(('files',))
 ACTION_POLICIES = {
-    'execute_command': ActionPolicy(
+    AgentActionKind.execute_command: ActionPolicy(
         COMMAND_MODES,
         ('command', 'prepared_command', 'cwd', 'env', 'timeout_seconds'),
         ActionChoices.connect,
     ),
-    'open_terminal': ActionPolicy(COMMAND_MODES, ('timeout_seconds',), ActionChoices.connect),
-    'file_list': ActionPolicy(FILE_MODES, FILE_FIELDS + ('cursor',), ActionChoices.connect),
+    AgentActionKind.open_terminal: ActionPolicy(COMMAND_MODES, ('timeout_seconds',), ActionChoices.connect),
+    AgentActionKind.file_list: ActionPolicy(FILE_MODES, FILE_FIELDS + ('cursor',), ActionChoices.connect),
     **{
         kind: ActionPolicy(FILE_MODES, FILE_FIELDS, permission)
         for kind, permission in (
-            ('file_stat', ActionChoices.connect),
-            ('file_read', ActionChoices.download),
-            ('file_download', ActionChoices.download),
-            ('file_write', ActionChoices.upload),
-            ('file_upload', ActionChoices.upload),
-            ('file_mkdir', ActionChoices.upload),
-            ('file_remove', ActionChoices.delete),
-            ('file_rename', ActionChoices.upload | ActionChoices.delete),
+            (AgentActionKind.file_stat, ActionChoices.connect),
+            (AgentActionKind.file_read, ActionChoices.download),
+            (AgentActionKind.file_download, ActionChoices.download),
+            (AgentActionKind.file_write, ActionChoices.upload),
+            (AgentActionKind.file_upload, ActionChoices.upload),
+            (AgentActionKind.file_mkdir, ActionChoices.upload),
+            (AgentActionKind.file_remove, ActionChoices.delete),
+            (AgentActionKind.file_rename, ActionChoices.upload | ActionChoices.delete),
         )
     },
 }
