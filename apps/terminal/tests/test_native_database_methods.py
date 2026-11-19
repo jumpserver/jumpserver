@@ -65,11 +65,20 @@ class NativeDatabaseConnectMethodTests(SimpleTestCase):
         view.get_smart_endpoint = Mock(return_value=Endpoint(
             host='gateway.example.com', magnus_port=15525,
         ))
-        for protocol in (Protocol.db2, Protocol.clickhouse):
+        for protocol, asset_type, mode in [
+            (Protocol.db2, 'db2', None), (Protocol.clickhouse, 'clickhouse', None),
+            (Protocol.mysql, 'mysql', None), (Protocol.mysql, 'oceanbase', 'oracle'),
+            (Protocol.mysql, 'oceanbase', 'mysql'), (Protocol.mysql, 'oceanbase', None),
+        ]:
             asset = SimpleNamespace(
-                id='asset-id', category='database', type=protocol, name='test',
+                id='asset-id', category='database', type=asset_type, name='test',
                 address='backend.example.com', spec_info={'db_name': 'ANALYTICS'},
             )
+            if asset_type == 'oceanbase':
+                asset.platform = Mock()
+                asset.platform.protocols.filter.return_value.values_list.return_value.first.return_value = (
+                    {'tenant_mode': mode} if mode else {}
+                )
             token = SimpleNamespace(
                 id='selector-token', value='access-secret', org_id='org-id',
                 protocol=protocol, connect_method='db_client', asset=asset,
@@ -87,5 +96,7 @@ class NativeDatabaseConnectMethodTests(SimpleTestCase):
                 self.assertEqual(data['asset']['info']['db_name'], 'ANALYTICS')
                 if protocol == Protocol.clickhouse:
                     self.assertEqual(data['connect_options'], {'clickhouse_http': True})
+                elif mode is not None:
+                    self.assertEqual(data['connect_options'], {'oceanbase_tenant_mode': mode})
                 else:
                     self.assertNotIn('connect_options', data)
