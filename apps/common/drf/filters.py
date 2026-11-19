@@ -971,10 +971,7 @@ class AttrRulesFilterBackend(filters.BaseFilterBackend):
         return queryset
 
     def filter_queryset_by_attr_rules(self, attr_rules, queryset):
-        qs = RelatedManager.get_to_filter_qs(attr_rules, queryset.model)
-        for q in qs:
-            queryset = queryset.filter(q)
-        return queryset.distinct()
+        return RelatedManager.filter_queryset(attr_rules, queryset)
     
     def filter_queryset_by_attr_rules_instance(self, attr_rules_instance, queryset):
         if not attr_rules_instance or not isinstance(attr_rules_instance, dict):
