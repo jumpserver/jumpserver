@@ -8,6 +8,9 @@ from rest_framework import serializers
 
 from accounts.models import Account
 from accounts.serializers import AccountSerializer
+from assets.clickhouse import (
+    CLICKHOUSE_HTTP_DEFAULT_PORT, CLICKHOUSE_HTTP_PROTOCOL,
+)
 from common.const import UUID_PATTERN
 from common.serializers import (
     WritableNestedModelSerializer, SecretReadableMixin,
@@ -18,7 +21,10 @@ from common.serializers.fields import LabeledChoiceField, ObjectRelatedField
 from django.utils.translation import gettext
 from labels.models import Label
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
-from ...const import Category, AllTypes
+from orgs.models import Organization
+from orgs.utils import current_org
+from users.models import User
+from ...const import Category, AllTypes, DatabaseTypes
 from ...models import Asset, Node, Platform, Protocol, Host, Device, Database, Cloud, Web, Custom
 from ...validators import validate_asset_address
 
@@ -26,12 +32,22 @@ __all__ = [
     'AssetSerializer', 'AssetSimpleSerializer', 'MiniAssetSerializer',
     'AssetTaskSerializer', 'AssetsTaskSerializer', 'AssetProtocolsSerializer',
     'AssetDetailSerializer', 'DetailMixin', 'AssetAccountSerializer',
-    'AccountSecretSerializer', 'AssetProtocolsPermsSerializer', 'AssetLabelSerializer'
+    'AccountSecretSerializer', 'AssetProtocolsPermsSerializer', 'AssetLabelSerializer',
+    'SyncPlatformProtocolsSerializer',
 ]
+
+
+class SyncPlatformProtocolsSerializer(serializers.Serializer):
+    platform_id = serializers.IntegerField()
 
 
 class AssetProtocolsSerializer(serializers.ModelSerializer):
     port = serializers.IntegerField(required=True, allow_null=True, max_value=65535, min_value=0)
+
+    def validate(self, attrs):
+        if attrs.get('name') == CLICKHOUSE_HTTP_PROTOCOL and not attrs.get('port'):
+            raise serializers.ValidationError({'port': _('Port must be between 1 and 65535.')})
+        return attrs
 
     def get_render_help_text(self):
         if self.parent and self.parent.many:
@@ -159,6 +175,10 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
     platform = ObjectRelatedField(queryset=Platform.objects, required=True, label=_('Platform'),
                                   attrs=('id', 'name', 'type'))
     accounts_amount = serializers.IntegerField(read_only=True, label=_('Accounts amount'))
+    owner = ObjectRelatedField(
+        queryset=User.objects, required=False, allow_null=True,
+        attrs=('id', 'name', 'username'), label=_('Asset owner'),
+    )
 
     class Meta:
         model = Asset
@@ -168,7 +188,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
         amount_fields = list(relation_count_fields)
         fields_fk = ['zone', 'platform']
         fields_mini = ['id', 'name', 'address'] + fields_fk
-        fields_small = fields_mini + ['is_active', 'comment']
+        fields_small = fields_mini + ['owner', 'is_active', 'comment']
         fields_m2m = [
             'nodes', 'labels', 'protocols',
             'nodes_display', 'accounts',
@@ -201,6 +221,17 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
         validate_asset_address(value)
         return value
 
+    def validate_owner(self, value):
+        if value is None:
+            return value
+        org_id = getattr(self.instance, 'org_id', None) or current_org.id
+        if org_id == Organization.ROOT_ID:
+            raise serializers.ValidationError(_('Select an organization before assigning an asset owner.'))
+        org = Organization.get_instance(org_id)
+        if not value.is_valid or value.is_service_account or not User.get_org_users(org).filter(pk=value.pk).exists():
+            raise serializers.ValidationError(_('The asset owner must be an active user in the asset organization.'))
+        return value
+
     def to_internal_value(self, data):
         accounts = serializers.empty
         if isinstance(data, dict) and 'accounts' in data:
@@ -216,8 +247,8 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
             validated_data['accounts'] = accounts
         return validated_data
 
-    def _get_protocols_required_default(self):
-        platform = self._asset_platform
+    @staticmethod
+    def _get_protocols_required_default(platform):
         platform_protocols = platform.protocols.all()
         protocols_default = [p for p in platform_protocols if p.default]
         protocols_required = [p for p in platform_protocols if p.required or p.primary]
@@ -232,10 +263,16 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
         if getattr(self, 'instance', None):
             return
 
-        protocols_required, protocols_default = self._get_protocols_required_default()
+        platform = self._asset_platform
+        protocols_required, protocols_default = self._get_protocols_required_default(platform)
         protocol_map = {str(protocol.id): protocol for protocol in protocols_required + protocols_default}
         protocols = list(protocol_map.values())
         protocols_data = [{'name': p.name, 'port': p.port} for p in protocols]
+        if any(p.name == DatabaseTypes.CLICKHOUSE for p in protocols):
+            protocols_data.append({
+                'name': CLICKHOUSE_HTTP_PROTOCOL,
+                'port': CLICKHOUSE_HTTP_DEFAULT_PORT,
+            })
         self.initial_data['protocols'] = protocols_data
 
     def _init_field_choices(self):
@@ -255,7 +292,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related('zone', 'nodes', 'protocols', 'directory_services') \
+        queryset = queryset.select_related('owner').prefetch_related('zone', 'nodes', 'protocols', 'directory_services') \
             .prefetch_related('platform', 'platform__automation') \
             .annotate(category=F("platform__category")) \
             .annotate(type=F("platform__type"))
@@ -324,11 +361,19 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
         protocols_data_map = {p['name']: p for p in protocols_data}
         for p in protocols_data:
             port = p.get('port', 0)
-            if port < 0 or port > 65535:
+            if port is None or port < 0 or port > 65535:
                 error = p.get('name') + ': ' + _("port out of range (0-65535)")
                 raise serializers.ValidationError(error)
 
-        protocols_required, __ = self._get_protocols_required_default()
+        platform = self._asset_platform
+        if CLICKHOUSE_HTTP_PROTOCOL in protocols_data_map:
+            if (DatabaseTypes.CLICKHOUSE not in protocols_data_map
+                    or not platform.protocols.filter(name=DatabaseTypes.CLICKHOUSE).exists()):
+                raise serializers.ValidationError(_("ClickHouse HTTP requires the ClickHouse Native protocol."))
+            if sum(p['name'] == CLICKHOUSE_HTTP_PROTOCOL for p in protocols_data) > 1:
+                raise serializers.ValidationError(_("Only one ClickHouse HTTP port is allowed."))
+
+        protocols_required, __ = self._get_protocols_required_default(platform)
         protocols_not_found = [p.name for p in protocols_required if p.name not in protocols_data_map]
         if protocols_not_found:
             raise serializers.ValidationError({

@@ -424,6 +424,7 @@ class GatherAccountsManager(AccountBasePlaybookManager):
             for username in new_found_users:
                 self.result["new_accounts"].append(
                     {
+                        **self.get_asset_result_metadata(asset),
                         "asset": str(asset),
                         "username": username,
                     }
@@ -432,7 +433,9 @@ class GatherAccountsManager(AccountBasePlaybookManager):
         # 远端上 比 收集账号少的
         # 标识 remote_present=False, 标记为待处理
         # 远端资产上不存在的，标识为待处理，需要管理员介入
-        lost_users = ori_ga_users - remote_users
+        # Db2 catalog views cannot enumerate OS/LDAP users (including users
+        # authorized solely through a directory group). Absence is not deletion.
+        lost_users = ori_ga_users - remote_users if asset.type != 'db2' else set()
         if lost_users:
             queryset.filter(username__in=lost_users).update(
                 status=ConfirmOrIgnore.pending, remote_present=False
@@ -441,6 +444,7 @@ class GatherAccountsManager(AccountBasePlaybookManager):
             for username in lost_users:
                 self.result["lost_accounts"].append(
                     {
+                        **self.get_asset_result_metadata(asset),
                         "asset": str(asset),
                         "username": username,
                     }

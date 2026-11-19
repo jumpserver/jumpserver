@@ -7,6 +7,17 @@ class Scope(models.TextChoices):
     org = 'org', _('Organization')
 
 
+LEGACY_REPORT_PERMISSION_CODENAMES = tuple(
+    f'{action}_{resource}'
+    for resource in (
+        'userloginreport', 'userchangepasswordreport',
+        'assetstatisticsreport', 'assetactivityreport',
+        'accountstatisticsreport', 'accountautomationreport',
+    )
+    for action in ('view', 'add', 'delete')
+)
+
+
 exclude_permissions = (
     # ('App', 'Model', 'Action', 'Resource') Model 和 Resource 可能不同
     # users.add_user
@@ -50,7 +61,6 @@ exclude_permissions = (
     ('assets', 'baseautomation', '*', '*'),
     ('assets', 'assetbaseautomation', '*', '*'),
     ('assets', 'automationexecution', '*', '*'),
-    ('assets', 'pingautomation', '*', '*'),
     ('assets', 'platformprotocol', '*', '*'),
     ('assets', 'platformautomation', '*', '*'),
     ('assets', 'verifyaccountautomation', '*', '*'),
@@ -67,7 +77,6 @@ exclude_permissions = (
     ('accounts', 'accountbaseautomation', '*', '*'),
     ('accounts', 'accountbackupautomation', '*', '*'),
     ('accounts', 'pushsecretrecord', 'add,change,delete', '*'),
-    ('accounts', 'verifyaccountautomation', '*', '*'),
     ('accounts', 'gatheredaccount', 'add,change', '*'),
     ('accounts', 'automationexecution', '*', 'automationexecution'),
     ('accounts', 'accountbackupexecution', 'delete,change', 'accountbackupexecution'),
@@ -113,15 +122,12 @@ exclude_permissions = (
     ('tickets', 'ticket', 'add,delete,change', 'ticket'),
     ('tickets', 'ticketstep', '*', '*'),
     ('tickets', 'approvalrule', '*', '*'),
-    ('tickets', 'applyloginticket', '*', '*'),
-    ('tickets', 'applyloginassetticket', '*', '*'),
-    ('tickets', 'applycommandticket', '*', '*'),
-    ('tickets', 'applyassetticket', '*', '*'),
-    ('tickets', 'applyapplicationticket', '*', '*'),
     ('tickets', 'superticket', 'delete', 'superticket'),
     ('tickets', 'ticketsession', 'view,delete', 'ticketsession'),
     ('xpack', 'interface', '*', '*'),
     ('xpack', 'license', '*', '*'),
+    ('xpack', 'cloudassetbinding', '*', '*'),
+    ('xpack', 'cloudsyncexecutionitem', '*', '*'),
     ('xpack', 'syncinstancedetail', 'add,delete,change', 'syncinstancedetail'),
     ('xpack', 'syncinstancetaskexecution', 'delete,change', 'syncinstancetaskexecution'),
     ('common', 'permission', 'add,delete,view,change', 'permission'),
@@ -135,6 +141,7 @@ exclude_permissions = (
     ('terminal', 'session', 'delete,change', 'command'),
     ('applications', '*', '*', '*'),
     ('oauth2_provider', 'grant', '*', '*'),
+    ('oauth2_provider', 'devicegrant', '*', '*'),
     ('oauth2_provider', 'refreshtoken', '*', '*'),
     ('oauth2_provider', 'idtoken', '*', '*'),
     ('oauth2_provider', 'application', '*', '*'),
@@ -153,8 +160,14 @@ only_system_permissions = (
     ('orgs', 'organization', '*', '*'),
     ('xpack', 'license', '*', '*'),
     ('settings', 'setting', 'add,change,delete', '*'),
-    ('tickets', '*', '*', '*'),
+    # New workflow definitions and instance audit permissions are organization
+    # scoped. Other legacy ticket internals are already excluded globally.
+    ('tickets', 'ticket', '*', '*'),
+    ('tickets', 'ticketflow', '*', '*'),
+    ('tickets', 'superticket', '*', '*'),
+    ('tickets', 'ticketsession', '*', '*'),
     ('ops', 'celerytask', 'view', 'taskmonitor'),
+    ('ops', 'celerytask', 'stop', 'taskmonitor'),
     ('terminal', 'terminal', '*', '*'),
     ('terminal', 'commandstorage', '*', '*'),
     ('terminal', 'replaystorage', '*', '*'),
@@ -168,7 +181,6 @@ only_system_permissions = (
     ('authentication', 'passkey', '*', '*'),
     ('authentication', 'ssotoken', '*', '*'),
     ('oauth2_provider', 'accesstoken', '*', '*'),
-    ('tickets', '*', '*', '*'),
     ('orgs', 'organization', 'view', 'rootorg'),
     ('terminal', 'applet', '*', '*'),
     ('terminal', 'applethost', '*', '*'),

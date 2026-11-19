@@ -1,6 +1,6 @@
 from django.core.cache import cache
 from django.utils.translation import gettext, gettext as _
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.generics import CreateAPIView, RetrieveAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -8,6 +8,7 @@ from rest_framework.serializers import ValidationError
 
 from common.permissions import IsServiceAccount
 from common.utils import get_logger, get_object_or_none
+from common.utils.lock import DistributedLock
 from orgs.utils import tmp_to_root_org
 from terminal.api.session.task import create_sessions_tasks
 from users.models import User
@@ -95,10 +96,12 @@ class FaceCallbackApi(AuthMixin, CreateAPIView):
 
             if user.check_face(face_code):
                 with tmp_to_root_org():
-                    connection_token_id = context.get('connection_token_id')
-                    token = ConnectionToken.objects.filter(id=connection_token_id).first()
-                    token.is_active = True
-                    token.save(update_fields=['is_active'])
+                    ids = context.get('connection_token_ids') or [context.get('connection_token_id')]
+                    for connection_token_id in sorted(ids):
+                        token = ConnectionToken.objects.filter(id=connection_token_id).first()
+                        if not token or str(token.user_id) != str(user_id):
+                            raise ValidationError({'error': gettext('Face verification does not belong to this connection')})
+                        token.complete_acl_requirement('face', face_token=context.get('token'))
             else:
                 context.update({
                     'success': False,
@@ -156,11 +159,11 @@ class FaceMonitorContext:
 
     @classmethod
     def get_or_create_context(cls, token, user_id):
-        context = cls.get(token)
-        if not context:
-            context = FaceMonitorContext(token=token,
-                                         user_id=user_id)
-            context.save()
+        with DistributedLock(cls.get_cache_key(token), expire=5):
+            context = cls.get(token)
+            if not context:
+                context = FaceMonitorContext(token=token, user_id=user_id)
+                cache.set(cls.get_cache_key(token), context, FACE_MONITOR_CONTEXT_CACHE_TTL)
         return context
 
     def add_session(self, session_id):
@@ -174,11 +177,22 @@ class FaceMonitorContext:
 
     def save(self):
         cache_key = self.get_cache_key(self.token)
-        cache.set(cache_key, self, FACE_MONITOR_CONTEXT_CACHE_TTL)
+        with DistributedLock(cache_key, expire=5):
+            current = self.get(self.token)
+            if not current or str(current.user_id) != str(self.user_id):
+                raise ValidationError({'face_monitor_token': _('Online face monitoring context is no longer available')})
+            # Two concurrent joins or a monitor callback must not overwrite
+            # each other's session registrations with a stale cached object.
+            self.session_ids = list(dict.fromkeys(current.session_ids + self.session_ids))
+            cache.set(cache_key, self, FACE_MONITOR_CONTEXT_CACHE_TTL)
 
     def close(self):
-        self.terminal_sessions()
-        self._destroy()
+        with DistributedLock(self.get_cache_key(self.token), expire=5):
+            current = self.get(self.token)
+            if current:
+                self.session_ids = current.session_ids
+                self.terminal_sessions()
+                self._destroy()
 
     def _destroy(self):
         cache_key = self.get_cache_key(self.token)
@@ -206,7 +220,14 @@ class FaceMonitorContextApi(CreateAPIView):
         session_id = serializer.validated_data.get('session_id')
 
         context = FaceMonitorContext.get(face_monitor_token)
-        context.add_session(session_id)
+        if not context:
+            raise ValidationError({'face_monitor_token': _('Online face monitoring context is no longer available')})
+        from terminal.models import Session
+        with tmp_to_root_org():
+            session = Session.objects.filter(pk=session_id, is_finished=False, terminal__user=self.request.user).first()
+        if not session or str(session.user_id) != str(context.user_id):
+            raise PermissionDenied(_('Face monitoring does not belong to this session'))
+        context.add_session(str(session.id))
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)

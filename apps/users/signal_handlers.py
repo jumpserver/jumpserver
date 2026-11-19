@@ -20,7 +20,7 @@ from common.const.crontab import CRONTAB_AT_AM_TWO
 from common.decorators import on_transaction_commit
 from common.sessions.cache import user_session_manager
 from common.signals import django_ready
-from common.utils import get_logger, text_hmac_sha256
+from common.utils import get_logger
 from jumpserver.utils import get_current_request
 from ops.celery.decorator import register_as_period_task
 from orgs.models import Organization
@@ -30,7 +30,7 @@ from rbac.const import Scope
 from rbac.models import RoleBinding
 from settings.signals import setting_changed
 from .models import User, UserPasswordHistory, UserGroup
-from .signals import post_user_create, post_user_update
+from .signals import post_user_create
 
 logger = get_logger(__file__)
 
@@ -78,29 +78,6 @@ def user_authenticated_handle(user, created, source, attrs=None, **kwargs):
             if key in attr_whitelist and value:
                 setattr(user, key, value)
         user.save()
-
-
-def set_user_email_lookup(user):
-    if user.email:
-        email_lookup = text_hmac_sha256(user.email)
-    else:
-        email_lookup = ''
-    if user.email_lookup == email_lookup:
-        return
-    logger.debug(f"Set user email_lookup: {email_lookup} for user: {user}")
-    user.email_lookup = email_lookup
-    user.save(update_fields=['email_lookup'])
-
-
-@receiver(post_user_create)
-@receiver(post_user_update)
-def save_user_email_lookup(sender, user, **kwargs):
-    set_user_email_lookup(user)
-
-
-@receiver(post_save, sender=User)
-def save_user_email_lookup(sender, instance, **kwargs):
-    set_user_email_lookup(instance)
 
 
 @receiver(post_save, sender=User)
@@ -221,7 +198,13 @@ def on_ldap_create_user(sender, user, ldap_user, **kwargs):
 )
 @register_as_period_task(crontab=CRONTAB_AT_AM_TWO)
 def clean_expired_user_session_period():
-    UserSession.clear_expired_sessions()
+    from django.utils.translation import gettext
+    from ops.celery.task_logging import TaskLog
+    with TaskLog(logger, gettext('Clean up expired user sessions')) as log:
+        matched, deleted = UserSession.clear_expired_sessions()
+        log.checked = matched
+        log.processed = deleted
+        log.metric(gettext('Sessions deleted'), deleted)
 
 
 @receiver(user_logged_out)

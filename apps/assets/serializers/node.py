@@ -57,7 +57,7 @@ class NodeSerializer(BulkOrgResourceModelSerializer):
         else:
             instance = Node.org_root()
             siblings = instance.get_children()
-        if siblings.filter(value=data):
+        if siblings.filter(value=data).exists():
             raise serializers.ValidationError(
                 _('The same level node name cannot be the same')
             )
@@ -223,7 +223,7 @@ class CategoryTreeMetricsQuerySerializer(serializers.Serializer):
 
 
 class NodeAddChildrenSerializer(serializers.Serializer):
-    nodes = serializers.ListField()
+    nodes = serializers.ListField(child=serializers.UUIDField())
 
 
 class NodeTaskSerializer(serializers.Serializer):

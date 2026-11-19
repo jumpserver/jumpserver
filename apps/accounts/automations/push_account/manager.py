@@ -34,7 +34,7 @@ class PushAccountManager(BaseChangeSecretPushManager):
             raise ValueError(_('Secret cannot be empty'))
         record = self.get_or_create_record(asset, account, h['name'])
         new_secret, private_key_path = self.handle_ssh_secret(secret_type, secret, path_dir)
-        h = self.gen_inventory(h, account, new_secret, private_key_path, asset)
+        h = self.gen_inventory(h, account, new_secret, private_key_path, asset, path_dir)
         return h, record
 
     def get_or_create_record(self, asset, account, name):

@@ -1,6 +1,6 @@
 <div align="center">
   <a name="readme-top"></a>
-  <a href="https://jumpserver.com" target="_blank"><img src="https://download.jumpserver.org/images/jumpserver-logo.svg" alt="JumpServer" width="300" /></a>
+  <a href="https://jumpserver.com" target="_blank"><img src="assets/jumpserver-logo.svg" alt="JumpServer" width="300" /></a>
   
 ## Nền tảng PAM mã nguồn mở (máy chủ bastion)
 
@@ -12,7 +12,7 @@
 [![][github-release-shield]][github-release-link]
 [![][github-stars-shield]][github-stars-link]
 
-[English](/README.md) · [中文(简体)](/readmes/README.zh-hans.md) · [中文(繁體)](/readmes/README.zh-hant.md) · [日本語](/readmes/README.ja.md) · [Português (Brasil)](/readmes/README.pt-br.md) · [Español](/readmes/README.es.md) · [Русский](/readmes/README.ru.md) · [한국어](/readmes/README.ko.md) · [Tiếng Việt](/readmes/README.vi.md)
+[English](/README.md) · [中文(简体)](/readmes/README.zh-hans.md) · [中文(繁體)](/readmes/README.zh-hant.md) · [日本語](/readmes/README.ja.md) · [Português (Brasil)](/readmes/README.pt-br.md) · [Español](/readmes/README.es.md) · [Français](/readmes/README.fr.md) · [Русский](/readmes/README.ru.md) · [한국어](/readmes/README.ko.md) · [Tiếng Việt](/readmes/README.vi.md)
 
 </div>
 
@@ -22,7 +22,7 @@
 
 JumpServer là nền tảng quản lý truy cập đặc quyền (PAM) mã nguồn mở có tích hợp AI. Nền tảng cung cấp cho các nhóm DevOps và CNTT một không gian làm việc thống nhất để truy cập an toàn vào SSH, RDP, Kubernetes, cơ sở dữ liệu, trang web, RemoteApp, VirtualApp và nhiều tài nguyên khác.
 
-<img alt="Sơ đồ kiến trúc JumpServer" src="assets/jumpserver-architecture.png" />
+<img alt="Sơ đồ kiến trúc JumpServer" src="assets/jumpserver-architecture.gif" />
 
 ## Bắt đầu nhanh
 
@@ -32,7 +32,7 @@ Chuẩn bị một máy chủ Linux 64 bit mới, có ít nhất 4 nhân CPU và
 curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quick_start.sh | bash
 ```
 
-Mở JumpServer trong trình duyệt tại `http://your-jumpserver-ip/`
+Mở `https://<jumpserver-host>/` trong trình duyệt và thay `<jumpserver-host>` bằng địa chỉ IP hoặc tên miền của máy chủ đang chạy JumpServer.
 
 - Tên đăng nhập: `admin`
 - Mật khẩu: `ChangeMe`
@@ -40,28 +40,28 @@ Mở JumpServer trong trình duyệt tại `http://your-jumpserver-ip/`
 ## Ảnh chụp màn hình
 
 <p align="center">
-  <img src="assets/screenshot-01.png" alt="Bảng điều khiển PAM của JumpServer" width="49%" />
-  <img src="assets/screenshot-02.png" alt="Quản lý tài sản trong JumpServer" width="49%" />
+  <img src="assets/screenshot-01.png" alt="Bảng điều khiển PAM của JumpServer" title="Bảng điều khiển PAM của JumpServer" width="49%" />
+  <img src="assets/screenshot-02.png" alt="Quản lý tài sản trong JumpServer" title="Quản lý tài sản trong JumpServer" width="49%" />
 </p>
 
 <p align="center">
-  <img src="assets/screenshot-03.png" alt="Hộp thoại kết nối SSH của JumpServer" width="49%" />
-  <img src="assets/screenshot-04.png" alt="Yêu cầu AI từ terminal JumpServer" width="49%" />
+  <img src="assets/screenshot-03.png" alt="Hộp thoại kết nối SSH của JumpServer" title="Hộp thoại kết nối SSH của JumpServer" width="49%" />
+  <img src="assets/screenshot-04.png" alt="Yêu cầu AI từ terminal JumpServer" title="Yêu cầu AI từ terminal JumpServer" width="49%" />
 </p>
 
 <p align="center">
-  <img src="assets/screenshot-05.png" alt="Trợ lý AI của JumpServer" width="49%" />
-  <img src="assets/screenshot-06.png" alt="Phiên máy tính từ xa trong JumpServer" width="49%" />
+  <img src="assets/screenshot-05.png" alt="Trợ lý AI của JumpServer" title="Trợ lý AI của JumpServer" width="49%" />
+  <img src="assets/screenshot-06.png" alt="Phiên máy tính từ xa trong JumpServer" title="Phiên máy tính từ xa trong JumpServer" width="49%" />
 </p>
 
 <p align="center">
-  <img src="assets/screenshot-07.png" alt="Bảng tài sản terminal JumpServer ở giao diện sáng" width="49%" />
-  <img src="assets/screenshot-08.png" alt="Phiên SSH JumpServer ở giao diện sáng" width="49%" />
+  <img src="assets/screenshot-07.png" alt="KoKo TUI asset browser with searchable authorized assets" title="KoKo TUI asset browser with searchable authorized assets" width="49%" />
+  <img src="assets/screenshot-08.png" alt="KoKo TUI multi-session manager for switching between active SSH sessions" title="KoKo TUI multi-session manager for switching between active SSH sessions" width="49%" />
 </p>
 
 <p align="center">
-  <img src="assets/screenshot-09.png" alt="Bảng tài sản terminal JumpServer ở giao diện tối" width="49%" />
-  <img src="assets/screenshot-10.png" alt="Phiên SSH JumpServer ở giao diện tối" width="49%" />
+  <img src="assets/screenshot-09.png" alt="KoKo classic text-mode home screen with connection shortcuts" title="KoKo classic text-mode home screen with connection shortcuts" width="49%" />
+  <img src="assets/screenshot-10.png" alt="KoKo classic text-mode asset list with authorized SSH targets" title="KoKo classic text-mode asset list with authorized SSH targets" width="49%" />
 </p>
 
 ## Thành phần

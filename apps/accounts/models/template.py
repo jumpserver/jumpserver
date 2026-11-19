@@ -46,11 +46,7 @@ class AccountTemplate(LabeledMixin, BaseAccount, SecretWithRandomMixin):
     def get_su_from_account(self, asset):
         su_from = self.su_from
         if su_from and asset.platform.su_enabled:
-            account = asset.accounts.filter(
-                username=su_from.username,
-                secret_type=su_from.secret_type
-            ).first()
-            return account
+            return asset.find_account(su_from.username, su_from.secret_type)
 
     def bulk_update_accounts(self, accounts):
         history_model = Account.history.model

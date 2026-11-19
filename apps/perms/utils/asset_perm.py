@@ -3,6 +3,7 @@ from dataclasses import dataclass
 
 from accounts.const import AliasAccount
 from accounts.models import Account, VirtualAccount
+from assets.clickhouse import CLICKHOUSE_HTTP_PROTOCOL
 from assets.models import Asset, MyAsset, Node, Protocol
 from common.utils import lazyproperty, get_logger
 from orgs.utils import tmp_to_org, tmp_to_root_org
@@ -299,12 +300,15 @@ class PermAssetDetailUtil:
 
     def validate_permission(self, account_alias, protocol):
         with tmp_to_org(self.asset.org):
-            protocols = self.get_permed_protocols_for_user(only_name=True)
-            if 'all' not in protocols and protocol not in protocols:
+            if not self.user.is_superuser and not self.user.orgs.filter(pk=self.asset.org_id).exists():
                 return None
-            permed_accounts = self.get_permed_accounts_for_user()
+            if not self.asset.protocols.filter(name=protocol).exists():
+                return None
+            permed_accounts = self.get_permed_accounts_for_user(protocol=protocol)
             accounts_mapper = {account.alias: account for account in permed_accounts}
             account = accounts_mapper.get(account_alias)
+            if account is None and account_alias == AliasAccount.USER:
+                account = next((item for item in permed_accounts if item.username == self.user.username), None)
             return account
 
     @lazyproperty
@@ -313,11 +317,14 @@ class PermAssetDetailUtil:
         perms = perm_util.get_permissions_for_user_asset(self.user, self.asset_id)
         return perms
 
-    def get_permed_accounts_for_user(self):
+    def get_permed_accounts_for_user(self, protocol=None):
         """ 获取授权给用户某个资产的账号 """
-        perms = self.user_asset_perms
+        from tickets.plugins.file_transfer.permissions import add_transfer_actions
+        perms = list(self.user_asset_perms)
+        if protocol:
+            perms = [perm for perm in perms if 'all' in perm.protocols or protocol in perm.protocols]
         permed_accounts = self.get_permed_accounts_from_perms(perms, self.user, self.asset)
-        return permed_accounts
+        return add_transfer_actions(self.user, self.asset, permed_accounts, perms, protocol)
 
     def get_permed_protocols_for_user(self, only_name=False):
         """ 获取授权给用户某个资产的账号 """
@@ -327,7 +334,7 @@ class PermAssetDetailUtil:
             names |= set(perm.protocols)
         if only_name:
             return names
-        protocols = self.asset.protocols.all()
+        protocols = self.asset.protocols.exclude(name=CLICKHOUSE_HTTP_PROTOCOL)
         if 'all' not in names:
             protocols = protocols.filter(name__in=names)
         return protocols
@@ -414,8 +421,19 @@ class PermAssetDetailUtil:
         )
         accounts = []
         virtual_accounts = []
+        push_protocols = None
         for account, action_bit in cleaned_accounts_action_bit.items():
             account.actions = action_bit
+            account.auto_push_protocols = set()
+            if account.username == user.username and action_bit & ActionChoices.connect:
+                if push_protocols is None:
+                    from accounts.provisioning import push_policy
+                    from common.utils import get_request_ip_or_data
+                    from jumpserver.utils import get_current_request
+                    request = get_current_request()
+                    enabled = request and push_policy(user, asset, account, get_request_ip_or_data(request))
+                    push_protocols = {protocol for perm in perms for protocol in perm.protocols} if enabled else set()
+                account.auto_push_protocols = push_protocols
             all_date_expired = cleaned_accounts_expired[account]
             if not all_date_expired:
                 logger.warning(f"Account {account.username} has no date expired")

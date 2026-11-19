@@ -92,11 +92,18 @@ class AppletHostSerializer(HostSerializer):
             }
         return super().update(instance, validated_data)
 
-    def __init__(self, *args, data=None, **kwargs):
-        if data:
-            self.set_initial_data(data)
+    def __init__(self, *args, data=serializers.empty, **kwargs):
+        if data is not serializers.empty:
+            if isinstance(data, dict):
+                data = data.copy()
+                if data or not kwargs.get('partial', False):
+                    self.set_initial_data(data)
             kwargs['data'] = data
         super().__init__(*args, **kwargs)
+
+    def _set_protocols_default(self):
+        if isinstance(getattr(self, 'initial_data', None), dict):
+            super()._set_protocols_default()
 
     def set_initial_data(self, data):
         platform_id = None

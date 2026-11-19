@@ -4,6 +4,7 @@
 import ipaddress
 import json
 import logging
+import operator
 import re
 
 from django.apps import apps
@@ -12,6 +13,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.db.models import Q, Manager, QuerySet
 from django.utils.translation import gettext, gettext_lazy as _
+from rest_framework.exceptions import ValidationError as DRFValidationError
 from rest_framework.utils.encoders import JSONEncoder
 
 from common.utils import contains_ip
@@ -19,6 +21,8 @@ from .utils import Encryptor
 from .validators import PortRangeValidator
 
 __all__ = [
+    "UnicodeCharField",
+    "UnicodeTextField",
     "JsonMixin",
     "JsonDictMixin",
     "JsonListMixin",
@@ -41,6 +45,24 @@ __all__ = [
     "JSONManyToManyField",
     "RelatedManager",
 ]
+
+
+class _UnicodeFieldMixin:
+    """Use full Unicode on MySQL, leaving other backends' defaults intact."""
+
+    def db_parameters(self, connection):
+        params = super().db_parameters(connection)
+        if connection.vendor == 'mysql' and params.get('collation') is None:
+            params['collation'] = 'utf8mb4_general_ci'
+        return params
+
+
+class UnicodeCharField(_UnicodeFieldMixin, models.CharField):
+    pass
+
+
+class UnicodeTextField(_UnicodeFieldMixin, models.TextField):
+    pass
 
 
 class JsonMixin:
@@ -170,6 +192,8 @@ class EncryptTextField(EncryptMixin, models.TextField):
 
 
 class EncryptCharField(EncryptMixin, models.CharField):
+    """Optionally keep plaintext validation separate from ciphertext storage."""
+
     @staticmethod
     def change_max_length(kwargs):
         kwargs.setdefault("max_length", 1024)
@@ -179,12 +203,34 @@ class EncryptCharField(EncryptMixin, models.CharField):
         max_length = max_length * 2
         kwargs["max_length"] = max_length
 
-    def __init__(self, *args, **kwargs):
-        self.change_max_length(kwargs)
+    def __init__(self, *args, storage_max_length=None, **kwargs):
+        self.storage_max_length = storage_max_length
+        if storage_max_length is None:
+            self.change_max_length(kwargs)
         super().__init__(*args, **kwargs)
+
+    def db_type_parameters(self, connection):
+        params = super().db_type_parameters(connection)
+        if self.storage_max_length is not None:
+            params['max_length'] = self.storage_max_length
+        return params
+
+    def db_parameters(self, connection):
+        params = super().db_parameters(connection)
+        if (
+            self.storage_max_length is not None
+            and connection.vendor == 'mysql'
+            and params['collation'] is None
+        ):
+            # Ciphertext is base64 ASCII; avoid an oversized utf8mb4 unique index.
+            params['collation'] = 'ascii_bin'
+        return params
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
+        if self.storage_max_length is not None:
+            kwargs['storage_max_length'] = self.storage_max_length
+            return name, path, args, kwargs
         max_length = kwargs.pop("max_length")
         if max_length > 255:
             max_length = max_length // 2
@@ -269,6 +315,23 @@ class PortRangeField(models.CharField):
 
 
 class RelatedManager:
+    _allowed_filter_attrs = {
+        'users.user': frozenset({
+            'name', 'username', 'email', 'comment', 'is_active', 'is_first_login',
+            'system_roles', 'org_roles', 'groups', 'labels',
+        }),
+        'assets.asset': frozenset({
+            'name', 'address', 'nodes', 'platform', 'category', 'type',
+            'protocols', 'labels', 'comment',
+        }),
+        'accounts.account': frozenset({'name', 'asset'}),
+    }
+    _user_email_matchers = {
+        'exact': operator.eq,
+        'startswith': str.startswith,
+        'contains': operator.contains,
+    }
+
     def __init__(self, instance, field):
         self.instance = instance
         self.field = field
@@ -279,7 +342,7 @@ class RelatedManager:
         self.instance.__dict__[self.field.name] = value
 
     @classmethod
-    def get_to_filter_qs(cls, value, to_model):
+    def get_to_filter_qs(cls, value, to_model, *, queryset=None):
         """
         这个是 instance 去查找 to_model 的 queryset 的 Q
         :param value:
@@ -295,7 +358,7 @@ class RelatedManager:
         elif value["type"] == "ids" and isinstance(value.get("ids"), list):
             return [Q(id__in=value["ids"])]
         elif value["type"] == "attrs" and isinstance(value.get("attrs"), list):
-            return cls._get_filter_attrs_qs(value, to_model)
+            return cls._get_filter_attrs_qs(value, to_model, queryset=queryset)
         else:
             return default
 
@@ -305,8 +368,11 @@ class RelatedManager:
             queryset = to_model.get_queryset()
         else:
             queryset = to_model.objects.all()
-        qs = cls.get_to_filter_qs(value, to_model)
-        for q in qs:
+        return cls.filter_queryset(value, queryset)
+
+    @classmethod
+    def filter_queryset(cls, value, queryset):
+        for q in cls.get_to_filter_qs(value, queryset.model, queryset=queryset):
             queryset = queryset.filter(q)
         return queryset.distinct()
 
@@ -339,8 +405,19 @@ class RelatedManager:
         return q
 
     @classmethod
-    def _get_filter_attrs_qs(cls, value, to_model):
+    def _get_filter_attrs_qs(cls, value, to_model, *, queryset=None):
+        allowed_attrs = None
+        # Asset subclasses use the same public attributes as Asset.
+        for model in (to_model, *to_model._meta.get_parent_list()):
+            allowed_attrs = cls._allowed_filter_attrs.get(model._meta.label_lower)
+            if allowed_attrs is not None:
+                break
+        if allowed_attrs is None:
+            raise DRFValidationError({'attr_rules': gettext('Unsupported filter model.')})
+
         filters = []
+        email_rules = []
+        match_user_email = queryset is not None and to_model._meta.label_lower == 'users.user'
         # 特殊情况有这几种，
         # 1. 像 资产中的 type 和 category，集成自 Platform。所以不能直接查询
         # 2. 像 资产中的 nodes，不是简单的 m2m，是树 的关系
@@ -349,12 +426,21 @@ class RelatedManager:
         custom_attr_filter = getattr(to_model, "get_json_filter_attr_q", None)
         for attr in value["attrs"]:
             if not isinstance(attr, dict):
-                continue
+                raise DRFValidationError({'attr_rules': gettext('Invalid attribute rule.')})
 
             name = attr.get('name')
             val = attr.get('value')
             match = attr.get('match', 'exact')
-            if name is None or val is None:
+            if not isinstance(name, str) or '__' in name or name not in allowed_attrs:
+                raise DRFValidationError({'attr_rules': gettext('Invalid filter attribute.')})
+            if val is None or not isinstance(match, str):
+                raise DRFValidationError({'attr_rules': gettext('Invalid attribute rule.')})
+
+            if match_user_email and name == 'email' and match in cls._user_email_matchers:
+                if not isinstance(val, str):
+                    raise DRFValidationError({'attr_rules': gettext('Invalid attribute rule.')})
+                if match != 'exact' or val != '*':
+                    email_rules.append((cls._user_email_matchers[match], val))
                 continue
 
             custom_filter_q = None
@@ -397,7 +483,21 @@ class RelatedManager:
             else:
                 q = Q() if val == '*' else Q(**{name: val})
             filters.append(q)
+
+        if email_rules:
+            for q in filters:
+                queryset = queryset.filter(q)
+            filters.append(cls._get_user_email_filter_q(queryset, email_rules))
         return filters
+
+    @staticmethod
+    def _get_user_email_filter_q(queryset, email_rules):
+        # Django decrypts email on read. Scan only the users left by the other filters.
+        candidates = queryset.order_by().values_list('pk', 'email').distinct().iterator()
+        return Q(pk__in=[
+            pk for pk, email in candidates
+            if all(matches(email or '', value) for matches, value in email_rules)
+        ])
 
     def _get_queryset(self):
         to_model = apps.get_model(self.field.to)
@@ -556,8 +656,9 @@ class JSONManyToManyDescriptor:
 
 
 class JSONManyToManyField(models.JSONField):
-    def __init__(self, to, *args, **kwargs):
+    def __init__(self, to, *args, allow_empty_ids=False, **kwargs):
         self.to = to
+        self.allow_empty_ids = allow_empty_ids
         super().__init__(*args, **kwargs)
 
     def contribute_to_class(self, cls, name, **kwargs):
@@ -567,10 +668,12 @@ class JSONManyToManyField(models.JSONField):
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
         kwargs['to'] = self.to
+        if self.allow_empty_ids:
+            kwargs['allow_empty_ids'] = True
         return name, path, args, kwargs
 
     @staticmethod
-    def check_value(val):
+    def check_value(val, allow_empty_ids=False):
         if not val:
             return val
         e = ValueError(_(
@@ -585,7 +688,7 @@ class JSONManyToManyField(models.JSONField):
         if val["type"] == "ids":
             if not isinstance(val["ids"], list):
                 raise ValueError(_("Invalid ids for ids, should be a list"))
-            if not val["ids"]:
+            if not val["ids"] and not allow_empty_ids:
                 raise ValueError(_("This field is required."))
         elif val["type"] == "attrs":
             if not isinstance(val["attrs"], list):
@@ -609,4 +712,4 @@ class JSONManyToManyField(models.JSONField):
         super().validate(value, model_instance)
         if not isinstance(value, dict):
             raise ValidationError(gettext("Invalid JSON data for JSONManyToManyField."))
-        self.check_value(value)
+        self.check_value(value, self.allow_empty_ids)

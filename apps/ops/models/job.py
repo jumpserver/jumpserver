@@ -21,21 +21,25 @@ __all__ = ["Job", "JobExecution", "JMSPermedInventory"]
 from simple_history.models import HistoricalRecords
 
 from accounts.models import Account
-from acls.models import CommandFilterACL, DataMaskingRule
+from acls.models import CommandFilterACL, DataMaskingRule, LoginAssetACL
 from assets.const import Protocol
 from assets.models import Asset
 from assets.automations.base.manager import SSHTunnelManager
 from common.db.encoder import ModelJSONFieldEncoder
 from ops.ansible import (
     JMSInventory, AdHocRunner, PlaybookRunner, TaskLogCallback, UploadFileRunner,
-    escape_jinja2_syntax, neutralize_jinja2_syntax,
+    escape_jinja2_syntax, neutralize_jinja2_syntax, quote_ansible_module_arg,
 )
 
 """stop all ssh child processes of the given ansible process pid."""
 from ops.ansible.exception import CommandInBlackListException
 from ops.mixin import PeriodTaskModelMixin
 from ops.variables import *
-from ops.const import Types, RunasPolicies, JobStatus, JobModules
+from ops.const import Types, RunasPolicies, JobStatus, JobModules, LOGIN_ASSET_ACL_DENIED
+from ops.database import (
+    DATABASE_JOB_MODULES, DATABASE_JOB_PROTOCOLS, NATIVE_DATABASE_JOB_MODULES,
+    database_module_matches,
+)
 from ops.utils import merge_nodes_and_assets
 from orgs.mixins.models import JMSOrgBaseModel
 from perms.models import AssetPermission
@@ -69,6 +73,19 @@ def check_upload_permission(host, *, user, asset, account, **kwargs):
             'Asset ({asset}) authorization lacks upload permissions'
         ).format(asset=asset.name)
     return host
+
+
+def match_rejected_login_asset_acl(user, assets, account, ip=None):
+    for asset in assets:
+        acls = LoginAssetACL.filter_queryset(
+            user=user, asset=asset, account_username=account
+        )
+        acl = LoginAssetACL.get_match_rule_acls(user, ip, acls)
+        if not acl:
+            continue
+        if not acl.allows_noninteractive_for(user, account, asset):
+            return asset, acl
+    return None, None
 
 
 def get_parent_keys(key, include_self=True):
@@ -127,22 +144,32 @@ class JMSPermedInventory(JMSInventory):
             'winrm': ['win_shell', 'shell'],
         }
 
-        if self.module not in protocol_supported_modules_mapping.get(protocol.name, []):
+        database_options = host['jms_asset'].get('database_options', {})
+        is_database = database_module_matches(self.module, asset.type, protocol.name, database_options)
+        if not is_database and self.module not in protocol_supported_modules_mapping.get(protocol.name, []):
             host['error'] = _("Module {} is not suitable for this asset").format(self.module)
             return host
 
-        if protocol.name in ('mariadb', 'mysql', 'postgresql', 'sqlserver'):
-            host['login_host'] = asset.address
+        if asset.type == 'oceanbase' and database_options.get('tenant_mode') == 'oracle' and self.module != 'oceanbase':
+            host['error'] = _("Oracle-mode OceanBase assets require the OceanBase module")
+            return host
+
+        if is_database:
+            host['ansible_connection'] = 'local'
+            host['login_host'] = escape_jinja2_syntax(asset.address)
             host['login_port'] = protocol.port
-            host['login_user'] = account.username
-            host['login_password'] = account.secret
-            host['login_db'] = asset.spec_info.get('db_name', '')
+            host['login_user'] = escape_jinja2_syntax(account.username)
+            host['login_password'] = escape_jinja2_syntax(account.secret)
+            host['login_db'] = escape_jinja2_syntax(asset.spec_info.get('db_name', ''))
+            # Job parameters are jms_* namespaced. Keep trusted TLS/tenant
+            # options outside that namespace, like the existing login_* vars.
+            host['login_options'] = database_options
             host['ansible_python_interpreter'] = '{{ local_python_interpreter }}'
             if gateway:
                 host['jms_gateway'] = {
                     'address': gateway.address, 'port': gateway.port,
                     'username': gateway.username, 'secret': gateway.password,
-                    'private_key_path': gateway.private_key_path
+                    'private_key_path': gateway.get_private_key_path(path_dir)
                 }
                 host['jms_asset']['port'] = protocol.port
             return host
@@ -310,9 +337,13 @@ class JobExecution(JMSOrgBaseModel):
 
     @classmethod
     def clean_unexpected_execution(cls):
+        checked = cleaned = 0
         for execution in cls.objects.filter(status__in=[JobStatus.running]).all():
+            checked += 1
             if execution.date_created < (timezone.now() - timedelta(hours=3)):
                 execution.set_error(zombie_task_exception)
+                cleaned += 1
+        return checked, cleaned
 
     @property
     def current_job(self):
@@ -353,9 +384,22 @@ class JobExecution(JMSOrgBaseModel):
         module = self.current_job.module
         args = escape_jinja2_syntax(self.rendered_args)
 
-        db_modules = ('mysql', 'postgresql', 'sqlserver', 'oracle')
+        if module in NATIVE_DATABASE_JOB_MODULES:
+            # SQL remains one literal argument; trusted connection arguments
+            # follow it so user SQL cannot override the inventory endpoint.
+            shell = 'query="{}" action=query database_type={} '.format(
+                quote_ansible_module_arg(args), module,
+            )
+            shell += ('login_host={{login_host}} login_port={{login_port}} '
+                      'login_user={{login_user}} login_password={{login_password}} '
+                      'login_database={{login_db}} '
+                      'connection_options={{login_options}}')
+            return 'database_automation', shell
+
+        db_modules = DATABASE_JOB_MODULES
         db_module_name_map = {
             'mysql': 'community.mysql.mysql_query',
+            'mariadb': 'community.mysql.mysql_query',
             'postgresql': 'community.postgresql.postgresql_query',
             'sqlserver': 'mssql_script',
         }
@@ -382,7 +426,11 @@ class JobExecution(JMSOrgBaseModel):
             if module == 'mssql_script':
                 login_args += "encryption={{jms_asset.encryption | default(None) }} " \
                               "tds_version={{jms_asset.tds_version | default(None) }} "
-            shell = "{} {}=\"{}\" ".format(login_args, query_token, args)
+            # Keep user SQL inside query/script, then set login_* so injected
+            # connection keys cannot override inventory.
+            shell = '{}="{}" {}'.format(
+                query_token, quote_ansible_module_arg(args), login_args
+            )
             return module, shell
 
         if module == 'win_shell':
@@ -402,7 +450,7 @@ class JobExecution(JMSOrgBaseModel):
 
         if module == JobModules.huawei.value:
             module = 'ce_command'
-            shell = "commands=\"{}\" ".format(args)
+            shell = 'commands="{}" '.format(quote_ansible_module_arg(args))
 
         return module, shell
 
@@ -500,6 +548,8 @@ class JobExecution(JMSOrgBaseModel):
     def set_result(self, cb):
         status_mapper = {
             'successful': JobStatus.success,
+            # stop() records user cancellation as a terminal failure.
+            'canceled': JobStatus.failed,
         }
         this = self.__class__.objects.get(id=self.id)
         this.status = status_mapper.get(cb.status, cb.status)
@@ -624,7 +674,7 @@ class JobExecution(JMSOrgBaseModel):
                 account_username=self.current_job.runas
             )
             protocols = [p.name for p in asset.protocols.all()]
-            if acls and set(protocols) & {'mariadb', 'mysql', 'postgresql', 'sqlserver'}:
+            if acls and set(protocols) & DATABASE_JOB_PROTOCOLS:
                 print(
                     "\033[31mcommand \'{}\' on asset {}({}) and account {} is rejected by data masking rules acl {}\033[0m"
                     .format(self.current_job.args, asset.name, asset.address, self.current_job.runas, list(acls))
@@ -638,7 +688,27 @@ class JobExecution(JMSOrgBaseModel):
         if self.current_job.type == 'adhoc':
             self.check_command_acl()
 
+    def check_login_asset_acls(self, ip=None):
+        asset, _acl = match_rejected_login_asset_acl(
+            self.creator, self.inventory.assets, self.current_job.runas, ip
+        )
+        if not asset:
+            return
+        message = LOGIN_ASSET_ACL_DENIED.format(
+            asset=asset.name, address=asset.address
+        )
+        print(f'\033[31m{message}\033[0m')
+        raise Exception(message)
+
+    def is_upload_cancelled(self):
+        if self.job_type != Types.upload_file:
+            return False
+        args = Job.objects.filter(pk=self.job_id).values_list('args', flat=True).first()
+        return bool(json.loads(args or '{}').get('upload_cancelled'))
+
     def before_start(self):
+        if self.is_upload_cancelled():
+            raise Exception(_('Task canceled by user'))
         self.check_assets_perms()
         self.check_assets_acls()
 
@@ -653,6 +723,9 @@ class JobExecution(JMSOrgBaseModel):
         ssh_tunnel = SSHTunnelManager()
         ssh_tunnel.local_gateway_prepare(runner)
         try:
+            if self.job_type == Types.upload_file:
+                # Also catch cancellation while the runner is still preparing its transport.
+                kwargs['cancel_callback'] = self.is_upload_cancelled
             cb = runner.run(**kwargs)
             self.set_result(cb)
             return cb
@@ -670,6 +743,25 @@ class JobExecution(JMSOrgBaseModel):
 
     def stop(self):
         from ops.signal_handlers import job_execution_stop_pub_sub
+        remote_path = os.path.join(self.private_dir, 'remote.json')
+        try:
+            with open(remote_path) as stream:
+                remote = json.load(stream)
+        except FileNotFoundError:
+            remote = {}
+        if remote.get('backend') == 'ssh':
+            job_id = str(uuid.UUID(remote['job_id']))
+            # Pub/sub listeners may live in Celery's parent process. Persist the
+            # request in the shared task directory so prefork workers see it too.
+            try:
+                cancel_path = os.path.join(self.private_dir, f'cancel-{job_id}')
+                fd = os.open(cancel_path, os.O_WRONLY | os.O_CREAT | os.O_NOFOLLOW, 0o600)
+                os.close(fd)
+            except FileNotFoundError:
+                pass  # The runner has already finished and cleaned its directory.
+            job_execution_stop_pub_sub.publish(remote)
+            self.set_error('Job stop by "user cancel"')
+            return
         pid_path = os.path.join(self.private_dir, "local.pid")
         if os.path.exists(pid_path):
             with open(pid_path) as f:

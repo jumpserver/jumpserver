@@ -9,7 +9,8 @@ __all__ = [
     'SecurityPasswordRuleSerializer', 'SecuritySessionSerializer',
     'SecurityAuthSerializer', 'SecuritySettingSerializer',
     'SecurityLoginLimitSerializer', 'SecurityBasicSerializer',
-    'SecurityBlockIPSerializer', 'LeakPasswordPSerializer'
+    'SecurityBlockIPSerializer', 'SecurityUnlockIPSerializer',
+    'SecurityUnlockIPResultSerializer', 'LeakPasswordPSerializer'
 ]
 
 from settings.models import LeakPasswords
@@ -219,6 +220,57 @@ class SecurityAuthSerializer(serializers.Serializer):
 
 
 class SecuritySessionSerializer(serializers.Serializer):
+    SESSION_COOKIE_AGE = serializers.IntegerField(
+        min_value=300, max_value=31536000, required=False, label=_('Web session lifetime (second)'),
+        help_text=_(
+            'When renewal is disabled, the login expires after this duration, even if the session is saved or identity is verified again. '
+            'When renewal is enabled, each renewal grants this duration again. '
+            'Changes apply to new logins without restarting Core.'
+        ),
+    )
+    SESSION_RENEW_ON_REQUEST = serializers.BooleanField(
+        required=False, label=_('Renew session on request'),
+        help_text=_(
+            'Requests can extend the session at most once per minute. Background business requests also count; '
+            'profile, online-status and lock-status polling do not. '
+            'Disabled: the expiry time stays fixed. Changes apply to new logins without restarting Core.'
+        ),
+    )
+    SECURITY_CLIENT_REAUTH_ON_EXIT = serializers.BooleanField(
+        required=False, label=_('Log in again after exiting the client'),
+        help_text=_(
+            'Require a new login after exiting and restarting. Minimizing or hiding the client does not count '
+            'as exiting.'
+        ),
+    )
+    SECURITY_CLIENT_MAX_SESSION_TIME = serializers.IntegerField(
+        min_value=0, max_value=99999, required=False,
+        label=_('Maximum client login lifetime (minute)'),
+        help_text=_(
+            '0 means unlimited. Counted from login. Sign in again when it expires; activity does not extend '
+            'it. A login already overdue after a change gets up to 10 more minutes.'
+        ),
+    )
+    SECURITY_CLIENT_IDLE_LOCK_TIME = serializers.IntegerField(
+        min_value=0, max_value=99999, required=False,
+        label=_('Client idle screen lock (minute)'),
+        help_text=_(
+            '0 disables automatic locking. Locks after the idle timeout. Switching accounts does not reset '
+            'the previous account’s idle time. Enter the lock password to unlock. '
+            'External application windows are not protected.'
+        ),
+    )
+    SECURITY_WEB_IDLE_LOCK_TIME = serializers.IntegerField(
+        min_value=0, max_value=99999, required=False,
+        label=_('Web idle screen lock (minute)'),
+        help_text=_(
+            '0 disables idle locking. Locks the console and Web terminal after the specified idle time. '
+            'Enter the lock password to unlock. With idle locking enabled, closing all pages also locks this login '
+            'after 10 seconds. Close-page sign-out takes priority. Refreshing or reopening within 10 seconds cancels this. '
+            'Administrator settings are defaults and limits. Users may choose stricter settings; otherwise they follow '
+            'the administrator.'
+        ),
+    )
     SECURITY_WATERMARK_ENABLED = serializers.BooleanField(
         required=True, label=_('Watermark'),
     )
@@ -249,8 +301,13 @@ class SecuritySessionSerializer(serializers.Serializer):
         help_text=_('If idle time more than it, disconnect connection.')
     )
     SESSION_EXPIRE_AT_BROWSER_CLOSE = serializers.BooleanField(
-        required=False, default=False, label=_('Session expire at browser closed'),
-        help_text=_('Whether to expire the session when the user closes their browser.')
+        required=False, default=False, label=_('Log in again when the browser closes'),
+        help_text=_(
+            'End this login 10 seconds after all console and Web terminal pages for it close. '
+            'Refreshing or reopening a page within 10 seconds cancels sign-out. '
+            'A browser crash may prevent the close report; use Sign out to reliably end the login. '
+            'Changes apply to new logins.'
+        )
     )
     VIEW_ASSET_ONLINE_SESSION_INFO = serializers.BooleanField(
         required=False,
@@ -300,6 +357,37 @@ class SecuritySettingSerializer(
 class SecurityBlockIPSerializer(serializers.Serializer):
     id = serializers.UUIDField(required=False)
     ip = serializers.CharField(max_length=1024, required=False, allow_blank=True)
+
+
+class LoginIPAddressField(serializers.IPAddressField):
+    """Validate IPs without changing the spelling used by login cache keys."""
+
+    def to_internal_value(self, data):
+        super().to_internal_value(data)
+        return data.strip()
+
+
+class SecurityUnlockIPSerializer(serializers.Serializer):
+    ip = LoginIPAddressField(
+        required=False, help_text=_('Provide either ip or a non-empty ips list.'),
+    )
+    ips = serializers.ListField(
+        child=LoginIPAddressField(), required=False, allow_empty=False,
+        help_text=_('Provide either ip or a non-empty ips list.'),
+    )
+
+    def validate(self, attrs):
+        if 'ip' not in attrs and 'ips' not in attrs:
+            raise serializers.ValidationError({
+                'ip': [_('Provide either ip or a non-empty ips list.')],
+            })
+        if 'ip' in attrs and 'ips' in attrs:
+            raise serializers.ValidationError(_('Provide only one of ip or ips.'))
+        return attrs
+
+
+class SecurityUnlockIPResultSerializer(serializers.Serializer):
+    ips = serializers.ListField(child=serializers.IPAddressField())
 
 
 class LeakPasswordPSerializer(serializers.ModelSerializer):

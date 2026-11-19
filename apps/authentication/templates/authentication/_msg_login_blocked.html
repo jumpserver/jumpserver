@@ -1,0 +1,11 @@
+{% load i18n %}
+<p>{% trans "The maximum number of failed login attempts has been reached. Login has been temporarily blocked." %}</p>
+<ul>
+  <li>{% trans "Lockout type" %}: {{ block_type }}</li>
+  {% if username %}<li>{% trans "Username" %}: {{ username }}</li>{% endif %}
+  <li>{% trans "IP" %}: {{ ip }}</li>
+  <li>{% trans "Login failures count" %}: {{ count }}</li>
+  <li>{% trans "Lockout duration (minutes)" %}: {{ lock_minutes }}</li>
+  <li>{% trans "Time" %}: {{ time }}</li>
+</ul>
+<p>{% trans "Please review the login logs and check for suspicious activity." %}</p>

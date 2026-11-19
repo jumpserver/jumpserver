@@ -16,6 +16,7 @@ def parse_playbook_name(path):
 
 
 class PlaybookSerializer(ScopeSerializerMixin, CommonBulkModelSerializer, WritableNestedModelSerializer):
+    name = serializers.CharField(max_length=128, label=_('Name'))
     creator = ReadableHiddenField(default=serializers.CurrentUserDefault())
     path = serializers.FileField(required=False)
     variable = PlaybookVariableSerializer(many=True, required=False, allow_null=True, label=_('Variable'))
@@ -34,3 +35,23 @@ class PlaybookSerializer(ScopeSerializerMixin, CommonBulkModelSerializer, Writab
             "id", 'path', 'scope', "name", "comment", "creator",
             'create_method', 'vcs_url',
         ]
+
+
+class PlaybookFileCreateSerializer(serializers.Serializer):
+    key = serializers.CharField(required=False, allow_blank=True, trim_whitespace=False, write_only=True)
+    name = serializers.CharField(required=False, allow_blank=True, trim_whitespace=False)
+    is_directory = serializers.BooleanField(required=False, write_only=True)
+    content = serializers.CharField(required=False, allow_blank=True, trim_whitespace=False, write_only=True)
+    id = serializers.CharField(read_only=True)
+    title = serializers.CharField(read_only=True)
+    isParent = serializers.BooleanField(read_only=True)
+    pId = serializers.CharField(read_only=True)
+    open = serializers.BooleanField(read_only=True)
+    iconSkin = serializers.CharField(read_only=True)
+
+
+class PlaybookFileUpdateSerializer(serializers.Serializer):
+    key = serializers.CharField(trim_whitespace=False, write_only=True)
+    new_name = serializers.CharField(required=False, allow_blank=True, trim_whitespace=False, write_only=True)
+    is_directory = serializers.BooleanField(required=False, write_only=True)
+    content = serializers.CharField(required=False, allow_blank=True, trim_whitespace=False, write_only=True)

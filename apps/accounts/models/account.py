@@ -100,6 +100,20 @@ class JSONFilterMixin:
 
 
 class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
+    def save(self, *args, **kwargs):
+        # Keep the password, history and subscription publication atomic.
+        using = kwargs.get('using') or self._state.db or 'default'
+        with transaction.atomic(using=using):
+            previous = self._get_previous_for_update(using)
+            if previous:
+                # Secret API access tracking owns this field; preserve newer
+                # accesses when saving an account loaded before the request.
+                self.date_last_secret_access = previous.date_last_secret_access
+            self._prepare_save_kwargs(kwargs)
+            if self._can_skip_template_transition(kwargs.get('update_fields')):
+                return self._save_without_template_transition(*args, **kwargs)
+            return self._save_with_locked_previous(previous, *args, **kwargs)
+
     asset = models.ForeignKey(
         'assets.Asset', related_name='accounts',
         on_delete=models.CASCADE, verbose_name=_('Asset')
@@ -122,6 +136,7 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
     TEMPLATE_SYNC_FIELDS = ()
 
     date_last_login = models.DateTimeField(null=True, blank=True, verbose_name=_('Date last access'))
+    date_last_secret_access = models.DateTimeField(null=True, blank=True, verbose_name=_('Last application Secret API access'))
     login_by = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Access by'))
     date_change_secret = models.DateTimeField(null=True, blank=True, verbose_name=_('Date change secret'))
     change_secret_status = models.CharField(
@@ -296,19 +311,6 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
         self.__dict__.pop('_secret_explicitly_set', None)
         return result
 
-    def _save_template_transition(self, *args, **kwargs):
-        using = kwargs.get('using') or self._state.db or 'default'
-        # Keep the credential snapshot and opt-out in the same database transaction.
-        with transaction.atomic(using=using):
-            previous = self._get_previous_for_update(using)
-            return self._save_with_locked_previous(previous, *args, **kwargs)
-
-    def save(self, *args, **kwargs):
-        self._prepare_save_kwargs(kwargs)
-        if self._can_skip_template_transition(kwargs.get('update_fields')):
-            return self._save_without_template_transition(*args, **kwargs)
-        return self._save_template_transition(*args, **kwargs)
-
     def __str__(self):
         if self.asset_id:
             host = self.asset.name
@@ -377,14 +379,14 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
         return self.history.count()
 
     def get_su_from_accounts(self):
-        """ 排除自己和以自己为 su-from 的账号 """
-        return self.asset.accounts.exclude(id=self.id).exclude(su_from=self)
+        """ 资产账号及加入的目录服务账号，排除自己和以自己为 su-from 的账号 """
+        return self.asset.all_accounts.exclude(id=self.id).exclude(su_from=self)
 
-    def make_account_ansible_vars(self, su_from):
+    def make_account_ansible_vars(self, su_from, path_dir=None):
         from ops.ansible.utils import escape_jinja2_syntax
 
         var = {
-            'ansible_user': escape_jinja2_syntax(su_from.username),
+            'ansible_user': escape_jinja2_syntax(su_from.full_username),
         }
         if not su_from.secret:
             return var
@@ -393,17 +395,19 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
                 su_from.secret
             )
         elif su_from.secret_type == SecretType.SSH_KEY:
-            var['ansible_ssh_private_key_file'] = su_from.private_key_path
+            var['ansible_ssh_private_key_file'] = (
+                su_from.get_private_key_path(path_dir) if path_dir else su_from.private_key_path
+            )
         return var
 
-    def get_ansible_become_auth(self):
+    def get_ansible_become_auth(self, path_dir=None):
         su_from = self.su_from
         platform = self.platform
         auth = {'ansible_become': False}
         if not (platform.su_enabled and su_from):
             return auth
 
-        auth.update(self.make_account_ansible_vars(su_from))
+        auth.update(self.make_account_ansible_vars(su_from, path_dir))
 
         become_method = platform.ansible_become_method
         if become_method == 'sudo':

@@ -25,7 +25,8 @@ from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.edit import FormView
 
 from common.const import Language
-from common.utils import FlashMessageUtil, safe_next_url
+from common.utils import FlashMessageUtil, safe_next_url, get_logger
+from tickets.workflow.errors import WorkflowConfigurationError
 from users.utils import (
     redirect_user_first_login_or_index
 )
@@ -39,6 +40,8 @@ __all__ = [
     'UserLoginGuardView', 'UserLoginWaitConfirmView',
 ]
 
+logger = get_logger(__name__)
+
 
 class UserLoginContextMixin:
     get_user_mfa_context: Callable
@@ -46,7 +49,9 @@ class UserLoginContextMixin:
     error_origin: str
 
     def get_support_auth_methods(self):
-        query_string = self.request.GET.urlencode()
+        query_params = self.request.GET.copy()
+        query_params.pop('admin', None)
+        query_string = query_params.urlencode()
         all_methods = get_auth_methods()
         methods = []
         for method in all_methods:
@@ -280,15 +285,12 @@ class UserLoginGuardView(mixins.AuthMixin, RedirectView):
 
     def login_it(self, user):
         auth_login(self.request, user)
-        # 如果设置了自动登录，那需要设置 session_id cookie 的有效期
-        if self.request.session.get('auto_login'):
-            age = self.request.session.get_expiry_age()
-            self.request.session.set_expiry(age)
 
     def get_redirect_url(self, *args, **kwargs):
         try:
             user = self.get_user_from_session()
             self.check_user_mfa_if_need(user)
+            review_required = self.request.session.get('auth_confirm_required')
             self.check_user_login_confirm_if_need(user)
         except (errors.CredentialError, errors.SessionEmptyError) as e:
             return self.format_redirect_url(self.login_url)
@@ -296,11 +298,25 @@ class UserLoginGuardView(mixins.AuthMixin, RedirectView):
             return self.format_redirect_url(self.login_mfa_url)
         except errors.LoginConfirmBaseError:
             return self.format_redirect_url(self.login_confirm_url)
+        except WorkflowConfigurationError as exc:
+            logger.warning('Unable to start login approval for user %s: %s', user.pk, exc)
+            message = _('The login approval workflow is misconfigured. Unable to log in. Please contact your administrator.')
+            auth_logout(self.request)
+            self.send_auth_signal(success=False, username=user.username, reason=message)
+            return FlashMessageUtil.gen_message_url({
+                'title': _('Login confirm'), 'error': message,
+                'redirect_url': reverse('authentication:login') + '?admin=1',
+                'confirm_button': _('Login'), 'auto_redirect': False,
+            })
         except errors.MFAUnsetError as e:
             return e.url
         except errors.PasswordTooSimple as e:
             return e.url
         else:
+            if review_required and self.request.session.get('auth_third_party_required'):
+                # Reviewer exemptions can finish here without polling the approval API.
+                self.request.session['auth_third_party_done'] = 1
+                self.request.session.pop('auth_third_party_required', None)
             self.login_it(user)
             self.send_auth_signal(success=True, user=user)
             self.clear_auth_mark()
@@ -376,6 +392,9 @@ class UserLogoutView(TemplateView):
     def get(self, request, *args, **kwargs):
         backend_logout_url = self.get_backend_logout_url()
         if backend_logout_url:
+            # Preserve provider logout data until its handler completes, while clearing local caches now.
+            from authentication.services.web_session_lock import clear_web_session_cache
+            clear_web_session_cache(request.session.session_key)
             return redirect(backend_logout_url)
 
         auth_logout(request)

@@ -2,9 +2,13 @@
 #
 from django.conf import settings
 from django.db import transaction
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from django.utils.translation import gettext, gettext_lazy as _
+from dateutil.relativedelta import relativedelta
 from django_filters import rest_framework as drf_filters
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -13,6 +17,7 @@ from rest_framework.status import HTTP_200_OK
 from accounts.serializers import AccountSerializer
 from accounts.tasks import push_accounts_to_assets_task, verify_accounts_connectivity_task
 from assets import serializers
+from assets.clickhouse import CLICKHOUSE_HTTP_PROTOCOL
 from assets.exceptions import NotSupportedTemporarilyError
 from assets.filters import IpInFilterBackend, NodeFilterBackend
 from assets.models import Asset, Gateway, Platform, Protocol
@@ -25,6 +30,8 @@ from common.utils import get_logger, is_uuid
 from orgs.mixins import generics
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import tmp_to_root_org
+from perms.models import AssetPermission
+from perms.utils import AssetPermissionPermAssetUtil, AssetPermissionUtil
 from ...const import GATEWAY_NAME
 from ...notifications import BulkUpdatePlatformSkipAssetUserMsg
 
@@ -112,6 +119,13 @@ class AssetFilterSet(BaseFilterSet):
         field_name="platform__automation__gather_accounts_enabled",
         label=_("Gather accounts enabled")
     )
+    not_accessed_in_three_months = drf_filters.BooleanFilter(
+        method='filter_not_accessed_in_three_months',
+        label=_("Not accessed for over three months")
+    )
+    no_valid_permission = drf_filters.BooleanFilter(
+        method='filter_no_valid_permission', label=_("No valid permission")
+    )
 
     class Meta:
         model = Asset
@@ -124,7 +138,7 @@ class AssetFilterSet(BaseFilterSet):
             "is_gateway", "gateway_enabled", "ping_enabled",
             "gather_facts_enabled", "change_secret_enabled",
             "push_account_enabled", "verify_account_enabled",
-            "gather_accounts_enabled",
+            "gather_accounts_enabled", "not_accessed_in_three_months", "no_valid_permission",
         ]
         fields_operator = {
             'protocols': ('in',),
@@ -161,6 +175,30 @@ class AssetFilterSet(BaseFilterSet):
     def filter_protocols(queryset, name, value):
         value = value.split(',')
         return queryset.filter(protocols__name__in=value).distinct()
+
+    @staticmethod
+    def filter_not_accessed_in_three_months(queryset, name, value):
+        if not value:
+            return queryset
+        cutoff = timezone.now() - relativedelta(months=3)
+        return queryset.filter(
+            Q(date_last_login__lt=cutoff) |
+            Q(date_last_login__isnull=True, date_created__lt=cutoff)
+        )
+
+    @staticmethod
+    def filter_no_valid_permission(queryset, name, value):
+        if not value:
+            return queryset
+        permissions = AssetPermissionUtil.get_permissions(
+            AssetPermission.objects.values_list('id', flat=True)
+        )
+        resolver = AssetPermissionPermAssetUtil(permissions.values_list('id', flat=True))
+        granted_assets = resolver.get_all_assets().values('id')
+        # Root-node grants cover all assets in their org, including assets without
+        # an explicit node relation when querying across organizations.
+        granted_orgs = resolver.get_perm_nodes().filter(parent_key='').values('org_id')
+        return queryset.exclude(Q(id__in=granted_assets) | Q(org_id__in=granted_orgs))
 
 
 class BaseAssetViewSet(OrgBulkModelViewSet):
@@ -260,16 +298,19 @@ class AssetViewSet(SuggestionMixin, BaseAssetViewSet):
             gateways = asset.zone.gateways
         return self.get_paginated_response_from_queryset(gateways)
 
+    @extend_schema(request=serializers.SyncPlatformProtocolsSerializer, responses={200: None})
     @action(methods=['post'], detail=False, url_path='sync-platform-protocols')
     def sync_platform_protocols(self, request, *args, **kwargs):
-        platform_id = request.data.get('platform_id')
-        platform = get_object_or_404(Platform, pk=platform_id)
+        serializer = serializers.SyncPlatformProtocolsSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        platform = get_object_or_404(Platform, pk=serializer.validated_data['platform_id'])
         asset_ids = list(platform.assets.values_list('id', flat=True))
         platform_protocols = list(platform.protocols.values('name', 'port'))
 
         with transaction.atomic():
             if asset_ids:
-                Protocol.objects.filter(asset_id__in=asset_ids).delete()
+                # The ClickHouse HTTP endpoint belongs to each asset, not the platform.
+                Protocol.objects.filter(asset_id__in=asset_ids).exclude(name=CLICKHOUSE_HTTP_PROTOCOL).delete()
             if asset_ids and platform_protocols:
                 objs = []
                 for aid in asset_ids:

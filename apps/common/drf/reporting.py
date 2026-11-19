@@ -1,21 +1,96 @@
 import json
+import pickle
 from collections import Counter, OrderedDict
 from datetime import date, datetime, time
+from heapq import nsmallest
+from io import BytesIO
+from tempfile import TemporaryFile
 
 from django.conf import settings
+from django.db.models import QuerySet
 from django.http import HttpResponse
 from django.utils.encoding import force_str
 from django.utils.functional import Promise
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from openpyxl import Workbook
-from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
-from openpyxl.styles import Alignment, Font, PatternFill
-from openpyxl.utils import get_column_letter
-from openpyxl.writer.excel import save_virtual_workbook
 
-from common.drf.renders.excel import ExcelFileRenderer
+from common.drf.renders.excel import ExcelFileRenderer, ILLEGAL_CHARACTERS_RE
 from common.drf.renders.mixins import LogMixin
+
+
+class ReportRecordSnapshot:
+    """Replay the records actually read without retaining every ORM object.
+
+    This private, automatically deleted file only contains pickles written by
+    this instance. It is never populated from an upload or a caller's path.
+    It stabilizes the rows between the summary/data passes, not the database
+    while the bounded queries are initially being read.
+    """
+
+    def __init__(self, queryset, limit, batch_size=500):
+        self._file = TemporaryFile(mode='w+b')
+        self._offsets = []
+        self._count = 0
+        try:
+            for batch in self._read_batches(queryset, limit, batch_size):
+                if not batch:
+                    continue
+                self._offsets.append(self._file.tell())
+                pickle.dump(batch, self._file, protocol=pickle.HIGHEST_PROTOCOL)
+                self._count += len(batch)
+        except BaseException:
+            self.close()
+            raise
+
+    @staticmethod
+    def _read_batches(queryset, limit, batch_size):
+        if isinstance(queryset, QuerySet) and not getattr(queryset, 'custom', False):
+            # Freeze only ordered primary keys, not the much larger model and
+            # serializer graphs. Later inserts/deletes cannot shift OFFSETs;
+            # rows deleted before their batch is read are simply omitted.
+            keys = list(queryset.values_list('pk', flat=True)[:limit])
+            source = queryset.all()
+            source.query.clear_limits()
+            for start in range(0, len(keys), batch_size):
+                current = keys[start:start + batch_size]
+                objects = {obj.pk: obj for obj in source.filter(pk__in=current)}
+                yield [objects[key] for key in current if key in objects]
+            return
+        for start in range(0, limit, batch_size):
+            batch = list(queryset[start:min(start + batch_size, limit)])
+            if not batch:
+                break
+            yield batch
+            if len(batch) < batch_size:
+                break
+
+    def __len__(self):
+        return self._count
+
+    def iter_batches(self):
+        for offset in self._offsets:
+            self._file.seek(offset)
+            # The input is our own private temporary file, never user data.
+            yield pickle.load(self._file)
+
+    def __iter__(self):
+        for batch in self.iter_batches():
+            yield from batch
+
+    def close(self):
+        self._file.close()
+
+
+class ReportAuditRows:
+    def __init__(self, count, ids):
+        self.count = count
+        self.ids = ids
+
+    def __len__(self):
+        return self.count
+
+    def __iter__(self):
+        return ({'id': value} for value in self.ids)
 
 
 class BaseListReportExporter:
@@ -28,11 +103,8 @@ class BaseListReportExporter:
     min_column_width = 12
     max_column_width = 48
 
-    header_fill = PatternFill('solid', fgColor='D9EAF7')
-    section_fill = PatternFill('solid', fgColor='EAF4EA')
-    header_font = Font(bold=True)
-    section_font = Font(bold=True, size=12)
-    wrap_alignment = Alignment(vertical='top', wrap_text=True)
+    header_fill = '#D9EAF7'
+    section_fill = '#EAF4EA'
     filter_label_map = {
         'date_from': _('Date from'),
         'date_to': _('Date to'),
@@ -42,16 +114,15 @@ class BaseListReportExporter:
         self.view = view
         self.request = request
         self.queryset = queryset
-        self.records = self._materialize_records(queryset)
-        self.serializer = self.view.get_serializer(self.records, many=True)
+        self.serializer = self.view.get_serializer([], many=True)
         self.export_serializer = getattr(self.serializer, 'child', self.serializer)
         self.render_helper = self._get_render_helper()
-        self.serialized_rows = self.render_helper.process_data(self.serializer.data)
+        self.records = self._materialize_records(queryset)
+        self._exported_count = 0
+        self._activity_ids = []
 
     def _materialize_records(self, queryset):
-        if isinstance(queryset, list):
-            return queryset[:self.max_rows]
-        return list(queryset[:self.max_rows])
+        return ReportRecordSnapshot(queryset, self.max_rows)
 
     def _get_render_helper(self):
         helper = ExcelFileRenderer()
@@ -70,45 +141,61 @@ class BaseListReportExporter:
             return ILLEGAL_CHARACTERS_RE.sub('', value)
         return value
 
-    def _set_text_cell(self, cell, value):
-        if isinstance(value, str):
-            cell.value = self._sanitize_value(value)
-            cell.data_type = 's'
-        else:
-            cell.value = value
+    def _get_cell_format(self, *, bold=False, fill=None, section=False, value=None):
+        number_format = None
+        if isinstance(value, datetime):
+            number_format = 'yyyy-mm-dd h:mm:ss'
+        elif isinstance(value, date):
+            number_format = 'yyyy-mm-dd'
+        elif isinstance(value, time):
+            number_format = 'h:mm:ss'
+        key = (bold, fill, section, number_format)
+        if key not in self._formats:
+            properties = {'valign': 'top', 'text_wrap': True}
+            if bold or section:
+                properties['bold'] = True
+            if fill:
+                properties['bg_color'] = fill
+            if section:
+                properties['font_size'] = 12
+            if number_format:
+                properties['num_format'] = number_format
+            self._formats[key] = self._workbook.add_format(properties)
+        return self._formats[key]
 
     def _write_row(self, worksheet, row_index, values, *, bold=False, fill=None):
-        for column_index, value in enumerate(values, start=1):
-            cell = worksheet.cell(row=row_index, column=column_index)
-            self._set_text_cell(cell, self._sanitize_value(value))
-            cell.alignment = self.wrap_alignment
-            if bold:
-                cell.font = self.header_font
-            if fill is not None:
-                cell.fill = fill
+        lengths = self._column_lengths.setdefault(worksheet, {})
+        for column_index, value in enumerate(values):
+            value = self._sanitize_value(value)
+            cell_format = self._get_cell_format(bold=bold, fill=fill, value=value)
+            lengths[column_index] = max(lengths.get(column_index, 0), len(str(value)))
+            if isinstance(value, str):
+                worksheet.write_string(row_index - 1, column_index, value, cell_format)
+            elif isinstance(value, (datetime, date, time)):
+                worksheet.write_datetime(row_index - 1, column_index, value, cell_format)
+            else:
+                worksheet.write(row_index - 1, column_index, value, cell_format)
         return row_index + 1
 
     def _write_section_title(self, worksheet, row_index, title, width):
         width = max(width, 2)
-        worksheet.merge_cells(start_row=row_index, start_column=1, end_row=row_index, end_column=width)
-        cell = worksheet.cell(row=row_index, column=1)
-        self._set_text_cell(cell, str(title))
-        cell.font = self.section_font
-        cell.fill = self.section_fill
-        cell.alignment = self.wrap_alignment
+        cell_format = self._get_cell_format(fill=self.section_fill, section=True)
+        worksheet.merge_range(row_index - 1, 0, row_index - 1, width - 1, '', cell_format)
+        title = self._sanitize_value(str(title))
+        worksheet.write_string(row_index - 1, 0, title, cell_format)
+        lengths = self._column_lengths.setdefault(worksheet, {})
+        lengths[0] = max(lengths.get(0, 0), len(title))
+        for column in range(1, width):
+            lengths.setdefault(column, 0)
         return row_index + 1
 
     def _auto_fit(self, worksheet):
-        for cells in worksheet.columns:
-            max_length = 0
-            column_letter = get_column_letter(cells[0].column)
-            for cell in cells:
-                value = cell.value
-                if value is None:
-                    continue
-                max_length = max(max_length, len(str(value)))
-            width = max(self.min_column_width, min(max_length + 2, self.max_column_width))
-            worksheet.column_dimensions[column_letter].width = width
+        for column, length in self._column_lengths.get(worksheet, {}).items():
+            width = max(self.min_column_width, min(length + 2, self.max_column_width))
+            # openpyxl stored this width directly. XlsxWriter adds Excel's
+            # five-pixel padding to character widths; use pixels to preserve
+            # the existing serialized widths for the default Calibri font.
+            worksheet.set_column_pixels(column, column, width * 7)
 
     def _format_query_params(self):
         params = LogMixin._clean_params(self.request.query_params)
@@ -147,8 +234,20 @@ class BaseListReportExporter:
         return f'{self.get_report_basename()}_{suffix}.{self.format}'
 
     def get_response(self):
-        workbook = self.build_workbook()
-        content = save_virtual_workbook(workbook)
+        try:
+            workbook = self.build_workbook()
+            workbook.close()
+            content = self._workbook_buffer.getvalue()
+        finally:
+            self.records.close()
+            workbook = getattr(self, '_workbook', None)
+            try:
+                if workbook is not None and not workbook.fileclosed:
+                    workbook.close()
+            finally:
+                buffer = getattr(self, '_workbook_buffer', None)
+                if buffer is not None:
+                    buffer.close()
         response = HttpResponse(
             content,
             content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -157,7 +256,8 @@ class BaseListReportExporter:
         return response
 
     def record_logs(self):
-        LogMixin().record_logs(self.request, self.view, self.serialized_rows)
+        rows = ReportAuditRows(self._exported_count, self._activity_ids)
+        LogMixin().record_logs(self.request, self.view, rows)
 
     def get_data_sheet_headers(self):
         fields = self.render_helper.get_rendered_fields()
@@ -166,14 +266,24 @@ class BaseListReportExporter:
 
     def get_data_sheet_rows(self):
         fields, headers = self.get_data_sheet_headers()
-        rows = []
-        for row in self.serialized_rows:
-            current = []
-            for field in fields:
-                field._row = row
-                current.append(self.render_helper.render_value(field, row.get(field.field_name)))
-            rows.append(current)
-        return headers, rows
+
+        def rows():
+            self._exported_count = 0
+            self._activity_ids = []
+            needs_activity_ids = hasattr(self.view, 'get_activity_detail_msg')
+            for batch in self.records.iter_batches():
+                serializer = self.view.get_serializer(batch, many=True)
+                for row in self.render_helper.process_data(serializer.data):
+                    current = []
+                    for field in fields:
+                        field._row = row
+                        current.append(self.render_helper.render_value(field, row.get(field.field_name)))
+                    self._exported_count += 1
+                    if needs_activity_ids and 'id' in row:
+                        self._activity_ids.append(row['id'])
+                    yield current
+
+        return headers, rows()
 
     def get_summary_metadata(self):
         return OrderedDict([
@@ -187,12 +297,16 @@ class BaseListReportExporter:
         return []
 
     def build_workbook(self):
-        workbook = Workbook()
-        summary_sheet = workbook.active
-        summary_sheet.title = str(self.summary_sheet_name)
+        from xlsxwriter import Workbook
+
+        self._workbook_buffer = BytesIO()
+        workbook = self._workbook = Workbook(self._workbook_buffer, {'constant_memory': True})
+        self._formats = {}
+        self._column_lengths = {}
+        summary_sheet = workbook.add_worksheet(str(self.summary_sheet_name))
         self.build_summary_sheet(summary_sheet)
 
-        data_sheet = workbook.create_sheet(title=str(self.data_sheet_name))
+        data_sheet = workbook.add_worksheet(str(self.data_sheet_name))
         self.build_data_sheet(data_sheet)
         return workbook
 
@@ -201,7 +315,7 @@ class BaseListReportExporter:
         next_row = self._write_row(worksheet, 1, headers, bold=True, fill=self.header_fill)
         for row in rows:
             next_row = self._write_row(worksheet, next_row, row)
-        worksheet.freeze_panes = 'A2'
+        worksheet.freeze_panes(1, 0)
         self._auto_fit(worksheet)
 
     def build_summary_sheet(self, worksheet):
@@ -251,10 +365,11 @@ class BaseListReportExporter:
 
     @staticmethod
     def build_counter_rows(counter, *, top_n=None):
-        items = list(counter.items())
-        items.sort(key=lambda item: (-item[1], str(item[0])))
+        sort_key = lambda item: (-item[1], str(item[0]))
         if top_n is not None:
-            items = items[:top_n]
+            items = nsmallest(top_n, counter.items(), key=sort_key)
+        else:
+            items = sorted(counter.items(), key=sort_key)
         return [[key, value] for key, value in items]
 
     @staticmethod

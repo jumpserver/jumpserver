@@ -1,12 +1,33 @@
 import uuid
 
+from celery import shared_task
+from django.utils.translation import gettext_lazy as _
+
 from assets.tasks.common import generate_automation_execution_data
 from common.const.choices import Trigger
+from orgs.utils import tmp_to_org
+
+
+@shared_task(
+    queue='ansible', soft_time_limit=600, time_limit=660,
+    verbose_name=_('Credential rotation precheck'),
+)
+def execute_credential_precheck(execution_id, org_id):
+    from accounts.credential_rotation.preflight import run
+    with tmp_to_org(org_id):
+        run(execution_id)
 
 
 def quickstart_automation_by_snapshot(task_name, tp, task_snapshot=None):
-    from accounts.models import AutomationExecution
+    from accounts.const import AutomationTypes
+    from accounts.models import Account, AutomationExecution
+    from accounts.models.automations.verify_account import get_target_account_details
+
     data = generate_automation_execution_data(task_name, tp, task_snapshot)
+    snapshot = data['snapshot']
+    if tp == AutomationTypes.verify_account and snapshot.get('accounts'):
+        accounts = Account.objects.filter(id__in=snapshot['accounts'])
+        snapshot['target_account_details'] = get_target_account_details(accounts)
 
     pk = data['id']
     if AutomationExecution.objects.filter(id=pk).exists():
@@ -17,3 +38,48 @@ def quickstart_automation_by_snapshot(task_name, tp, task_snapshot=None):
     )
     execution.start()
     return execution
+
+
+@shared_task(queue='ansible', verbose_name=_('Execute credential rotation secret change'))
+def execute_credential_change(execution_id, org_id):
+    from accounts.models import AutomationExecution, Account, ChangeSecretRecord
+    from accounts.credential_rotation.execution import locked_rotation, reconcile
+    from django.db import transaction
+    from django.utils import timezone
+    from celery import current_task
+    from common.const import Status
+    with tmp_to_org(org_id):
+        with transaction.atomic():
+            initial = AutomationExecution.objects.get(id=execution_id)
+            credential, rotation = locked_rotation(initial.snapshot['credential_rotation_id'])
+            execution = AutomationExecution.objects.select_for_update().get(id=execution_id)
+            if execution.status != Status.pending:
+                return
+            if rotation.change_execution_id != execution.id or credential.change_execution_id != execution.id:
+                return
+            account = Account.objects.get(id=rotation.change_account_id)
+            if account.version != execution.snapshot['expected_account_version']:
+                execution.status = Status.failed
+                execution.date_finished = timezone.now()
+                execution.save(update_fields=['status', 'date_finished'])
+                transaction.on_commit(lambda: reconcile(execution_id))
+                return
+            execution.status = Status.running
+            execution.date_start = timezone.now()
+            execution.snapshot.update(
+                celery_task_id=str(execution.id),
+                celery_worker_hostname=current_task.request.hostname,
+            )
+            execution.save(update_fields=['status', 'date_start', 'snapshot'])
+        try:
+            execution.start()
+        finally:
+            execution.refresh_from_db()
+            if not execution.is_finished:
+                from accounts.automations.recovery import finalize_interrupted_execution
+                finalize_interrupted_execution(execution.id, 'Rotation execution interrupted.')
+            if not ChangeSecretRecord.objects.filter(execution_id=execution.id).exists():
+                execution.refresh_from_db()
+                execution.summary['rotation_no_remote_change'] = True
+                execution.save(update_fields=['summary'])
+            reconcile(execution_id)

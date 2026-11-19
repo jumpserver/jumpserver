@@ -15,6 +15,7 @@ from accounts.personal_credentials import (
     record_personal_credential_audit,
     validate_personal_credential_secret_type,
     validate_personal_credential_test_acl,
+    validate_personal_credential_username,
     validate_personal_credential_verification_protocol,
 )
 from accounts.serializers import PersonalAssetCredentialSerializer
@@ -97,6 +98,7 @@ class PersonalAssetCredentialViewSet(OrgBulkModelViewSet):
                 request.user, credential.asset, credential.protocol
             )
         )
+        validate_personal_credential_username(permission_account, credential.username)
         validate_personal_credential_secret_type(
             platform_protocol, credential.secret_type
         )

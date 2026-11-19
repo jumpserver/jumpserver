@@ -78,8 +78,7 @@ class HuaweiSMS(BaseSMSClient):
             logger.info(f'Huawei sms send: '
                         f'phone_numbers={phone_numbers} '
                         f'sign_name={sign_name} '
-                        f'template_code={template_code} '
-                        f'template_param={template_param}')
+                        f'template_code={template_code}')
 
             resp_msg = self.client.send_sms(**req_params)
 

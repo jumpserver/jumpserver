@@ -19,6 +19,7 @@ from assets.const import HostTypes
 from common.const import Status
 from common.db.utils import safe_atomic_db_connection
 from common.utils import get_logger
+from ops.ansible.exception import AnsibleDockerImageNotFound
 from ops.ansible.utils import escape_jinja2_syntax, neutralize_jinja2_syntax
 
 logger = get_logger(__name__)
@@ -177,6 +178,16 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
                 failed += 1
         return success, failed, unverified
 
+    def on_runner_failed(self, runner, error, **kwargs):
+        not_started = isinstance(error, AnsibleDockerImageNotFound)
+        self._remote_change_not_started = not_started
+        if not_started and (self.execution.snapshot or {}).get('credential_rotation_id'):
+            self.summary['rotation_no_remote_change'] = True
+        try:
+            return super().on_runner_failed(runner, error, **kwargs)
+        finally:
+            self._remote_change_not_started = False
+
     def get_host_success_log(self, host):
         return None, None
 
@@ -292,7 +303,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
             new_secret = self.generate_public_key(new_secret)
         return new_secret, private_key_path
 
-    def gen_inventory(self, h, account, new_secret, private_key_path, asset):
+    def gen_inventory(self, h, account, new_secret, private_key_path, asset, path_dir):
         secret_type = account.secret_type
         h['ssh_params'].update(self.get_ssh_params(new_secret, secret_type))
         h['account'] = {
@@ -302,7 +313,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
             'secret_type': secret_type,
             'secret': escape_jinja2_syntax(new_secret),
             'private_key_path': private_key_path,
-            'become': account.get_ansible_become_auth(),
+            'become': account.get_ansible_become_auth(path_dir=path_dir),
         }
         if asset.platform.type == 'oracle':
             use_sysdba = (
@@ -343,6 +354,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         error_msg = _("No pending accounts found")
         if not accounts:
             self.result['skipped_assets'].append({
+                **self.get_asset_result_metadata(asset),
                 'asset': str(asset),
                 'reason': str(error_msg),
             })
@@ -427,6 +439,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
             ))
             self.summary['fail_accounts'] += 1
             self.result['fail_accounts'].append({
+                **self.get_asset_result_metadata(account.asset if account else None),
                 'asset': str(account.asset) if account else '',
                 'username': account_label,
                 'account_id': account_id,
@@ -447,7 +460,24 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         )
         return max(total_timeout + 600, 3600) if total_timeout else 86400
 
+    @transaction.atomic
     def acquire_account_lock(self, account_id):
+        from accounts.models import ApplicationCredential
+        from django.db.models import Q
+        credentials = ApplicationCredential.objects.select_for_update(of=('self',)).filter(
+            Q(account_id=account_id) | Q(alternate_account_id=account_id),
+            mode=ApplicationCredential.Mode.alternating_rotation,
+        ).order_by('key')
+        for credential in credentials:
+            if credential.status == credential.Status.idle:
+                continue
+            rotation = credential.rotation_records.first()
+            change_account_id = rotation.change_account_id if rotation else None
+            if (change_account_id != account_id
+                    and str(change_account_id) != str(account_id)) or (
+                credential.change_execution_id != self.execution.id
+            ):
+                raise ValueError(_('This account belongs to an active credential policy rotation.'))
         account_id = str(account_id)
         if account_id in self.account_locks:
             return True
@@ -546,6 +576,9 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
             date_finished=record.date_finished,
         )
 
+    def should_update_account_on_success(self, result):
+        return True
+
     def on_host_success(self, host, result):
         record = self.name_record_mapper.get(host)
         if not record:
@@ -572,6 +605,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
             )
             self.summary[result_key] += 1
             self.result[result_key].append({
+                **self.get_asset_result_metadata(record.asset),
                 "asset": str(record.asset),
                 "username": record.comment or '',
             })
@@ -617,6 +651,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
             else 'ok_accounts'
         )
         result_item = {
+            **self.get_asset_result_metadata(account.asset),
             "asset": str(account.asset),
             "username": account.username,
         }
@@ -627,7 +662,8 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         with safe_atomic_db_connection():
             try:
                 with transaction.atomic():
-                    account.save(update_fields=update_fields)
+                    if self.should_update_account_on_success(result):
+                        account.save(update_fields=update_fields)
                     self.save_record(record)
             except Exception as error:
                 logger.exception(
@@ -673,6 +709,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         self.summary[result_key] += 1
         self.result[result_key].append(
             {
+                **self.get_asset_result_metadata(record.asset),
                 "asset": str(record.asset),
                 "username": account.username if account else '',
             }
@@ -710,6 +747,8 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         record = self.name_record_mapper.get(host)
         if not record:
             return super().on_host_incomplete(host, error)
+        if getattr(self, '_remote_change_not_started', False):
+            return self.on_host_error(host, error, {})
         self.finalize_incomplete_record(record, error)
 
     def on_inventory_host_error(self, host, error):
@@ -719,6 +758,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         if account:
             self.summary['fail_accounts'] += 1
             self.result['fail_accounts'].append({
+                **self.get_asset_result_metadata(account.asset),
                 'asset': str(account.asset),
                 'username': account.username,
                 'error': str(error),
@@ -764,6 +804,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
             self.summary[result_key] += 1
             self.result[result_key].append(
                 {
+                    **self.get_asset_result_metadata(record.asset),
                     "asset": str(record.asset),
                     "username": (
                         record.account.username if record.account else ''
@@ -817,6 +858,12 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         record = self.name_record_mapper.get(host)
         if not record:
             return
+        if (self.execution.snapshot or {}).get('credential_rotation_id'):
+            task = str(error or '').splitlines()[0].split(': ', 1)[0].strip().lower()
+            if any(keyword in task for keyword in (
+                    'check if ', 'whether the user exists', 'passwd lookup',
+            )):
+                self.summary['rotation_no_remote_change'] = True
         record.status = ChangeSecretRecordStatusChoice.failed.value
         record.date_finished = timezone.now()
         record.error = error
@@ -824,6 +871,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         if not account:
             self.summary['fail_accounts'] += 1
             self.result['fail_accounts'].append({
+                **self.get_asset_result_metadata(record.asset),
                 "asset": str(record.asset),
                 "username": record.comment or '',
                 "error": str(error),
@@ -849,6 +897,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         self.summary['fail_accounts'] += 1
         self.result['fail_accounts'].append(
             {
+                **self.get_asset_result_metadata(record.asset),
                 "asset": str(record.asset),
                 "username": record.account.username,
                 "error": str(error),

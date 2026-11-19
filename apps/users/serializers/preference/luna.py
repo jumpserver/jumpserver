@@ -5,7 +5,7 @@ from rest_framework import serializers
 
 from users.const import (
     RDPResolution, RDPSmartSize, KeyboardLayout, ConnectDefaultOpenMethod, Themes,
-    RDPClientOption, AppletConnectionMethod, RDPColorQuality, FileNameConflictResolution
+    RDPClientOption, RDPKeyboardHook, AppletConnectionMethod, RDPColorQuality, FileNameConflictResolution
 )
 
 
@@ -47,6 +47,13 @@ class GraphicsSerializer(serializers.Serializer):
     rdp_client_option = MultipleChoiceField(
         choices=RDPClientOption.choices, default={RDPClientOption.FULL_SCREEN},
         label=_('RDP client option'), required=False
+    )
+    printers_redirect = serializers.BooleanField(
+        required=False, default=False, label=_('Printer redirection')
+    )
+    rdp_keyboard_hook = serializers.ChoiceField(
+        choices=RDPKeyboardHook.choices, default=RDPKeyboardHook.FULL_SCREEN,
+        required=False, label=_('Apply Windows key combinations')
     )
     rdp_color_quality = serializers.ChoiceField(
         choices=RDPColorQuality.choices, default=RDPColorQuality.HIGH,

@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 #
 from importlib import import_module
+from datetime import datetime, timedelta, timezone as datetime_timezone
 
 from django.conf import settings
-from django.db.models import F, Value, CharField, Q
-from django.db.models.functions import Cast
-from django.http import HttpResponse, FileResponse
+from django.db.models import F, Value, CharField, Q, BooleanField, Case, DateTimeField, Exists, OuterRef, When
+from django.db.models.functions import Cast, Coalesce
+from django.http import HttpResponse, FileResponse, Http404, JsonResponse
+from django.utils import timezone
+from django.utils.translation import gettext
 from django.utils.encoding import escape_uri_path
 from django_celery_beat.models import PeriodicTask
 from rest_framework import generics
@@ -14,6 +17,8 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
+from jumpserver.rewriting.pagination import MaxLimitOffsetPagination
 
 from common.api import CommonApiMixin, ReportExportMixin
 from common.const.http import GET, POST
@@ -32,6 +37,7 @@ from orgs.utils import current_org, tmp_to_root_org
 from rbac.permissions import RBACPermission
 from terminal.models import default_storage
 from tickets.filters import TicketFilter
+from tickets.reporting import TicketReportExporter
 from tickets.serializers.ticket import TicketSerializer
 from users.models import User
 from .backends import TYPE_ENGINE_MAPPING
@@ -39,8 +45,8 @@ from .const import ActivityChoices, ActionChoices
 from .filters import (
     FTPLogFilterSet, JobLogFilterSet, OperateLogFilterSet,
     JobsAuditFilterSet,
-    PasswordChangeLogFilterSet, ServiceAccessLogFilterSet,
-    UserLoginLogFilterSet, UserSessionFilterSet,
+    PasswordChangeLogFilterSet,
+    UserLoginLogFilterSet, UserSessionFilterSet, ClientUserSessionFilterSet,
 )
 from .models import (
     FTPLog, UserLoginLog, OperateLog, PasswordChangeLog,
@@ -56,11 +62,37 @@ from .serializers import (
     OperateLogSerializer, OperateLogActionDetailSerializer,
     PasswordChangeLogSerializer, ActivityUnionLogSerializer,
     FileSerializer, UserSessionSerializer, JobsAuditSerializer,
-    ServiceAccessLogSerializer, OperateLogFullSerializer
+    OperateLogFullSerializer, ServiceAccessLogSerializer
 )
 from .utils import construct_userlogin_usernames, record_operate_log_and_activity_log
 
 logger = get_logger(__name__)
+
+
+class ServiceAccessLogViewSet(OrgReadonlyModelViewSet):
+    model = IntegrationApplicationLog
+    serializer_class = ServiceAccessLogSerializer
+    extra_filter_backends = [DatetimeRangeFilterBackend]
+    date_range_filter_fields = [('datetime', ('date_from', 'date_to'))]
+    filterset_fields = [
+        'id', 'service', 'service_id', 'asset', 'asset_id', 'account', 'account_id',
+        'remote_addr', 'instance_id', 'source', 'result', 'credential_id',
+        'credential_key', 'revision', 'summary',
+    ]
+    search_fields = ['id', 'service', 'service_id', 'asset', 'account', 'instance_id',
+                     'remote_addr', 'credential_key', 'summary']
+    ordering_fields = ['datetime']
+    ordering = ['-datetime', '-id']
+
+    def get_queryset(self):
+        from accounts.models import IntegrationApplication
+        queryset = super().get_queryset()
+        if not current_org.is_root():
+            application_ids = IntegrationApplication.objects.filter(org_id=str(current_org.id)).values('id')
+            queryset = queryset.filter(
+                Q(org_id=str(current_org.id)) | Q(org_id='', service_id__in=application_ids)
+            )
+        return queryset
 
 
 class JobLogAuditViewSet(ReportExportMixin, OrgReadonlyModelViewSet):
@@ -145,8 +177,11 @@ class FTPLogViewSet(ReportExportMixin, OrgModelViewSet):
         ftp_storage = self.get_storage()
         local_path, url = ftp_storage.get_file_path_url()
         if local_path is None:
-            # url => error message
-            return HttpResponse(url)
+            logger.warning('FTP file unavailable for log %s: %s', ftp_log.id, url)
+            return JsonResponse({
+                'detail': gettext('File not found'),
+                'code': 'file_not_found',
+            }, status=status.HTTP_404_NOT_FOUND)
 
         file = open(default_storage.path(local_path), 'rb')
         response = FileResponse(file)
@@ -335,8 +370,9 @@ class PasswordChangeLogViewSet(ReportExportMixin, OrgReadonlyModelViewSet):
         return self.model.filter_queryset_by_org(queryset)
 
 
-class TicketAuditViewSet(OrgReadonlyModelViewSet):
+class TicketAuditViewSet(ReportExportMixin, OrgReadonlyModelViewSet):
     model = TicketAudit
+    report_exporter_class = TicketReportExporter
     serializer_class = TicketSerializer
     filterset_class = TicketFilter
     extra_filter_backends = [DatetimeRangeFilterBackend]
@@ -358,9 +394,23 @@ class TicketAuditViewSet(OrgReadonlyModelViewSet):
         return queryset
 
 
+class UserDevicePagination(MaxLimitOffsetPagination):
+    def get_count(self, queryset):
+        # Preserve both projections when counting the SQL union.
+        return queryset.count()
+
+
 class UserSessionViewSet(CommonApiMixin, viewsets.ModelViewSet):
     http_method_names = ('get', 'post', 'head', 'options', 'trace')
     serializer_class = UserSessionSerializer
+    pagination_class = UserDevicePagination
+    page_no_limit = True  # Apply the unpaged cap after merging both sources.
+    ordering_fields = ('id', 'date_created', 'ip', 'type', 'backend', 'is_active')
+    device_fields = (
+        'id', 'user_id', 'ip', 'city', 'user_agent', 'type', 'backend',
+        'date_created', 'is_active', 'date_expired', 'is_locked', 'key',
+        'policy_expires_at',
+    )
     filterset_class = UserSessionFilterSet
     search_fields = [
         'id', 'user__name', 'user__username', 'ip', 'city',
@@ -384,30 +434,144 @@ class UserSessionViewSet(CommonApiMixin, viewsets.ModelViewSet):
         queryset = queryset.filter(user_id__in=user_ids)
         return queryset
 
+    def get_client_queryset(self):
+        from authentication.models import ClientLoginSession
+        from authentication.services.client_login_session import client_applications
+        from oauth2_provider.models import get_refresh_token_model
+
+        now = timezone.now()
+        live_refresh = get_refresh_token_model().objects.filter(
+            application_id=OuterRef('application_id'), token_family=OuterRef('token_family'),
+            revoked__isnull=True, access_token__isnull=False,
+        )
+        queryset = ClientLoginSession.objects.filter(
+            application__in=client_applications(), revoked_at__isnull=True,
+        ).annotate(
+            date_created=F('authenticated_at'), date_expired=Coalesce('policy_expires_at', 'expires_at'),
+            has_live_refresh=Exists(live_refresh),
+            # Existing token last-used writes are batched for up to a minute.
+            # Three minutes covers that delay and the client's one-minute sync.
+            is_active=Exists(live_refresh.filter(access_token__updated__gte=now - timedelta(minutes=3))),
+            city=Value('', CharField()), type=Value('C', CharField()),
+            backend=Value('OAuth2', CharField()), key=Value('', CharField()),
+        ).filter(has_live_refresh=True).filter(Q(date_expired__isnull=True) | Q(date_expired__gt=now))
+        if not current_org.is_root():
+            queryset = queryset.filter(user_id__in=self.org_user_ids)
+        return queryset
+
+    def device_rows(self, rows):
+        if not rows:
+            return rows
+        from authentication.services.client_login_session import client_login_policy
+        from authentication.services.idle_lock import (
+            IDLE_LOCK_CATEGORY, PERSONAL_SETTINGS, effective_idle_lock_time,
+            idle_lock_limits, personal_client_login_policy,
+        )
+        from common.sessions import policy_locked, policy_expiry, session_login_policies
+        from users.models import Preference
+        from .models import _get_city_display
+
+        users = User.objects.in_bulk({row['user_id'] for row in rows})
+        preferences = {user_id: {} for user_id in users}
+        for user_id, name, value in Preference.objects.filter(
+            user_id__in=users, category=IDLE_LOCK_CATEGORY, name__in=PERSONAL_SETTINGS,
+        ).values_list('user_id', 'name', 'value'):
+            preferences[user_id][name] = value
+        web_policies = session_login_policies([row['key'] for row in rows if row['type'] != 'C'])
+        web_idle_limit = idle_lock_limits(use_cache=True)['web_idle_lock_time']
+        client_policy = client_login_policy() if any(row['type'] == 'C' for row in rows) else None
+        for row in rows:
+            row['user'] = users[row['user_id']]
+            row['city_display'] = _get_city_display(row['ip'], row['city'])
+            row['backend_display'] = gettext(row['backend'])
+            personal = preferences[row['user_id']]
+            if row['type'] == 'C':
+                policy = personal_client_login_policy(row['user_id'], client_policy, preferences=personal)
+                grace = row['policy_expires_at']
+                row['session_policy'] = {
+                    'duration': policy['max_session_time'] * 60, 'renew': False,
+                    'reauth_on_exit': policy['reauth_on_exit'], 'idle_lock_time': policy['idle_lock_time'],
+                    'grace_expires_at': grace.isoformat() if grace else None,
+                }
+            else:
+                policy = web_policies.get(row['key'])
+                row['is_active'] = bool(policy)
+                row['is_locked'] = policy_locked(policy)
+                row['date_expired'] = (
+                    datetime.fromtimestamp(policy_expiry(policy),
+                                           tz=datetime_timezone.utc) if policy
+                    else None
+                )
+                row['session_policy'] = {
+                    'duration': policy['duration'], 'renew': policy['renew'],
+                    'reauth_on_exit': policy['browser_close'],
+                    'idle_lock_time': effective_idle_lock_time(
+                        web_idle_limit, int(personal['web_idle_lock_time']) if 'web_idle_lock_time' in personal else None,
+                    ), 'grace_expires_at': None,
+                } if policy else None
+        return rows
+
+    def list(self, request, *args, **kwargs):
+        active_keys = user_session_manager.get_active_keys()
+        web = self.filter_queryset(self.get_queryset().annotate(
+            is_active=Case(When(key__in=active_keys, then=True), default=False, output_field=BooleanField()),
+            # Keep the union projection aligned; Web lock state comes from Session below.
+            is_locked=Value(False, BooleanField()),
+            date_expired=Value(None, DateTimeField()),
+            policy_expires_at=Value(None, DateTimeField()),
+        ))
+        original_filterset = self.filterset_class
+        self.filterset_class = ClientUserSessionFilterSet
+        try:
+            client = self.filter_queryset(self.get_client_queryset())
+        finally:
+            self.filterset_class = original_filterset
+        ordering = web.query.order_by or ('-date_created',)
+        queryset = web.order_by().values(*self.device_fields).union(
+            client.order_by().values(*self.device_fields), all=True,
+        ).order_by(*ordering, 'id')
+        # Union rows must not be reloaded as Web-only UserSession objects.
+        queryset.custom = True
+        page = self.paginate_queryset(queryset)
+        if page is None and settings.DEFAULT_PAGE_SIZE:
+            queryset = queryset[:settings.DEFAULT_PAGE_SIZE]
+        rows = self.device_rows(list(page if page is not None else queryset))
+        data = self.get_serializer(rows, many=True).data
+        return self.get_paginated_response(data) if page is not None else Response(data)
+
+    def retrieve(self, request, *args, **kwargs):
+        pk = kwargs.get(self.lookup_field)
+        if not is_uuid(pk):
+            raise Http404
+        instance = self.get_queryset().filter(pk=pk).first()
+        if instance is not None:
+            self.check_object_permissions(request, instance)
+            row = {field: getattr(instance, field, None) for field in self.device_fields}
+            return Response(self.get_serializer(self.device_rows([row])[0]).data)
+        row = self.get_client_queryset().filter(pk=pk).values(*self.device_fields).first()
+        if row is None:
+            raise Http404
+        self.check_object_permissions(request, row)
+        return Response(self.get_serializer(self.device_rows([row])[0]).data)
+
     @action(['POST'], detail=False, url_path='offline')
     def offline(self, request, *args, **kwargs):
         ids = request.data.get('ids', [])
+        if not isinstance(ids, list) or not all(isinstance(pk, str) and is_uuid(pk) for pk in ids):
+            raise ValidationError({'ids': 'Expected a list of session UUIDs.'})
         queryset = self.get_queryset()
         session_key = request.session.session_key
         queryset = queryset.exclude(key=session_key).filter(id__in=ids)
-        if not queryset.exists():
-            return Response(status=status.HTTP_200_OK)
-
         keys = queryset.values_list('key', flat=True)
         for key in keys:
             user_session_manager.remove(key)
         queryset.delete()
+
+        from authentication.services.client_login_session import revoke_session
+        clients = self.get_client_queryset().filter(pk__in=ids)
+        current_client = getattr(request, 'client_login_session', None)
+        if current_client is not None:
+            clients = clients.exclude(pk=current_client.pk)
+        for client in clients:
+            revoke_session(client, 'security_revoke')
         return Response(status=status.HTTP_200_OK)
-
-
-class ServiceAccessLogViewSet(OrgReadonlyModelViewSet):
-    model = IntegrationApplicationLog
-    serializer_class = ServiceAccessLogSerializer
-    filterset_class = ServiceAccessLogFilterSet
-    extra_filter_backends = [DatetimeRangeFilterBackend]
-    date_range_filter_fields = [
-        ('datetime', ('date_from', 'date_to'))
-    ]
-    search_fields = ('service', 'asset', 'account', 'remote_addr')
-    ordering_fields = ('datetime',)
-    ordering = ['-datetime']

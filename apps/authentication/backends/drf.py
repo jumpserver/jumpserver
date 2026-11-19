@@ -10,8 +10,9 @@ from rest_framework import authentication, exceptions
 from oauth2_provider.contrib.rest_framework import OAuth2Authentication as BaseOAuth2Authentication
 from oauth2_provider.models import get_access_token_model
 
-from accounts.models import IntegrationApplication
+from accounts.models import CredentialClientInstance, IntegrationApplication
 from common.auth import signature
+from common.auth.cache import BEARER_TOKEN_KEY, valid_token_format, valid_uuid
 from common.decorators import merge_delay_run
 from common.utils import get_object_or_none, get_request_ip_or_data, contains_ip, get_request_ip
 from users.models import User
@@ -84,13 +85,21 @@ class AccessTokenAuthentication(authentication.BaseAuthentication):
 
     @staticmethod
     def authenticate_credentials(token):
-        model = get_user_model()
-        user_id = cache.get(token)
-        if not user_id:
+        # Other Bearer backends (including OAuth2) must still get a chance.
+        if not valid_token_format(token, 36):
             return None, None
+        cache_key = BEARER_TOKEN_KEY.format(token=token)
+        missing = object()
+        user_id = cache.get(cache_key, missing)
+        if user_id is missing:
+            return None, None
+        if not valid_uuid(user_id):
+            cache.delete(cache_key)
+            raise exceptions.AuthenticationFailed(_('Invalid token.'))
+        model = get_user_model()
         user = get_object_or_none(model, id=user_id)
         if user is None or not user.is_valid:
-            cache.delete(token)
+            cache.delete(cache_key)
             raise exceptions.AuthenticationFailed(_('User is inactive or expired.'))
         return user, None
 
@@ -111,15 +120,48 @@ class PrivateTokenAuthentication(authentication.TokenAuthentication):
 
 
 class OAuth2Authentication(BaseOAuth2Authentication):
+    allow_locked_client_session = False
+
     def authenticate(self, request):
+        from authentication.services.client_login_session import (
+            ClientSessionExpired, ClientSessionLocked, expired_session_from_receipt, validate_access_token,
+        )
+
         user_token = super().authenticate(request)
+        if not user_token:
+            auth = authentication.get_authorization_header(request).split()
+            if len(auth) == 2 and auth[0].lower() == b'bearer':
+                session = expired_session_from_receipt(
+                    request.headers.get('X-JMS-Client-Login-Session'), auth[1].decode('utf-8', errors='replace'),
+                    'access_token',
+                )
+                if session:
+                    request._request.expired_client_login_session_id = session.pk
+                    raise ClientSessionExpired(session)
         if user_token:
             _, token = user_token
+            try:
+                request.client_login_session = validate_access_token(token)
+            except ClientSessionExpired as error:
+                request._request.expired_client_login_session_id = error.session_id
+                raise
+            session = request.client_login_session
+            # Identity-only bootstrap is needed to restore a locked account; asset/business APIs remain blocked.
+            bootstrap = (
+                request.headers.get('X-JMS-Check-Session-Lock') != '1' and request.method == 'GET'
+                and request.path_info in (
+                    '/api/v1/users/profile/', '/api/v1/users/profile/permissions/',
+                    '/api/v1/orgs/orgs/current/', '/api/v1/settings/public/',
+                )
+            )
+            if session and session.is_locked and not (self.allow_locked_client_session or bootstrap):
+                raise ClientSessionLocked(session)
             update_token_last_used.delay(tokens=(token,))
         return user_token
 
 
 class SessionAuthentication(authentication.SessionAuthentication):
+    allow_locked_web_session = False
     def authenticate(self, request):
         """
         Returns a `User` if the request session currently has a logged in user.
@@ -140,7 +182,20 @@ class SessionAuthentication(authentication.SessionAuthentication):
             except exceptions.AuthenticationFailed:
                 return None
 
-        # CSRF passed with authenticated user
+        # Components use strict profile checks; only UI identity bootstrap may bypass the lock.
+        bootstrap = (
+            request.headers.get('X-JMS-Check-Session-Lock') != '1' and request.method == 'GET'
+            and request.path_info in (
+                '/api/v1/users/profile/', '/api/v1/users/profile/permissions/',
+                '/api/v1/orgs/orgs/current/', '/api/v1/settings/public/',
+            )
+        )
+        if not self.allow_locked_web_session and not bootstrap:
+            from authentication.services.web_session_lock import WebSessionLocked
+            from common.sessions import policy_locked
+
+            if policy_locked(request.session.login_policy):
+                raise WebSessionLocked()
         return user, None
 
 
@@ -200,11 +255,32 @@ class ServiceAuthentication(signature.SignatureAuthentication):
             return None, None
         return obj, obj.secret
 
+    @staticmethod
+    def get_ip_group(obj):
+        return obj.ip_group
+
     def is_ip_allow(self, key_id, request):
         obj = self.get_object(key_id)
-        if not contains_ip(get_request_ip(request), obj.ip_group):
+        if not obj:
             return False
-        return True
+        return contains_ip(get_request_ip(request), self.get_ip_group(obj))
 
     def after_authenticate_update_date(self, user):
         update_service_integration_last_used.delay((user.id,))
+
+
+class CredentialAgentAuthentication(ServiceAuthentication):
+    source = 'jms-pam-agent'
+
+    def get_object(self, key_id):
+        return CredentialClientInstance.objects.filter(
+            id=key_id, type=CredentialClientInstance.Type.agent,
+            is_active=True, application__is_active=True,
+        ).select_related('application').first()
+
+    @staticmethod
+    def get_ip_group(obj):
+        return obj.application.ip_group
+
+    def after_authenticate_update_date(self, user):
+        update_service_integration_last_used.delay((user.application_id,))

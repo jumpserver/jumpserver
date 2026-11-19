@@ -1,12 +1,11 @@
 import os
 import time
-from collections import defaultdict, OrderedDict
+from collections import defaultdict
 
 from django.conf import settings
 from django.db.models import F
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
-from xlsxwriter import Workbook
 
 from accounts.const import AccountBackupType
 from accounts.models import BackupAccountAutomation, Account
@@ -29,12 +28,13 @@ class RecipientsNotFound(Exception):
 
 class BaseAccountHandler:
     @classmethod
-    def unpack_data(cls, serializer_data, data=None):
+    def unpack_data(cls, serializer_data, serializer, data=None):
         if data is None:
             data = {}
         for k, v in serializer_data.items():
-            if isinstance(v, OrderedDict):
-                cls.unpack_data(v, data)
+            field = serializer.fields.get(k)
+            if isinstance(field, serializers.Serializer) and isinstance(v, dict):
+                cls.unpack_data(v, field, data)
             else:
                 if isinstance(v, dict):
                     v = v.get('label')
@@ -65,18 +65,18 @@ class BaseAccountHandler:
         return header_fields
 
     @classmethod
-    def create_row(cls, data, header_fields):
-        data = cls.unpack_data(data)
+    def create_row(cls, data, header_fields, serializer):
+        data = cls.unpack_data(data, serializer)
         row_dict = {}
         for field, header_name in header_fields.items():
             row_dict[header_name] = str(data.get(field, field))
         return row_dict
 
     @classmethod
-    def add_rows(cls, data, header_fields, sheet):
+    def add_rows(cls, data, header_fields, sheet, serializer):
         data_map = defaultdict(list)
         for i in data:
-            row = cls.create_row(i, header_fields)
+            row = cls.create_row(i, header_fields, serializer)
             if sheet not in data_map:
                 data_map[sheet].append(list(row.keys()))
             data_map[sheet].append(list(row.values()))
@@ -107,31 +107,41 @@ class AssetAccountHandler(BaseAccountHandler):
             account_data['secret'] = secret
 
     @classmethod
-    def create_data_map(cls, accounts, section):
-        data_map = defaultdict(list)
-
-        if not accounts.exists():
-            return data_map
-
+    def iter_sheet_rows(cls, accounts, section, batch_size=500):
         type_dict = {}
         for i in AllTypes.grouped_choices_to_objs():
             for j in i['children']:
                 type_dict[j['value']] = j['display_name']
 
-        header_fields = cls.get_header_fields(AccountSecretSerializer(accounts.first()))
-        account_type_map = defaultdict(list)
-        for account in accounts:
-            account_type_map[account.type].append(account)
-
-        data_map = {}
-        for tp, _accounts in account_type_map.items():
-            sheet_name = type_dict.get(tp, tp)
-            data = AccountSecretSerializer(_accounts, many=True).data
+        header_fields = None
+        seen_sheets = set()
+        last_pk = None
+        exported_count = 0
+        # MySQL's normal cursor buffers the result, so iterator() alone does
+        # not bound memory. A stable keyset also avoids OFFSET shifts when an
+        # account is removed while a large backup is being generated.
+        accounts = accounts.order_by('pk')
+        while True:
+            batch_qs = accounts if last_pk is None else accounts.filter(pk__gt=last_pk)
+            batch = list(batch_qs[:batch_size])
+            if not batch:
+                break
+            last_pk = batch[-1].pk
+            exported_count += len(batch)
+            if header_fields is None:
+                serializer = AccountSecretSerializer(batch[0])
+                header_fields = cls.get_header_fields(serializer)
+            data = AccountSecretSerializer(batch, many=True).data
             cls.handler_secret(data, section)
-            data_map.update(cls.add_rows(data, header_fields, sheet_name))
+            for account, item in zip(batch, data):
+                sheet_name = str(type_dict.get(account.type, account.type))
+                row = cls.create_row(item, header_fields, serializer)
+                if sheet_name not in seen_sheets:
+                    seen_sheets.add(sheet_name)
+                    yield sheet_name, list(row.keys())
+                yield sheet_name, list(row.values())
         number_of_backup_accounts = _('Number of backup accounts')
-        print('\033[33m- {}: {}\033[0m'.format(number_of_backup_accounts, accounts.count()))
-        return data_map
+        print('\033[33m- {}: {}\033[0m'.format(number_of_backup_accounts, exported_count))
 
 
 class AccountBackupHandler:
@@ -150,6 +160,8 @@ class AccountBackupHandler:
         return qs
 
     def create_excel(self, section='complete'):
+        from xlsxwriter import Workbook
+
         hint = _('Generating asset related backup information files')
         print(
             f'\033[32m>>> {hint}\033[0m'
@@ -159,20 +171,25 @@ class AccountBackupHandler:
         time_start = time.time()
         files = []
         accounts = self.get_accounts()
-        self.manager.summary['total_accounts'] = accounts.count()
-        data_map = AssetAccountHandler.create_data_map(accounts, section)
-        if not data_map:
+        count = accounts.count()
+        self.manager.summary['total_accounts'] = count
+        if not count:
             return files
 
         filename = AssetAccountHandler.get_filename(self.name)
 
-        wb = Workbook(filename)
-        for sheet, data in data_map.items():
-            ws = wb.add_worksheet(str(sheet))
-            for row_index, row_data in enumerate(data):
+        with Workbook(filename, {'constant_memory': True}) as wb:
+            worksheets = {}
+            row_indices = defaultdict(int)
+            for sheet, row_data in AssetAccountHandler.iter_sheet_rows(accounts, section):
+                if sheet not in worksheets:
+                    worksheets[sheet] = wb.add_worksheet(sheet)
+                ws = worksheets[sheet]
+                row_index = row_indices[sheet]
                 for col_index, col_data in enumerate(row_data):
                     ws.write_string(row_index, col_index, col_data)
-        wb.close()
+                row_indices[sheet] += 1
+            self.manager.summary['total_accounts'] = sum(row_indices.values()) - len(worksheets)
         files.append(filename)
         timedelta = round((time.time() - time_start), 2)
         time_cost = _('Duration')

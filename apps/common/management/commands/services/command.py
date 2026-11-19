@@ -1,13 +1,9 @@
-import os
 import psutil
-import multiprocessing
-
 from django.core.management.base import BaseCommand
 from django.db.models import TextChoices
 
 from .hands import *
 from .utils import ServicesUtil
-
 
 SERVER_SIZE = os.environ.get('SERVER_SIZE', 'auto')
 if SERVER_SIZE == 'auto':
@@ -19,13 +15,13 @@ if SERVER_SIZE == 'auto':
     else:
         SERVER_SIZE = 'large'
 
+
 class Services(TextChoices):
     gunicorn = 'gunicorn', 'gunicorn'
     celery_ansible = 'celery_ansible', 'celery_ansible'
     celery_default = 'celery_default', 'celery_default'
     celery_combine = 'celery_combine', 'celery_combine'
     beat = 'beat', 'beat'
-    flower = 'flower', 'flower'
     ws = 'ws', 'ws'
     web = 'web', 'web'
     celery = 'celery', 'celery'
@@ -37,7 +33,6 @@ class Services(TextChoices):
         from . import services
         services_map = {
             cls.gunicorn.value: services.GunicornService,
-            cls.flower: services.FlowerService,
             cls.celery_default: services.CeleryDefaultService,
             cls.celery_ansible: services.CeleryAnsibleService,
             cls.celery_combine: services.CeleryCombineService,
@@ -47,10 +42,7 @@ class Services(TextChoices):
 
     @classmethod
     def web_services(cls):
-        if SERVER_SIZE == 'small' or os.environ.get('FLOWER_ENABLED', '1') == '0':
-            return [cls.gunicorn]
-        else:
-            return [cls.gunicorn, cls.flower]
+        return [cls.gunicorn]
 
     @classmethod
     def celery_services(cls):

@@ -1,16 +1,19 @@
 from django.conf import settings
+from django.utils import translation
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from accounts.const import ChangeSecretAccountStatus, SecretStrategy
+from accounts.const import AliasAccount, ChangeSecretAccountStatus, SecretStrategy
 from accounts.models import Account
 from accounts.tasks import change_secret_accounts_to_assets_task
 from accounts.utils import account_secret_task_status
 from acls.models import LoginAssetACL
 from assets.models import Asset
+from common.const.choices import Language
 from common.serializers.fields import LabeledChoiceField
 from common.utils import pretty_string, get_logger
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
+from orgs.utils import tmp_to_org
 from terminal.session_lifecycle import lifecycle_events_map
 from users.models import User
 from .terminal import TerminalSmallSerializer
@@ -27,6 +30,7 @@ __all__ = [
 
 
 class SessionSerializer(BulkOrgResourceModelSerializer):
+    token_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, write_only=True)
     org_id = serializers.CharField(allow_blank=True)
     protocol = serializers.CharField(max_length=128, label=_("Protocol"))
     type = LabeledChoiceField(
@@ -53,7 +57,7 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
         ]
         fields_fk = ["terminal", ]
         fields_custom = ["can_replay", "can_join", "can_terminate"]
-        fields = fields_small + fields_fk + fields_custom
+        fields = fields_small + fields_fk + fields_custom + ['token_id']
         extra_kwargs = {
             "duration": {'label': _('Duration')},
             "protocol": {'label': _('Protocol')},
@@ -83,6 +87,11 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
         max_length = self.Meta.model.asset.field.max_length
         value = pretty_string(value, max_length=max_length)
         return value
+
+    @staticmethod
+    def validate_token_id(value):
+        # Older components serialize their unset token ID as an empty string.
+        return serializers.UUIDField().run_validation(value) if value else None
 
     @staticmethod
     def get_valid_instance(model_cls, instance_id, field_name, error_message, validation_attr='is_active'):
@@ -122,7 +131,7 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
         acl = LoginAssetACL.get_match_rule_acls(user, instance.remote_addr, acls)
         if not acl:
             return
-        if not acl.is_action(acl.ActionChoices.change_secret):
+        if not acl.enabled('change_secret_enabled'):
             return
 
         manager = account_secret_task_status
@@ -141,7 +150,62 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
                 countdown=manager.delayed_task_countdown,
             )
 
+    @staticmethod
+    def get_connection_reason(token_id, validated_data, user, asset):
+        from authentication.models import ConnectionToken
+
+        with tmp_to_org(asset.org_id):
+            token = ConnectionToken.objects.filter(pk=token_id).first()
+            invalid = serializers.ValidationError({'token_id': _('Connection token does not match this session.')})
+            if not token or any((
+                    str(token.user_id) != str(user.pk),
+                    str(token.asset_id) != str(asset.pk),
+                    str(token.org_id) != str(validated_data.get('org_id')),
+                    validated_data.get('protocol') not in (
+                        (token.protocol, 'sftp') if token.protocol == 'ssh' else (token.protocol,)
+                    ),
+            )):
+                raise invalid
+            reason = (token.acl_context or {}).get('reason') or token.comment or ''
+            if not reason:
+                return ''
+            # A one-time token is normally expired before the component creates
+            # its session. Bind the audit reason without rechecking its expiry
+            # or releasing credentials a second time.
+            account = None
+            if token.account == AliasAccount.USER:
+                account = asset.all_valid_accounts.filter(username=user.username).first()
+            elif not token.account.startswith('@'):
+                account = token.get_asset_accounts_by_alias(asset, token.account)
+            if account:
+                if str(account.pk) != str(validated_data.get('account_id')):
+                    raise invalid
+            elif token.account in (AliasAccount.INPUT, AliasAccount.USER, AliasAccount.ANON):
+                # Virtual account IDs are freshly generated on credential reads.
+                # Match the exact display emitted to components instead.
+                username = {
+                    AliasAccount.INPUT: token.input_username,
+                    AliasAccount.USER: user.username,
+                    AliasAccount.ANON: AliasAccount.ANON.value,
+                }[token.account]
+                account = Account(name=AliasAccount(token.account).label, username=username)
+                account.alias = token.account
+                token.set_ad_domain_if_need(account)
+                displays = {f'{account.name}({account.full_username})'}
+                # Credential retrieval and session creation can use different
+                # request languages. Compare whole translated displays, never a
+                # suffix that could confuse usernames containing parentheses.
+                for language in Language.values:
+                    with translation.override(language):
+                        displays.add(f'{account.name}({account.full_username})')
+                if validated_data.get('account') not in displays:
+                    raise invalid
+            else:
+                raise invalid
+            return reason
+
     def create(self, validated_data):
+        token_id = validated_data.pop('token_id', None)
         user_id = validated_data.get('user_id')
         asset_id = validated_data.get('asset_id')
 
@@ -163,9 +227,19 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
         validated_data['user'] = str(user)
         # web 资产 url 太长，超出限制
         validated_data['asset'] = str(asset)[:128]
+        if token_id:
+            reason = self.get_connection_reason(token_id, validated_data, user, asset)
+            if reason:
+                comment = validated_data.get('comment') or ''
+                # Preserve component metadata (for example the selected applet),
+                # while the connection reason always comes from its own token.
+                validated_data['comment'] = reason if not comment or comment == reason else '{}\n\n{}: {}'.format(
+                    reason, _('Comment'), comment,
+                )
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
+        validated_data.pop('token_id', None)
         # Components initially mark a replay as unsupported until upload completes.
         if (
                 validated_data.get('has_replay') is True and

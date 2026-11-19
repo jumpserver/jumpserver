@@ -16,8 +16,10 @@ BOOTSTRAP_TOKEN:
 # LOG_LEVEL: DEBUG
 # LOG_DIR:
 
-# Session expiration setting, Default 1 hour, Also set expired on on browser close
-# 浏览器Session过期时间，默认 1 小时, 也可以设置浏览器关闭则过期
+# Web session lifetime; these settings can also be changed in System settings without restarting.
+# Web 会话有效时长；也可在系统设置中修改，无需重启。
+# When browser-close expiry is enabled, closing all console/Web terminal pages ends this login after 10 seconds.
+# 开启浏览器关闭时重新登录后，全部控制台和 Web 终端页面关闭约 10 秒后，会话失效。
 # SESSION_COOKIE_AGE: 3600
 # SESSION_EXPIRE_AT_BROWSER_CLOSE: false
 
@@ -69,6 +71,18 @@ WS_LISTEN_PORT: 8070
 #   - https://jumpserver.example.com
 #   - http://localhost:3000
 #   - http://localhost:9528
+
+# 复用系统设置中的 Ansible Docker 隔离开关：开启使用常驻 SSH 执行器，关闭本地执行。
+# SSH 部署说明：utils/ansible_executor/ssh-backend.md
+# 以下为标准部署默认值，自定义执行器或凭据挂载路径时再覆盖。
+# ANSIBLE_DOCKER_ENABLED: true
+# ANSIBLE_EXECUTOR_HOST: ansible-executor
+# ANSIBLE_EXECUTOR_PORT: 2222
+# ANSIBLE_EXECUTOR_PRIVATE_KEY: /run/jms-executor/client
+# ANSIBLE_EXECUTOR_KNOWN_HOSTS: /run/jms-executor/known_hosts
+# ANSIBLE_EXECUTOR_CONNECT_TIMEOUT: 10
+# 网域隧道：执行容器可访问的当前 Core/Celery 节点地址（使用网域时必填）。
+# ANSIBLE_EXECUTOR_GATEWAY_HOST: celery-ansible
 
 # Ansible 单批次超时（一次 ansible-runner 执行，单位：秒）
 # 当前资产自动化会按每 80 个资产分批；每批只启动一个 ansible-runner，
@@ -138,6 +152,11 @@ REDIS_PORT: 6379
 # REDIS_PASSWORD:
 # REDIS_DB_CELERY: 3
 # REDIS_DB_CACHE: 4
+# Redis 建连和缓存、会话的读写超时（秒，必须大于 0，可使用小数）。
+# 订阅和阻塞锁使用独立连接池，保留原有的长时间等待行为；不影响 Celery 配置。
+# 超时后不会自动重放命令，避免重复写入；后续调用会重新建立连接。
+# REDIS_SOCKET_TIMEOUT: 5
+# REDIS_SOCKET_CONNECT_TIMEOUT: 5
 
 # Windows/RDP 录像与 Video Worker（以下均为示例，按组件分别配置）
 # Core 自身只使用录像存储配置；终端组件的录像存储也可以在管理界面配置。
@@ -291,6 +310,10 @@ REDIS_PORT: 6379
 # OTP_VALID_WINDOW: 0
 # OTP_ISSUER_NAME: JumpServer
 
+# 是否始终要求登录验证码，默认 False，登录失败后才要求验证码
+# 仅在 SECURITY_LOGIN_CAPTCHA_ENABLED 开启且未启用登录页动态口令或 MFA 时生效
+# SECURITY_LOGIN_CAPTCHA_ALWAYS_REQUIRED: False
+
 # 启用定时任务
 # PERIOD_TASK_ENABLED: True
 #
@@ -298,17 +321,21 @@ REDIS_PORT: 6379
 # 是否开启 Luna 水印
 # SECURITY_WATERMARK_ENABLED: False
 
-# 浏览器关闭页面后，会话过期
-# SESSION_EXPIRE_AT_BROWSER_CLOSE: False
-
-# 每次 api 请求，session 续期
-# SESSION_SAVE_EVERY_REQUEST: True
+# 请求触发会话续期，同一个会话每分钟最多续期一次。关闭时，从登录成功开始固定计时。
+# 页面中的“系统设置 → 安全设置 → Web 端”可在线修改，新登录生效，无需重启。
+# SESSION_RENEW_ON_REQUEST: False
+# 兼容旧配置 SESSION_SAVE_EVERY_REQUEST，新配置优先。
 
 # 仅允许用户从来源处登录
 # ONLY_ALLOW_AUTH_FROM_SOURCE: False
 
 # 仅允许已存在的用户登录，不允许第三方认证后，自动创建用户
 # ONLY_ALLOW_EXIST_USER_AUTH: False
+
+# 应用授权账号数上限，默认 10；具体账号、全部账号和按属性选择均受此限制。
+# 旧授权在修改范围前保持可用；新授权的动态范围超限后会拒绝取密。
+# 修改后重启 Core，使配置生效。
+# APPLICATION_ACCOUNT_SCOPE_LIMIT: 10
 
 # 人脸识别默认关闭。下载模型后再显式设为 true：
 # uv run python requirements/download_face_models.py

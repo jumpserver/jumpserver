@@ -4,7 +4,9 @@ from django.http import HttpResponse, JsonResponse
 from django.views import View
 
 from authentication.serializers import SSHKeySerializer
+from authentication.services.web_session_lock import WebSessionLocked
 from common.permissions import IsValidUser
+from common.sessions import policy_locked
 from common.utils import get_logger, ssh_key_gen
 from common.views.mixins import PermissionsMixin
 from users.exceptions import CreateSSHKeyExceedLimit
@@ -19,6 +21,9 @@ class UserPublicKeyGenerateView(PermissionsMixin, View):
     permission_classes = [IsValidUser]
 
     def get(self, request, *args, **kwargs):
+        if policy_locked(request.session.login_policy):
+            error = WebSessionLocked()
+            return JsonResponse(error.detail, status=error.status_code)
         username = request.user.username
         serializer = SSHKeySerializer(data=request.GET, context={'request': request})
         if not serializer.is_valid():

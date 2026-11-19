@@ -42,6 +42,22 @@ __all__ = [
 ]
 
 
+def _validate_filter_values(field, values, param):
+    """Validate query values before ORM lookups can raise Django exceptions."""
+    cleaned_values = []
+    errors = {}
+    for index, value in enumerate(values):
+        try:
+            cleaned_values.append(field.to_python(value))
+        except DjangoValidationError as exc:
+            errors[index] = exc.messages
+        except (TypeError, ValueError):
+            errors[index] = [_('Invalid value.')]
+    if errors:
+        raise ValidationError({param: errors})
+    return cleaned_values
+
+
 class LookupFilterBackend(drf_filters.DjangoFilterBackend):
     """
     Preserve django-filter's default behavior while allowing explicit
@@ -165,7 +181,7 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
                     if value == "":
                         continue
                     queryset = self.apply_dynamic_value_lookup(
-                        queryset, view, field_name,
+                        queryset, view, field_name, param,
                         **{model_field_name: value}
                     )
                 if "__" in model_field_name:
@@ -177,17 +193,23 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
                 if not cleaned_values:
                     continue
                 queryset = self.apply_dynamic_value_lookup(
-                    queryset, view, field_name,
+                    queryset, view, field_name, param,
                     **{f"{model_field_name}__{lookup}": cleaned_values}
                 )
                 if "__" in model_field_name:
                     queryset = queryset.distinct()
         return queryset
 
-    @staticmethod
     def apply_dynamic_value_lookup(
-        queryset, view, field_name, negate=False, **kwargs
+        self, queryset, view, field_name, param, negate=False, **kwargs
     ):
+        model_field_name = self.get_filterset_model_field(view, field_name)
+        field = self.resolve_model_field(queryset.model, model_field_name, queryset)
+        for lookup, value in kwargs.items():
+            is_collection = lookup.endswith('__in')
+            values = value if is_collection else [value]
+            values = _validate_filter_values(field, values, param)
+            kwargs[lookup] = values if is_collection else values[0]
         filterset_class = getattr(view, "filterset_class", None)
         filter_field = (
             filterset_class.get_filters().get(field_name)
@@ -219,6 +241,9 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
 
             param = raw_param[:-1]
             field_name, lookup = self.split_lookup_param(param)
+            if raw_param == 'id!':
+                # The compatibility parameter accepts comma-separated IDs.
+                lookup = 'in'
             if lookup in self.negated_text_lookups:
                 if not self.is_allowed_filterset_field(view, field_name):
                     continue
@@ -259,7 +284,7 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
                     cleaned_values = self.split_csv_values(values)
                     if cleaned_values:
                         queryset = self.apply_dynamic_value_lookup(
-                            queryset, view, field_name, negate=True,
+                            queryset, view, field_name, raw_param, negate=True,
                             **{
                                 f"{model_field_name}__{lookup}":
                                 cleaned_values
@@ -270,7 +295,7 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
                         if value == "":
                             continue
                         queryset = self.apply_dynamic_value_lookup(
-                            queryset, view, field_name, negate=True,
+                            queryset, view, field_name, raw_param, negate=True,
                             **{model_field_name: value}
                         )
         return queryset
@@ -747,6 +772,7 @@ class IDInFilterBackend(filters.BaseFilterBackend):
             request.path,
         )
         id_list = [i.strip() for i in ids.split(",")]
+        id_list = _validate_filter_values(queryset.model._meta.get_field('id'), id_list, 'ids')
         queryset = queryset.filter(id__in=id_list)
         return queryset
 
@@ -778,6 +804,7 @@ class IDNotFilterBackend(filters.BaseFilterBackend):
             request.path,
         )
         id_list = [i.strip() for i in ids.split(",")]
+        id_list = _validate_filter_values(queryset.model._meta.get_field('id'), id_list, 'id!')
         queryset = queryset.exclude(id__in=id_list)
         return queryset
 
@@ -897,6 +924,7 @@ class LabelFilterBackend(filters.BaseFilterBackend):
 
 
 class CustomFilterBackend(filters.BaseFilterBackend):
+    """Describe parameters handled by the view, optionally scoped by ``methods``."""
 
     def get_schema_operation_parameters(self, view):
         fields = []
@@ -916,6 +944,11 @@ class CustomFilterBackend(filters.BaseFilterBackend):
             elif isinstance(field, dict):
                 parameter.update(field)
             else:
+                continue
+            methods = parameter.pop("methods", None)
+            if methods is not None and view.request.method.lower() not in {
+                method.lower() for method in methods
+            }:
                 continue
             parameter["in"] = parameter.pop(
                 "location", parameter.get("in", "query")
@@ -980,10 +1013,7 @@ class AttrRulesFilterBackend(filters.BaseFilterBackend):
         return queryset
 
     def filter_queryset_by_attr_rules(self, attr_rules, queryset):
-        qs = RelatedManager.get_to_filter_qs(attr_rules, queryset.model)
-        for q in qs:
-            queryset = queryset.filter(q)
-        return queryset.distinct()
+        return RelatedManager.filter_queryset(attr_rules, queryset)
     
     def filter_queryset_by_attr_rules_instance(self, attr_rules_instance, queryset):
         if not attr_rules_instance or not isinstance(attr_rules_instance, dict):

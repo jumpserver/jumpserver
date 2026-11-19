@@ -6,6 +6,8 @@ from django.db.models.functions import Cast
 from django.http.response import JsonResponse
 from django.utils import timezone
 from django.utils.timesince import timesince
+from django.utils.translation import gettext_lazy as _
+from rest_framework.exceptions import ValidationError
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
@@ -35,10 +37,10 @@ class DateTimeMixin:
 
     @lazyproperty
     def days(self):
-        query_params = self.request.query_params
-        count = query_params.get('days')
-        count = int(count) if count else 1
-        return count
+        try:
+            return int(self.request.query_params.get('days', 1))
+        except (TypeError, ValueError):
+            raise ValidationError({'days': [_('A valid integer is required.')]}) from None
 
     @property
     def days_to_datetime(self):
@@ -348,6 +350,7 @@ class IndexApi(DateTimeMixin, DatesLoginMetricMixin, APIView):
     }
 
     def get(self, request, *args, **kwargs):
+        _ = self.days  # Validate before running any statistics queries.
         data = {}
 
         query_params = self.request.query_params

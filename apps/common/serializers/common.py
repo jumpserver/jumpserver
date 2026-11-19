@@ -1,5 +1,6 @@
 import logging
 
+from django.db import transaction
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from drf_writable_nested.serializers import WritableNestedModelSerializer as NestedModelSerializer
@@ -12,7 +13,7 @@ from .mixin import BulkListSerializerMixin, BulkSerializerMixin
 
 __all__ = [
     'MethodSerializer', 'EmptySerializer', 'BulkModelSerializer',
-    'AdaptedBulkListSerializer', 'CeleryTaskExecutionSerializer',
+    'AdaptedBulkListSerializer', 'UniqueBulkListSerializer', 'CeleryTaskExecutionSerializer',
     'WritableNestedModelSerializer', 'GroupedChoiceSerializer',
     'FileSerializer', 'DictSerializer'
 ]
@@ -75,6 +76,42 @@ class BulkModelSerializer(BulkSerializerMixin, ModelSerializer):
 
 class AdaptedBulkListSerializer(BulkListSerializerMixin, BulkListSerializer):
     pass
+
+
+class UniqueBulkListSerializer(AdaptedBulkListSerializer):
+    """Validate batch uniqueness and save all items in one transaction."""
+
+    unique_field = None
+
+    def get_unique_keys(self, validated_data):
+        for item in validated_data:
+            yield item.get(self.unique_field)
+
+    @staticmethod
+    def validate_unique_keys(field, keys):
+        seen = {}
+        errors = []
+        for index, key in enumerate(keys):
+            errors.append({})
+            if key is None:
+                continue
+            if key in seen:
+                error = {field: [_('This field must be unique.')]}
+                errors[seen[key]] = error
+                errors[index] = error
+            else:
+                seen[key] = index
+        if any(errors):
+            raise serializers.ValidationError(errors, code='unique')
+
+    def to_internal_value(self, data):
+        validated_data = super().to_internal_value(data)
+        self.validate_unique_keys(self.unique_field, self.get_unique_keys(validated_data))
+        return validated_data
+
+    @transaction.atomic
+    def save(self, **kwargs):
+        return super().save(**kwargs)
 
 
 class CeleryTaskExecutionSerializer(serializers.Serializer):

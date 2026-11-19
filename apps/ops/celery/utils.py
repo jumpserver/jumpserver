@@ -7,6 +7,7 @@ import redis_lock
 from django.conf import settings
 from django.db.utils import ProgrammingError, OperationalError
 from django.utils.timezone import get_current_timezone
+from django.utils.translation import gettext
 from django_celery_beat.models import (
     PeriodicTask, IntervalSchedule, CrontabSchedule, PeriodicTasks
 )
@@ -34,6 +35,7 @@ def create_or_update_celery_periodic_tasks(tasks):
     """
     # Todo: check task valid, task and callback must be a celery task
     for name, detail in tasks.items():
+        logger.info(gettext('Checking periodic task: %(name)s.'), {'name': name})
         interval = None
         crontab = None
         last_run_at = None
@@ -41,6 +43,9 @@ def create_or_update_celery_periodic_tasks(tasks):
         try:
             IntervalSchedule.objects.all().count()
         except (ProgrammingError, OperationalError):
+            logger.warning(gettext(
+                'Skipped periodic task %(name)s: the scheduling database is unavailable.'
+            ), {'name': name})
             return None
 
         if isinstance(detail.get("interval"), int):
@@ -53,11 +58,14 @@ def create_or_update_celery_periodic_tasks(tasks):
             if interval is None:
                 interval = IntervalSchedule.objects.create(**kwargs)
             last_run_at = local_now()
+            logger.info(gettext('Schedule: every %(seconds)s seconds.'), {'seconds': detail['interval']})
         elif isinstance(detail.get("crontab"), str):
             try:
                 minute, hour, day, month, week = detail["crontab"].split()
             except ValueError:
-                logger.error("crontab is not valid")
+                logger.error(gettext(
+                    'Skipped periodic task %(name)s: the cron expression must contain five fields.'
+                ), {'name': name})
                 return
             kwargs = dict(
                 minute=minute, hour=hour, day_of_week=week,
@@ -66,8 +74,13 @@ def create_or_update_celery_periodic_tasks(tasks):
             crontab = CrontabSchedule.objects.filter(**kwargs).first()
             if crontab is None:
                 crontab = CrontabSchedule.objects.create(**kwargs)
+            logger.info(gettext('Schedule (cron): %(cron)s; time zone: %(timezone)s.'), {
+                'cron': detail['crontab'], 'timezone': str(get_current_timezone()),
+            })
         else:
-            logger.warning("Schedule is not valid: %s" % name)
+            logger.warning(gettext(
+                'Skipped periodic task %(name)s: no valid interval or cron expression is configured.'
+            ), {'name': name})
             return
 
         defaults = dict(
@@ -87,13 +100,23 @@ def create_or_update_celery_periodic_tasks(tasks):
             defaults=defaults, name=name,
         )
         PeriodicTasks.update_changed()
+        instance, created = task
+        if created:
+            message = gettext('Created periodic task %(name)s; enabled: %(enabled)s.')
+        else:
+            message = gettext('Updated periodic task %(name)s; enabled: %(enabled)s.')
+        logger.info(message, {
+            'name': name,
+            'enabled': gettext('Yes') if instance.enabled else gettext('No'),
+        })
         return task
 
 
 def disable_celery_periodic_task(task_name):
     from django_celery_beat.models import PeriodicTask
-    PeriodicTask.objects.filter(name=task_name).update(enabled=False)
+    count = PeriodicTask.objects.filter(name=task_name).update(enabled=False)
     PeriodicTasks.update_changed()
+    return count
 
 
 def delete_celery_periodic_task(task_name):

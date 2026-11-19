@@ -2559,7 +2559,7 @@ msgid ""
 "With * indicating a match all. Such as: 192.168.10.1, 192.168.1.0/24, "
 "10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64 "
 msgstr ""
-"* はすべて一致することを示します。例: 192.168.10.1、192.168.1.0/24、"
+"記号 * はすべて一致することを示します。例: 192.168.10.1、192.168.1.0/24、"
 "10.1.1.1-10.1.1.20、2001:db8:2de::e13、2001:db8:1a:1110::/64"
 
 #: acls/serializers/rules/rules.py:48 audits/reporting.py:246
@@ -7185,10 +7185,6 @@ msgstr "アカウントが正常に作成されました"
 msgid "JumpServer - An open-source PAM"
 msgstr "JumpServer オープンソースの要塞ホスト"
 
-#: jumpserver/views/celery_flower.py:22
-msgid "<h1>Flower service unavailable, check it</h1>"
-msgstr "<h1> フラワーサービス利用不可、チェック </h1>"
-
 #: jumpserver/views/other.py:28
 msgid ""
 "<div>Luna is a separately deployed program, you need to deploy Luna, koko, "
@@ -8609,6 +8605,42 @@ msgid "The model provider endpoint was not found. Please check the Base URL."
 msgstr "モデルプロバイダーのエンドポイントが見つかりません。ベース URL を確認してください。"
 
 #: settings/api/chat.py
+msgid "{detail} The provider must support the Responses API (/responses)."
+msgstr "{detail} プロバイダーは Responses API（/responses）をサポートしている必要があります。"
+
+#: settings/api/chat.py
+msgid "The provider did not return a Responses API event stream."
+msgstr "プロバイダーから Responses API のイベントストリームが返されませんでした。"
+
+#: settings/api/chat.py
+msgid "The Responses API stream failed: {detail}"
+msgstr "Responses API のストリーミング応答に失敗しました：{detail}"
+
+#: settings/api/chat.py
+msgid "The Responses API stream ended without a successful completion event."
+msgstr "Responses API のストリームは、正常な完了イベントを受信せずに終了しました。"
+
+#: settings/api/chat.py
+msgid "The Responses API stream returned an incomplete output item."
+msgstr "Responses API のストリームから未完了の出力項目が返されました。"
+
+#: settings/api/chat.py
+msgid "The Responses API text stream is missing or does not match the final output."
+msgstr "Responses API のテキストストリームの差分が欠落しているか、最終出力と一致しません。"
+
+#: settings/api/chat.py
+msgid "The Responses API tool argument stream does not match the final tool call."
+msgstr "Responses API のツール引数ストリームが最終的なツール呼び出しと一致しません。"
+
+#: settings/api/chat.py
+msgid "The Responses API returned an invalid health-check tool call (name, call ID, or arguments)."
+msgstr "Responses API から無効なヘルスチェックツール呼び出しが返されました（名前、呼び出し ID、または引数）。"
+
+#: settings/api/chat.py
+msgid "The model did not correctly return the health-check nonce after receiving the tool result."
+msgstr "モデルはツールの結果を受信した後、ヘルスチェック用の nonce を正しく返しませんでした。"
+
+#: settings/api/chat.py
 msgid "The model provider request limit was exceeded. Please try again later."
 msgstr "モデルプロバイダーのリクエスト制限を超えました。しばらくしてから再試行してください。"
 
@@ -9811,6 +9843,26 @@ msgstr "キーボードレイアウト"
 #: settings/serializers/luna.py:41 users/serializers/preference/luna.py:49
 msgid "RDP client option"
 msgstr "RDPクライアントオプション"
+
+#: users/serializers/preference/luna.py:52
+msgid "Printer redirection"
+msgstr "プリンターのリダイレクト"
+
+#: users/serializers/preference/luna.py:56
+msgid "Apply Windows key combinations"
+msgstr "Windows キーの組み合わせの適用先"
+
+#: users/const.py:38
+msgid "On the local computer"
+msgstr "ローカル コンピューター"
+
+#: users/const.py:39
+msgid "On the remote computer"
+msgstr "リモート コンピューター"
+
+#: users/const.py:40
+msgid "Only when using full screen"
+msgstr "全画面表示時のみ"
 
 #: settings/serializers/luna.py:45 users/serializers/preference/luna.py:53
 msgid "RDP color quality"
@@ -14300,9 +14352,6 @@ msgstr "ライセンスのインポートに成功"
 msgid "Invalid license"
 msgstr "ライセンスが無効です"
 
-#~ msgid "Ticket already closed"
-#~ msgstr "チケットはすでに閉じています"
-
 #: templates/resource_download.html
 #, python-format
 msgid "Download %(vendor)s Client"
@@ -16399,3 +16448,2589 @@ msgstr "メールの件名"
 #: xpack/plugins/jdmc/serializers.py:8
 msgid "Message of the email"
 msgstr "メールの本文"
+
+#: reports/audit_contract.py
+msgid "Management Summary and Recommendations"
+msgstr "管理サマリーと推奨事項"
+
+#: reports/audit_contract.py
+msgid "Key Overview"
+msgstr "主要指標の概要"
+
+#: reports/audit_contract.py
+msgid "Operations Activity Analysis"
+msgstr "運用活動の分析"
+
+#: reports/audit_contract.py
+msgid "Security Event Analysis"
+msgstr "セキュリティイベントの分析"
+
+#: reports/audit_contract.py
+msgid "Asset and Account Overview"
+msgstr "資産とアカウントの概要"
+
+#: reports/audit_contract.py
+msgid "Account Operations Analysis"
+msgstr "アカウント運用の分析"
+
+#: reports/audit_contract.py
+msgid "Comprehensive Audit Report"
+msgstr "総合監査レポート"
+
+#: reports/audit_contract.py
+msgid "Summarize operations activity, security events, assets, and accounts for monthly, quarterly, or annual audits."
+msgstr "事業活動、セキュリティイベント、資産、および月間、四半期、または年次監査のためのアカウントをまとめる。"
+
+#: reports/audit_contract.py
+msgid "Operations Activity Report"
+msgstr "運用活動レポート"
+
+#: reports/audit_contract.py
+msgid "Review who performed sessions, commands, and file operations on each asset."
+msgstr "セッション、コマンド、およびファイル作業を各アセットで実行した人のレビュー。"
+
+#: reports/audit_contract.py
+msgid "Security Event Report"
+msgstr "セキュリティイベントレポート"
+
+#: reports/audit_contract.py
+msgid "Review high-risk commands, login anomalies, and access denials, distinguishing failures from security events."
+msgstr "高リスクコマンド、ログイン異常、アクセス拒否を検討し、セキュリティイベントから失敗を区別します。"
+
+#: reports/audit_contract.py
+msgid "Account Operations Report"
+msgstr "アカウント運用レポート"
+
+#: reports/audit_contract.py
+msgid "Review the outcomes and failures of account automation tasks."
+msgstr "アカウント自動化タスクの結果と失敗を検討します。"
+
+#: reports/api/audit.py
+msgid "You do not have permission to view data for this report theme."
+msgstr "このレポートのテーマに関するデータを表示する権限はありません。"
+
+#: reports/api/audit.py
+msgid "The end date cannot be earlier than the start date."
+msgstr "終了日は開始日より前にできません。"
+
+#: reports/api/audit.py
+msgid "A report can cover at most 366 days. Select a shorter date range."
+msgstr "レポートの対象期間は最大 366 日です。より短い期間を選択してください。"
+
+#: reports/api/audit.py
+msgid "The end date cannot be later than today. For the current period, report through today."
+msgstr "終了日を今日より後にすることはできません。現在の期間は今日までを集計してください。"
+
+#: reports/api/audit.py
+msgid "Chapters are duplicated or do not belong to the selected report theme."
+msgstr "章は複製されているか、または選択されたレポートテーマに属していない。"
+
+#: reports/api/audit.py
+msgid "Select at least one chapter containing statistical data."
+msgstr "統計データを含む少なくとも1つの章を選択します。"
+
+#: reports/services/audit_data.py
+msgid "Asset Sessions"
+msgstr "資産セッション"
+
+#: reports/services/audit_data.py
+msgid "Command Records"
+msgstr "コマンド記録"
+
+#: reports/services/audit_data.py
+msgid "Login Logs"
+msgstr "ログインログ"
+
+#: reports/services/audit_data.py
+msgid "Operation Logs"
+msgstr "操作ログ"
+
+#: reports/services/audit_data.py
+msgid "File Transfers"
+msgstr "ファイル転送"
+
+#: reports/services/audit_data.py
+msgid "Current Assets"
+msgstr "現在の資産"
+
+#: reports/services/audit_data.py
+msgid "Current Accounts"
+msgstr "現在のアカウント"
+
+#: reports/services/audit_data.py
+msgid "Account Automation Tasks"
+msgstr "アカウント自動化タスク"
+
+#: reports/services/audit_data.py
+msgid "Platform User Password Change Logs"
+msgstr "プラットフォームユーザーのパスワード変更ログ"
+
+#: reports/services/audit_data.py
+msgid " (available stores)"
+msgstr "（利用可能なストレージ）"
+
+#: reports/services/audit_data.py
+msgid "Alerted Commands"
+msgstr "警告コマンド"
+
+#: reports/services/audit_data.py
+msgid "Commands Blocked by Rules"
+msgstr "ルールによってブロックされたコマンド"
+
+#: reports/services/audit_data.py
+msgid "Approval-Rejected Commands"
+msgstr "承認で拒否されたコマンド"
+
+#: reports/services/audit_data.py
+msgid "Approval-Approved Commands"
+msgstr "承認されたコマンド"
+
+#: reports/services/audit_data.py
+msgid "Approval-Canceled Commands"
+msgstr "承認がキャンセルされたコマンド"
+
+#: reports/services/audit_data.py
+msgid "Unsupported report theme"
+msgstr "サポートされていないレポートテーマ"
+
+#: reports/services/audit_data.py
+msgid "Select a start date and an end date"
+msgstr "開始日と終了日を選択してください"
+
+#: reports/services/audit_data.py
+msgid "The start date cannot be later than the end date, and the report can cover at most 366 days"
+msgstr "スタート日付は終了日より遅くはありませんが、レポートは最大366日間をカバーすることができます。"
+
+#: reports/services/audit_data.py
+msgid "The end date cannot be later than today"
+msgstr "終了日を今日より後にすることはできません"
+
+#: reports/services/audit_data.py
+msgid "Select report chapters without duplicates"
+msgstr "重複しないようにレポートの章を選択してください"
+
+#: reports/services/audit_data.py
+msgid "The selected chapters do not belong to this report theme"
+msgstr "選ばれた章は、このレポートのテーマには属していません。"
+
+#: reports/services/audit_data.py
+msgid "Session Count"
+msgstr "セッション数"
+
+#: reports/services/audit_data.py
+msgid "times"
+msgstr "回"
+
+#: reports/services/audit_data.py
+msgid "Active Users"
+msgstr "アクティブユーザー"
+
+#: reports/services/audit_data.py
+msgid "users"
+msgstr "人"
+
+#: reports/services/audit_data.py
+msgid "Accessed Assets"
+msgstr "アクセスされた資産"
+
+#: reports/services/audit_data.py
+msgid "assets"
+msgstr "台"
+
+#: reports/services/audit_data.py
+msgid "Connection Failures"
+msgstr "接続失敗"
+
+#: reports/services/audit_data.py
+msgid "Session Recording Status"
+msgstr "セッション録画の状態"
+
+#: reports/services/audit_data.py
+msgid "Top 5 Connection Failure Reasons"
+msgstr "接続失敗の主な原因トップ5"
+
+#: reports/services/audit_data.py
+msgid "User Access Ranking"
+msgstr "ユーザーアクセスランキング"
+
+#: reports/services/audit_data.py
+msgid "Asset Access Ranking"
+msgstr "資産アクセスランキング"
+
+#: reports/services/audit_data.py
+msgid "Connection Protocol Distribution"
+msgstr "接続プロトコルの分布"
+
+#: reports/services/audit_data.py
+msgid "Session Operation Types"
+msgstr "セッション操作の種類"
+
+#: reports/services/audit_data.py
+msgid "Platform Access Distribution"
+msgstr "プラットフォーム別アクセス分布"
+
+#: reports/services/audit_data.py
+msgid "Daily Asset Session Trend"
+msgstr "日別資産セッション推移"
+
+#: reports/services/audit_data.py
+msgid "Weekly Asset Session Trend"
+msgstr "週別資産セッション推移"
+
+#: reports/services/audit_data.py
+msgid "Monthly Asset Session Trend"
+msgstr "月別資産セッション推移"
+
+#: reports/services/audit_data.py
+msgid "Recent Asset Sessions"
+msgstr "最近の資産セッション"
+
+#: reports/services/audit_data.py
+msgid "Recordings Requiring Review"
+msgstr "確認が必要な録画"
+
+#: reports/services/audit_data.py
+msgid "records"
+msgstr "件"
+
+#: reports/services/audit_data.py
+msgid "Command Approval Clues from the Same Session"
+msgstr "同一セッションのコマンド承認手掛かり"
+
+#: reports/services/audit_data.py
+msgid "Successful Logins"
+msgstr "成功したログイン"
+
+#: reports/services/audit_data.py
+msgid "Failed Logins"
+msgstr "失敗したログイン"
+
+#: reports/services/audit_data.py
+msgid "Restricted Login Records"
+msgstr "ログイン制限の記録"
+
+#: reports/services/audit_data.py
+msgid "Login Policy Denials"
+msgstr "ログインポリシーによる拒否"
+
+#: reports/services/audit_data.py
+msgid "Recent Failed Logins"
+msgstr "最近のログイン失敗"
+
+#: reports/services/audit_data.py
+msgid "New-City Login Clues"
+msgstr "新しい都市からのログインの手掛かり"
+
+#: reports/services/audit_data.py
+msgid "New-City Login Review Clues"
+msgstr "新しい都市からのログイン確認項目"
+
+#: reports/services/audit_data.py
+msgid "File Operation Types"
+msgstr "ファイル操作の種類"
+
+#: reports/services/audit_data.py
+msgid "Top 5 Affected File Operation Targets"
+msgstr "ファイル操作失敗の影響先トップ 5"
+
+#: reports/services/audit_data.py
+msgid "Recent Failed File Operations"
+msgstr "最近失敗したファイル操作"
+
+#: reports/services/audit_data.py
+msgid "Account Task Executions"
+msgstr "アカウントタスクの実行回数"
+
+#: reports/services/audit_data.py
+msgid "Successful Executions"
+msgstr "実行成功"
+
+#: reports/services/audit_data.py
+msgid "Failed or Errored Executions"
+msgstr "実行失敗またはエラー"
+
+#: reports/services/audit_data.py
+msgid "Incomplete Executions"
+msgstr "未完了の実行"
+
+#: reports/services/audit_data.py
+msgid "Account Task Types and Results"
+msgstr "アカウントタスクの種類と結果"
+
+#: reports/services/audit_data.py
+msgid "Recent Failed Account Tasks"
+msgstr "最近失敗したアカウントタスク"
+
+#: reports/services/audit_data.py
+msgid "Task Failure or Error Rate"
+msgstr "タスクの失敗・エラー率"
+
+#: reports/services/audit_data.py
+msgid "Top 5 Password-Change Error Clues"
+msgstr "パスワード変更エラーの手掛かりトップ 5"
+
+#: reports/services/audit_data.py
+msgid "Password-Change Accounts Requiring Review"
+msgstr "パスワード変更の確認が必要なアカウント"
+
+#: reports/services/audit_data.py
+msgid "Restricted logins or policy denials were recorded. Verify that the source, user identity, and access policy are expected."
+msgstr "制限されたログインやポリシー拒否が記録されました。 ソース、ユーザーアイデンティティ、アクセスポリシーが期待されていることを確認します。"
+
+#: reports/services/audit_data.py
+msgid "Command Count"
+msgstr "コマンド数"
+
+#: reports/services/audit_data.py
+msgid "Command Decisions Requiring Review"
+msgstr "確認が必要なコマンド処理記録"
+
+#: reports/services/audit_data.py
+msgid "No separate rejection reason was saved; review the ticket discussion"
+msgstr "個別の却下理由は保存されていません。チケットのやり取りを確認してください"
+
+#: reports/services/audit_data.py
+msgid "Not recorded"
+msgstr "記録なし"
+
+#: reports/services/audit_data.py
+msgid "Loopback Address Login Records"
+msgstr "ループバックアドレスからのログイン記録"
+
+#: reports/services/audit_data.py
+msgid "Rejected"
+msgstr "拒否"
+
+#: reports/services/audit_data.py
+msgid "Platform Operation Count"
+msgstr "プラットフォーム操作回数"
+
+#: reports/services/audit_data.py
+msgid "Operation Policy Denials"
+msgstr "操作ポリシーによる拒否"
+
+#: reports/services/audit_data.py
+msgid "Policy Denial Details"
+msgstr "ポリシー拒否の詳細"
+
+#: reports/services/audit_data.py
+msgid "File Operation Count"
+msgstr "ファイル操作回数"
+
+#: reports/services/audit_data.py
+msgid "Failed File Operations"
+msgstr "失敗したファイル操作"
+
+#: reports/services/audit_data.py
+msgid "File Operation Failure Rate"
+msgstr "ファイル操作の失敗率"
+
+#: reports/services/audit_data.py
+msgid "Current Asset Total"
+msgstr "現在の資産総数"
+
+#: reports/services/audit_data.py
+msgid "Currently Enabled Assets"
+msgstr "現在有効な資産"
+
+#: reports/services/audit_data.py
+msgid "Current Asset Distribution by Platform"
+msgstr "プラットフォーム別の現在の資産分布"
+
+#: reports/services/audit_data.py
+msgid "accounts"
+msgstr "個"
+
+#: reports/services/audit_data.py
+msgid "Currently Enabled Accounts"
+msgstr "現在有効なアカウント"
+
+#: reports/services/audit_data.py
+msgid "Asset Account Count Ranking"
+msgstr "資産別アカウント数ランキング"
+
+#: reports/services/audit_data.py
+msgid "Assets with Password Changes Requiring Review"
+msgstr "パスワード変更の確認が必要な資産"
+
+#: reports/services/audit_data.py
+msgid "Accounts with Password Changes Requiring Review"
+msgstr "パスワード変更の確認が必要なアカウント"
+
+#: reports/services/audit_data.py
+msgid "Asset deleted"
+msgstr "資産は削除済み"
+
+#: reports/services/audit_data.py
+msgid "Platform User Password Changes"
+msgstr "プラットフォームユーザーのパスワード変更"
+
+#: reports/services/audit_data.py
+msgid "Recent Platform User Password Changes"
+msgstr "最近のプラットフォームユーザーのパスワード変更"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s alerted or rejected commands were recorded. Review their purpose and approval basis in the session context."
+msgstr "警告または拒否されたコマンドが %(count)s 件記録されています。セッションの状況とあわせて、コマンドの目的と承認の根拠を確認してください。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "The operation log contains %(count)s policy denials. Check the denied resources and policies in the audit details."
+msgstr "オペレーティング ログには %(count)s ポリシー 拒否が含まれています。 拒否された資源やポリシーを監査の詳細で確認します。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s platform user password changes were recorded. Review the operators and change rationale as needed."
+msgstr "%(count)s プラットフォームユーザーパスワードの変更が記録されました。 オペレーターを検討し、必要に応じて合理的な変更を行います。"
+
+#: reports/services/audit_data.py
+msgid "Recording Status"
+msgstr "録画状態"
+
+#: reports/services/audit_data.py
+msgid "Recorded Reason"
+msgstr "記録された原因"
+
+#: reports/services/audit_data.py
+msgid "Failure Count"
+msgstr "失敗回数"
+
+#: reports/services/audit_data.py
+msgid "Start Time"
+msgstr "開始日時"
+
+#: reports/services/audit_data.py
+msgid "Platform User"
+msgstr "プラットフォームユーザー"
+
+#: reports/services/audit_data.py
+msgid "Asset Account"
+msgstr "資産アカウント"
+
+#: reports/services/audit_data.py
+msgid "Connection Result"
+msgstr "接続結果"
+
+#: reports/services/audit_data.py
+msgid "Connection Failure Reason"
+msgstr "接続失敗の原因"
+
+#: reports/services/audit_data.py
+msgid "Original Session"
+msgstr "元のセッション"
+
+#: reports/services/audit_data.py
+msgid "No reviewer recorded"
+msgstr "処理担当者は記録されていません"
+
+#: reports/services/audit_data.py
+msgid "Approval Ticket"
+msgstr "承認チケット"
+
+#: reports/services/audit_data.py
+msgid "Request Time"
+msgstr "申請日時"
+
+#: reports/services/audit_data.py
+msgid "Requested Command"
+msgstr "申請コマンド"
+
+#: reports/services/audit_data.py
+msgid "Rule at the Time"
+msgstr "当時のルール"
+
+#: reports/services/audit_data.py
+msgid "Reviewer"
+msgstr "処理担当者"
+
+#: reports/services/audit_data.py
+msgid "Rejection Reason"
+msgstr "拒否理由"
+
+#: reports/services/audit_data.py
+msgid "Related Session"
+msgstr "関連セッション"
+
+#: reports/services/audit_data.py
+msgid "Source IP"
+msgstr "接続元 IP"
+
+#: reports/services/audit_data.py
+msgid "City"
+msgstr "都市"
+
+#: reports/services/audit_data.py
+msgid "Operation Count"
+msgstr "操作回数"
+
+#: reports/services/audit_data.py
+msgid "File Path"
+msgstr "ファイルパス"
+
+#: reports/services/audit_data.py
+msgid "Task Type"
+msgstr "タスクの種類"
+
+#: reports/services/audit_data.py
+msgid "Execution Count"
+msgstr "実行回数"
+
+#: reports/services/audit_data.py
+msgid "Original Execution Record"
+msgstr "元の実行記録"
+
+#: reports/services/audit_data.py
+msgid "Error Clue Category"
+msgstr "エラーの手掛かりの分類"
+
+#: reports/services/audit_data.py
+msgid "Account Record Count"
+msgstr "アカウント記録数"
+
+#: reports/services/audit_data.py
+msgid "Record Time"
+msgstr "記録日時"
+
+#: reports/services/audit_data.py
+msgid "Error Clue"
+msgstr "エラーの手掛かり"
+
+#: reports/services/audit_data.py
+msgid "Execution Record"
+msgstr "実行記録"
+
+#: reports/services/audit_data.py
+msgid "Asset deleted or platform not recorded"
+msgstr "資産は削除済み、またはプラットフォームは未記録"
+
+#: reports/services/audit_data.py
+msgid "Decision"
+msgstr "処理結果"
+
+#: reports/services/audit_data.py
+msgid "Historical rule name not recorded"
+msgstr "当時のルール名は未記録"
+
+#: reports/services/audit_data.py
+msgid "Asset Count"
+msgstr "資産数"
+
+#: reports/services/audit_data.py
+msgid "Account Count"
+msgstr "アカウント数"
+
+#: reports/services/audit_data.py
+msgid "Operator"
+msgstr "操作者"
+
+#: reports/services/evidence.py
+msgid "Recording marked present"
+msgstr "録画記録あり"
+
+#: reports/services/evidence.py
+msgid "Recording unsupported"
+msgstr "録画非対応"
+
+#: reports/services/evidence.py
+msgid "Session in progress"
+msgstr "セッション実行中"
+
+#: reports/services/evidence.py
+msgid "Recording creation failed"
+msgstr "録画の作成に失敗"
+
+#: reports/services/evidence.py
+msgid "Recording upload failed"
+msgstr "録画のアップロードに失敗"
+
+#: reports/services/evidence.py
+msgid "Recording conversion failed"
+msgstr "録画の変換に失敗"
+
+#: reports/services/evidence.py
+msgid "No recording flag"
+msgstr "録画フラグなし"
+
+#: reports/services/evidence.py
+msgid "Connection failed; not applicable"
+msgstr "接続失敗のため対象外"
+
+#: reports/services/evidence.py
+msgid "Connection failed (no further reason recorded)"
+msgstr "接続失敗（詳細な原因は未記録）"
+
+#: reports/services/evidence.py
+msgid "Connection failure reason not recorded"
+msgstr "接続失敗の原因は未記録"
+
+#: reports/services/evidence.py
+msgid "Authentication-related"
+msgstr "認証関連"
+
+#: reports/services/evidence.py
+msgid "Execution or connection timeout"
+msgstr "実行または接続のタイムアウト"
+
+#: reports/services/evidence.py
+msgid "Network or connection-related"
+msgstr "ネットワークまたは接続関連"
+
+#: reports/services/evidence.py
+msgid "Permission denial-related"
+msgstr "権限拒否関連"
+
+#: reports/services/evidence.py
+msgid "Target missing or unavailable"
+msgstr "対象が存在しないか利用不可"
+
+#: reports/services/evidence.py
+msgid "Result verification-related"
+msgstr "結果の検証関連"
+
+#: reports/services/evidence.py
+msgid "Error reason not recorded"
+msgstr "エラー原因は未記録"
+
+#: reports/services/evidence.py
+msgid "Other error (review the original record)"
+msgstr "その他のエラー（元の記録を確認）"
+
+msgid ""
+"1-100; lower values have higher priority.\n"
+"Select the highest-priority group from the rules that match. Any Reject in that group blocks the connection; if all Allow, combine their enabled connection controls."
+msgstr ""
+"1～100。値が小さいほど優先度が高くなります。\n"
+"一致したルールから優先度が最も高いグループを選びます。拒否するルールが1つでもあれば接続を拒否し、すべて許可する場合は有効な接続制御を組み合わせます。"
+
+msgid "A valid license is required"
+msgstr "有効なライセンスが必要です。"
+
+msgid "ACL changed; start a new connection"
+msgstr "ACL が変更されました。新しい接続を開始してください。"
+
+msgid "Account is ready."
+msgstr "アカウントの準備が完了しました。"
+
+msgid "Account permission is no longer available"
+msgstr "アカウントの権限が失効しています。"
+
+msgid "Account preparation has not succeeded. Contact an administrator."
+msgstr "アカウントの準備に失敗しました。管理者にお問い合わせください。"
+
+msgid "Account push failed. Contact an administrator with the task ID."
+msgstr "アカウントの配布に失敗しました。タスク ID を管理者にお知らせください。"
+
+msgid "Account push is not enabled for this asset platform."
+msgstr "この資産プラットフォームではアカウント配布が有効になっていません。"
+
+msgid ""
+"Account usernames or @ALL (all accounts), @SPEC with specified usernames, "
+"and @USER (the current user's same-name account)."
+msgstr ""
+"ユーザー名、全アカウントを表す @ALL、指定ユーザー名と組み合わせる @SPEC、現在のユーザーと同名のアカウントを表す @USER を使用できます。"
+
+msgid "Administrator permission is no longer available"
+msgstr "管理者権限が失効しています。"
+
+msgid ""
+"After approval, allow reconnects by the same user to the same asset and "
+"account under this rule for this many hours. 0 requires approval every time."
+" Changes do not affect existing exemptions."
+msgstr ""
+"承認後、指定した時間内は、同じユーザーがこのルールで同じ資産・アカウントに再接続する際の承認を免除します。0 "
+"は毎回承認が必要です。変更は既存の免除に影響しません。"
+
+msgid "Allow applies the connection controls; Reject blocks the connection."
+msgstr "許可の場合は接続制御を適用し、拒否の場合は接続をブロックします。"
+
+msgid "Automatic same-name account push is not authorized."
+msgstr "同名アカウントの自動配布は許可されていません。"
+
+msgid ""
+"Automatically provision only same-name accounts before their first "
+"connection; reuse existing managed accounts without provisioning them again."
+" Requires account provisioning support on the asset platform."
+msgstr ""
+"同名アカウントの初回接続前にのみ自動配布します。既存の管理対象アカウントは再配布せず再利用します。資産プラットフォームがアカウント配布に対応している必要があります。"
+
+msgid "Cancel connections individually."
+msgstr "接続を個別にキャンセルしてください。"
+
+msgid "Complete the current connection step first"
+msgstr "先に現在の接続ステップを完了してください。"
+
+msgid "Connection ACL context"
+msgstr "接続 ACL コンテキスト"
+
+msgid "Connection ACL requirements are incomplete"
+msgstr "接続 ACL の検証が完了していません。"
+
+msgid "Connection approval is no longer valid"
+msgstr "接続の承認が失効しています。"
+
+msgid "Connection details"
+msgstr "接続の詳細"
+
+msgid "Connection is no longer available"
+msgstr "この接続は無効になりました。接続を開始し直してください。"
+
+msgid "Connection parameters cannot be changed; create a new connection token"
+msgstr "接続パラメーターは変更できません。新しい接続トークンを作成してください。"
+
+msgid "Connection reason"
+msgstr "接続理由"
+
+msgid "Connection review was rejected or closed"
+msgstr "接続の承認申請が拒否または終了されました。"
+
+msgid "Connection token does not match this session."
+msgstr "接続トークンがこのセッションと一致しません。"
+
+msgid "Creating the account and configuring its login credentials."
+msgstr "アカウントを作成し、ログイン資格情報を設定しています。"
+
+msgid "Duplicate connection tokens."
+msgstr "接続トークンが重複しています。"
+
+msgid "Enter a connection reason (up to 4096 characters)."
+msgstr "接続理由を入力してください（最大 4096 文字）。"
+
+msgid "Enter a reason before connecting."
+msgstr "接続前に理由を入力してください。"
+
+msgid "Exemption period"
+msgstr "承認免除期間"
+
+msgid "Face monitoring context belongs to a different user"
+msgstr "顔監視コンテキストは別のユーザーに属しています。"
+
+msgid "Face monitoring does not belong to this session"
+msgstr "顔監視がこのセッションに対応していません。"
+
+msgid "Face verification"
+msgstr "顔認証"
+
+msgid "Face verification does not belong to this connection"
+msgstr "顔認証がこの接続に対応していません。"
+
+msgid "Face verification failed"
+msgstr "顔認証に失敗しました。"
+
+msgid "Face verification is no longer available"
+msgstr "顔認証は利用できなくなりました。"
+
+msgid "Face verification session expired; retry verification"
+msgstr "顔認証セッションの有効期限が切れました。再度認証してください。"
+
+msgid "Face verification session is no longer current"
+msgstr "顔認証セッションは現在のものではありません。"
+
+msgid "First-login same-name account push"
+msgstr "初回接続時の同名アカウント配布"
+
+msgid "MFA verification"
+msgstr "MFA 認証"
+
+msgid "No available reviewers. Contact an administrator."
+msgstr "利用可能な承認者がいません。管理者にお問い合わせください。"
+
+msgid ""
+"Notify the selected recipients when a user requests an asset connection. A "
+"notification does not mean the connection succeeded."
+msgstr "ユーザーが資産への接続を要求した際に、選択した通知先に通知します。通知は接続の成功を意味しません。"
+
+msgid "Online face monitoring context is no longer available"
+msgstr "継続的な顔監視のコンテキストが失効しています。"
+
+msgid "Online face monitoring context is required"
+msgstr "継続的な顔監視のコンテキストが必要です。"
+
+msgid "Online face verification requires Web Terminal"
+msgstr "継続的な顔認証には Web ターミナルが必要です。"
+
+msgid "Permission to connect to this account is no longer available."
+msgstr "このアカウントで接続する権限が失効しています。"
+
+msgid "Prepare the same-name account before connecting."
+msgstr "接続前に同名アカウントの準備を完了してください。"
+
+msgid "Push same-name account on first connection"
+msgstr "初回接続時に同名アカウントを配布"
+
+msgid "Require approval"
+msgstr "承認が必要"
+
+msgid ""
+"Require approval before connecting, except during a valid exemption period."
+msgstr "有効な承認免除期間中を除き、接続前に承認が必要です。"
+
+msgid "Rotate password"
+msgstr "パスワードを変更"
+
+msgid ""
+"Rotate the connected account's secret after the session ends. Requires "
+"system rotation after session end and automatic rotation on an active "
+"account."
+msgstr ""
+"セッション終了後に接続先アカウントのシークレットを変更します。システムのセッション終了後の変更と、有効なアカウントの自動変更を有効にする必要があります。"
+
+msgid "Same-name account provisioning uses server-managed credentials."
+msgstr "同名アカウントの配布には、サーバーで管理する資格情報を使用します。"
+
+msgid "Secret rotation after session end is disabled"
+msgstr "セッション終了後のシークレット変更は無効になっています。"
+
+msgid "Select an active MFA method; enroll MFA first if none are available."
+msgstr "利用可能な MFA 方式を選択してください。ない場合は先に MFA を登録してください。"
+
+msgid "Select at least one active, unexpired reviewer from this organization."
+msgstr "この組織の有効かつ期限切れでない承認者を1人以上選択してください。"
+
+msgid "Select at least one notification recipient."
+msgstr "通知先を1人以上選択してください。"
+
+msgid ""
+"Select reviewers when approval is enabled. Connections are blocked if no "
+"reviewers are available."
+msgstr "承認を有効にする場合は承認者を選択してください。利用可能な承認者がいない場合、接続はブロックされます。"
+
+msgid "Send notification"
+msgstr "通知を送信"
+
+msgid "The existing same-name account is inactive. Contact an administrator."
+msgstr "既存の同名アカウントは無効です。管理者にお問い合わせください。"
+
+msgid "The same-name account username is determined by the server."
+msgstr "同名アカウントのユーザー名はサーバーが決定します。"
+
+msgid "This MFA method does not send a verification code"
+msgstr "この MFA 方式では認証コードを送信しません。"
+
+msgid "This connection does not require this step"
+msgstr "この接続ではこのステップは不要です。"
+
+msgid "This field cannot be submitted."
+msgstr "このフィールドは送信できません。"
+
+msgid "This field does not belong to the current step."
+msgstr "このフィールドは現在のステップに属していません。"
+
+msgid "This push method does not support create-only mode"
+msgstr "この配布方式は新規作成のみのモードに対応していません。"
+
+msgid "This username cannot be provisioned automatically."
+msgstr "このユーザー名は自動配布できません。"
+
+msgid "Use Web Terminal to complete face verification"
+msgstr "Web ターミナルで顔認証を完了してください。"
+
+msgid ""
+"Verify an enrolled MFA code before connecting. Block connections if no code-"
+"based MFA method is enrolled."
+msgstr "接続前に登録済みの MFA コードを検証します。コード方式の MFA が登録されていない場合、接続はブロックされます。"
+
+msgid ""
+"Verify the user's face before connecting. Requires system face recognition "
+"and an enrolled face."
+msgstr "接続前にユーザーの顔を認証します。システムの顔認識を有効にし、顔を登録する必要があります。"
+
+msgid "Waiting to push the same-name account."
+msgstr "同名アカウントの配布を待っています。"
+
+msgid ""
+"Web Terminal only: verify the user's face before connecting and monitor "
+"throughout the session. Requires system face recognition and an enrolled "
+"face."
+msgstr ""
+"Web ターミナル専用です。接続前に顔認証を行い、セッション中は継続的に監視します。システムの顔認識を有効にし、顔を登録する必要があります。"
+
+msgctxt "Asset connection ACL"
+msgid "Face online"
+msgstr "継続的な顔監視"
+
+msgctxt "Asset connection ACL"
+msgid "Push account"
+msgstr "アカウントを配布"
+
+#: reports/services/audit_data.py
+msgid "Account Health"
+msgstr "アカウントの健全性"
+
+#: reports/services/audit_data.py
+msgid "Account Tasks to Review"
+msgstr "確認が必要なアカウントタスク"
+
+#: reports/services/audit_data.py
+msgid "Assets with Pending Risks"
+msgstr "対応待ちのリスクがある資産"
+
+#: reports/services/audit_data.py
+msgid "Awaiting review"
+msgstr "確認待ち"
+
+#: reports/services/audit_data.py
+msgid "Candidate credential verified"
+msgstr "候補の認証情報の検証に成功"
+
+#: reports/services/audit_data.py
+msgid "Check connection conditions and the original session before retrying."
+msgstr "再試行する前に、接続条件と元のセッションを確認してください。"
+
+#: reports/services/audit_data.py
+msgid "Check recording creation, upload, and storage for the original session."
+msgstr "元のセッションの録画作成、アップロード、保存を確認してください。"
+
+#: reports/services/audit_data.py
+msgid "Command Decisions to Review"
+msgstr "確認が必要なコマンドの判定"
+
+#: reports/services/audit_data.py
+msgid "Compare the detected change with approved access and confirm the handling result."
+msgstr "検出された変更を承認済みのアクセス権限と照合し、対応結果を確認してください。"
+
+#: reports/services/audit_data.py
+msgid "Confirm that the newer credential is synchronized and access works."
+msgstr "新しい認証情報が同期され、アクセスできることを確認してください。"
+
+#: reports/services/audit_data.py
+msgid "Confirm whether the location change matches travel, proxy use, or expected access."
+msgstr "接続元の場所の変化が、出張、プロキシの利用、または想定されたアクセスによるものか確認してください。"
+
+#: reports/services/audit_data.py
+msgid "Confirmed Risk Records"
+msgstr "確認済みのリスク記録"
+
+#: reports/services/audit_data.py
+msgid "Connection Failures to Review"
+msgstr "確認が必要な接続失敗"
+
+#: reports/services/audit_data.py
+msgid "Credential verification failed"
+msgstr "認証情報の検証に失敗"
+
+#: reports/services/audit_data.py
+msgid "Credential verification in progress"
+msgstr "認証情報を検証中"
+
+#: reports/services/audit_data.py
+msgid "Current Account Risk Details"
+msgstr "現在のアカウントリスクの詳細"
+
+#: reports/services/audit_data.py
+msgid "Current Account Risks"
+msgstr "現在のアカウントリスク"
+
+#: reports/services/audit_data.py
+msgid "Current Risk Records"
+msgstr "現在のリスク記録"
+
+#: reports/services/audit_data.py
+msgid "Failed Logins to Review"
+msgstr "確認が必要なログイン失敗"
+
+#: reports/services/audit_data.py
+msgid "File Operations to Review"
+msgstr "確認が必要なファイル操作"
+
+#: reports/services/audit_data.py
+msgid "Handling Progress"
+msgstr "対応状況"
+
+#: reports/services/audit_data.py
+msgid "Ignored Risk Records"
+msgstr "無視されたリスク記録"
+
+#: reports/services/audit_data.py
+msgid "Issue"
+msgstr "問題"
+
+#: reports/services/audit_data.py
+msgid "Later password change succeeded"
+msgstr "後続のパスワード変更に成功"
+
+#: reports/services/audit_data.py
+msgid "New-City Logins to Review"
+msgstr "確認が必要な新しい都市からのログイン"
+
+#: reports/services/audit_data.py
+msgid "Next Step"
+msgstr "次の対応"
+
+#: reports/services/audit_data.py
+msgid "No account risk records are currently available."
+msgstr "現在、アカウントリスクの記録はありません。"
+
+#: reports/services/audit_data.py
+msgid "Original Record"
+msgstr "元の記録"
+
+#: reports/services/audit_data.py
+msgid "Pending Risk Records"
+msgstr "対応待ちのリスク記録"
+
+#: reports/services/audit_data.py
+msgid "Pending Risks by Type"
+msgstr "種類別の対応待ちリスク"
+
+#: reports/services/audit_data.py
+msgid "Policy Denials to Review"
+msgstr "確認が必要なポリシーによる拒否"
+
+#: reports/services/audit_data.py
+msgid "Recordings to Review"
+msgstr "確認が必要な録画"
+
+#: reports/services/audit_data.py
+msgid "Remediation Checklist"
+msgstr "対応チェックリスト"
+
+#: reports/services/audit_data.py
+msgid "Review and synchronize the verified candidate credential; verification alone does not confirm recovery."
+msgstr "検証済みの候補の認証情報を確認し、同期してください。検証だけでは復旧を確認したことにはなりません。"
+
+#: reports/services/audit_data.py
+msgid "Review the command purpose, matched rule, and approval trail in the original session."
+msgstr "元のセッションで、コマンドの目的、一致したルール、承認履歴を確認してください。"
+
+#: reports/services/audit_data.py
+msgid "Review the denied operation and confirm that the access policy is expected."
+msgstr "拒否された操作を確認し、アクセスポリシーが意図どおりであることを確認してください。"
+
+#: reports/services/audit_data.py
+msgid "Review the execution log and affected targets, correct the cause, then retry."
+msgstr "実行ログと影響を受けた対象を確認し、原因を解消してから再試行してください。"
+
+#: reports/services/audit_data.py
+msgid "Review the file path, access permissions, and original session before retrying."
+msgstr "再試行する前に、ファイルパス、アクセス権限、元のセッションを確認してください。"
+
+#: reports/services/audit_data.py
+msgid "Review the verification result and original execution before retrying."
+msgstr "再試行する前に、検証結果と元の実行記録を確認してください。"
+
+#: reports/services/audit_data.py
+msgid "Review whether the reason for ignoring this failure still applies."
+msgstr "この失敗を無視した理由が現在も当てはまるか確認してください。"
+
+#: reports/services/audit_data.py
+msgid "Review whether the reason for ignoring this risk still applies."
+msgstr "このリスクを無視した理由が現在も当てはまるか確認してください。"
+
+#: reports/services/audit_data.py
+msgid "Risk Count"
+msgstr "リスク数"
+
+#: reports/services/audit_data.py
+msgid "Updated"
+msgstr "更新日時"
+
+#: reports/services/audit_data.py
+msgid "Verification Time"
+msgstr "検証日時"
+
+#: reports/services/audit_data.py
+msgid "Verify the candidate credential and synchronize it only after confirming that access works."
+msgstr "候補の認証情報を検証し、アクセスできることを確認してから同期してください。"
+
+#: reports/services/audit_data.py
+msgid "Verify the login source and account identity, then review the authentication log."
+msgstr "ログイン元とアカウントの本人性を確認し、認証ログを確認してください。"
+
+#: reports/services/audit_data.py
+msgid "Wait for verification to finish before deciding whether to synchronize the credential."
+msgstr "検証が完了してから、認証情報を同期するかどうかを判断してください。"
+
+#: reports/services/assessment.py
+msgid "Readable"
+msgstr "読み取り可能"
+
+#: reports/services/assessment.py
+msgid "Reference"
+msgstr "参照根拠"
+
+#: reports/services/assessment.py
+msgid "Record ID"
+msgstr "記録ID"
+
+#: reports/services/audit_data.py
+msgid "Review failed connections using the affected assets, accounts, and recorded reasons."
+msgstr "対象資産、アカウント、記録された原因に基づいて接続失敗を確認してください。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s completed successful sessions require recording review. Check recording creation, upload, and storage."
+msgstr "正常接続後に終了したセッションのうち %(count)s 件で録画の確認が必要です。録画の作成、アップロード、保存を確認してください。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s new-city login records require review of user identity and access location."
+msgstr "新しい都市からのログイン記録 %(count)s 件について、ユーザーの本人確認とアクセス場所の確認が必要です。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s platform login records use loopback source addresses. Confirm whether these are local accesses or proxy-forwarded requests."
+msgstr "プラットフォームのログイン記録 %(count)s 件でループバック送信元アドレスが使われています。ローカルアクセスか、プロキシ転送された要求かを確認してください。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s platform logins failed. Review the affected users, source addresses, and recorded reasons."
+msgstr "プラットフォームへのログインが %(count)s 回失敗しました。対象ユーザー、送信元アドレス、記録された原因を確認してください。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(failed)s of %(total)s file operations failed (%(rate)s%%). Review the affected assets, accounts, file paths, and original sessions."
+msgstr "ファイル操作 %(total)s 件のうち %(failed)s 件が失敗しました（%(rate)s%%）。対象資産、アカウント、ファイルパス、元のセッションを確認してください。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(sessions)s asset sessions were recorded: %(success)s connections succeeded and %(failed)s failed, involving %(users)s users and %(assets)s assets."
+msgstr "資産セッションは %(sessions)s 件で、接続成功 %(success)s 件、失敗 %(failed)s 件でした。対象はユーザー %(users)s 人、資産 %(assets)s 台です。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(total)s account tasks were executed: %(success)s succeeded, %(failed)s failed or errored, and %(pending)s remain incomplete."
+msgstr "アカウントタスクは %(total)s 件実行され、成功 %(success)s 件、失敗またはエラー %(failed)s 件、未完了 %(pending)s 件でした。"
+
+#: reports/services/audit_data.py
+msgid "Account Risks to Review"
+msgstr "確認が必要なアカウントリスク"
+
+#: reports/services/audit_data.py
+msgid "Accounts Identified in Pending Risks"
+msgstr "未対応リスクで特定されたアカウント"
+
+#: reports/services/audit_data.py
+msgid "Affected Accounts"
+msgstr "影響を受けるアカウント数"
+
+#: reports/services/audit_data.py
+msgid "Affected Assets"
+msgstr "影響を受ける資産数"
+
+#: reports/services/audit_data.py
+msgid "Assets with Latest Check Successful"
+msgstr "直近の検査に成功した資産"
+
+#: reports/services/audit_data.py
+msgid "Assign a unique credential to each affected account, synchronize dependent services, and verify access."
+msgstr "影響を受ける各アカウントに固有の認証情報を設定し、依存サービスと同期してアクセスを確認してください。"
+
+#: reports/services/audit_data.py
+msgid "Check Result"
+msgstr "検査結果"
+
+#: reports/services/audit_data.py
+msgid "Compare authorized keys with approved keys, and remove unapproved keys."
+msgstr "登録済みの認証鍵を承認済みの鍵と照合し、未承認の鍵を削除してください。"
+
+#: reports/services/audit_data.py
+msgid "Compare group membership changes with approved access, and remove unapproved privileges."
+msgstr "グループ所属の変更を承認済みのアクセス権と照合し、未承認の権限を削除してください。"
+
+#: reports/services/audit_data.py
+msgid "Compare sudo permission changes with approved access, and remove unapproved privileges."
+msgstr "sudo 権限の変更を承認済みのアクセス権と照合し、未承認の権限を削除してください。"
+
+#: reports/services/audit_data.py
+msgid "Confirm the account owner and purpose, then manage approved accounts or disable unauthorized accounts."
+msgstr "アカウントの所有者と用途を確認し、承認済みアカウントを管理対象に追加するか、未承認アカウントを無効化してください。"
+
+#: reports/services/audit_data.py
+msgid "Confirm whether deletion was approved, then reconcile the managed account inventory."
+msgstr "削除が承認されていたかを確認し、管理対象アカウントの一覧と照合してください。"
+
+#: reports/services/audit_data.py
+msgid "Confirm whether the account is still needed, then disable unused accounts after approval."
+msgstr "アカウントが引き続き必要かを確認し、未使用のアカウントを承認後に無効化してください。"
+
+#: reports/services/audit_data.py
+msgid "Current Managed Accounts"
+msgstr "現在の管理対象アカウント"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "Currently, %(pending)s pending account risk records involve %(accounts)s distinct accounts on %(assets)s assets. Review the affected accounts by risk type."
+msgstr "現在、未対応のアカウントリスク記録 %(pending)s 件が、資産 %(assets)s 台の異なるアカウント %(accounts)s 件に関連しています。リスクの種類ごとに対象アカウントを確認してください。"
+
+#: reports/services/audit_data.py
+msgid "Latest Check Failed"
+msgstr "直近の検査で失敗"
+
+#: reports/services/audit_data.py
+msgid "Latest Check Successful"
+msgstr "直近の検査で成功"
+
+#: reports/services/audit_data.py
+msgid "Managed Accounts with Latest Check Successful"
+msgstr "直近の検査に成功した管理対象アカウント"
+
+#: reports/services/audit_data.py
+msgid "Most Recent Stored Check"
+msgstr "保存されている直近の検査日時"
+
+#: reports/services/audit_data.py
+msgid "No Check Result"
+msgstr "検査結果なし"
+
+#: reports/services/audit_data.py
+msgid "No listed security events were found in the available records for this period."
+msgstr "この期間の利用可能な記録では、一覧対象のセキュリティイベントは見つかりませんでした。"
+
+#: reports/services/audit_data.py
+msgid "Not Applicable"
+msgstr "対象外"
+
+#: reports/services/audit_data.py
+msgid "Password Changes with Subsequent Progress"
+msgstr "後続の進展があるパスワード変更"
+
+#: reports/services/audit_data.py
+msgid "Renew the expired credential and verify dependent tasks and account access."
+msgstr "期限切れの認証情報を更新し、依存タスクとアカウントへのアクセスを確認してください。"
+
+#: reports/services/audit_data.py
+msgid "Replace the weak password with a strong unique password, then verify account access."
+msgstr "弱いパスワードを強力かつ固有のパスワードに変更し、アカウントへのアクセスを確認してください。"
+
+#: reports/services/audit_data.py
+msgid "Review failed task logs and affected accounts; prioritize unresolved items before records with subsequent progress."
+msgstr "失敗したタスクのログと対象アカウントを確認し、後続の進展がある記録よりも未解決の項目を優先してください。"
+
+#: reports/services/audit_data.py
+msgid "Review risks"
+msgstr "リスクを確認"
+
+#: reports/services/audit_data.py
+msgid "Review the confirmed finding and verify the current account state."
+msgstr "確認済みの検出事項を再確認し、現在のアカウント状態を確認してください。"
+
+#: reports/services/audit_data.py
+msgid "Risk Accounts Matched to Managed Accounts"
+msgstr "管理対象に一致するリスクアカウント"
+
+#: reports/services/audit_data.py
+msgid "Risk Accounts Not Matched to Managed Accounts"
+msgstr "管理対象に一致しないリスクアカウント"
+
+#: reports/services/audit_data.py
+msgid "Risk List"
+msgstr "リスク一覧"
+
+#: reports/services/audit_data.py
+msgid "Risk Records"
+msgstr "リスク記録数"
+
+#: reports/services/audit_data.py
+msgid "Rotate the credential according to the rotation policy and verify dependent services."
+msgstr "ローテーションポリシーに従って認証情報を変更し、依存サービスを確認してください。"
+
+#: reports/services/audit_data.py
+msgid "Rotate the potentially exposed credential, review recent access, and verify dependent services."
+msgstr "漏えいの可能性がある認証情報を変更し、最近のアクセスを再確認して依存サービスを確認してください。"
+
+#: reports/services/audit_data.py
+msgid "Stored Asset Connectivity Results"
+msgstr "保存された資産の接続確認結果"
+
+#: reports/services/audit_data.py
+msgid "Stored Managed Account Connectivity Results"
+msgstr "保存された管理対象アカウントの接続確認結果"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "There are currently %(total)s assets, of which %(active)s are enabled."
+msgstr "現在の資産は %(total)s 台で、そのうち %(active)s 台が有効です。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "There are currently %(total)s managed account records, of which %(active)s are enabled."
+msgstr "現在の管理対象アカウント記録は %(total)s 件で、そのうち %(active)s 件が有効です。"
+
+#: reports/services/audit_data.py
+msgid "There are currently no pending account risk records."
+msgstr "現在、未対応のアカウントリスク記録はありません。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s account task executions were canceled."
+msgstr "アカウントタスクの実行 %(count)s 件がキャンセルされました。"
+
+msgid "Please upgrade the JumpServer client to use the configured login policy."
+msgstr "設定されたログインポリシーを使用するには、JumpServer クライアントをアップグレードしてください。"
+
+msgid "Client login session expired. Please authenticate again."
+msgstr "クライアントのログインセッションが失効しました。再認証してください。"
+
+msgid "Log in again after exiting the client"
+msgstr "クライアント終了後に再ログイン"
+
+msgid ""
+"When enabled, log in again after the desktop application exits and restarts."
+" Minimizing or hiding the application does not count as exiting."
+msgstr "有効にすると、デスクトップアプリケーションを終了して再起動した際に再ログインが必要になります。最小化や非表示は終了に含まれません。"
+
+msgid "Client login idle timeout (minute)"
+msgstr "アイドルタイムアウト（分）"
+
+msgid "Log in again when the idle timeout is reached. 0 disables the limit (default). Real keyboard and mouse input in the main window, separate asset windows and built-in websites counts as activity. An open connection, background output and automatic refresh do not count. Input in external software such as Xshell or MSTSC, and in some cross-origin embedded pages, cannot be captured. Using only these areas, watching without input for a long time, or failed reports due to network issues may still trigger the idle timeout. Time is measured from the last activity confirmed by the server."
+msgstr "アイドルタイムアウトに達すると再ログインが必要です。0 は制限なし（既定）です。メインウィンドウ、独立したアセットウィンドウ、内蔵ブラウザーで表示するサイトでの実際のキーボード・マウス操作が活動として記録されます。接続の維持、バックグラウンド出力、自動更新は活動に含まれません。Xshell、MSTSC などの外部ソフトウェアや、一部のクロスオリジン埋め込みページでの操作は取得できません。これらの領域だけを操作する場合、長時間操作せずに閲覧する場合、またはネットワークの問題で報告に失敗した場合も、アイドルタイムアウトが発生することがあります。時間はサーバーが最後に確認した活動から計算されます。"
+
+msgid "Maximum client login lifetime (minute)"
+msgstr "クライアントの最長ログイン有効期間 (分)"
+
+msgid "Measured from client login; activity and token refresh do not extend it. 0 disables the lifetime limit (default). Exit and idle timeout settings still apply. Log in again when the lifetime ends."
+msgstr "クライアントへのログイン時から計測し、操作やトークンの更新では延長されません。0 は有効期間の制限なしです（デフォルト）。終了時とアイドルタイムアウトの設定は引き続き適用されます。有効期間が終了すると再ログインが必要になります。"
+
+msgid "Client exit"
+msgstr "クライアントの終了"
+
+msgid "Idle timeout"
+msgstr "アイドルタイムアウト"
+
+msgid "Maximum login time"
+msgstr "ログイン有効期間の終了"
+
+msgid "Client login policy changed"
+msgstr "クライアントのログインポリシーが変更されました"
+
+msgid "Authorization revoked"
+msgstr "認可が取り消されました"
+
+#: assets/models/asset/common.py assets/serializers/asset/common.py
+msgid "Asset owner"
+msgstr "資産責任者"
+
+msgid "Manager"
+msgstr "Manager"
+
+msgid "Workflow"
+msgstr "Workflow"
+
+msgid "Approval workflow"
+msgstr "Approval workflow"
+
+msgid "Workflow version"
+msgstr "Workflow version"
+
+msgid "Workflow instance"
+msgstr "Workflow instance"
+
+msgid "Workflow node"
+msgstr "Workflow node"
+
+msgid "Workflow edge"
+msgstr "Workflow edge"
+
+msgid "Workflow node instance"
+msgstr "Workflow node instance"
+
+msgid "Approval task"
+msgstr "Approval task"
+
+msgid "Workflow event"
+msgstr "Workflow event"
+
+msgid "Client idle lock (minute)"
+msgstr "アイドルロック (分)"
+
+msgid ""
+"0 disables idle locking (default). When enabled, the client starts locked. "
+"Only the active site and account are checked for system keyboard or mouse "
+"inactivity. Lock the main page and managed asset windows without ending "
+"login or connections. Unlock only on the main page with the current account "
+"client lock password. Set the password in Personal settings > Login "
+"authentication > Client credentials. External applications are not covered "
+"by the client lock."
+msgstr ""
+"0 はアイドルロックを無効にします。 "
+"メイン画面と管理対象の資産ウィンドウをロックし、メイン画面でのみ解除できます。ログインと接続は維持されます。外部アプリは保護されません。有効時は新規・復元ログインもロック状態から開始します。"
+" 外部アプリを含むシステムのキーボードとマウス入力で、現在のサイトとアカウントのみのタイマーをリセットします。操作はサーバーに送信しません。"
+
+msgid "Client lock password"
+msgstr "クライアントロックパスワード"
+
+msgid "Set a client lock password in the web personal settings first."
+msgstr "ロックパスワードが未設定です。このサイトとアカウントの Web 個人設定で設定し、戻って更新してください。"
+
+msgid "The client lock password is incorrect."
+msgstr "解除できません。パスワードと接続を確認してください。"
+
+msgid ""
+"Calculated from each login time using the latest setting. Activity and token"
+" refresh do not extend it. 0 means unlimited. If a change makes a login "
+"overdue, allow up to 10 minutes before sign-out and signing in again."
+msgstr ""
+"各ログイン時刻から最新設定で計算します。操作やトークン更新では延長しません。0は無制限です。設定変更により期限を超えた場合は最大10分後にログアウトし、再ログインが必要です。"
+
+msgid ""
+"{} - Encryption password not set - Please go to Personal Settings → Login "
+"authentication → Client credentials → File Encryption Password to set it."
+msgstr ""
+"{} - 暗号化パスワードが未設定です。個人設定 → ログイン認証 → クライアント認証情報 → ファイル暗号化パスワードで設定してください。"
+
+msgid ""
+"0 disables automatic idle locking (default). System keyboard and mouse input"
+" determines inactivity for the active site and account only. Activity is not"
+" reported for each action; an idle timeout or manual lock sends one request "
+"to lock this login on the server. Idle timeout locks the main page and its "
+"managed asset windows even without a lock password. Unlock only on the main "
+"page after server password verification. New logins open normally; "
+"previously locked logins stay locked after restoration. External application"
+" windows are not protected."
+msgstr ""
+"0 "
+"は自動アイドルロック無効（既定）。システムのキーボードとマウス入力で、アクティブなサイトとアカウントの無操作時間のみを判定します。操作ごとの報告は行わず、無操作期限または手動ロック時にサーバーへこのログインのロックを要求します。"
+" "
+"無操作期限になると、パスワード未設定でもメイン画面と管理対象の資産ウィンドウをロックします。メイン画面でサーバーのパスワード検証に成功した場合のみ解除できます。新規ログインは通常どおり開き、ロック済みのログインは復元後もロックを維持します。外部アプリの画面は保護されません。"
+
+msgid "The web session is locked. Unlock it before authorizing a client."
+msgstr "Web セッションはロックされています。クライアントを認可する前にロックを解除してください。"
+
+msgid "Client is locked. Unlock it on the main page."
+msgstr "クライアントはロックされています。メイン画面で解除してください。"
+
+msgid ""
+"Default: 15 minutes. 0 disables automatic locking. After the configured "
+"period without system keyboard or mouse input, lock the main page and asset "
+"windows for the current site and account. Unlock on the main page by "
+"verifying the lock password online. Locking also applies if no password is "
+"configured; set it in web personal settings. External application windows "
+"are not protected."
+msgstr ""
+"既定値は15分です。 0 "
+"は自動ロックを無効にします。システムのキーボードやマウスが設定時間操作されないと、現在のサイトとアカウントのメイン画面と資産ウィンドウをロックします。メイン画面でオンラインのロックパスワード検証後に解除できます。パスワード未設定でもロックされます。Web"
+" の個人設定で設定してください。外部アプリの画面は保護されません。"
+
+msgid ""
+"{} - Encryption password not set - Please go to Personal Settings → User "
+"authentication → File Encryption to set it."
+msgstr "{} - 暗号化パスワードが未設定です。個人設定 → ユーザー認証 → ファイル暗号化で設定してください。"
+
+#: rbac/tree.py
+msgid "Audit reports"
+msgstr "監査レポート"
+
+#: rbac/tree.py
+msgid "Legacy reports"
+msgstr "旧版レポート"
+
+#: rbac/models/menu.py
+msgid "Can view comprehensive audit report"
+msgstr "総合監査レポートを表示できる"
+
+#: rbac/models/menu.py
+msgid "Can view operations activity report"
+msgstr "運用活動レポートを表示できる"
+
+#: rbac/models/menu.py
+msgid "Can view security event report"
+msgstr "セキュリティイベントレポートを表示できる"
+
+#: rbac/models/menu.py
+msgid "Can view asset and account overview"
+msgstr "資産とアカウントの概要を表示できる"
+
+#: rbac/models/menu.py
+msgid "Can view account operations report"
+msgstr "アカウント運用レポートを表示できる"
+
+msgid "Locked"
+msgstr "ロック状態"
+
+msgid "Screen lock password"
+msgstr "画面ロックパスワード"
+
+msgid "Idle screen lock (minute)"
+msgstr "アイドル画面ロック (分)"
+
+msgid "Set a lock password after signing in again."
+msgstr "再ログインして画面ロックパスワードを設定してください。"
+
+msgid "The lock password is incorrect."
+msgstr "画面ロックパスワードが正しくありません。"
+
+msgid ""
+"Configure an identity verification method before changing the lock password."
+msgstr "画面ロックパスワードを変更する前に本人確認方法を設定してください。"
+
+msgid "This verification method is not available."
+msgstr "この確認方法は使用できません。"
+
+msgid ""
+"Default: 15 minutes. 0 disables automatic locking. Shared by the desktop "
+"client, console and Web terminal. Desktop uses system keyboard/mouse "
+"activity; Web combines activity in tabs on this site. Idle locks even "
+"without a password. Unlock requires online password verification; if unset, "
+"sign out and sign in again to set it. External applications are not "
+"protected."
+msgstr ""
+"既定は15分、0で自動ロックを無効にします。クライアント・コンソール・Webターミナルで共通です。クライアントはシステム全体のキー・マウス操作、Webは同一サイトのタブの操作を集計します。パスワード未設定でも時間到達時にロックします。解除にはオンラインでパスワードを確認します。未設定の場合はログアウトして再ログイン後に設定できます。外部アプリのウィンドウは保護されません。"
+
+msgid ""
+"Too many incorrect screen lock passwords. This session has been signed out."
+msgstr "画面ロックパスワードを5回連続で間違えたため、ログアウトしました。"
+
+msgid ""
+"Default: 15 minutes. 0 disables automatic locking. Uses system "
+"keyboard/mouse activity. Locks the desktop client and its asset windows even"
+" without a lock password. Unlock on the main window with online password "
+"verification. External applications are not protected."
+msgstr ""
+"既定は15分です。0で自動ロックを無効にします。システムのキーボード・マウス操作でアイドルを判定し、パスワードが未設定でもクライアントと資産ウィンドウをロックします。メイン画面でサーバーによるパスワード検証後に解除します。外部アプリは保護されません。"
+
+msgid ""
+"Default: 15 minutes. 0 disables automatic locking. Shared by the console and"
+" Web terminal. Uses keyboard/mouse activity across tabs on this site; other "
+"sites and external applications cannot be monitored. Locks the current Web "
+"login even without a lock password. If unset, sign out and sign in again."
+msgstr ""
+"既定は15分です。0で自動ロックを無効にします。コンソールとWebターミナルで共有し、同一サイトのタブのキーボード・マウス操作を集計します。他のサイトや外部アプリの操作は取得できません。パスワードが未設定でもロックし、その場合はログアウトして再ログインしてください。"
+
+#~ msgid "Ticket already closed"
+#~ msgstr "チケットはすでに閉じています"
+
+msgid "Web session lifetime (second)"
+msgstr "Web セッション有効期間 (秒)"
+
+msgid "Renew session on request"
+msgstr "リクエストで有効期限を更新"
+
+msgid ""
+"SESSION_COOKIE_AGE, in seconds. Change it in Core config.yml and restart "
+"Core. New or renewed sessions use the new duration; stored expiry times are "
+"not immediately rewritten. This is not a fixed maximum since login. Web and "
+"desktop login policies are independent."
+msgstr ""
+"設定項目 SESSION_COOKIE_AGE、単位は秒です。Core の config.yml を変更し、Core "
+"を再起動してください。新規または更新されたセッションに新しい期間を適用し、保存済みの有効期限は一括変更しません。ログイン時点からの固定上限ではありません。Web"
+" とクライアントのログインポリシーは独立しています。"
+
+msgid ""
+"SESSION_SAVE_EVERY_REQUEST. Change it in Core config.yml and restart Core. "
+"When enabled, ordinary requests renew the Web session for the configured "
+"duration. Disabling it does not impose a fixed maximum: writing to the "
+"session can still renew it. Keyboard/mouse inactivity does not sign out the "
+"user; idle screen locking is configured separately."
+msgstr ""
+"設定項目 SESSION_SAVE_EVERY_REQUEST。Core の config.yml を変更し、Core "
+"を再起動してください。有効にすると通常のリクエストで設定期間分だけ期限を更新します。無効でも固定上限にはならず、Session "
+"への書き込みで更新される場合があります。キーボードやマウスのアイドル状態ではログアウトせず、アイドルロックは別途設定します。"
+
+msgid ""
+"0 means unlimited. Calculated from each login time using the latest setting."
+" Activity and token refresh do not extend it. Settings sync about every 60 "
+"seconds. If a change makes a login overdue, allow up to 10 minutes before "
+"sign-out. Extending the limit during grace cancels sign-out if the login is "
+"within the new limit."
+msgstr ""
+"0 は無制限です。各ログイン時刻と最新設定から計算し、操作や Token "
+"更新では延長しません。設定は約60秒ごとに同期します。変更により期限を過ぎた場合は最大10分の猶予後にログアウトします。猶予中の延長で新しい期限内に戻った場合はログアウトを取り消します。"
+
+msgid "Web idle screen lock (minute)"
+msgstr "Web 無操作時ロック（分）"
+
+msgid "Client idle screen lock (minute)"
+msgstr "クライアント無操作時ロック（分）"
+
+msgid ""
+"Leave blank to follow the administrator. A personal value must not exceed "
+"the administrator limit."
+msgstr "空欄で管理者設定に従います。個人設定は管理者の上限以下にしてください。"
+
+#, python-format
+msgid ""
+"The administrator limit is %(minutes)s minutes. Leave blank to follow it."
+msgstr "管理者の上限は %(minutes)s 分です。空欄で管理者設定に従います。"
+
+msgid ""
+"Global default and maximum. Users who have not customized it follow this "
+"value. Personal values must not exceed it. Lowering the maximum also lowers "
+"larger personal values; raising it keeps customized values."
+msgstr ""
+"全体の既定値と上限です。未設定のユーザーは常にこの値に従います。個人設定は上限以下にできます。上限を下げると超過する個人設定も下げます。上限を上げても設定済みの個人値は変わりません。"
+
+msgid "Choose either setting or clearing the lock password."
+msgstr "ロックパスワードの設定と削除を同時に行うことはできません。"
+
+msgid ""
+"When the global value is 0, users may choose 0 to disable locking or a "
+"positive personal timeout."
+msgstr "全体の値が0の場合、ユーザーは0でロックを無効にするか、正の時間を指定できます。"
+
+msgid "The administrator requires reauthentication after client exit."
+msgstr "管理者が終了後の再ログインを必須にしています。"
+
+msgid ""
+"Users may enable it themselves when the administrator does not require it."
+msgstr "管理者が必須にしていない場合も、ユーザーは自分で有効にできます。"
+
+msgid ""
+"SESSION_COOKIE_AGE, in seconds. Change it in Core config.yml and restart "
+"Core. New logins use the new duration. Existing expiry times are not "
+"immediately rewritten. Renewals use the new duration unless the session has "
+"its own saved duration; sign in again to apply the new duration to those "
+"sessions. This is not a fixed maximum since login. Web and desktop login "
+"policies are independent."
+msgstr ""
+"有効期間とリクエスト更新は Core の config.yml を変更し Core "
+"を再起動します。新しいログインに適用し、既存の期限は一括変更しません。固有の期間を保存したセッションは更新時も元の期間を使う場合があり、新しい期間の適用には再ログインが必要です。"
+" SESSION_COOKIE_AGE "
+"はセッション保存時に使う有効期間（秒）です。最初のログインからの固定上限ではありません。個人情報に表示する現在の期限が、サーバーに保存された期限です。"
+
+msgid ""
+"Default Web session duration, in seconds, after login or renewal. It is not "
+"a fixed maximum since the first login. Change SESSION_COOKIE_AGE in Core "
+"config.yml and restart Core. Existing sessions may keep their saved "
+"duration; sign in again to apply the new duration."
+msgstr ""
+"ログインまたは更新後の Web セッションの既定の有効期間（秒）です。最初のログインからの固定上限ではありません。Core の config.yml の"
+" SESSION_COOKIE_AGE を変更し、Core "
+"を再起動してください。既存セッションは元の期間を保持する場合があり、新しい期間は再ログイン後に適用されます。"
+
+msgid ""
+"Enabled: ordinary HTTP requests, including background requests, renew the "
+"session. Disabled: ordinary read-only requests do not renew it, but session "
+"writes such as identity verification still can. Change "
+"SESSION_SAVE_EVERY_REQUEST in Core config.yml and restart Core."
+msgstr ""
+"有効：通常の HTTP "
+"リクエストで更新し、バックグラウンドのリクエストも更新する場合があります。無効：通常の読み取り専用リクエストでは更新しませんが、本人確認など "
+"Session を書き換える操作は更新する場合があります。Core の config.yml の SESSION_SAVE_EVERY_REQUEST "
+"を変更し Core を再起動してください。"
+
+msgid ""
+"Enabled: closing the browser normally requires signing in again. Browser "
+"session restore may keep login cookies; use Sign out to end the login "
+"reliably. This does not set a fixed maximum login duration."
+msgstr ""
+"有効なら、ブラウザー終了後は通常再ログインが必要です。復元機能がログイン Cookie "
+"を保持する場合があります。確実に終了するには「ログアウト」を使ってください。固定の最大ログイン時間を設定するものではありません。"
+
+msgid ""
+"Default duration, in seconds.<br>Each renewal restarts the clock: expiry = "
+"renewal time + duration.<br>Ordinary requests renew it when request renewal "
+"is enabled; session writes such as identity verification can still renew it "
+"when disabled.<br>This is not a fixed maximum from the first "
+"login.<br>Change SESSION_COOKIE_AGE in Core config.yml and restart Core. "
+"Existing sessions may retain their saved duration; sign in again to apply "
+"the new duration."
+msgstr ""
+"既定の有効期間。単位は秒です。<br>更新のたびに再計算します：有効期限 = 更新時刻 + "
+"有効期間。<br>リクエスト更新が有効なら通常のリクエストで更新します。無効でも本人確認など Session "
+"を変更する操作は更新する場合があります。<br>最初のログインからの固定最大時間ではありません。<br>Core の config.yml の "
+"SESSION_COOKIE_AGE を変更して Core "
+"を再起動します。既存セッションは元の期間を保持する場合があり、新しい期間は再ログイン後に適用されます。"
+
+msgid ""
+"Enabled: most API requests using a valid Web session renew it, including GET"
+" queries and background business polling. Mouse or keyboard activity is not "
+"required.<br>Excluded read-only queries: profile, online status (user-"
+"session), and lock status (session-lock/status).<br>Disabled: ordinary read-"
+"only requests do not renew it, but identity verification and other session "
+"writes still can.<br>Why: the project writes the verification result to "
+"Session; Django saves the modified session and recalculates its relative "
+"expiry by default.<br>Change SESSION_SAVE_EVERY_REQUEST in Core config.yml "
+"and restart Core."
+msgstr ""
+"有効：有効な Web セッションを使う大半の API リクエストで更新します。GET "
+"と業務のバックグラウンドポーリングも含み、鍵盤・マウス操作は不要です。<br>更新しない読み取り専用の照会：プロフィール、オンライン状態（user-"
+"session）、ロック状態（session-lock/status）。<br>無効：通常の読み取り専用リクエストでは更新しませんが、本人確認など "
+"Session を変更する操作は更新する場合があります。<br>理由：プロジェクトが確認結果を Session に保存し、Django が変更された "
+"Session の保存時に相対的な有効期限を既定で再計算するためです。<br>Core の config.yml の "
+"SESSION_SAVE_EVERY_REQUEST を変更して Core を再起動します。"
+
+msgid ""
+"Enabled: after quitting the entire browser application, opening it again "
+"normally requires signing in.<br>Closing a tab or window, or minimizing it, "
+"is not the same as quitting the application; the browser may still be "
+"running in the background.<br>Browser session restore may preserve login "
+"cookies. Use the site Sign out action to reliably end the login.<br>This "
+"does not set a fixed maximum login duration."
+msgstr ""
+"有効なら、ブラウザーアプリ全体を終了して開き直すと、通常は再ログインが必要です。<br>タブやウィンドウを閉じること、最小化はアプリの終了とは異なり、ブラウザーがバックグラウンドで動いている場合があります。<br>復元機能がログイン"
+" Cookie "
+"を保持する場合があります。確実に終了するにはサイトの「ログアウト」を使用してください。<br>固定の最大ログイン時間を設定する項目ではありません。"
+
+#: apps/settings/serializers/security.py
+msgid ""
+"Require a new login after exiting and restarting. Minimizing or hiding the "
+"client does not count as exiting."
+msgstr "終了して再起動すると再ログインが必要です。最小化や非表示は終了に含みません。"
+
+#: apps/settings/serializers/security.py
+msgid ""
+"0 means unlimited. Counted from login. Sign in again when it expires; "
+"activity does not extend it. A login already overdue after a change gets up "
+"to 10 more minutes."
+msgstr ""
+"0 は無制限です。 ログイン時刻から計算し、期限切れ後は再ログインが必要です。操作しても延長されません。 "
+"変更により期限を過ぎたログインには最大10分の猶予があります。"
+
+#: apps/settings/serializers/security.py
+msgid ""
+"0 disables automatic locking. Locks after the idle timeout. Switching "
+"accounts does not reset the previous account’s idle time. Enter the lock "
+"password to unlock. External application windows are not protected."
+msgstr ""
+"0 "
+"は自動ロックを無効にします。アイドル時間を超えるとロックします。アカウントを切り替えても、前のアカウントのアイドル時間はリセットされません。ロックパスワードで解除できます。外部アプリのウィンドウは保護されません。"
+
+#: settings/serializers/feature.py
+msgid "Asset application scope"
+msgstr "資産の申請範囲"
+
+#: settings/serializers/feature.py
+msgid "Specifies which assets users can select when requesting access via a ticket.<br><b>All assets:</b> All assets in the ticket's organization, even if the user has no existing permission.<br><b>Permed assets:</b> Assets included in permission rules assigned to the user or their user groups, including inactive, expired and not-yet-effective rules.<br><b>Permed valid assets:</b> Assets included in valid permission rules assigned to the user or their user groups. The rule must be enabled, and the current time must be between its start and end times."
+msgstr "チケットでアクセス権を申請する際に選択できる資産の範囲を設定します。<br><b>すべての資産：</b>事前の認可がなくても、チケットの所属組織内のすべての資産を選択できます。<br><b>認可された資産：</b>ユーザー本人または所属グループに割り当てられた認可ルールの対象資産を選択できます。無効化されたルール、期限切れのルール、適用開始前のルールも含まれます。<br><b>有効な認可資産：</b>ユーザー本人または所属グループの有効な認可ルールの対象資産のみ選択できます。ルールが有効化され、現在時刻が開始時刻と終了時刻の間にあることが条件です。"
+
+#: chat_ai/models.py
+msgid "Chat AI conversation audit"
+msgstr "AI 会話監査"
+
+msgid "Completed policy cycles are retained from their end time. Active cycles, cycles requiring attention, and their dependent audit and confirmation records are preserved."
+msgstr "完了したサイクルの保持期間は終了時刻から計算されます。実行中および対応が必要なサイクルと、それらに必要な監査・アプリケーション確認記録は保持されます。"
+
+msgid "Clean expired application audits, completed policy cycles and webhook delivery records."
+msgstr "期限切れのアプリケーション監査、完了したポリシーサイクル、Webhook 配信記録を削除します。"
+
+msgid "The start time must be earlier than the end time."
+msgstr "開始時刻は終了時刻より前である必要があります。"
+
+#: apps/settings/serializers/security.py
+msgid ""
+"0 disables idle locking. Locks the console and Web terminal after the "
+"specified idle time. Enter the lock password to unlock. With idle locking "
+"enabled, closing all pages also locks this login after 10 seconds. Close-"
+"page sign-out takes priority. Refreshing or reopening within 10 seconds "
+"cancels this. Administrator settings are defaults and limits. Users may "
+"choose stricter settings; otherwise they follow the administrator."
+msgstr ""
+"0 で無操作によるロックを無効にします。 指定した無操作時間でコンソールと Web ターミナルをロックします。ロック用パスワードで解除します。 "
+"無操作によるロックが有効な場合、すべてのページを閉じても10秒後にロックされます。ページ終了時のログアウト設定が優先されます。更新や10秒以内の再表示でキャンセルされます。"
+" 管理者設定が既定値と上限です。ユーザーはより厳しい設定にでき、未設定の場合は管理者設定に従います。"
+
+#: apps/settings/serializers/security.py:222
+msgid ""
+"When renewal is disabled, the login expires after this duration, even if the"
+" session is saved or identity is verified again. When renewal is enabled, "
+"each renewal grants this duration again. Changes apply to new logins without"
+" restarting Core."
+msgstr ""
+"更新が無効の場合、ログイン成功時からこの時間が経過すると期限切れになります。セッションの保存や再認証では延長されません。有効の場合、更新のたびにこの時間が再設定されます。変更は再起動なしで新しいログインに適用されます。"
+
+#: apps/settings/serializers/security.py:230
+msgid ""
+"Requests can extend the session at most once per minute. Background business"
+" requests also count; profile, online-status and lock-status polling do not."
+" Disabled: the expiry time stays fixed. Changes apply to new logins without "
+"restarting Core."
+msgstr ""
+"リクエストによるセッション更新は1分間に最大1回です。バックグラウンドの業務リクエストも対象ですが、プロフィール、オンライン状態、ロック状態のポーリングは除きます。無効の場合、期限は固定されます。変更は再起動なしで新しいログインに適用されます。"
+
+#: apps/settings/serializers/security.py:299
+msgid "Log in again after exiting the browser"
+msgstr "ブラウザー終了後に再ログイン"
+
+#: apps/settings/serializers/security.py:299
+msgid ""
+"Require a new login after quitting the browser application. Closing a tab or"
+" window does not count. Browser session restore may preserve the login; use "
+"Sign out to reliably end it. Changes apply to new logins."
+msgstr ""
+"ブラウザーアプリの終了後に再ログインを要求します。タブやウィンドウを閉じる操作は含みません。セッション復元によりログインが保持される場合があります。確実に終了するにはログアウトしてください。変更は新しいログインに適用されます。"
+
+msgid "Log in again after exiting the browser or closing all JumpServer pages"
+msgstr "ブラウザー終了または全ページ閉鎖後に再ログイン"
+
+msgid ""
+"End this login 10 seconds after all console and Web terminal pages for it "
+"close. Refreshing or reopening a page within 10 seconds cancels sign-out. A "
+"browser crash may prevent the close report; use Sign out to reliably end the"
+" login. Changes apply to new logins."
+msgstr ""
+"同じログインのコンソールと Web "
+"ターミナルをすべて閉じると、約10秒後にログアウトします。更新や10秒以内の再表示でキャンセルされます。異常終了時は通知できない場合があります。確実に終了するにはログアウトしてください。変更は新しいログインに適用されます。"
+
+msgid "Session policy"
+msgstr "セッションポリシー"
+
+msgid "Log in again when the browser closes"
+msgstr "ブラウザーを閉じた後に再ログイン"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "External ID"
+msgstr "クラウドリソース ID"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Last seen at"
+msgstr "最終検出日時"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Stale since"
+msgstr "最初の欠落日時"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Missing count"
+msgstr "連続未検出回数"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Stale"
+msgstr "確認待ち"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Conflict"
+msgstr "競合"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Cloud resource was not found in a complete scan"
+msgstr "完全なスキャンでクラウドリソースが検出されませんでした"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The resource no longer matches the synchronization strategy"
+msgstr "クラウドリソースは同期戦略に一致しなくなりました"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The region was removed from the synchronization scope"
+msgstr "リージョンが同期範囲から除外されました"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud resource binding needs manual review"
+msgstr "クラウドリソースの関連付けを手動で確認してください"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The discovered resource was not selected for import"
+msgstr "クラウドリソースは検出されましたが、インポート対象に選択されていません"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The resource was discovered but was not imported"
+msgstr "クラウドリソースは検出されましたが、インポートされていません"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud resource changed, but automatic update is disabled"
+msgstr "クラウドリソースは変更されていますが、自動更新が無効です"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud region scan timed out"
+msgstr "クラウドリージョンのスキャンがタイムアウトしました"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud region scan did not return a complete result"
+msgstr "クラウドリージョンのスキャン結果が不完全です"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud region scan returned an invalid result"
+msgstr "クラウドリージョンから無効なスキャン結果が返されました"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud region could not be scanned"
+msgstr "クラウドリージョンをスキャンできませんでした"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "No additional details"
+msgstr "追加情報はありません"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "First seen at"
+msgstr "初回検出日時"
+
+#: xpack/plugins/cloud/manager.py
+#, python-format
+msgid ""
+"Resources: new %(new)s, updated %(updated)s, unchanged %(nochange)s, to "
+"review %(stale)s, failed %(failed)s, skipped %(skip)s, released %(released)s"
+msgstr ""
+"リソース: 新規 %(new)s、更新 %(updated)s、変更なし %(nochange)s、要確認 %(stale)s、失敗 "
+"%(failed)s、スキップ %(skip)s、解放済み %(released)s"
+
+#: xpack/plugins/cloud/manager.py
+#, python-format
+msgid ""
+"Regions: total %(total)s, succeeded %(succeeded)s, failed %(failed)s, "
+"incomplete %(incomplete)s, not scanned %(unscanned)s"
+msgstr ""
+"リージョンスキャン: 合計 %(total)s、成功 %(succeeded)s、失敗 %(failed)s、不完全 "
+"%(incomplete)s、未スキャン %(unscanned)s"
+
+#: xpack/plugins/cloud/manager.py
+msgid "Interactive import does not automatically release assets."
+msgstr "対話式インポートではアセットを自動的に解放しません。"
+
+#: xpack/plugins/cloud/manager.py
+msgid ""
+"Automatic release is enabled for resources confirmed missing by a complete "
+"scan."
+msgstr "自動解放が有効です。完全なスキャンで存在しないことを確認したクラウドリソースのみを対象とします。"
+
+#: xpack/plugins/cloud/manager.py
+msgid ""
+"Automatic release is disabled; missing cloud resources require manual "
+"review."
+msgstr "自動解放は無効です。見つからないクラウドリソースは手動で確認する必要があります。"
+
+#: xpack/plugins/cloud/manager.py
+msgid ""
+"Resource failures and scan or task errors are counted separately. A task can"
+" fail even when no individual resource failed."
+msgstr "リソースの失敗とスキャンやタスクのエラーは別々に集計されます。個別のリソースに失敗がなくても、タスクが失敗する場合があります。"
+
+#: xpack/plugins/cloud/const.py
+msgid "Partial"
+msgstr "一部成功"
+
+#: terminal/tasks.py:42
+#, python-format
+msgid "Checking terminal status records older than %(days)s days."
+msgstr "%(days)s 日を超えたターミナル状態レコードを確認しています。"
+
+#: terminal/tasks.py:47 ops/tasks.py:235
+#, python-format
+msgid "Expired records matched: %(checked)s; deleted: %(deleted)s."
+msgstr "期限切れの該当レコード：%(checked)s 件、削除：%(deleted)s 件。"
+
+#: terminal/tasks.py:65
+msgid "Checking unfinished sessions; active sessions will be kept."
+msgstr "未終了のセッションを確認しています。アクティブなセッションは保持します。"
+
+#: terminal/tasks.py:82
+#, python-format
+msgid "Sessions checked: %(checked)s; marked finished: %(finished)s; skipped because still active: %(active)s; related tasks marked finished: %(tasks)s."
+msgstr "確認したセッション：%(checked)s 件、終了に変更：%(finished)s 件、アクティブのためスキップ：%(active)s 件、完了に変更した関連タスク：%(tasks)s 件。"
+
+#: terminal/tasks.py:51 ops/tasks.py:239
+msgid "Nothing to clean: no records exceeded the retention period."
+msgstr "クリーンアップ不要：保持期間を超えたレコードはありません。"
+
+#: terminal/tasks.py:87
+msgid "Nothing to process: no unfinished sessions."
+msgstr "処理不要：未終了のセッションはありません。"
+
+#: ops/celery/utils.py:38
+#, python-format
+msgid "Checking periodic task: %(name)s."
+msgstr "定期タスクを確認しています：%(name)s。"
+
+#: ops/celery/utils.py:61
+#, python-format
+msgid "Schedule: every %(seconds)s seconds."
+msgstr "実行スケジュール：%(seconds)s 秒ごと。"
+
+#: ops/celery/utils.py:46
+#, python-format
+msgid "Skipped periodic task %(name)s: the scheduling database is unavailable."
+msgstr "定期タスク %(name)s をスキップ：スケジュール用データベースを利用できません。"
+
+#: ops/celery/utils.py:77
+#, python-format
+msgid "Schedule (cron): %(cron)s; time zone: %(timezone)s."
+msgstr "実行スケジュール（cron）：%(cron)s、タイムゾーン：%(timezone)s。"
+
+#: ops/celery/utils.py:81
+#, python-format
+msgid "Skipped periodic task %(name)s: no valid interval or cron expression is configured."
+msgstr "定期タスク %(name)s をスキップ：有効な実行間隔または cron 式が設定されていません。"
+
+#: ops/celery/utils.py:66
+#, python-format
+msgid "Skipped periodic task %(name)s: the cron expression must contain five fields."
+msgstr "定期タスク %(name)s をスキップ：cron 式には 5 つのフィールドが必要です。"
+
+#: ops/tasks.py:123
+msgid "Checking periodic tasks; tasks still registered in the worker will be kept."
+msgstr "定期タスクを確認しています。Worker に登録されているタスクは保持します。"
+
+#: ops/tasks.py:144
+#, python-format
+msgid "Periodic tasks checked: %(checked)s; deleted: %(cleaned)s; kept because still registered: %(kept)s; cleanup failures: %(failed)s."
+msgstr "確認した定期タスク：%(checked)s 件、削除：%(cleaned)s 件、登録済みのため保持：%(kept)s 件、クリーンアップ失敗：%(failed)s 件。"
+
+#: ops/tasks.py:161
+msgid "Starting periodic task registration."
+msgstr "定期タスクの登録を開始します。"
+
+#: ops/tasks.py:172
+#, python-format
+msgid "Periodic tasks checked: %(checked)s; created: %(created)s; updated: %(updated)s; skipped: %(skipped)s."
+msgstr "確認した定期タスク：%(checked)s 件、作成：%(created)s 件、更新：%(updated)s 件、スキップ：%(skipped)s 件。"
+
+#: ops/tasks.py:203
+#, python-format
+msgid "Checking running jobs; jobs older than %(hours)s hours will be marked failed."
+msgstr "実行中のジョブを確認しています。%(hours)s 時間を超えたジョブは失敗に変更します。"
+
+#: ops/tasks.py:208
+#, python-format
+msgid "Jobs checked: %(checked)s; marked failed: %(cleaned)s; skipped because within the time limit: %(skipped)s."
+msgstr "確認したジョブ：%(checked)s 件、失敗に変更：%(cleaned)s 件、制限時間内のためスキップ：%(skipped)s 件。"
+
+#: ops/tasks.py:229
+#, python-format
+msgid "Checking job execution records older than %(days)s days."
+msgstr "%(days)s 日を超えたジョブ実行レコードを確認しています。"
+
+#: ops/tasks.py:133
+#, python-format
+msgid "Removing periodic task %(name)s: its task is no longer registered."
+msgstr "定期タスク %(name)s を削除しています：対応するタスクの登録がなくなりました。"
+
+#: ops/tasks.py:213
+msgid "Nothing to process: no running jobs."
+msgstr "処理不要：実行中のジョブはありません。"
+
+#: ops/tasks.py:143
+#, python-format
+msgid "Periodic task %(name)s still exists after cleanup."
+msgstr "クリーンアップ後も定期タスク %(name)s が存在します。"
+
+#: settings/tasks/ldap.py:88
+#, python-format
+msgid "Checking LDAP periodic sync configuration: %(name)s."
+msgstr "LDAP 定期同期の設定を確認しています：%(name)s。"
+
+#: settings/tasks/ldap.py:95
+#, python-format
+msgid "Skipped registration: LDAP periodic sync is disabled; schedules kept disabled: %(count)s."
+msgstr "登録をスキップ：LDAP 定期同期は無効です。無効状態を維持するスケジュール：%(count)s 件。"
+
+#: users/tasks.py:97
+msgid "Checking active local users with unexpired accounts and passwords."
+msgstr "アカウントとパスワードが有効期限内の、有効なローカルユーザーを確認しています。"
+
+#: users/tasks.py:113 users/tasks.py:187
+#, python-format
+msgid "Users checked: %(checked)s; reminders queued: %(notified)s; skipped because inactive or expired: %(invalid)s; skipped because outside the reminder window: %(outside)s."
+msgstr "確認したユーザー：%(checked)s 人、通知をキューに登録：%(notified)s 件、無効または期限切れのためスキップ：%(invalid)s 人、通知期間外のためスキップ：%(outside)s 人。"
+
+#: users/tasks.py:156
+#, python-format
+msgid "Checking active local users expiring within %(first)s days; remind %(first)s days before expiry and daily within %(daily)s days."
+msgstr "%(first)s 日以内に期限切れとなる有効なローカルユーザーを確認しています。期限の %(first)s 日前と、最後の %(daily)s 日間は毎日通知します。"
+
+#: users/tasks.py:107
+#, python-format
+msgid "Queuing a password expiration reminder for %(user)s: %(days)s days remaining."
+msgstr "%(user)s のパスワード期限通知をキューに登録しています：残り %(days)s 日。"
+
+#: users/tasks.py:119 users/tasks.py:193
+msgid "Nothing to process: no users matched the check criteria."
+msgstr "処理不要：確認条件に一致するユーザーはいません。"
+
+#: users/tasks.py:181
+#, python-format
+msgid "Queuing an account expiration reminder for %(user)s: %(days)s days remaining."
+msgstr "%(user)s のアカウント期限通知をキューに登録しています：残り %(days)s 日。"
+
+#: accounts/tasks/openbao.py:114
+#, python-format
+msgid "OpenBao tokens checked: 1; rotated: 1; new TTL: %(ttl)s seconds."
+msgstr "確認した OpenBao トークン：1 個、ローテーション：1 個、新しい有効期間：%(ttl)s 秒。"
+
+#: accounts/tasks/openbao.py:124
+msgid "Checking OpenBao token rotation configuration."
+msgstr "OpenBao トークンのローテーション設定を確認しています。"
+
+#: accounts/tasks/openbao.py:126
+msgid "Skipped token rotation: the OpenBao vault backend is not enabled."
+msgstr "トークンのローテーションをスキップ：OpenBao Vault バックエンドが有効ではありません。"
+
+#: accounts/tasks/openbao.py:130
+msgid "Skipped token rotation: no enabled rotation AppRole is configured."
+msgstr "トークンのローテーションをスキップ：有効なローテーション用 AppRole が設定されていません。"
+
+#: accounts/tasks/openbao.py:137
+msgid "Skipped token rotation: another rotation task is running."
+msgstr "トークンのローテーションをスキップ：別のローテーションタスクが実行中です。"
+
+#: accounts/tasks/openbao.py:82
+#, python-format
+msgid "OpenBao tokens checked: 1; rotated: 0; skipped: 1. The token is still valid for %(ttl)s seconds, above the rotation threshold of %(threshold)s seconds."
+msgstr "確認した OpenBao トークン：1 個、ローテーション：0 個、スキップ：1 個。残りの有効期間は %(ttl)s 秒で、ローテーションのしきい値 %(threshold)s 秒を超えています。"
+
+#: ops/celery/utils.py
+#, python-format
+msgid "Created periodic task %(name)s; enabled: %(enabled)s."
+msgstr "定期タスク %(name)s を作成しました。有効：%(enabled)s。"
+
+#: ops/celery/utils.py
+#, python-format
+msgid "Updated periodic task %(name)s; enabled: %(enabled)s."
+msgstr "定期タスク %(name)s を更新しました。有効：%(enabled)s。"
+
+#: tickets/tasks.py perms/tasks.py tickets/plugins/file_transfer/execution.py
+msgid "The batch limit was reached; remaining records will be checked next time."
+msgstr "バッチ上限に達しました。残りのレコードは次回確認します。"
+
+#: perms/tasks.py
+msgid "No reminder was queued; recipients are missing or publication failed."
+msgstr "通知はキューに登録されませんでした。受信者がいないか、登録に失敗しました。"
+
+#: perms/tasks.py
+msgid "No users or administrators are available to receive reminders."
+msgstr "通知を受信できるユーザーまたは管理者がいません。"
+
+#: perms/tasks.py authentication/tasks.py
+msgid "Notifications queued"
+msgstr "キューに登録した通知"
+
+#: perms/tasks.py
+msgid "The permission is outside the reminder window."
+msgstr "権限が通知期間外です。"
+
+#: perms/tasks.py
+msgid "Unable to queue a notification."
+msgstr "通知をキューに登録できません。"
+
+#: terminal/tasks.py
+msgid "Alert notifications queued"
+msgstr "キューに登録したアラート通知"
+
+#: terminal/tasks.py
+#, python-format
+msgid "Storage check failed: %(name)s (%(type)s)."
+msgstr "ストレージの確認に失敗しました：%(name)s（%(type)s）。"
+
+#: terminal/tasks.py
+msgid "Storage connectivity or credential validation failed."
+msgstr "ストレージの接続または認証情報の検証に失敗しました。"
+
+#: users/tasks.py
+msgid "Automatic disabling of unused users is not enabled."
+msgstr "未使用ユーザーの自動無効化が有効になっていません。"
+
+#: users/tasks.py
+#, python-format
+msgid "Checking users with no login or API key use for %(days)s days; admin is excluded."
+msgstr "%(days)s 日間ログインも API キーの使用もないユーザーを確認しています。admin は除外します。"
+
+#: users/tasks.py ops/celery/task_logging.py accounts/tasks/automation.py tickets/plugins/file_transfer/execution.py
+msgid "The record was already handled by another task."
+msgstr "レコードは別のタスクで処理済みです。"
+
+#: users/tasks.py
+msgid "The unused-user threshold is outside the enabled range of 1–998 days."
+msgstr "未使用ユーザーのしきい値が有効範囲（1～998 日）の外です。"
+
+#: users/tasks.py
+msgid "Users disabled"
+msgstr "無効化したユーザー"
+
+#: users/signal_handlers.py
+msgid "Sessions deleted"
+msgstr "削除したセッション"
+
+#: ops/tasks.py
+msgid "Components with health alerts"
+msgstr "正常性アラートのあるコンポーネント"
+
+#: ops/tasks.py
+msgid "No health alerts to send."
+msgstr "送信する正常性アラートはありません。"
+
+#: ops/tasks.py
+msgid "Service performance checks are disabled by configuration."
+msgstr "設定によりサービス性能チェックが無効になっています。"
+
+#: ops/tasks.py
+msgid "The component is inactive."
+msgstr "コンポーネントが無効です。"
+
+#: authentication/tasks.py
+msgid "Client login session cleanup"
+msgstr "クライアントログインセッションのクリーンアップ"
+
+#: authentication/tasks.py
+msgid "Credential activity records included"
+msgstr "集計に含まれる認証情報のアクティビティ記録"
+
+#: authentication/tasks.py
+msgid "No recent credential activity matched this user."
+msgstr "このユーザーには対象となる最近の認証情報アクティビティがありません。"
+
+#: authentication/tasks.py
+msgid "OAuth credential cleanup categories"
+msgstr "OAuth 認証情報カテゴリのクリーンアップ"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Expired ID tokens deleted"
+msgstr "削除した期限切れ ID トークン"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Expired access tokens deleted"
+msgstr "削除した期限切れアクセストークン"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Expired grant tokens deleted"
+msgstr "削除した期限切れ認可コード"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Expired refresh tokens deleted"
+msgstr "削除した期限切れリフレッシュトークン"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "No expired records in this credential category."
+msgstr "この認証情報カテゴリに期限切れレコードはありません。"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Orphaned refresh tokens deleted"
+msgstr "削除した孤立リフレッシュトークン"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Refresh-token retention settings require these tokens to be kept."
+msgstr "リフレッシュトークンの保持設定により、これらのトークンは保持されます。"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Revoked refresh tokens deleted"
+msgstr "削除した失効済みリフレッシュトークン"
+
+#: notifications/notifications.py
+#, python-format
+msgid "Channel %(channel)s: matched recipients %(matched)s; recipients with a channel account %(bound)s; unbound %(unbound)s."
+msgstr "チャネル %(channel)s：対象受信者 %(matched)s 人、チャネルアカウント連携済み %(bound)s 人、未連携 %(unbound)s 人。"
+
+#: notifications/notifications.py
+msgid "No recipients have an account for this notification channel."
+msgstr "この通知チャネルのアカウントを持つ受信者がいません。"
+
+#: notifications/notifications.py
+msgid "Notification channel calls completed"
+msgstr "完了した通知チャネル呼び出し"
+
+#: notifications/notifications.py
+msgid "The notification channel does not support this message."
+msgstr "この通知チャネルはこのメッセージをサポートしていません。"
+
+#: notifications/notifications.py
+msgid "The notification channel raised an error."
+msgstr "通知チャネルでエラーが発生しました。"
+
+#: authentication/services/client_login_session.py
+msgid "Client sessions revoked"
+msgstr "失効したクライアントセッション"
+
+#: authentication/services/client_login_session.py
+msgid "The client login session is still valid."
+msgstr "クライアントログインセッションはまだ有効です。"
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Failed %(count)s: %(reason)s"
+msgstr "失敗 %(count)s：%(reason)s"
+
+#: ops/celery/task_logging.py
+msgid "No matching records to process."
+msgstr "処理対象のレコードはありません。"
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Result count — %(name)s: %(count)s."
+msgstr "処理結果 — %(name)s：%(count)s。"
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Skipped %(count)s: %(reason)s"
+msgstr "スキップ %(count)s：%(reason)s"
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Task interrupted after %(checked)s checks; changes may have been rolled back. See the task error for details."
+msgstr "%(checked)s 件の確認後にタスクが中断しました。変更はロールバックされた可能性があります。詳細はタスクのエラーログを確認してください。"
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Task started: %(name)s."
+msgstr "タスク開始：%(name)s。"
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Task summary: checked %(checked)s; processed %(processed)s; skipped %(skipped)s; failed %(failed)s."
+msgstr "タスク集計：確認 %(checked)s、処理 %(processed)s、スキップ %(skipped)s、失敗 %(failed)s。"
+
+#: accounts/tasks/remove_account.py
+msgid "History cleanup is disabled by the retention limit."
+msgstr "保持上限の設定により履歴のクリーンアップが無効です。"
+
+#: accounts/tasks/remove_account.py
+#, python-format
+msgid "Keeping %(count)s history records per account, including the current version."
+msgstr "現在のバージョンを含め、アカウントごとに %(count)s 件の履歴を保持します。"
+
+#: accounts/tasks/automation.py
+msgid "Another instance of this maintenance task is running."
+msgstr "同じメンテナンスタスクの別のインスタンスが実行中です。"
+
+#: accounts/tasks/automation.py
+msgid "Records belong to a credential rotation that is still running."
+msgstr "レコードは実行中の認証情報ローテーションに属しています。"
+
+#: accounts/tasks/automation.py xpack/plugins/cloud/tasks.py
+#, python-format
+msgid "Retention period: %(days)s days."
+msgstr "保持期間：%(days)s 日。"
+
+#: accounts/tasks/automation.py
+msgid "The latest unsuccessful first-login result must be retained."
+msgstr "初回ログインの最新の失敗結果は保持する必要があります。"
+
+#: accounts/tasks/automation.py
+msgid "The owning worker has not replied and the hard timeout has not elapsed."
+msgstr "担当 Worker が応答せず、最大実行時間も経過していません。"
+
+#: accounts/tasks/automation.py
+msgid "The task is still running on a worker."
+msgstr "タスクは Worker で実行中です。"
+
+#: accounts/tasks/automation.py
+msgid "The task is still within the startup grace period."
+msgstr "タスクは起動猶予期間内です。"
+
+#: accounts/tasks/automation.py
+msgid "Unable to acquire the task lock."
+msgstr "タスクのロックを取得できません。"
+
+#: accounts/tasks/automation.py
+msgid "Unable to release the task lock."
+msgstr "タスクのロックを解放できません。"
+
+#: accounts/tasks/automation.py
+msgid "Waiting for repeated confirmation that the task is missing."
+msgstr "タスクが消失したかどうかの再確認を待っています。"
+
+#: accounts/tasks/automation.py
+msgid "Worker status is unavailable; recovery cannot be confirmed."
+msgstr "Worker の状態を取得できないため、復旧の必要性を確認できません。"
+
+#: accounts/tasks/application_events.py
+msgid "Deliveries marked expired"
+msgstr "期限切れに変更した配信"
+
+#: accounts/tasks/application_events.py tickets/plugins/change_secret/execution.py tickets/plugins/file_transfer/execution.py
+msgid "Executions queued"
+msgstr "キューに登録した実行タスク"
+
+#: accounts/tasks/application_events.py tickets/plugins/change_secret/execution.py tickets/plugins/file_transfer/execution.py
+msgid "Unable to queue an execution; it will be retried later."
+msgstr "実行タスクをキューに登録できません。後で再試行します。"
+
+#: accounts/tasks/credential_preparation.py
+msgid "Unable to check credential rotation readiness."
+msgstr "認証情報ローテーションの準備状態を確認できません。"
+
+#: accounts/tasks/credential_preparation.py
+msgid "Waiting for client confirmation or the source-account quiet period."
+msgstr "クライアントの確認または元アカウントの無操作期間の終了を待っています。"
+
+#: tickets/workflow/engine.py
+msgid "The workflow has changed or its approval deadline has not elapsed."
+msgstr "ワークフローが変更されたか、承認期限がまだ経過していません。"
+
+#: tickets/plugins/change_secret/execution.py tickets/plugins/file_transfer/execution.py
+msgid "The execution is no longer eligible for dispatch."
+msgstr "実行レコードが配信条件を満たさなくなりました。"
+
+#: tickets/plugins/file_transfer/execution.py
+msgid "Clean ticket transfer files"
+msgstr "チケット転送ファイルのクリーンアップ"
+
+#: tickets/plugins/file_transfer/execution.py
+msgid "Files belong to a transfer that is still running."
+msgstr "ファイルは実行中の転送に属しています。"
+
+#: tickets/plugins/file_transfer/execution.py
+msgid "Interrupted transfers marked for verification"
+msgstr "要検証に変更した中断済み転送"
+
+#: tickets/plugins/file_transfer/execution.py
+msgid "Maintain ticket file transfers"
+msgstr "チケットのファイル転送のメンテナンス"
+
+#: tickets/plugins/file_transfer/execution.py
+msgid "Unable to remove a temporary file; it will be retried later."
+msgstr "一時ファイルを削除できません。後で再試行します。"
+
+#: xpack/plugins/cloud/tasks.py
+msgid "Cleanup is disabled because the retention period is not positive."
+msgstr "保持期間が正の値ではないため、クリーンアップは無効です。"
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Reason: %(reason)s"
+msgstr "説明：%(reason)s"
+
+#: notifications/notifications.py
+msgid "No notification channels are configured."
+msgstr "通知チャネルが設定されていません。"
+
+#: accounts/tasks/application_events.py:46
+#, python-format
+msgid "Unable to dispatch application webhook delivery %(delivery)s."
+msgstr "アプリケーション Webhook の配信 %(delivery)s をスケジュールできません。"
+
+#: accounts/tasks/application_events.py:167 accounts/tasks/application_events.py:170
+msgid "Expire application event deliveries"
+msgstr "アプリケーションイベントの配信を期限切れにする"
+
+#: accounts/tasks/automation.py:139
+msgid "Skipped interrupted account task inspection: no Celery worker replied."
+msgstr "Celery Worker から応答がないため、中断されたアカウントタスクの確認をスキップしました。"
+
+#: accounts/tasks/automation.py:132
+msgid "Unable to inspect active Celery tasks."
+msgstr "実行中の Celery タスクを確認できません。"
+
+#: accounts/tasks/automation.py:169
+#, python-format
+msgid "Unable to confirm interrupted task status: execution=%(execution)s."
+msgstr "中断されたタスクの状態を確認できません：実行=%(execution)s。"
+
+#: accounts/tasks/automation.py:180
+#, python-format
+msgid "Unable to clear the interrupted task confirmation marker: execution=%(execution)s."
+msgstr "中断されたタスクの確認マーカーを削除できません：実行=%(execution)s。"
+
+#: accounts/tasks/automation.py:202
+msgid "Unable to acquire the interrupted account task recovery lock."
+msgstr "中断されたアカウントタスクの復旧ロックを取得できません。"
+
+#: accounts/tasks/automation.py:218
+msgid "Unable to release the interrupted account task recovery lock."
+msgstr "中断されたアカウントタスクの復旧ロックを解放できません。"
+
+#: accounts/tasks/credential_preparation.py:12 accounts/tasks/credential_preparation.py:15
+msgid "Check credential rotation readiness"
+msgstr "認証情報ローテーションの準備状況を確認する"
+
+#: accounts/tasks/credential_preparation.py:33
+#, python-format
+msgid "Unable to check rotation readiness: credential=%(credential)s."
+msgstr "ローテーションの準備状況を確認できません：認証情報=%(credential)s。"
+
+#: accounts/tasks/openbao.py:28
+msgid "JumpServer must use the OpenBao vault backend."
+msgstr "JumpServer は OpenBao ボールトバックエンドを使用する必要があります。"
+
+#: accounts/tasks/openbao.py:30
+msgid "OpenBao token rotation requires HTTPS with TLS verification."
+msgstr "OpenBao トークンのローテーションには、TLS 検証を有効にした HTTPS が必要です。"
+
+#: accounts/tasks/openbao.py:62
+#, python-format
+msgid "OpenBao token lookup returned HTTP %(status)s."
+msgstr "OpenBao トークンの照会が HTTP %(status)s を返しました。"
+
+#: accounts/tasks/openbao.py:70
+msgid "OpenBao address changed. Reconfigure the rotation AppRole."
+msgstr "OpenBao のアドレスが変更されました。ローテーション用 AppRole を再設定してください。"
+
+#: accounts/tasks/openbao.py:98
+msgid "OpenBao did not issue a distinct token."
+msgstr "OpenBao は元のトークンと異なる新しいトークンを発行しませんでした。"
+
+#: accounts/tasks/openbao.py:102
+msgid "The new OpenBao token must support self lookup and last over seven days."
+msgstr "新しい OpenBao トークンは自己照会をサポートし、有効期間が 7 日を超える必要があります。"
+
+#: accounts/tasks/openbao.py:104
+msgid "The new token failed the JumpServer OpenBao operation check."
+msgstr "新しいトークンは JumpServer の OpenBao 操作チェックに失敗しました。"
+
+#: accounts/tasks/openbao.py:94
+#, python-format
+msgid "OpenBao AppRole login returned HTTP %(status)s."
+msgstr "OpenBao AppRole のログインが HTTP %(status)s を返しました。"
+
+#: accounts/tasks/openbao.py:109
+msgid "The configured OpenBao token changed during rotation."
+msgstr "設定された OpenBao トークンがローテーション中に変更されました。"
+
+#: accounts/tasks/openbao.py:120
+msgid "Check and rotate the OpenBao vault token"
+msgstr "OpenBao ボールトトークンを確認してローテーションする"
+
+#: accounts/tasks/openbao.py:133
+msgid "OpenBao rotation requires encrypted AppRole credentials."
+msgstr "OpenBao のローテーションには、暗号化された AppRole 認証情報が必要です。"
+
+#: authentication/services/client_login_session.py:411
+msgid "Access tokens deleted"
+msgstr "削除されたアクセストークン"
+
+#: authentication/services/client_login_session.py:412
+msgid "Refresh tokens deleted"
+msgstr "削除されたリフレッシュトークン"
+
+#: authentication/services/client_login_session.py:419
+msgid "Client login sessions deleted"
+msgstr "削除されたクライアントログインセッション"
+
+#: perms/tasks.py:141
+#, python-format
+msgid "Unable to queue an asset permission expiration reminder: permission=%(permission)s; user=%(user)s."
+msgstr "資産権限の有効期限リマインダーをキューに追加できません：権限=%(permission)s、ユーザー=%(user)s。"
+
+#: terminal/tasks.py:268
+#, python-brace-format
+msgid "Test failure: {error}"
+msgstr "テスト失敗：{error}"
+
+#: tickets/plugins/change_secret/execution.py:100
+#, python-format
+msgid "Unable to queue password change for ticket %(ticket)s (%(error)s)."
+msgstr "チケット %(ticket)s のパスワード変更をキューに追加できません（%(error)s）。"
+
+#: tickets/plugins/file_transfer/execution.py:50
+#, python-format
+msgid "Unable to queue ticket transfer %(ticket)s (%(error)s)."
+msgstr "チケット転送 %(ticket)s をキューに追加できません（%(error)s）。"
+
+#: tickets/plugins/file_transfer/execution.py:249
+#, python-format
+msgid "Unable to purge ticket transfer file %(file)s (%(error)s)."
+msgstr "チケット転送ファイル %(file)s を削除できません（%(error)s）。"
+
+#: tickets/tasks.py:16 tickets/tasks.py:21
+msgid "Expire overdue ticket approvals"
+msgstr "期限切れのチケット承認を処理する"
+
+#: tickets/tasks.py:17
+msgid "Check approval deadlines every minute and apply the configured timeout action."
+msgstr "承認期限を毎分確認し、設定されたタイムアウト処理を実行します。"
+
+#: tickets/tasks.py:47 tickets/tasks.py:52
+msgid "Dispatch ticket password changes"
+msgstr "チケットのパスワード変更をスケジュールする"
+
+#: tickets/tasks.py:48
+msgid "Dispatch pending password change executions every minute."
+msgstr "待機中のパスワード変更を毎分スケジュールします。"
+
+#: accounts/automations/recovery.py:38
+msgid "Invalid interrupted automation runtime path."
+msgstr "中断された自動化タスクの実行ディレクトリのパスが無効です。"
+
+#: accounts/automations/recovery.py:269
+#, python-format
+msgid "Interrupted account automation finalized: execution=%(execution)s; status=%(status)s; password change records=%(changes)s; password push records=%(pushes)s."
+msgstr "中断されたアカウント自動化を終了処理しました：実行=%(execution)s、状態=%(status)s、パスワード変更レコード=%(changes)s、パスワード配信レコード=%(pushes)s。"
+
+#: accounts/automations/recovery.py:264
+#, python-format
+msgid "Unable to clean the interrupted automation runtime: execution=%(execution)s."
+msgstr "中断された自動化タスクの実行ディレクトリを削除できません：実行=%(execution)s。"
+
+#: accounts/automations/recovery.py:244
+#, python-format
+msgid "Unable to clear interrupted account task status: execution=%(execution)s; account=%(account)s."
+msgstr "中断されたアカウントタスクの状態を削除できません：実行=%(execution)s、アカウント=%(account)s。"
+
+#: accounts/automations/recovery.py:257
+#, python-format
+msgid "Unable to release the interrupted account lock: execution=%(execution)s; account=%(account)s."
+msgstr "中断されたアカウントのロックを解放できません：実行=%(execution)s、アカウント=%(account)s。"
+
+#: assets/api/asset/asset.py
+msgid "Not accessed for over three months"
+msgstr "3か月を超えてアクセスなし"
+
+#: assets/api/asset/asset.py
+msgid "No valid permission"
+msgstr "有効な権限なし"

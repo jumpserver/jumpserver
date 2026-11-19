@@ -11,6 +11,7 @@ class DatabaseTypes(BaseType):
     SQLSERVER = 'sqlserver', 'SQLServer'
     DB2 = 'db2', 'DB2'
     DAMENG = 'dameng', 'Dameng'
+    OCEANBASE = 'oceanbase', 'OceanBase'
     CLICKHOUSE = 'clickhouse', 'ClickHouse'
     MONGODB = 'mongodb', 'MongoDB'
     REDIS = 'redis', 'Redis'
@@ -51,31 +52,24 @@ class DatabaseTypes(BaseType):
                 'push_account_enabled': False,
             },
             cls.DB2: {
-                'ansible_enabled': False,
-                'ping_enabled': False,
-                'gather_facts_enabled': False,
-                'gather_accounts_enabled': False,
-                'verify_account_enabled': False,
+                'ansible_enabled': True,
+                'ping_enabled': True,
+                'gather_facts_enabled': True,
+                'gather_accounts_enabled': True,
+                'verify_account_enabled': True,
+                # Db2 catalog authorization IDs are not OS/LDAP accounts.
                 'change_secret_enabled': False,
                 'push_account_enabled': False,
+                'remove_account_enabled': False,
             },
             cls.DAMENG: {
-                'ansible_enabled': False,
-                'ping_enabled': False,
-                'gather_facts_enabled': False,
-                'gather_accounts_enabled': False,
-                'verify_account_enabled': False,
-                'change_secret_enabled': False,
-                'push_account_enabled': False,
+                'gather_facts_enabled': True,
+            },
+            cls.OCEANBASE: {
+                'gather_facts_enabled': True,
             },
             cls.CLICKHOUSE: {
-                'ansible_enabled': False,
-                'ping_enabled': False,
-                'gather_facts_enabled': False,
-                'gather_accounts_enabled': False,
-                'verify_account_enabled': False,
-                'change_secret_enabled': False,
-                'push_account_enabled': False,
+                'gather_facts_enabled': True,
             },
         }
         return constrains
@@ -85,7 +79,9 @@ class DatabaseTypes(BaseType):
         return {
             '*': {
                 'choices': '__self__',
-            }
+            },
+            # OceanBase tenants use MySQL-family wire framing in both modes.
+            cls.OCEANBASE: {'choices': ['mysql']},
         }
 
     @classmethod
@@ -98,6 +94,10 @@ class DatabaseTypes(BaseType):
             cls.SQLSERVER: [{'name': 'SQLServer'}],
             cls.DB2: [{'name': 'DB2'}],
             cls.DAMENG: [{'name': 'Dameng'}],
+            cls.OCEANBASE: [
+                {'name': 'OceanBase-MySQL', 'protocols_setting': {'mysql': {'tenant_mode': 'mysql'}}},
+                {'name': 'OceanBase-Oracle', 'protocols_setting': {'mysql': {'tenant_mode': 'oracle'}}},
+            ],
             cls.CLICKHOUSE: [{'name': 'ClickHouse'}],
             cls.MONGODB: [{'name': 'MongoDB'}],
             cls.REDIS: [
@@ -112,6 +112,18 @@ class DatabaseTypes(BaseType):
                     'protocols_setting': {
                         'redis': {'auth_username': True}
                     }
+                },
+                {
+                    'name': 'Redis-Cluster',
+                    'protocols_setting': {
+                        'redis': {'auth_username': False, 'enable_cluster_mode': True}
+                    }
+                },
+                {
+                    'name': 'Redis-Cluster-ACL',
+                    'protocols_setting': {
+                        'redis': {'auth_username': True, 'enable_cluster_mode': True}
+                    }
                 }
             ]
         }
@@ -120,7 +132,7 @@ class DatabaseTypes(BaseType):
     def get_community_types(cls):
         return [
             cls.MYSQL, cls.MARIADB, cls.POSTGRESQL,
-            cls.MONGODB, cls.REDIS,
+            cls.MONGODB, cls.REDIS, cls.CLICKHOUSE,
         ]
 
 

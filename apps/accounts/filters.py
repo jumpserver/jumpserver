@@ -13,6 +13,7 @@ from assets.models import Asset
 from assets.utils import get_node_from_request, is_query_node_all_assets
 from common.utils.http import is_true
 from common.drf.filters import BaseFilterSet
+from common.const.choices import ConfirmOrIgnore
 from common.utils import get_logger
 from common.utils.timezone import local_zero_hour, local_now
 from .const.automation import (
@@ -23,7 +24,7 @@ from .models import (
     Account, AccountRisk, AutomationExecution, BackupAccountAutomation,
     ChangeSecretAutomation, ChangeSecretRecord, CheckAccountAutomation,
     GatheredAccount, IntegrationApplication,
-    PushSecretRecord, RiskChoice,
+    PushSecretRecord, RiskChoice, ConnectivityRecord,
 )
 from .utils import account_secret_task_status
 
@@ -99,6 +100,14 @@ class CheckAccountAutomationFilterSet(BaseFilterSet):
 
 
 class AccountRiskFilterSet(BaseFilterSet):
+    status = drf_filters.ChoiceFilter(choices=ConfirmOrIgnore.choices, method='filter_status')
+
+    @staticmethod
+    def filter_status(queryset, name, value):
+        if value == ConfirmOrIgnore.pending:
+            return queryset.filter(Q(status=value) | Q(status=''))
+        return queryset.filter(status=value)
+
     asset_id = drf_filters.UUIDFilter(
         field_name="asset__id", label=_("Asset ID")
     )
@@ -177,6 +186,10 @@ class AccountFilterSet(UUIDFilterMixin, BaseFilterSet):
         method="filter_integrationapplication",
         label=_("Integration application ID")
     )
+    integrationapplications = drf_filters.CharFilter(
+        method="filter_integrationapplications",
+        label=_("Integration application IDs")
+    )
     long_time_no_change_secret = drf_filters.BooleanFilter(
         method="filter_long_time", label=_("Long time no secret change")
     )
@@ -195,7 +208,7 @@ class AccountFilterSet(UUIDFilterMixin, BaseFilterSet):
             "privileged", "is_active",
             "secret_type", "category", "type", "platform",
             "secret_reset", "source", "source_id", "follow_template",
-            "has_secret", "risk", "integrationapplication",
+            "has_secret", "risk", "integrationapplication", "integrationapplications",
             "latest_discovery", "latest_accessed", "latest_updated",
             "latest_secret_changed", "latest_secret_change_failed",
             "long_time_no_change_secret", "long_time_no_login",
@@ -248,6 +261,20 @@ class AccountFilterSet(UUIDFilterMixin, BaseFilterSet):
         if not integrationapplication:
             return IntegrationApplication.objects.none()
         return queryset & integrationapplication.get_accounts()
+
+    @staticmethod
+    def filter_integrationapplications(queryset, name, value):
+        # Rotation accounts must be authorized by every selected application.
+        try:
+            ids = {uuid.UUID(item.strip()) for item in value.split(',')}
+        except ValueError:
+            return queryset.none()
+        applications = list(IntegrationApplication.objects.filter(pk__in=ids))
+        if not ids or len(applications) != len(ids):
+            return queryset.none()
+        for application in applications:
+            queryset = queryset.filter(pk__in=application.get_accounts().values('pk'))
+        return queryset
 
     @staticmethod
     def filter_latest(queryset, name, value):
@@ -410,3 +437,13 @@ class ChangeSecretStatusFilterSet(BaseFilterSet):
         }
         matched = [_id for _id, v in data_map.items() if v == value]
         return queryset.filter(id__in=matched)
+
+
+
+class ConnectivityRecordFilterSet(drf_filters.FilterSet):
+    execution_id = drf_filters.UUIDFilter(label=_('Execution ID'))
+    automation_id = drf_filters.UUIDFilter(field_name='execution__automation_id', label=_('Task'))
+
+    class Meta:
+        model = ConnectivityRecord
+        fields = ['execution_id', 'automation_id', 'type']

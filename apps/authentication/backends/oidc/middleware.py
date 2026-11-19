@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib import auth
 from django.core.exceptions import MiddlewareNotUsed
 
+from authentication.utils import is_logout_request
 from common.utils import get_logger
 from .utils import validate_and_return_id_token
 
@@ -24,7 +25,7 @@ class OIDCRefreshIDTokenMiddleware:
     def __call__(self, request):
         # Refreshes tokens only in the applicable cases.
         if request.method == 'GET' and not self.is_ajax(request) and \
-                request.user.is_authenticated and settings.AUTH_OPENID:
+                request.user.is_authenticated and settings.AUTH_OPENID and not is_logout_request(request):
             self.refresh_token(request)
         response = self.get_response(request)
         return response

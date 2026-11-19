@@ -2,12 +2,15 @@ from types import SimpleNamespace
 from unittest.mock import Mock, patch
 from uuid import uuid4
 
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, TestCase
 from rest_framework.test import APIRequestFactory, force_authenticate
 
 from orgs.models import Organization
-from orgs.utils import get_current_org_id, set_current_org
-from tickets.api.relation import TicketSessionApi
+from orgs.utils import get_current_org_id, set_current_org, tmp_to_org
+from terminal.models import Session, Terminal
+from tickets.api.relation import TicketSessionApi, TicketSessionListApi
+from tickets.models import Ticket, TicketSession
+from users.models import User
 
 
 class TicketSessionAPITests(SimpleTestCase):
@@ -132,3 +135,55 @@ class TicketSessionAPITests(SimpleTestCase):
     def test_anonymous_user_cannot_read_session(self):
         self.assert_denied(self.request(authenticated=False), status=403)
         self.relation.assert_not_called()
+
+
+class TicketSessionListTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.owner, cls.auditor = [
+            User(username=name, name=name, email=f'{name}@example.test')
+            for name in ('ticket-owner', 'session-auditor')
+        ]
+        User.objects.bulk_create([cls.owner, cls.auditor])
+        cls.org = Organization.default()
+        cls.other = Organization(id=str(uuid4()), name='Other session organization')
+        Organization.objects.bulk_create([cls.other])
+        cls.ticket = Ticket.objects.create(title='Asset review', type='login_asset_confirm',
+                                           applicant=cls.owner, org_id=cls.org.id)
+
+    def request(self, user):
+        with tmp_to_org(self.other), patch.object(user, 'has_perms', return_value=True):
+            request = APIRequestFactory().get('/')
+            force_authenticate(request, user=user)
+            return TicketSessionListApi.as_view(throttle_classes=[])(request, ticket_id=self.ticket.pk)
+
+    def add_session(self, org, **kwargs):
+        with tmp_to_org(org):
+            session = Session.objects.create(**kwargs)
+        TicketSession.objects.create(ticket=self.ticket, session=session)
+        return session
+
+    def test_related_user_sees_unique_sessions_online_first_across_request_orgs(self):
+        self.assertEqual(self.request(self.owner).data, [])
+        ended = self.add_session(self.org, is_finished=True)
+        live = self.add_session(self.org, terminal=Terminal.objects.create(name='Test KoKo', type='koko'))
+        TicketSession.objects.create(ticket=self.ticket, session=live)
+        response = self.request(self.owner)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual([row['id'] for row in response.data], [str(live.pk), str(ended.pk)])
+        self.assertEqual(response.data[0]['org_id'], str(self.org.id))
+        self.assertEqual(response.data[0]['terminal_type'], 'koko')
+        self.assertTrue(response.data[0]['can_join'])
+        self.assertFalse(response.data[1]['can_join'])
+
+    def test_auditor_only_sees_sessions_in_authorized_organizations(self):
+        allowed = self.add_session(self.org)
+        self.add_session(self.other)
+        with patch.object(self.auditor, 'get_all_permissions', side_effect=lambda: (
+                ['terminal.view_session'] if get_current_org_id() == self.org.id else [])):
+            response = self.request(self.auditor)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual([row['id'] for row in response.data], [str(allowed.pk)])
+        self.assertFalse(response.data[0]['can_join'])
+        with patch.object(self.auditor, 'get_all_permissions', return_value=[]):
+            self.assertEqual(self.request(self.auditor).status_code, 404)

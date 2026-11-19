@@ -61,6 +61,8 @@ class NativeClient(TextChoices):
                 Protocol.mongodb: [cls.db_client, cls.db_guide],
                 Protocol.oracle: [cls.db_client, cls.db_guide],
                 Protocol.dameng: [cls.db_client, cls.db_guide],
+                Protocol.db2: [cls.db_client, cls.db_guide],
+                Protocol.clickhouse: [cls.db_client, cls.db_guide],
             })
         return clients
 
@@ -165,7 +167,7 @@ class ConnectMethodUtil:
 
                     Protocol.mysql, Protocol.mariadb,
                     Protocol.sqlserver, Protocol.postgresql,
-                    Protocol.oracle, Protocol.dameng,
+                    Protocol.oracle, Protocol.dameng, Protocol.db2,
                 ],
                 # 限制客户端的协议，比如 koko 虽然也支持 数据库的 ssh 连接，但是不再这里拉起
                 # Listen协议: [Asset协议]
@@ -200,6 +202,7 @@ class ConnectMethodUtil:
                     Protocol.oracle, Protocol.mariadb,
                     Protocol.redis, Protocol.sqlserver,
                     Protocol.mongodb, Protocol.dameng,
+                    Protocol.db2, Protocol.clickhouse,
                 ],
                 'match': 'map'
             },

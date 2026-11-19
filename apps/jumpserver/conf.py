@@ -206,6 +206,8 @@ class Config(dict):
         'REDIS_SSL_CA': None,
         'REDIS_SSL_REQUIRED': 'none',
         'REDIS_MAX_CONNECTIONS': 100,
+        'REDIS_SOCKET_TIMEOUT': 5.0,
+        'REDIS_SOCKET_CONNECT_TIMEOUT': 5.0,
         # Redis Sentinel
         'REDIS_SENTINEL_HOSTS': '',
         'REDIS_SENTINEL_PASSWORD': '',
@@ -215,6 +217,7 @@ class Config(dict):
         'REDIS_DB_CACHE': 4,
         'REDIS_DB_SESSION': 5,
         'REDIS_DB_WS': 6,
+        'CELERY_TASK_ROUTES': {},
 
         'GLOBAL_ORG_DISPLAY_NAME': '',
         'SITE_URL': 'http://127.0.0.1',
@@ -660,6 +663,12 @@ class Config(dict):
         ],
         'SECURITY_COMMAND_EXECUTION': False,
         'ANSIBLE_DOCKER_ENABLED': True,
+        'ANSIBLE_EXECUTOR_HOST': 'ansible-executor',
+        'ANSIBLE_EXECUTOR_PORT': 2222,
+        'ANSIBLE_EXECUTOR_PRIVATE_KEY': '/run/jms-executor/client',
+        'ANSIBLE_EXECUTOR_KNOWN_HOSTS': '/run/jms-executor/known_hosts',
+        'ANSIBLE_EXECUTOR_CONNECT_TIMEOUT': 10,
+        'ANSIBLE_EXECUTOR_GATEWAY_HOST': '',
         'SECURITY_COMMAND_BLACKLIST': [
             'reboot', 'shutdown', 'poweroff', 'halt', 'dd', 'half', 'top'
         ],
@@ -668,8 +677,13 @@ class Config(dict):
         'SECURITY_SERVICE_ACCOUNT_REGISTRATION': 'auto',
         'SECURITY_VIEW_AUTH_NEED_MFA': True,
         'SECURITY_DISABLE_VIEW_SECRET': False,
+        'APPLICATION_ACCOUNT_SCOPE_LIMIT': 10,
         'SECURITY_MAX_IDLE_TIME': 30,
         'SECURITY_MAX_SESSION_TIME': 24,
+        'SECURITY_CLIENT_REAUTH_ON_EXIT': False,
+        'SECURITY_CLIENT_IDLE_LOCK_TIME': 15,
+        'SECURITY_WEB_IDLE_LOCK_TIME': 15,
+        'SECURITY_CLIENT_MAX_SESSION_TIME': 0,
         'SECURITY_PASSWORD_EXPIRATION_TIME_ADMIN': 9999,
         'SECURITY_PASSWORD_EXPIRATION_TIME': 9999,
         'SECURITY_EXPIRED_TOKEN_RECORD_KEEP_DAYS': 180,
@@ -682,6 +696,7 @@ class Config(dict):
         'SECURITY_MFA_IN_LOGIN_PAGE': False,
         'SECURITY_LOGIN_CHALLENGE_ENABLED': False,
         'SECURITY_LOGIN_CAPTCHA_ENABLED': True,
+        'SECURITY_LOGIN_CAPTCHA_ALWAYS_REQUIRED': False,
         'SECURITY_INSECURE_COMMAND': False,
         'SECURITY_INSECURE_COMMAND_LEVEL': 5,
         'SECURITY_INSECURE_COMMAND_EMAIL_RECEIVER': '',
@@ -748,7 +763,6 @@ class Config(dict):
         'PERM_EXPIRED_FIRST_NOTICE_DAYS': 3,
         'PERM_EXPIRED_DAILY_NOTICE_DAYS': 3,
         'PERM_TREE_REGEN_INTERVAL': 1,
-        'FLOWER_URL': "127.0.0.1:5555",
         'LANGUAGE_CODE': 'en',
         # Luna user preference defaults
         'LUNA_DEFAULT_IS_ASYNC_ASSET_TREE': True,
@@ -773,7 +787,8 @@ class Config(dict):
         'CSRF_COOKIE_SECURE': False,
         'REFERER_CHECK_ENABLED': False,
         'SESSION_ENGINE': 'cache',
-        'SESSION_SAVE_EVERY_REQUEST': True,
+        'SESSION_SAVE_EVERY_REQUEST': False,
+        'SESSION_RENEW_ON_REQUEST': False,
         'SERVER_REPLAY_STORAGE': {},
         'SECURITY_DATA_CRYPTO_ALGO': None,
         'GMSSL_ENABLED': False,
@@ -786,9 +801,18 @@ class Config(dict):
         'ACTIVITY_LOG_KEEP_DAYS': 180,
         'FTP_LOG_KEEP_DAYS': 180,
         'CLOUD_SYNC_TASK_EXECUTION_KEEP_DAYS': 180,
+        'CLOUD_SYNC_MIN_INTERVAL_SECONDS': 120,
+        'CLOUD_SYNC_MAX_JITTER_SECONDS': 60,
+        'CLOUD_SYNC_TASK_TIMEOUT_SECONDS': 3600,
+        'CLOUD_SYNC_GLOBAL_SLOTS': 2,
+        'CLOUD_SYNC_SLOT_LEASE_SECONDS': 90,
+        'CLOUD_SYNC_SLOT_RETRY_MIN_SECONDS': 5,
+        'CLOUD_SYNC_SLOT_RETRY_MAX_SECONDS': 15,
+        'CLOUD_SYNC_TASK_RATE_LIMIT': '30/m',
         'JOB_EXECUTION_KEEP_DAYS': 180,
         'PASSWORD_CHANGE_LOG_KEEP_DAYS': 999,
         'ACCOUNT_CHANGE_SECRET_RECORD_KEEP_DAYS': 180,
+        'APPLICATION_RECORD_KEEP_DAYS': 180,
 
         'TICKETS_ENABLED': True,
         'TICKETS_DIRECT_APPROVE': False,
@@ -863,9 +887,6 @@ class Config(dict):
         # Suggestion api
         'SUGGESTION_LIMIT': 10,
 
-        # oauth2_provider settings 
-        'OAUTH2_PROVIDER_ACCESS_TOKEN_EXPIRE_SECONDS': 60 * 60,
-        'OAUTH2_PROVIDER_REFRESH_TOKEN_EXPIRE_SECONDS': 60 * 60 * 24 * 7,
         'VENDOR': 'JumpServer',
 
         # JDMC
@@ -873,7 +894,6 @@ class Config(dict):
         'JDMC_SOCK_PATH': '',
         'SMALL_LOGO_MODE': os.environ.get('SMALL_LOGO_MODE', False),
 
-        'FLOWER_ENABLED': True,
 
         # x-forwarded-for 相关
         'TRUSTED_IP_VERIFY_ENABLED': False,
@@ -891,6 +911,7 @@ class Config(dict):
     }
 
     old_config_map = {
+        'SESSION_RENEW_ON_REQUEST': 'SESSION_SAVE_EVERY_REQUEST',
         'CONNECTION_TOKEN_ONETIME_EXPIRATION': 'CONNECTION_TOKEN_EXPIRATION',
         'CONNECTION_TOKEN_REUSABLE_EXPIRATION': 'CONNECTION_TOKEN_EXPIRATION_MAX',
         'PERM_EXPIRED_FIRST_NOTICE_DAYS': 'PERM_EXPIRED_NOTICE_DAYS',

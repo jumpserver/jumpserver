@@ -13,9 +13,9 @@ from ops.const import JobStatus
 from ops.models import Job
 from orgs.utils import current_org
 from .auth_backends import get_auth_backend_choices
-from .const import LoginTypeChoices, MFAChoices
+from .const import LoginTypeChoices, MFAChoices, USER_DEVICE_TYPE_CHOICES
 from .models import (
-    FTPLog, IntegrationApplicationLog, JobLog, OperateLog,
+    FTPLog, JobLog, OperateLog,
     PasswordChangeLog, UserLoginLog, UserSession,
 )
 
@@ -55,10 +55,10 @@ class UserSessionFilterSet(BaseFilterSet):
         method='filter_is_active', label=_('Is active')
     )
     type = drf_filters.ChoiceFilter(
-        choices=LoginTypeChoices.choices, label=_('Login type')
+        choices=USER_DEVICE_TYPE_CHOICES, label=_('Login type')
     )
     backend = drf_filters.ChoiceFilter(
-        choices=get_auth_backend_choices(), label=_('Auth backend')
+        choices=[*get_auth_backend_choices(), ('OAuth2', _('OAuth2'))], label=_('Auth backend')
     )
 
     @staticmethod
@@ -90,6 +90,18 @@ class UserSessionFilterSet(BaseFilterSet):
             'user': ('icontains',),
             'ip': ('exact', 'in'),
         }
+
+
+class ClientUserSessionFilterSet(UserSessionFilterSet):
+    city = drf_filters.CharFilter(lookup_expr='iexact', label=_('Login city'))
+
+    @staticmethod
+    def filter_is_active(queryset, name, is_active):
+        return queryset.filter(is_active=is_active)
+
+    class Meta(UserSessionFilterSet.Meta):
+        from authentication.models import ClientLoginSession
+        model = ClientLoginSession
 
 
 class FTPLogFilterSet(BaseFilterSet):
@@ -210,17 +222,6 @@ class OperateLogFilterSet(BaseFilterSet):
         fields_operator = {
             'resource_type': ('exact',),
         }
-
-
-class ServiceAccessLogFilterSet(BaseFilterSet):
-    service_id = drf_filters.UUIDFilter(label=_("Application ID"))
-
-    class Meta:
-        model = IntegrationApplicationLog
-        fields = [
-            "id", "service", "service_id", "asset", "account",
-            "remote_addr",
-        ]
 
 
 class JobLogFilterSet(BaseFilterSet):

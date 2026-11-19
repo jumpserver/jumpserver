@@ -1,0 +1,13 @@
+id: ping_database_native
+name: "{{ 'Database connectivity' | trans }}"
+category: database
+type:
+  - dameng
+  - oceanbase
+  - clickhouse
+  - db2
+method: ping
+i18n:
+  Database connectivity:
+    en: Database connectivity
+    zh: 数据库连通性测试

@@ -9,15 +9,12 @@ from django.shortcuts import redirect, reverse
 from django.utils.translation import gettext as _
 from django.views.generic.base import TemplateView
 
+from common.auth.cache import TICKET_DIRECT_APPROVE_KEY, valid_token_format, valid_uuid
 from common.exceptions import JMSException
 from common.utils import get_logger, FlashMessageUtil
 from orgs.utils import tmp_to_root_org
-from tickets.const import TicketType
 from tickets.errors import TicketStateChanged
-from tickets.models import (
-    Ticket, ApplyAssetTicket,
-    ApplyLoginTicket, ApplyLoginAssetTicket, ApplyCommandTicket
-)
+from tickets.models import Ticket
 from users.models import User
 
 logger = get_logger(__name__)
@@ -28,13 +25,6 @@ __all__ = ['TicketDirectApproveView']
 class TicketDirectApproveView(TemplateView):
     template_name = 'tickets/approve_check_password.html'
     redirect_field_name = 'next'
-
-    TICKET_SUB_MODEL_MAP = {
-        TicketType.apply_asset: ApplyAssetTicket,
-        TicketType.login_confirm: ApplyLoginTicket,
-        TicketType.login_asset_confirm: ApplyLoginAssetTicket,
-        TicketType.command_confirm: ApplyCommandTicket,
-    }
 
     @property
     def message_data(self):
@@ -62,7 +52,27 @@ class TicketDirectApproveView(TemplateView):
 
     @staticmethod
     def clear(token):
-        cache.delete(token)
+        if valid_token_format(token, 32):
+            cache.delete(TICKET_DIRECT_APPROVE_KEY.format(token=token))
+
+    @staticmethod
+    def get_ticket_info(token):
+        if not valid_token_format(token, 32):
+            return None
+        data = cache.get(TICKET_DIRECT_APPROVE_KEY.format(token=token))
+        if not isinstance(data, dict):
+            return None
+        if not all(valid_uuid(data.get(field)) for field in ('ticket_id', 'approver_id')):
+            return None
+        content = data.get('content')
+        if not isinstance(content, list):
+            return None
+        if not all(
+            isinstance(section, dict) and isinstance(section.get('content'), list)
+            for section in content
+        ):
+            return None
+        return data
 
     def get_context_data(self, **kwargs):
         # 放入工单信息
@@ -85,7 +95,7 @@ class TicketDirectApproveView(TemplateView):
             redirect_url = FlashMessageUtil.gen_message_url(message_data)
             return redirect(redirect_url)
 
-        ticket_info = cache.get(kwargs['token'])
+        ticket_info = self.get_ticket_info(kwargs['token'])
         if not ticket_info:
             return self.redirect_message_response(redirect_url=self.login_url)
         return super().get(request, ticket_info=ticket_info, *args, **kwargs)
@@ -105,7 +115,7 @@ class TicketDirectApproveView(TemplateView):
             msg = _('Illegal approval action')
             return self.redirect_message_response(error=str(msg))
 
-        ticket_info = cache.get(token)
+        ticket_info = self.get_ticket_info(token)
         if not ticket_info:
             return self.redirect_message_response(redirect_url=self.login_url)
         try:
@@ -113,13 +123,14 @@ class TicketDirectApproveView(TemplateView):
             ticket_id = ticket_info.get('ticket_id')
             with tmp_to_root_org():
                 ticket = Ticket.all().get(id=ticket_id)
-                ticket_sub_model = self.TICKET_SUB_MODEL_MAP[ticket.type]
-                ticket = ticket_sub_model.objects.get(id=ticket_id)
             if not ticket.has_current_assignee(user):
                 if ticket.has_all_assignee(user):
                     raise TicketStateChanged
                 raise JMSException(_("This user is not authorized to approve this ticket"))
-            getattr(ticket, action)(user)
+            if not ticket_info.get('task_id') or str(user.pk) != str(ticket_info.get('approver_id')):
+                raise TicketStateChanged
+            with tmp_to_root_org():
+                getattr(ticket, action)(user, task_id=ticket_info['task_id'])
         except TicketStateChanged as e:
             self.clear(token)
             return self.redirect_message_response(error=str(e), redirect_url=self.login_url)

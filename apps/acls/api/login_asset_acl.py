@@ -8,11 +8,14 @@ __all__ = ['LoginAssetACLViewSet']
 class LoginAssetACLFilter(ACLUserAssetFilterMixin):
     class Meta:
         model = models.LoginAssetACL
-        fields = ['id', 'name', 'users', 'assets', 'action']
+        fields = ['id', 'name', 'users', 'assets', 'action', *models.LoginAssetACL.CONTROL_FIELDS]
 
 
 class LoginAssetACLViewSet(OrgBulkModelViewSet):
     model = models.LoginAssetACL
+    queryset = models.LoginAssetACL.objects.select_related(
+        'workflow__active_version',
+    ).prefetch_related('workflow__active_version__nodes')
     filterset_class = LoginAssetACLFilter
     search_fields = ['name']
     serializer_class = serializers.LoginAssetACLSerializer

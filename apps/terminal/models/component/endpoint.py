@@ -39,6 +39,7 @@ class Endpoint(JMSBaseModel):
             Protocol.mysql, Protocol.mariadb, Protocol.postgresql,
             Protocol.redis, Protocol.sqlserver, Protocol.oracle,
             Protocol.mongodb, Protocol.dameng,
+            Protocol.db2, Protocol.clickhouse,
         }
         if protocol in magnus_protocols:
             return self.magnus_port

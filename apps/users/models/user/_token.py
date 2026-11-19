@@ -4,6 +4,7 @@ from django.conf import settings
 from django.core.cache import cache
 from django.utils import timezone
 
+from common.auth.cache import BEARER_TOKEN_KEY, BEARER_INDEX_KEY, valid_token_format
 from common.utils import (
     get_logger,
     random_string,
@@ -47,12 +48,12 @@ class TokenMixin:
         if not isinstance(remote_addr, bytes):
             remote_addr = remote_addr.encode("utf-8")
         remote_addr = base64.b16encode(remote_addr)  # .replace(b'=', '')
-        cache_key = "%s_%s" % (self.id, remote_addr)
+        cache_key = BEARER_INDEX_KEY.format(user_id=self.id, remote_addr=remote_addr)
         token = cache.get(cache_key)
-        if not token:
+        if not valid_token_format(token, 36):
             token = random_string(36)
-        cache.set(token, self.id, expiration)
-        cache.set("%s_%s" % (self.id, remote_addr), token, expiration)
+        cache.set(BEARER_TOKEN_KEY.format(token=token), self.id, expiration)
+        cache.set(cache_key, token, expiration)
         date_expired = timezone.now() + timezone.timedelta(seconds=expiration)
         return token, date_expired
 

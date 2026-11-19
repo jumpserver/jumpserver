@@ -58,7 +58,7 @@
         jms_credential_probe:
           auth_status: unknown
           reason_code: WINDOWS_VERIFY_FAILED
-          change_succeeded: true
+          change_succeeded: "{{ not (change_secret_result.failed | default(false)) }}"
       when:
         - not (change_secret_result.failed | default(false))
         - verify_winping.failed | default(false)

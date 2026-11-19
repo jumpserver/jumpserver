@@ -1,0 +1,164 @@
+from django.utils.translation import gettext
+from uuid import UUID
+
+from django.db.models import Q
+from django.utils import timezone
+
+from common.db.fields import RelatedManager
+from labels.models import Label
+from orgs.models import Organization
+from orgs.utils import tmp_to_org
+from rbac.builtin import BuiltinRole
+from rbac.models import Role, RoleBinding
+from users.models import User, UserGroup
+from .definition import validate_user_selector
+from .errors import WorkflowConfigurationError
+
+
+def user_snapshot(user):
+    return {'id': str(user.pk), 'name': user.name, 'username': user.username} if user else {}
+
+
+def available_users(org_id):
+    if org_id == Organization.ROOT_ID:
+        users = User.objects.all()
+    else:
+        org = Organization.objects.get(pk=org_id)
+        users = User.get_org_users(org=org)
+    return users.filter(is_active=True, is_service_account=False).filter(
+        Q(date_expired__isnull=True) | Q(date_expired__gt=timezone.now())
+    )
+
+
+def snapshot_ids(values, asset_name):
+    if not isinstance(values, list) or not values:
+        raise WorkflowConfigurationError(gettext(
+            'Asset "{asset}" has no owner. Set its owner on the asset edit page.'
+        ).format(asset=asset_name))
+    try:
+        return {str(UUID(value)) for value in values}
+    except (ValueError, TypeError, AttributeError):
+        raise WorkflowConfigurationError(gettext(
+            'Asset "{asset}" has invalid owner information. Set its owner on the asset edit page.'
+        ).format(asset=asset_name))
+
+
+def excluded_approver_ids(config, context, applicant_id):
+    from tickets.plugins import get_ticket_plugin
+    ids = {str(applicant_id)} if config['exclude_applicant'] else set()
+    ticket_type = context.get('plugin', {}).get('type') or context.get('request', {}).get('type')
+    if ticket_type:
+        ids.update(get_ticket_plugin(ticket_type).excluded_approver_ids(context, applicant_id))
+    return ids
+
+
+def selected_users(selector, org_id):
+    try:
+        validate_user_selector(selector)
+    except (ValueError, TypeError) as exc:
+        raise WorkflowConfigurationError(gettext('Invalid user filter.')) from exc
+    with tmp_to_org(org_id):
+        for attr in selector.get('attrs', []):
+            name, ids = attr['name'], attr['value']
+            if name in ('system_roles', 'org_roles'):
+                resources = Role.objects.filter(scope='system' if name == 'system_roles' else 'org')
+            elif name in ('groups', 'labels'):
+                model = UserGroup if name == 'groups' else Label
+                resources = model.objects.filter(org_id=org_id)
+            else:
+                continue
+            if resources.filter(pk__in=ids).count() != len(set(ids)):
+                raise WorkflowConfigurationError(gettext('A configured approver is inactive, missing, or outside the organization.'))
+        users = available_users(org_id)
+        for query in RelatedManager.get_to_filter_qs(selector, User):
+            users = users.filter(query)
+        return users.distinct()
+
+
+def bind_acl_reviewers(context, version, bindings, org_id):
+    # Only matched server-side ACLs may supply these identities.
+    context.pop('acl_reviewers', None)
+    snapshot = {}
+    for key in version.acl_reviewer_keys:
+        ids = set((bindings or {}).get(key, []))
+        valid = {
+            str(pk) for pk in available_users(org_id).filter(pk__in=ids)
+            .values_list('pk', flat=True)
+        }
+        if not 1 <= len(ids) <= 1000 or ids != valid:
+            raise WorkflowConfigurationError(gettext(
+                'Select at least one active, unexpired reviewer from this organization.'
+            ))
+        snapshot[key] = sorted(ids)
+    if snapshot:
+        context['acl_reviewers'] = snapshot
+
+
+def resolve_approvers(node_instance, context, org_id, applicant_id):
+    config = node_instance.node.config
+    spec = config['approvers']
+    kind = spec['type']
+    users = available_users(org_id)
+    explicit_ids = None
+    if kind == 'user':
+        explicit_ids = set(spec['value'])
+    elif kind == 'user_selector':
+        explicit_ids = set(context.get('approver_selections', {}).get(node_instance.node.key, []))
+    elif kind == 'acl_reviewers':
+        explicit_ids = set(context.get('acl_reviewers', {}).get(node_instance.node.key, []))
+    elif kind == 'user_group':
+        with tmp_to_org(org_id):
+            groups = UserGroup.objects.filter(pk__in=spec['value'], org_id=org_id)
+            if groups.count() != len(spec['value']):
+                raise WorkflowConfigurationError(gettext('An approver group is missing or belongs to another organization.'))
+            users = users.filter(groups__in=groups)
+    elif kind in ('role', 'org_admin'):
+        roles = spec['value'] if kind == 'role' else [BuiltinRole.org_admin.id]
+        bindings = RoleBinding.objects_raw.filter(role_id__in=roles).filter(
+            Q(scope='org', org_id=org_id) | Q(scope='system', org__isnull=True)
+        )
+        users = users.filter(pk__in=bindings.values('user_id'))
+    elif kind == 'asset_owner':
+        assets = context.get('assets')
+        if not isinstance(assets, list) or not assets:
+            raise WorkflowConfigurationError(gettext(
+                'This request has no assets. Select assets or use another approver source.'
+            ))
+        explicit_ids = set()
+        asset_owners = []
+        for asset in assets:
+            if not isinstance(asset, dict):
+                raise WorkflowConfigurationError(gettext('Invalid asset information in the request.'))
+            name = asset.get('name') or asset.get('id') or '-'
+            owner_ids = snapshot_ids(asset.get('owner_ids'), name)
+            asset_owners.append((name, owner_ids))
+            explicit_ids.update(owner_ids)
+    else:
+        raise WorkflowConfigurationError(gettext('Unknown approver resolver.'))
+    if explicit_ids is not None:
+        users = users.filter(pk__in=explicit_ids)
+        eligible_ids = {str(pk) for pk in users.values_list('pk', flat=True)}
+        if eligible_ids != explicit_ids:
+            if kind == 'asset_owner':
+                names = ', '.join(name for name, ids in asset_owners if ids - eligible_ids)
+                raise WorkflowConfigurationError(gettext(
+                    'The owners of these assets are unavailable (inactive, expired, deleted, or outside this organization): '
+                    '{assets}. Set valid owners on the asset edit page.'
+                ).format(assets=names))
+            raise WorkflowConfigurationError(gettext('A configured approver is inactive, missing, or outside the organization.'))
+    excluded = excluded_approver_ids(config, context, applicant_id)
+    candidates = users
+    if excluded:
+        users = users.exclude(pk__in=excluded)
+    result = list(users.distinct().order_by('id')[:1001])
+    if not result and excluded and candidates.exists():
+        runs = node_instance.instance.node_instances
+        started_at = runs.filter(node__type='start').latest('date_created').date_created
+        level = runs.filter(node__type='approval', date_created__gte=started_at).count()
+        raise WorkflowConfigurationError(gettext(
+            'Approval {level} has no eligible approvers after excluding the applicant or authorized users. '
+            'Adjust the approvers or select another workflow.'
+        ).format(level=level))
+    if not result or len(result) > 1000:
+        raise WorkflowConfigurationError(gettext('An approval node must resolve between 1 and 1000 eligible approvers.'))
+    return result

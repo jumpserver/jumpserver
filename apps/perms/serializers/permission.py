@@ -42,8 +42,15 @@ class ActionChoicesField(BitChoicesField):
 
 
 class PermAccountsSerializer(serializers.ListField):
+    child = serializers.CharField(trim_whitespace=False)
+
+    def __init__(self, **kwargs):
+        kwargs.setdefault('help_text', self.get_render_help_text())
+        super().__init__(**kwargs)
+
     def get_render_help_text(self):
-        return _('Accounts, format ["@virtual", "root", "%template_id"], '
+        return _('Account usernames, not account IDs. '
+                 'Format ["@virtual", "root", "%template_id"], '
                  'virtual choices: @ALL, @SPEC, @USER, @ANON, @INPUT')
 
 
@@ -157,9 +164,13 @@ class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSeriali
     def validate_accounts(self, usernames):
         template_ids = []
         account_usernames = []
-        for username in usernames:
+        for index, username in enumerate(usernames):
             if username.startswith('%'):
-                template_ids.append(username[1:])
+                try:
+                    template_id = serializers.UUIDField().run_validation(username[1:])
+                except serializers.ValidationError as exc:
+                    raise serializers.ValidationError({index: exc.detail}) from exc
+                template_ids.append(template_id)
             else:
                 account_usernames.append(username)
         self.template_accounts = AccountTemplate.objects.filter(id__in=template_ids)

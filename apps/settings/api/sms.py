@@ -17,19 +17,22 @@ from .. import serializers
 
 class SMSBackendAPI(ListAPIView):
     serializer_class = SMSBackendSerializer
+    pagination_class = None
+    filter_backends = []
     rbac_perms = {
-        'list': 'settings.view_setting'
+        'GET': 'settings.view_setting',
+        'HEAD': 'settings.view_setting',
     }
 
     def list(self, request, *args, **kwargs):
         data = [
             {
-                'name': b,
-                'label': b.label
+                'name': name,
+                'label': label,
             }
-            for b in BACKENDS.choices
+            for name, label in BACKENDS.choices
         ]
-        return Response(data)
+        return Response(self.get_serializer(data, many=True).data)
 
 
 class SMSTestingAPI(GenericAPIView):

@@ -2,7 +2,7 @@
 import base64
 import hashlib
 import secrets
-from datetime import timedelta
+from datetime import UTC, datetime, timedelta
 from types import SimpleNamespace
 from uuid import uuid4
 
@@ -151,7 +151,6 @@ class RDPLoginRedeemApi(APIView):
             check_binding(ticket, token, applet, request.user)
             # The ticket/token deadline only governs this exchange. Once it
             # succeeds, local login and launch use the asset permission expiry.
-            deadline = token.permed_account.date_expired
             if not ticket_cache.consume(data['username'], encoded):
                 raise PermissionDenied(gettext('RDP login ticket has already been used'))
             # The ticket is consumed before secrets are disclosed. An uncertain
@@ -161,6 +160,8 @@ class RDPLoginRedeemApi(APIView):
             connection = get_connection_token_secret(
                 token, ConnectionTokenSecretSerializer, expire_now=True,
             )
+            # Use the final serialized authorization, including administrator overrides.
+            deadline = datetime.fromtimestamp(connection['expire_at'], tz=UTC)
             return private_response({
                 'attempt_id': str(ticket.id), 'connection_id': str(ticket.connection_id),
                 'token_id': str(token.id), 'org_id': str(ticket.org_id),

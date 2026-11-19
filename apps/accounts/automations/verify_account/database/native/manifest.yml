@@ -1,0 +1,13 @@
+id: verify_account_database_native
+name: "{{ 'Database account verification' | trans }}"
+category: database
+type:
+  - dameng
+  - oceanbase
+  - clickhouse
+  - db2
+method: verify_account
+i18n:
+  Database account verification:
+    en: Database account verification
+    zh: 数据库账号验证

@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 from orgs.mixins.models import JMSOrgBaseModel
 
-from .mixins import CREATABLE_REPORT_TYPES
+from .const import CREATABLE_REPORT_TYPES
 
 REPORT_VISIBILITY_FILTER_FIELDS = {
     'visible_charts',

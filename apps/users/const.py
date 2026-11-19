@@ -34,6 +34,12 @@ class RDPClientOption(TextChoices):
     REMOTE_MICROPHONE = 'remote_microphone', _('Remote microphone')
 
 
+class RDPKeyboardHook(TextChoices):
+    LOCAL = '0', _('On the local computer')
+    REMOTE = '1', _('On the remote computer')
+    FULL_SCREEN = '2', _('Only when using full screen')
+
+
 class ConnectDefaultOpenMethod(TextChoices):
     CURRENT = 'current', _('Current window')
     NEW = 'new', _('New window')

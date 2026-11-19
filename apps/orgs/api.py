@@ -73,7 +73,7 @@ class OrgViewSet(JMSBulkModelViewSet):
 
         for model in org_related_models:
             data = self.get_data_from_model(instance, model)
-            if not data:
+            if not data.exists():
                 continue
             msg = _(
                 'The organization have resource ({}) cannot be deleted'

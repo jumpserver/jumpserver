@@ -6,7 +6,7 @@ from django.db.models.deletion import ProtectedError
 from django.http import Http404, JsonResponse
 from django.utils.translation import gettext
 from django.conf import settings
-from rest_framework import exceptions
+from rest_framework import exceptions, status
 from rest_framework.response import Response
 from rest_framework.views import set_rollback
 
@@ -25,15 +25,11 @@ def extract_object_name(exc, index=0):
     if exc.args:
         (msg, *others) = exc.args
     else:
-        return gettext('Object')
+        return ''
     return gettext(msg.split(sep=' ', maxsplit=index + 1)[index])
 
 
 def common_exception_handler(exc, context):
-    if settings.DEBUG_DEV:
-        logger.exception('Print traceback exception for Debug')
-        traceback.print_exc()
-
     if isinstance(exc, Http404):
         exc = JMSObjectDoesNotExist(object_name=extract_object_name(exc, 1))
     elif isinstance(exc, PermissionDenied):
@@ -43,7 +39,12 @@ def common_exception_handler(exc, context):
     elif isinstance(exc, ProtectedError):
         exc = ReferencedByOthers()
 
-    if isinstance(exc, exceptions.APIException):
+    is_api_exception = isinstance(exc, exceptions.APIException)
+    if settings.DEBUG_DEV and not (is_api_exception and status.is_client_error(exc.status_code)):
+        logger.exception('Print traceback exception for Debug')
+        traceback.print_exc()
+
+    if is_api_exception:
         headers = {}
         if getattr(exc, 'auth_header', None):
             headers['WWW-Authenticate'] = exc.auth_header
@@ -52,6 +53,10 @@ def common_exception_handler(exc, context):
 
         if isinstance(exc.detail, str) and isinstance(exc.get_codes(), str):
             data = {'detail': exc.detail, 'code': exc.get_codes()}
+            if isinstance(exc, exceptions.AuthenticationFailed) and getattr(exc, 'client_login_reason', None):
+                data['client_login_reason'] = exc.client_login_reason
+                if getattr(exc, 'client_login_session', None):
+                    data['client_login_session'] = exc.client_login_session
         else:
             data = exc.detail
 

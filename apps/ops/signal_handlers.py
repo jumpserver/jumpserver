@@ -14,6 +14,7 @@ from rest_framework.utils.encoders import JSONEncoder
 from common.db.utils import close_old_connections, get_logger
 from common.signals import django_ready
 from common.utils.connection import RedisPubSub
+from common.utils.verify_code import VERIFY_CODE_TASKS
 from jumpserver.utils import get_current_request
 from orgs.utils import get_current_org_id, set_current_org
 from .ansible.runner import interface
@@ -61,6 +62,7 @@ def check_registered_tasks(*args, **kwargs):
         'ops.tasks.create_or_update_registered_periodic_tasks',
         'settings.tasks.ldap.import_ldap_user_periodic', 'users.tasks.check_password_expired_periodic',
         'common.utils.verify_code.send_sms_async',
+        'common.utils.verify_code.send_verify_mail_async',
         'users.tasks.check_user_expired', 'orgs.tasks.refresh_org_cache_task',
         'terminal.tasks.upload_session_replay_to_external_storage', 'terminal.tasks.clean_orphan_session',
         'terminal.tasks.upload_session_replay_file_to_external_storage',
@@ -165,6 +167,11 @@ def task_sent_handler(headers=None, body=None, **kwargs):
         return
 
     args, kwargs, __ = body
+
+    if task in VERIFY_CODE_TASKS:
+        # 仅清空执行记录参数，保留原始 body 供活动回调使用。
+        args = []
+        kwargs = {}
 
     try:
         args = json.loads(json.dumps(list(args), cls=JSONEncoder))

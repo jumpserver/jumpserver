@@ -77,8 +77,7 @@ class TencentSMS(BaseSMSClient):
             logger.info(f'Tencent sms send: '
                         f'phone_numbers={phone_numbers} '
                         f'sign_name={sign_name} '
-                        f'template_code={template_code} '
-                        f'template_param={template_param}')
+                        f'template_code={template_code}')
 
             resp = self.client.SendSms(req)
 

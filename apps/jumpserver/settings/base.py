@@ -1,5 +1,7 @@
 import os
 import re
+from copy import deepcopy
+from math import isfinite
 
 from django.urls import reverse_lazy
 from redis.sentinel import SentinelManagedSSLConnection
@@ -27,7 +29,7 @@ def parse_sentinels_host(sentinels_host):
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 VERSION = const.VERSION
 # Covers breaking changes across the whole server release, including Koko, Chen and Kael.
-MIN_CLIENT_VERSION = 'v5.1.0'
+MIN_CLIENT_VERSION = 'v5.2.0'
 BASE_DIR = const.BASE_DIR
 PROJECT_DIR = const.PROJECT_DIR
 APPS_DIR = os.path.join(PROJECT_DIR, 'apps')
@@ -175,7 +177,7 @@ MIDDLEWARE = [
     'jumpserver.middleware.StartMiddleware',
     *PRE_CUSTOM_MIDDLEWARES,
     'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
+    'common.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -190,11 +192,14 @@ MIDDLEWARE = [
     'jumpserver.middleware.RefererCheckMiddleware',
     'jumpserver.middleware.SQLCountMiddleware',
     'orgs.middleware.OrgMiddleware',
+    'accounts.middleware.ApplicationAuditMiddleware',
     'authentication.backends.oidc.middleware.OIDCRefreshIDTokenMiddleware',
     'authentication.backends.cas.middleware.CASMiddleware',
     'authentication.middleware.MFAMiddleware',
     'authentication.middleware.ThirdPartyLoginMiddleware',
+    'authentication.middleware.WebSessionLockMiddleware',
     'authentication.middleware.SessionCookieMiddleware',
+    'authentication.client_session_middleware.ClientLoginSessionExpiryMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
     'jumpserver.middleware.SafeRedirectMiddleware',
     *POST_CUSTOM_MIDDLEWARES,
@@ -255,7 +260,8 @@ CSRF_COOKIE_NAME = '{}csrftoken'.format(SESSION_COOKIE_NAME_PREFIX)
 SESSION_COOKIE_NAME = '{}sessionid'.format(SESSION_COOKIE_NAME_PREFIX)
 
 SESSION_COOKIE_AGE = CONFIG.SESSION_COOKIE_AGE
-SESSION_SAVE_EVERY_REQUEST = CONFIG.SESSION_SAVE_EVERY_REQUEST
+SESSION_SAVE_EVERY_REQUEST = False
+SESSION_RENEW_ON_REQUEST = CONFIG.convert_type('SESSION_RENEW_ON_REQUEST', CONFIG.SESSION_RENEW_ON_REQUEST)
 SESSION_EXPIRE_AT_BROWSER_CLOSE = CONFIG.SESSION_EXPIRE_AT_BROWSER_CLOSE
 VIEW_ASSET_ONLINE_SESSION_INFO = CONFIG.VIEW_ASSET_ONLINE_SESSION_INFO
 SESSION_ENGINE = "common.sessions.{}".format(CONFIG.SESSION_ENGINE)
@@ -394,6 +400,14 @@ REDIS_SSL_CA = exist_or_default(os.path.join(CERTS_DIR, 'redis_ca.crt'), REDIS_S
 REDIS_SSL_REQUIRED = CONFIG.REDIS_SSL_REQUIRED
 REDIS_USE_SSL = CONFIG.REDIS_USE_SSL
 REDIS_PROTOCOL = 'rediss' if REDIS_USE_SSL else 'redis'
+REDIS_SOCKET_TIMEOUT = float(CONFIG.REDIS_SOCKET_TIMEOUT)
+REDIS_SOCKET_CONNECT_TIMEOUT = float(CONFIG.REDIS_SOCKET_CONNECT_TIMEOUT)
+for name, value in (
+    ('REDIS_SOCKET_TIMEOUT', REDIS_SOCKET_TIMEOUT),
+    ('REDIS_SOCKET_CONNECT_TIMEOUT', REDIS_SOCKET_CONNECT_TIMEOUT),
+):
+    if not isfinite(value) or value <= 0:
+        raise ValueError(f'{name} must be a positive finite number')
 # Cache use sentinel
 REDIS_SENTINEL_HOSTS = CONFIG.REDIS_SENTINEL_HOSTS
 REDIS_SENTINEL_SERVICE_NAME, REDIS_SENTINELS = parse_sentinels_host(REDIS_SENTINEL_HOSTS)
@@ -406,11 +420,13 @@ else:
 # Cache config
 
 REDIS_OPTIONS = {
-    "REDIS_CLIENT_KWARGS": {
-        "health_check_interval": 30
-    },
+    'SOCKET_TIMEOUT': REDIS_SOCKET_TIMEOUT,
+    'SOCKET_CONNECT_TIMEOUT': REDIS_SOCKET_CONNECT_TIMEOUT,
     "CONNECTION_POOL_KWARGS": {
         'max_connections': CONFIG.REDIS_MAX_CONNECTIONS,
+        'health_check_interval': 30,
+        'socket_keepalive': True,
+        'retry_on_timeout': False,
     }
 }
 if REDIS_USE_SSL:
@@ -435,7 +451,9 @@ if REDIS_SENTINEL_SERVICE_NAME and REDIS_SENTINELS:
             "ssl_certfile": REDIS_SSL_CERT,
             "ssl_ca_certs": REDIS_SSL_CA,
             'password': REDIS_SENTINEL_PASSWORD,
-            'socket_timeout': REDIS_SENTINEL_SOCKET_TIMEOUT
+            'socket_timeout': REDIS_SENTINEL_SOCKET_TIMEOUT or REDIS_SOCKET_TIMEOUT,
+            'socket_connect_timeout': REDIS_SOCKET_CONNECT_TIMEOUT,
+            'socket_keepalive': True,
         }
     })
     if REDIS_USE_SSL:
@@ -459,9 +477,28 @@ REDIS_CACHE_DEFAULT = {
 REDIS_CACHE_SESSION = dict(REDIS_CACHE_DEFAULT)
 REDIS_CACHE_SESSION['LOCATION'] = REDIS_LOCATION_NO_DB.format(CONFIG.REDIS_DB_SESSION)
 
+# Blocking locks need a separate pool without a read timeout so idle waits remain valid.
+REDIS_CACHE_BLOCKING = deepcopy(REDIS_CACHE_DEFAULT)
+REDIS_CACHE_BLOCKING['OPTIONS'].pop('SOCKET_TIMEOUT')
+REDIS_CACHE_BLOCKING['OPTIONS']['CONNECTION_FACTORY'] = (
+    'common.redis.BlockingSentinelConnectionFactory'
+    if REDIS_SENTINEL_SERVICE_NAME and REDIS_SENTINELS
+    else 'common.redis.BlockingConnectionFactory'
+)
+
+# Long-lived subscriptions must not consume the connections needed for locks.
+REDIS_CACHE_PUBSUB = deepcopy(REDIS_CACHE_DEFAULT)
+REDIS_CACHE_PUBSUB['OPTIONS']['CONNECTION_FACTORY'] = (
+    'common.redis.PubSubSentinelConnectionFactory'
+    if REDIS_SENTINEL_SERVICE_NAME and REDIS_SENTINELS
+    else 'common.redis.PubSubConnectionFactory'
+)
+
 CACHES = {
     'default': REDIS_CACHE_DEFAULT,
-    'session': REDIS_CACHE_SESSION
+    'session': REDIS_CACHE_SESSION,
+    'blocking': REDIS_CACHE_BLOCKING,
+    'pubsub': REDIS_CACHE_PUBSUB,
 }
 SESSION_CACHE_ALIAS = "session"
 

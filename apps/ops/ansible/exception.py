@@ -6,4 +6,6 @@ class CommandInBlackListException(Exception):
 
 
 class AnsibleDockerImageNotFound(Exception):
+    """Retained for rotation results that failed before remote execution started."""
+
     pass

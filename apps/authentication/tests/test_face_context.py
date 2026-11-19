@@ -1,5 +1,6 @@
+from contextlib import nullcontext
 from types import SimpleNamespace
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from django.test import SimpleTestCase
 from django.utils import translation
@@ -85,11 +86,18 @@ class FaceContextCreationTest(SimpleTestCase):
         view = ConnectionTokenViewSet()
         view.request = SimpleNamespace(
             user=SimpleNamespace(id="asset-user", is_face_code_set=True),
-            session={},
+            session={}, data={},
         )
         response = SimpleNamespace(data={"id": "connection-id"})
 
-        view.create_face_verify(response)
+        connection = Mock(pk='connection-id', user_id='asset-user', is_expired=False,
+                          acl_context={'requirements': {'face': 'pending'}})
+        with patch('authentication.api.connection_token.transaction.atomic', side_effect=nullcontext), \
+                patch('authentication.api.connection_token.ConnectionToken.objects.select_for_update') as query, \
+                patch('authentication.services.connection_acl.acl_state', return_value={}):
+            query.return_value.get.return_value = connection
+            view.create_face_verify(response)
+        self.assertEqual(connection.acl_context['face_token'], response.data['face_token'])
 
         token = response.data["face_token"]
         self.assertEqual(view.request.session[FACE_SESSION_KEY], token)

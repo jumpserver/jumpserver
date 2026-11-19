@@ -12,11 +12,13 @@ class AssetPermissionWillExpireSoonUserMsg(UserMessage):
         self.permission = permission
 
     def get_html_msg(self) -> dict:
+        from tickets.plugins.apply_asset.reapply import renewal_links
         context = {
             'name': self.user.name,
             'permission_name': self.permission.name,
             'org_name': self.permission.org.name,
             'date_expired': timezone.localtime(self.permission.date_expired),
+            'renewal_links': renewal_links(self.user, [self.permission]),
         }
         message = render_to_string('perms/_msg_asset_permission_expire_soon.html', context)
         return {
@@ -33,19 +35,22 @@ class AssetPermissionWillExpireSoonUserMsg(UserMessage):
 
 
 class PermedAssetsWillExpireUserMsg(UserMessage):
-    def __init__(self, user, assets, day_count=0):
+    def __init__(self, user, assets, day_count=0, permissions=()):
         super().__init__(user)
         self.assets = assets
         self.day_count = _('today') if day_count == 0 else str(day_count) + _('day')
+        self.permissions = permissions
 
     def get_html_msg(self) -> dict:
+        from tickets.plugins.apply_asset.reapply import renewal_links
         subject = _("The asset you authorized is about to expire")
         context = {
             'name': self.user.name,
             'count': self.day_count,
             'items': [str(asset) for asset in self.assets],
             'item_type': _("permed assets"),
-            'show_help': True
+            'show_help': True,
+            'renewal_links': renewal_links(self.user, self.permissions),
         }
         message = render_to_string('perms/_msg_permed_items_expire.html', context)
         return {

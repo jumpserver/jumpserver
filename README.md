@@ -1,6 +1,6 @@
 <div align="center">
   <a name="readme-top"></a>
-  <a href="https://jumpserver.com" target="_blank"><img src="https://download.jumpserver.org/images/jumpserver-logo.svg" alt="JumpServer" width="300" /></a>
+  <a href="https://jumpserver.com" target="_blank"><img src="readmes/assets/jumpserver-logo.svg" alt="JumpServer" width="300" /></a>
   
 ## An open-source PAM platform (Bastion Host)
 
@@ -12,7 +12,7 @@
 [![][github-release-shield]][github-release-link]
 [![][github-stars-shield]][github-stars-link]
 
-[English](/README.md) · [中文(简体)](/readmes/README.zh-hans.md) · [中文(繁體)](/readmes/README.zh-hant.md) · [日本語](/readmes/README.ja.md) · [Português (Brasil)](/readmes/README.pt-br.md) · [Español](/readmes/README.es.md) · [Русский](/readmes/README.ru.md) · [한국어](/readmes/README.ko.md) · [Tiếng Việt](/readmes/README.vi.md)
+[English](/README.md) · [中文(简体)](/readmes/README.zh-hans.md) · [中文(繁體)](/readmes/README.zh-hant.md) · [日本語](/readmes/README.ja.md) · [Português (Brasil)](/readmes/README.pt-br.md) · [Español](/readmes/README.es.md) · [Français](/readmes/README.fr.md) · [Русский](/readmes/README.ru.md) · [한국어](/readmes/README.ko.md) · [Tiếng Việt](/readmes/README.vi.md)
 
 </div>
 
@@ -22,7 +22,13 @@
 
 JumpServer is an open-source Privileged Access Management (PAM) platform with AI-powered capabilities. It gives DevOps and IT teams a unified workspace for secure access to SSH, RDP, Kubernetes, databases, websites, RemoteApp, VirtualApp, and more.
 
-<img alt="JumpServer architecture diagram" src="readmes/assets/jumpserver-architecture.png" />
+<img alt="JumpServer architecture diagram" src="readmes/assets/jumpserver-architecture.gif" />
+
+## Version Maintenance
+
+5.x is actively maintained, 4.10.x is an LTS release, and 3.10.x receives critical fixes only. V3 Community Edition (CE) reaches end of life on **December 31, 2026**, and Enterprise Edition (EE) on **December 31, 2028**.
+
+See [SECURITY.md](SECURITY.md) for version maintenance status and how to report security vulnerabilities.
 
 ## Quickstart
 
@@ -32,7 +38,7 @@ Prepare a clean 64-bit Linux server with at least 4 CPU cores and 8 GB of RAM.
 curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quick_start.sh | bash
 ```
 
-Open JumpServer in your browser at `http://your-jumpserver-ip/`
+Open `https://<jumpserver-host>/` in your browser, replacing `<jumpserver-host>` with the IP address or domain name of the host running JumpServer.
 
 - Username: `admin`
 - Password: `ChangeMe`
@@ -40,28 +46,28 @@ Open JumpServer in your browser at `http://your-jumpserver-ip/`
 ## Screenshots
 
 <p align="center">
-  <img src="readmes/assets/screenshot-01.png" alt="JumpServer PAM dashboard" width="49%" />
-  <img src="readmes/assets/screenshot-02.png" alt="JumpServer asset management" width="49%" />
+  <img src="readmes/assets/screenshot-01.png" alt="JumpServer PAM dashboard" title="JumpServer PAM dashboard" width="49%" />
+  <img src="readmes/assets/screenshot-02.png" alt="JumpServer asset management" title="JumpServer asset management" width="49%" />
 </p>
 
 <p align="center">
-  <img src="readmes/assets/screenshot-03.png" alt="JumpServer SSH connection dialog" width="49%" />
-  <img src="readmes/assets/screenshot-04.png" alt="JumpServer terminal AI prompt" width="49%" />
+  <img src="readmes/assets/screenshot-03.png" alt="JumpServer SSH connection dialog" title="JumpServer SSH connection dialog" width="49%" />
+  <img src="readmes/assets/screenshot-04.png" alt="JumpServer terminal AI prompt" title="JumpServer terminal AI prompt" width="49%" />
 </p>
 
 <p align="center">
-  <img src="readmes/assets/screenshot-05.png" alt="JumpServer AI assistant" width="49%" />
-  <img src="readmes/assets/screenshot-06.png" alt="JumpServer remote desktop session" width="49%" />
+  <img src="readmes/assets/screenshot-05.png" alt="JumpServer AI assistant" title="JumpServer AI assistant" width="49%" />
+  <img src="readmes/assets/screenshot-06.png" alt="JumpServer remote desktop session" title="JumpServer remote desktop session" width="49%" />
 </p>
 
 <p align="center">
-  <img src="readmes/assets/screenshot-07.png" alt="JumpServer terminal asset panel in light theme" width="49%" />
-  <img src="readmes/assets/screenshot-08.png" alt="JumpServer SSH session in light theme" width="49%" />
+  <img src="readmes/assets/screenshot-07.png" alt="KoKo TUI asset browser with searchable authorized assets" title="KoKo TUI asset browser with searchable authorized assets" width="49%" />
+  <img src="readmes/assets/screenshot-08.png" alt="KoKo TUI multi-session manager for switching between active SSH sessions" title="KoKo TUI multi-session manager for switching between active SSH sessions" width="49%" />
 </p>
 
 <p align="center">
-  <img src="readmes/assets/screenshot-09.png" alt="JumpServer terminal asset panel in dark theme" width="49%" />
-  <img src="readmes/assets/screenshot-10.png" alt="JumpServer SSH session in dark theme" width="49%" />
+  <img src="readmes/assets/screenshot-09.png" alt="KoKo classic text-mode home screen with connection shortcuts" title="KoKo classic text-mode home screen with connection shortcuts" width="49%" />
+  <img src="readmes/assets/screenshot-10.png" alt="KoKo classic text-mode asset list with authorized SSH targets" title="KoKo classic text-mode asset list with authorized SSH targets" width="49%" />
 </p>
 
 ## Components

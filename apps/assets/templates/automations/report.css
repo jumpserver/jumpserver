@@ -1,0 +1,282 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  color: #303133;
+  background: #fff;
+  font:
+    13px/1.6 -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "PingFang SC",
+    "Microsoft YaHei",
+    sans-serif;
+}
+.report {
+  padding: 16px 20px 24px;
+}
+.report-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+h1 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 26px;
+  overflow-wrap: anywhere;
+}
+.subtitle {
+  margin: 5px 0 0;
+  color: #909399;
+  font-size: 12px;
+}
+.subtitle span + span::before {
+  content: "·";
+  margin: 0 8px;
+}
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #606266;
+  white-space: nowrap;
+}
+.status::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+.success {
+  color: #21856f;
+}
+.failed,
+.error {
+  color: #c94141;
+}
+.unsupported,
+.unverified {
+  color: #a46b1b;
+}
+.running,
+.pending {
+  color: #2784ba;
+}
+.metadata {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px 24px;
+  margin: 20px 0;
+}
+.metadata dt {
+  color: #909399;
+  font-size: 12px;
+  margin-bottom: 3px;
+}
+.metadata dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+.summary {
+  display: flex;
+  margin-bottom: 24px;
+  padding: 16px 0;
+  border: 1px solid #e4e7ed;
+  border-radius: 4px;
+  background: #fafbfc;
+}
+.metric {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+  padding: 0 20px;
+}
+.metric + .metric {
+  border-left: 1px solid #e4e7ed;
+}
+.metric-label {
+  color: #606266;
+  font-size: 12px;
+}
+.metric-value {
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 28px;
+  font-variant-numeric: tabular-nums;
+}
+h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.result-count {
+  font-size: 12px;
+  color: #909399;
+  font-weight: 400;
+}
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+  border: 1px solid #e4e7ed;
+  border-radius: 4px;
+  overflow: hidden;
+}
+th,
+td {
+  padding: 10px 14px;
+  text-align: left;
+  overflow-wrap: anywhere;
+  vertical-align: top;
+}
+th {
+  background: #f5f7fa;
+  color: #606266;
+  font-size: 12px;
+  font-weight: 500;
+  border-bottom: 1px solid #e4e7ed;
+}
+td {
+  border-bottom: 1px solid #ebeef5;
+}
+tbody tr:last-child td {
+  border-bottom: 0;
+}
+tbody tr:hover {
+  background: #fafbfc;
+}
+.target-with-error {
+  width: 35%;
+}
+.status-column {
+  width: 120px;
+}
+.error-detail {
+  color: #606266;
+}
+.error-message {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  cursor: help;
+}
+.empty {
+  padding: 36px 16px;
+  text-align: center;
+  color: #909399;
+}
+.scope-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 28px;
+  margin: -10px 0 24px;
+  color: #606266;
+  font-size: 12px;
+}
+.scope-summary div {
+  display: inline-flex;
+  gap: 8px;
+}
+.scope-summary dt,
+.scope-summary dd {
+  margin: 0;
+}
+.scope-summary dd {
+  color: #303133;
+  font-variant-numeric: tabular-nums;
+}
+.account-column {
+  width: 22%;
+}
+.asset-column {
+  width: 30%;
+}
+.asset-label {
+  display: block;
+}
+.asset-name {
+  display: block;
+}
+.report-section .status {
+  max-width: 100%;
+  white-space: normal;
+}
+.notice {
+  margin: 0 0 20px;
+  padding: 12px 16px;
+  border-left: 3px solid #c94141;
+  background: #fef0f0;
+}
+.notice strong {
+  font-size: 13px;
+  font-weight: 500;
+  color: #c94141;
+}
+.notice p {
+  margin: 4px 0 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 600px) {
+  .report {
+    padding: 12px;
+  }
+  .metadata {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .metric {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 0 12px;
+    min-width: 85px;
+  }
+  .metric-value {
+    margin-top: auto;
+  }
+  .summary {
+    flex-wrap: wrap;
+    row-gap: 16px;
+  }
+  .scope-summary {
+    gap: 8px 16px;
+  }
+  .status-column {
+    width: 92px;
+  }
+  th,
+  td {
+    padding: 10px;
+  }
+}
+@media print {
+  .report {
+    padding: 0;
+  }
+  tr {
+    break-inside: avoid;
+  }
+  thead {
+    display: table-header-group;
+  }
+  .error-message {
+    display: block;
+    overflow: visible;
+    -webkit-line-clamp: unset;
+  }
+}

@@ -1,7 +1,7 @@
 from contextlib import nullcontext
 from datetime import datetime
 from types import SimpleNamespace
-from unittest.mock import Mock, PropertyMock, patch
+from unittest.mock import Mock, patch
 from uuid import uuid4
 import time
 
@@ -10,19 +10,62 @@ from django.core.cache import cache
 from django.db import transaction
 from django.db.backends.sqlite3.base import DatabaseWrapper
 from django.test import SimpleTestCase, override_settings
+from django.utils.translation import override
 
 from accounts.const import AliasAccount
 from acls.api.login_asset_check import LoginAssetCheckAPI
 from acls.models import LoginAssetACL
+from acls.models.login_asset_acl import LoginAssetPolicy
 from acls.serializers.login_asset_acl import LoginAssetACLSerializer
+from acls.serializers.command_acl import CommandFilterACLSerializer, CommandFilterACLListSerializer
+from acls.serializers.login_acl import LoginACLSerializer
 from authentication.api.connection_token import ConnectionTokenViewSet
 from common.exceptions import JMSException
 from tickets.const import TicketState
-from tickets.handlers.base import BaseHandler
-from tickets.handlers.login_asset_confirm import Handler
-from tickets.models import ApplyLoginAssetTicket
-from tickets.serializers.ticket.login_asset_review import LoginAssetReviewSerializer
+from tickets.models import Ticket, Workflow
+from tickets.serializers.ticket import TicketSerializer
 from rest_framework.exceptions import PermissionDenied
+
+
+class ACLWorkflowDisplayTests(SimpleTestCase):
+    serializers = (
+        LoginAssetACLSerializer, CommandFilterACLSerializer,
+        CommandFilterACLListSerializer, LoginACLSerializer,
+    )
+
+    def serialize_workflow(self, serializer_class, workflow):
+        instance = serializer_class.Meta.model(workflow=workflow)
+        serializer = serializer_class(instance)
+        # Isolate workflow fields from unrelated rule relations.
+        for name in list(serializer.fields):
+            if name not in ('workflow', 'workflow_name'):
+                serializer.fields.pop(name)
+        self.assertTrue(serializer.fields['workflow_name'].read_only)
+        return serializer.data
+
+    def test_workflow_name_preserves_custom_names_and_uuid_contract(self):
+        workflow = Workflow(name='Operations approval', type='command_confirm', enabled=False)
+        for serializer_class in self.serializers:
+            with self.subTest(serializer=serializer_class.__name__), override('zh'):
+                self.assertEqual(self.serialize_workflow(serializer_class, workflow), {
+                    'workflow': str(workflow.pk), 'workflow_name': 'Operations approval',
+                    'workflow_requires_reviewers': False,
+                })
+
+    def test_default_workflow_name_uses_request_language(self):
+        workflow = Workflow(name='Login confirm', type='login_confirm', created_by='System')
+        for serializer_class in self.serializers:
+            for language, expected in [('zh', '登录复核'), ('en', 'Login review')]:
+                with self.subTest(serializer=serializer_class.__name__, language=language), override(language):
+                    self.assertEqual(self.serialize_workflow(serializer_class, workflow)['workflow_name'], expected)
+        self.assertEqual(workflow.name, 'Login confirm')
+
+    def test_legacy_rule_without_workflow_remains_supported(self):
+        for serializer_class in self.serializers:
+            with self.subTest(serializer=serializer_class.__name__):
+                self.assertEqual(self.serialize_workflow(serializer_class, None), {
+                    'workflow': None, 'workflow_name': '', 'workflow_requires_reviewers': False,
+                })
 
 
 @override_settings(CACHES={'default': {
@@ -31,19 +74,32 @@ from rest_framework.exceptions import PermissionDenied
 class AssetReviewExemptionTests(SimpleTestCase):
     def setUp(self):
         cache.clear()
-        self.acl = LoginAssetACL(action='review', review_duration=2, org_id=str(uuid4()))
+        self.acl = LoginAssetACL(action='accept', review_enabled=True, review_duration=2, org_id=str(uuid4()))
+        self.policy = LoginAssetPolicy((self.acl,))
         self.user = SimpleNamespace(id=uuid4())
-        self.asset = SimpleNamespace(id=uuid4(), org_id=self.acl.org_id)
-        self.key = self.acl.get_review_cache_key(self.user.id, self.asset.id, 'root')
-        self.ticket = ApplyLoginAssetTicket(
-            state=TicketState.approved, org_id=self.acl.org_id,
-            apply_login_user_id=self.user.id, apply_login_asset_id=self.asset.id,
-            apply_login_account='root',
-            meta={'login_asset_review': {'acl_id': str(self.acl.id), 'cache_key': self.key}},
+        asset_id = uuid4()
+        self.asset = SimpleNamespace(
+            id=asset_id, pk=asset_id, org_id=self.acl.org_id,
+            name='asset', address='192.0.2.10',
         )
+        self.key = self.acl.get_review_cache_key(self.user.id, self.asset.id, 'root')
+        self.user.pk = self.user.id
+        self.asset.pk = self.asset.id
+        self.ticket = Ticket(
+            state=TicketState.approved, org_id=self.acl.org_id,
+            applicant_id=self.user.id,
+            request_data={'apply_login_asset': str(self.asset.id), 'apply_login_account': 'root'},
+            meta={'login_asset_reviews': [{'acl_id': str(self.acl.id), 'cache_key': self.key}]},
+        )
+        self.instance = SimpleNamespace(state='approved', applicant_id=self.user.id, context={
+            'assets': [{'id': str(self.asset.id)}], 'accounts': [{'username': 'root'}],
+        })
         self.query = patch.object(LoginAssetACL.objects, 'filter').start()
         self.query.return_value.first.return_value = self.acl
         patch('acls.models.login_asset_acl.tmp_to_org', side_effect=lambda org: nullcontext()).start()
+        patch.object(LoginAssetACL, 'get_review_assignees', return_value=[Mock()]).start()
+        patch('authentication.api.connection_token.get_request_os', return_value='linux').start()
+        patch('authentication.api.connection_token.ConnectMethodUtil.get_connect_method', return_value=None).start()
         self.addCleanup(patch.stopall)
 
     def test_commit_rollback_and_fixed_expiry(self):
@@ -53,20 +109,20 @@ class AssetReviewExemptionTests(SimpleTestCase):
         self.addCleanup(connection.close)
         with patch('django.db.transaction.get_connection', return_value=connection):
             with transaction.atomic():
-                LoginAssetACL.cache_approved_review(self.ticket)
+                LoginAssetACL.cache_approved_review(self.ticket, self.instance)
                 self.assertIsNone(cache.get(self.key))
             self.assertEqual(cache.get(self.key), str(self.ticket.id))
             cache.clear()
             with self.assertRaises(ValueError):
                 with transaction.atomic():
-                    LoginAssetACL.cache_approved_review(self.ticket)
+                    LoginAssetACL.cache_approved_review(self.ticket, self.instance)
                     raise ValueError('rollback')
             self.assertIsNone(cache.get(self.key))
 
             started = time.time()
             with patch('time.time', return_value=started):
                 with transaction.atomic():
-                    LoginAssetACL.cache_approved_review(self.ticket)
+                    LoginAssetACL.cache_approved_review(self.ticket, self.instance)
             with patch('time.time', return_value=started + 7199):
                 self.assertTrue(self.acl.is_review_exempt(self.user, self.asset, 'root'))
                 self.acl.review_duration = 0
@@ -85,7 +141,7 @@ class AssetReviewExemptionTests(SimpleTestCase):
             (self.user, self.asset, 'admin'),
         ]:
             self.assertFalse(self.acl.is_review_exempt(user, asset, username))
-        other_acl = LoginAssetACL(action='review', org_id=self.acl.org_id)
+        other_acl = LoginAssetACL(action='accept', review_enabled=True, org_id=self.acl.org_id)
         self.assertFalse(other_acl.is_review_exempt(self.user, self.asset, 'root'))
         self.acl.org_id = str(uuid4())
         self.assertFalse(self.acl.is_review_exempt(self.user, self.asset, 'root'))
@@ -93,21 +149,21 @@ class AssetReviewExemptionTests(SimpleTestCase):
     def test_unapproved_legacy_changed_and_disabled_reviews_do_not_grant_exemption(self):
         with patch('acls.models.login_asset_acl.transaction.on_commit') as on_commit:
             for state in [TicketState.pending, TicketState.rejected, TicketState.closed]:
-                self.ticket.state = state
-                LoginAssetACL.cache_approved_review(self.ticket)
-            self.ticket.state = TicketState.approved
+                self.instance.state = state
+                LoginAssetACL.cache_approved_review(self.ticket, self.instance)
+            self.instance.state = TicketState.approved
             self.ticket.meta = {}
-            LoginAssetACL.cache_approved_review(self.ticket)
+            LoginAssetACL.cache_approved_review(self.ticket, self.instance)
             self.ticket.meta = {'login_asset_review': {'acl_id': str(self.acl.id), 'cache_key': self.key}}
-            self.ticket.apply_login_account = 'admin'
-            LoginAssetACL.cache_approved_review(self.ticket)
-            self.ticket.apply_login_account = 'root'
+            self.instance.context['accounts'][0]['username'] = 'admin'
+            LoginAssetACL.cache_approved_review(self.ticket, self.instance)
+            self.instance.context['accounts'][0]['username'] = 'root'
             self.acl.review_duration = 0
-            LoginAssetACL.cache_approved_review(self.ticket)
+            LoginAssetACL.cache_approved_review(self.ticket, self.instance)
             self.query.return_value.first.return_value = None
-            LoginAssetACL.cache_approved_review(self.ticket)
+            LoginAssetACL.cache_approved_review(self.ticket, self.instance)
             on_commit.assert_not_called()
-        self.query.assert_called_with(id=str(self.acl.id), is_active=True, action='review')
+        self.query.assert_called_with(id=str(self.acl.id), is_active=True, review_enabled=True)
 
     def test_cache_failures_are_safe(self):
         with patch('acls.models.login_asset_acl.cache.get', side_effect=RuntimeError('offline')), \
@@ -119,28 +175,25 @@ class AssetReviewExemptionTests(SimpleTestCase):
             LoginAssetACL._cache_review(self.key, str(self.ticket.id), 7200)
             log.assert_called_once()
 
-    def test_only_final_approval_grants_exemption_without_a_token(self):
-        missing_token = ApplyLoginAssetTicket.connection_token.RelatedObjectDoesNotExist
-        with patch.object(BaseHandler, '_on_step_approved', return_value=False) as finished, \
-                patch.object(ApplyLoginAssetTicket, 'connection_token', new_callable=PropertyMock,
-                             side_effect=missing_token), \
-                patch.object(LoginAssetACL, 'cache_approved_review') as grant:
-            handler = Handler(self.ticket)
-            handler._on_step_approved(Mock())
-            grant.assert_not_called()
-            finished.return_value = True
-            handler._on_step_approved(Mock())
-            grant.assert_called_once_with(self.ticket)
-
     def test_ticket_creation_saves_server_generated_match(self):
-        with patch.object(ApplyLoginAssetTicket.objects, 'create') as create:
+        with patch.object(Ticket.objects, 'create') as create, patch.object(LoginAssetACL, 'review_configuration', return_value={}):
             reviewers = [Mock()]
-            ticket = self.acl.create_login_asset_review_ticket(
-                self.user, self.asset, 'root', reviewers, self.acl.org_id,
+            workflow = Mock()
+            ticket = LoginAssetACL.create_login_asset_review_ticket.__wrapped__(
+                self.acl, self.user, self.asset, 'root', reviewers, self.acl.org_id, workflow=workflow,
             )
-            self.assertEqual(create.call_args.kwargs['meta'], self.ticket.meta)
-            self.assertEqual(create.call_args.kwargs['apply_login_account'], 'root')
-            ticket.open_by_system.assert_called_once_with(reviewers)
+            self.assertEqual(create.call_args.kwargs['meta'], {
+                **self.ticket.meta, 'login_asset_review_config': {},
+                'login_asset_connections': [{
+                    'asset_id': str(self.asset.id), 'asset_name': self.asset.name,
+                    'asset_address': self.asset.address, 'account': 'root', 'reason': '',
+                    'reviews': self.ticket.meta['login_asset_reviews'],
+                }],
+            })
+            self.assertEqual(create.call_args.kwargs['request_data']['apply_login_account'], 'root')
+        ticket.open_by_system.assert_called_once_with(
+            reviewers, workflow=workflow, acl_reviewers=None,
+        )
 
     def test_duration_validation_and_private_ticket_metadata(self):
         field = LoginAssetACLSerializer().fields['review_duration']
@@ -150,28 +203,28 @@ class AssetReviewExemptionTests(SimpleTestCase):
         for value in [-1, 1.5, None, 'invalid']:
             with self.assertRaises(ValidationError):
                 field.run_validation(value)
-        self.assertNotIn('meta', LoginAssetReviewSerializer().fields)
+        self.assertNotIn('meta', TicketSerializer().fields)
 
     def test_token_entry_uses_resolved_account_and_still_requires_acl_match(self):
         view = ConnectionTokenViewSet()
-        view.request = SimpleNamespace(query_params={})
+        view.request = SimpleNamespace(query_params={}, META={}, user=self.user)
         view.input_username = 'account-display-name'
         view._record_operate_log = Mock()
         account = SimpleNamespace(username='root')
         with patch.object(LoginAssetACL, 'filter_queryset'), \
-                patch.object(LoginAssetACL, 'get_match_rule_acls', return_value=self.acl) as match, \
+                patch.object(LoginAssetACL, 'get_match_rule_acls', return_value=self.policy) as match, \
                 patch('authentication.api.connection_token.get_request_ip_or_data', return_value='127.0.0.1'):
-            with self.assertRaises(JMSException):
-                view._validate_acl(self.user, self.asset, account, 'web_cli', 'ssh')
+            context = view._validate_acl(self.user, self.asset, account, 'web_cli', 'ssh')
+            self.assertEqual(context['requirements'], {'review': 'pending'})
+            self.assertEqual(context['review_acls'], [str(self.acl.pk)])
             cache.set(self.key, str(self.ticket.id), 7200)
-            self.assertIsNone(view._validate_acl(self.user, self.asset, account, 'web_cli', 'ssh'))
-            view._record_operate_log.assert_called_once_with(self.acl, self.asset)
+            self.assertEqual(view._validate_acl(self.user, self.asset, account, 'web_cli', 'ssh')['requirements'], {})
+            view._record_operate_log.assert_called_with(self.acl, self.asset)
             account.username = AliasAccount.INPUT
             view.input_username = 'admin'
-            with self.assertRaises(JMSException):
-                view._validate_acl(self.user, self.asset, account, 'web_cli', 'ssh')
+            self.assertEqual(view._validate_acl(self.user, self.asset, account, 'web_cli', 'ssh')['requirements'], {'review': 'pending'})
             view.input_username = 'root'
-            self.assertIsNone(view._validate_acl(self.user, self.asset, account, 'web_cli', 'ssh'))
+            self.assertEqual(view._validate_acl(self.user, self.asset, account, 'web_cli', 'ssh')['requirements'], {})
             self.acl.action = 'reject'
             with self.assertRaises(JMSException):
                 view._validate_acl(self.user, self.asset, account, 'web_cli', 'ssh')
@@ -182,24 +235,22 @@ class AssetReviewExemptionTests(SimpleTestCase):
             'ip_group': ['192.0.2.10'],
             'time_period': [{'id': i, 'value': '09:00~10:00'} for i in range(7)],
         }
-        reject = LoginAssetACL(action='reject')
+        reject = LoginAssetACL(action='reject', priority=100)
         cache.set(self.key, str(self.ticket.id), 7200)
         view = ConnectionTokenViewSet()
-        view.request = SimpleNamespace(query_params={})
+        view.request = SimpleNamespace(query_params={}, META={}, user=self.user)
         view._record_operate_log = Mock()
         with patch.object(LoginAssetACL, 'filter_queryset', return_value=[self.acl, reject]), \
-                patch.object(LoginAssetACL, 'reviewers', new_callable=PropertyMock) as reviewers, \
                 patch('authentication.api.connection_token.get_request_ip_or_data') as request_ip, \
                 patch('common.utils.timezone.local_now') as now:
-            reviewers.return_value.exists.return_value = True
             for ip, hour, allowed in [('192.0.2.10', 9, True), ('192.0.2.11', 9, False), ('192.0.2.10', 12, False)]:
                 request_ip.return_value = ip
                 now.return_value = datetime(2026, 9, 23, hour, 30)
                 with self.subTest(ip=ip, hour=hour):
                     if allowed:
-                        self.assertIsNone(view._validate_acl(
+                        self.assertEqual(view._validate_acl(
                             self.user, self.asset, SimpleNamespace(username='root'), 'web_cli', 'ssh',
-                        ))
+                        )['requirements'], {})
                     else:
                         with self.assertRaises(JMSException):
                             view._validate_acl(
@@ -213,7 +264,7 @@ class AssetReviewExemptionTests(SimpleTestCase):
         self.asset.name = 'asset'
         self.asset.address = '192.0.2.10'
         with patch.object(LoginAssetACL, 'filter_queryset'), \
-                patch.object(LoginAssetACL, 'get_match_rule_acls', return_value=self.acl):
+                patch.object(LoginAssetACL, 'get_match_rule_acls', return_value=self.policy):
             with self.assertRaises(PermissionDenied):
                 LoginAssetACLCheckMixin().check_login_asset_acls(
                     self.user, [self.asset], 'root', '127.0.0.1',
@@ -225,14 +276,12 @@ class AssetReviewExemptionTests(SimpleTestCase):
         view.__dict__['serializer'] = SimpleNamespace(
             user=self.user, asset=self.asset, validated_data={'account_username': 'root'},
         )
-        view._get_response_data_of_need_review = Mock(return_value={})
         with patch.object(LoginAssetACL, 'filter_queryset'), \
-                patch.object(LoginAssetACL, 'get_match_rule_acls', return_value=self.acl), \
+                patch.object(LoginAssetACL, 'get_match_rule_acls', return_value=self.policy), \
                 patch('acls.api.login_asset_check.get_request_ip_or_data', return_value='127.0.0.1'):
             self.assertTrue(view.check_review()['need_review'])
             cache.set(self.key, str(self.ticket.id), 7200)
-            self.assertEqual(view.check_review(), {'need_review': False})
-            view._get_response_data_of_need_review.assert_called_once_with(self.acl)
+            self.assertEqual(view.check_review(), {'need_review': False, 'requirements': ['review']})
             self.acl.action = 'reject'
             with self.assertRaises(JMSException):
                 view.check_review()

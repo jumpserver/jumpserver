@@ -1,19 +1,23 @@
 # -*- coding: utf-8 -*-
 #
 import re
-from collections import defaultdict
+import logging
+from django.db.models import Count, Q
 
 from django.shortcuts import get_object_or_404
+from django.core.cache import cache
 from django.utils.translation import gettext as _, gettext_lazy
 from django_celery_beat.models import PeriodicTask
 from django_filters import rest_framework as drf_filters
-from rest_framework import generics, viewsets, mixins, status
+from rest_framework import viewsets, mixins, status, serializers
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from common.api import CommonApiMixin
 from common.drf.filters import BaseFilterSet
 from common.exceptions import JMSException
 from common.utils.timezone import local_now
+from common.utils.verify_code import VERIFY_CODE_TASKS
 from ops.celery import app
 from ..models import CeleryTaskExecution, CeleryTask
 from ..serializers import CeleryPeriodTaskSerializer
@@ -21,8 +25,10 @@ from ..serializers.celery import CeleryTaskSerializer, CeleryTaskExecutionSerial
 
 __all__ = [
     'CeleryPeriodTaskViewSet', 'CeleryTaskViewSet',
-    'CeleryTaskExecutionViewSet'
+    'CeleryTaskExecutionViewSet', 'CeleryMonitorAPIView', 'CeleryMonitorStopAPIView',
 ]
+
+logger = logging.getLogger(__name__)
 
 
 class CeleryPeriodTaskViewSet(CommonApiMixin, viewsets.ModelViewSet):
@@ -30,7 +36,7 @@ class CeleryPeriodTaskViewSet(CommonApiMixin, viewsets.ModelViewSet):
     serializer_class = CeleryPeriodTaskSerializer
     http_method_names = ('get', 'head', 'options', 'patch')
     lookup_field = 'name'
-    lookup_value_regex = '[\w.@]+'
+    lookup_value_regex = r'[\w.@]+'
 
     def get_object(self):
         name = self.kwargs.get('name')
@@ -38,9 +44,42 @@ class CeleryPeriodTaskViewSet(CommonApiMixin, viewsets.ModelViewSet):
         return obj
 
 
-class CelerySummaryAPIView(generics.RetrieveAPIView):
+class CeleryMonitorAPIView(APIView):
+    rbac_perms = {'GET': 'ops.view_taskmonitor', 'HEAD': 'ops.view_taskmonitor'}
+
     def get(self, request, *args, **kwargs):
-        pass
+        from ops.celery.monitor import get_monitor_snapshot
+        response = Response(get_monitor_snapshot())
+        response['Cache-Control'] = 'no-store'
+        return response
+
+
+class MonitorStopSerializer(serializers.Serializer):
+    worker = serializers.RegexField(r'^[\w.@,:-]{1,255}$', max_length=255)
+    task_id = serializers.RegexField(r'^[\w.:-]{1,128}$', max_length=128)
+    mode = serializers.ChoiceField(choices=('waiting', 'running'))
+
+
+class CeleryMonitorStopAPIView(APIView):
+    rbac_perms = {'POST': 'ops.stop_taskmonitor'}
+
+    def post(self, request, *args, **kwargs):
+        serializer = MonitorStopSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        from ops.celery.monitor import CACHE_KEY, stop_worker_task
+        result = stop_worker_task(data['worker'], data['task_id'], data['mode'])
+        logger.info('Task monitor stop: user=%s task=%s worker=%s mode=%s result=%s',
+                    request.user.pk, data['task_id'], data['worker'], data['mode'], result)
+        code = status.HTTP_202_ACCEPTED if result in (
+            'revoked', 'revoke_requested', 'termination_requested',
+        ) else status.HTTP_409_CONFLICT
+        if code == status.HTTP_202_ACCEPTED:
+            try:
+                cache.delete(CACHE_KEY)
+            except Exception:
+                logger.warning('Could not invalidate task monitor snapshot', exc_info=True)
+        return Response({'status': result}, status=code, headers={'Cache-Control': 'no-store'})
 
 
 class CeleryTaskFilterSet(BaseFilterSet):
@@ -105,41 +144,39 @@ class CeleryTaskViewSet(
             i.enabled = task.enabled
         return queryset
 
-    def generate_summary_state(self, execution_qs):
+    def generate_summary_state(self, names):
         model = self.get_queryset().model
-        executions = execution_qs.order_by('-date_published').values('name', 'state')
-        summary_state_dict = defaultdict(
-            lambda: {
-                'states': [], 'state': 'green',
-                'summary': {'total': 0, 'success': 0}
-            }
-        )
-        for execution in executions:
-            name = execution['name']
-            state = execution['state']
-
-            summary = summary_state_dict[name]['summary']
-
-            summary['total'] += 1
-            summary['success'] += 1 if state == 'SUCCESS' else 0
-
-            states = summary_state_dict[name].get('states')
-            if states is not None and len(states) >= 5:
-                color = model.compute_state_color(states)
-                summary_state_dict[name]['state'] = color
-                summary_state_dict[name].pop('states', None)
-            elif isinstance(states, list):
-                states.append(state)
-
-        return summary_state_dict
+        names = list(dict.fromkeys(names))
+        summaries = {}
+        # Conditional aggregates avoid grouping a 1024-character task name into
+        # a disk-backed temporary table. Bound the SQL width for large exports.
+        for offset in range(0, len(names), 50):
+            batch = names[offset:offset + 50]
+            aggregates = {}
+            for index, name in enumerate(batch):
+                aggregates[f'total_{index}'] = Count('id', filter=Q(name=name))
+                aggregates[f'success_{index}'] = Count(
+                    'id', filter=Q(name=name, state='SUCCESS')
+                )
+            counts = CeleryTaskExecution.objects.filter(name__in=batch).aggregate(**aggregates)
+            for index, name in enumerate(batch):
+                total = counts[f'total_{index}']
+                if not total:
+                    continue
+                # Fetch only five rows through the task/date index. A window
+                # query sorts every historical execution before limiting rows.
+                states = list(CeleryTaskExecution.objects.filter(name=name).order_by(
+                    '-date_published', '-id'
+                ).values_list('state', flat=True)[:5])
+                summaries[name] = {
+                    'summary': {'total': total, 'success': counts[f'success_{index}']},
+                    'state': model.compute_state_color(states),
+                }
+        return summaries
 
     def loading_summary_state(self, queryset):
-        if isinstance(queryset, list):
-            names = [i.name for i in queryset]
-            execution_qs = CeleryTaskExecution.objects.filter(name__in=names)
-        else:
-            execution_qs = CeleryTaskExecution.objects.all()
-        summary_state_dict = self.generate_summary_state(execution_qs)
+        names = [i.name for i in queryset]
+        summary_state_dict = self.generate_summary_state(names)
         for i in queryset:
             i.summary = summary_state_dict.get(i.name, {}).get('summary', {})
             i.state = summary_state_dict.get(i.name, {}).get('state', 'green')
@@ -172,7 +209,9 @@ class CeleryTaskViewSet(
     @staticmethod
     def mark_periodic_and_sorted(queryset):
         names = queryset.values_list('name', flat=True)
-        periodic_tasks = PeriodicTask.objects.filter(name__in=names)
+        periodic_tasks = PeriodicTask.objects.filter(name__in=names).select_related(
+            'interval', 'crontab', 'solar', 'clocked'
+        )
         periodic_task_dict = {task.task: task for task in periodic_tasks}
         for q in queryset:
             if q.name in periodic_task_dict:
@@ -184,26 +223,61 @@ class CeleryTaskViewSet(
         return queryset
 
 
+class CeleryTaskExecutionFilterSet(BaseFilterSet):
+    state = drf_filters.ChoiceFilter(choices=(
+        ('PENDING', gettext_lazy('Pending')),
+        ('RECEIVED', gettext_lazy('Pending')),
+        ('RUNNING', gettext_lazy('Running')),
+        ('STARTED', gettext_lazy('Running')),
+        ('SUCCESS', gettext_lazy('Success')),
+        ('FAILURE', gettext_lazy('Failed')),
+        ('RETRY', gettext_lazy('Retry')),
+        ('REVOKED', gettext_lazy('Cancelled')),
+    ), label=gettext_lazy('Status'))
+
+    class Meta:
+        model = CeleryTaskExecution
+        fields = ['name', 'state', 'is_finished']
+
+
 class CeleryTaskExecutionViewSet(CommonApiMixin, viewsets.ModelViewSet):
     serializer_class = CeleryTaskExecutionSerializer
     http_method_names = ('get', 'post', 'head', 'options',)
     queryset = CeleryTaskExecution.objects.all()
-    search_fields = ('id',)
+    search_fields = ('id', 'name')
+    filterset_class = CeleryTaskExecutionFilterSet
+
+    @property
+    def ordering(self):
+        if self.request.query_params.get('task_id'):
+            return ('-date_start', '-id')
+        return ('-date_published', '-id')
 
     def get_queryset(self):
+        queryset = super().get_queryset()
         task_id = self.request.query_params.get('task_id')
         if task_id:
             task = get_object_or_404(CeleryTask, id=task_id)
-            self.queryset = self.queryset.filter(name=task.name)
+            queryset = queryset.filter(name=task.name)
         if not self.request.user.is_superuser:
-            self.queryset = self.queryset.filter(creator=self.request.user)
-        return self.queryset
+            queryset = queryset.filter(creator=self.request.user)
+        return queryset
 
     def create(self, request, *args, **kwargs):
         form_id = self.request.query_params.get('from', None)
         if not form_id:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         execution = get_object_or_404(CeleryTaskExecution, id=form_id)
+        # 按任务名拒绝重跑，覆盖旧记录和管理员；
+        # 不能依赖去敏后参数缺失触发 TypeError 来阻止旧验证码重发。
+        if execution.name in VERIFY_CODE_TASKS:
+            raise JMSException(
+                code='verify_code_task_rerun_forbidden',
+                detail=_(
+                    'Verification code tasks cannot be run again. '
+                    'Please request a new code from the verification page.'
+                )
+            )
         task = app.tasks.get(execution.name, None)
         if not task:
             msg = _("Task {} not found").format(execution.name)

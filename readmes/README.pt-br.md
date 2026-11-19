@@ -1,6 +1,6 @@
 <div align="center">
   <a name="readme-top"></a>
-  <a href="https://jumpserver.com" target="_blank"><img src="https://download.jumpserver.org/images/jumpserver-logo.svg" alt="JumpServer" width="300" /></a>
+  <a href="https://jumpserver.com" target="_blank"><img src="assets/jumpserver-logo.svg" alt="JumpServer" width="300" /></a>
   
 ## Plataforma PAM de código aberto (bastião)
 
@@ -12,7 +12,7 @@
 [![][github-release-shield]][github-release-link]
 [![][github-stars-shield]][github-stars-link]
 
-[English](/README.md) · [中文(简体)](/readmes/README.zh-hans.md) · [中文(繁體)](/readmes/README.zh-hant.md) · [日本語](/readmes/README.ja.md) · [Português (Brasil)](/readmes/README.pt-br.md) · [Español](/readmes/README.es.md) · [Русский](/readmes/README.ru.md) · [한국어](/readmes/README.ko.md) · [Tiếng Việt](/readmes/README.vi.md)
+[English](/README.md) · [中文(简体)](/readmes/README.zh-hans.md) · [中文(繁體)](/readmes/README.zh-hant.md) · [日本語](/readmes/README.ja.md) · [Português (Brasil)](/readmes/README.pt-br.md) · [Español](/readmes/README.es.md) · [Français](/readmes/README.fr.md) · [Русский](/readmes/README.ru.md) · [한국어](/readmes/README.ko.md) · [Tiếng Việt](/readmes/README.vi.md)
 
 </div>
 
@@ -22,7 +22,7 @@
 
 O JumpServer é uma plataforma de gerenciamento de acesso privilegiado (PAM) de código aberto com recursos de IA. Ele oferece às equipes de DevOps e TI um espaço de trabalho unificado para acessar com segurança SSH, RDP, Kubernetes, bancos de dados, sites, RemoteApp, VirtualApp e outros recursos.
 
-<img alt="Diagrama da arquitetura do JumpServer" src="assets/jumpserver-architecture.png" />
+<img alt="Diagrama da arquitetura do JumpServer" src="assets/jumpserver-architecture.gif" />
 
 ## Início rápido
 
@@ -32,7 +32,7 @@ Prepare um servidor Linux de 64 bits limpo, com pelo menos 4 núcleos de CPU e 8
 curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quick_start.sh | bash
 ```
 
-Abra o JumpServer no navegador em `http://your-jumpserver-ip/`
+Abra `https://<jumpserver-host>/` no navegador e substitua `<jumpserver-host>` pelo endereço IP ou nome de domínio do host em que o JumpServer está em execução.
 
 - Usuário: `admin`
 - Senha: `ChangeMe`
@@ -40,28 +40,28 @@ Abra o JumpServer no navegador em `http://your-jumpserver-ip/`
 ## Capturas de tela
 
 <p align="center">
-  <img src="assets/screenshot-01.png" alt="Painel de PAM do JumpServer" width="49%" />
-  <img src="assets/screenshot-02.png" alt="Gerenciamento de ativos do JumpServer" width="49%" />
+  <img src="assets/screenshot-01.png" alt="Painel de PAM do JumpServer" title="Painel de PAM do JumpServer" width="49%" />
+  <img src="assets/screenshot-02.png" alt="Gerenciamento de ativos do JumpServer" title="Gerenciamento de ativos do JumpServer" width="49%" />
 </p>
 
 <p align="center">
-  <img src="assets/screenshot-03.png" alt="Janela de conexão SSH do JumpServer" width="49%" />
-  <img src="assets/screenshot-04.png" alt="Pergunta à IA no terminal do JumpServer" width="49%" />
+  <img src="assets/screenshot-03.png" alt="Janela de conexão SSH do JumpServer" title="Janela de conexão SSH do JumpServer" width="49%" />
+  <img src="assets/screenshot-04.png" alt="Pergunta à IA no terminal do JumpServer" title="Pergunta à IA no terminal do JumpServer" width="49%" />
 </p>
 
 <p align="center">
-  <img src="assets/screenshot-05.png" alt="Assistente de IA do JumpServer" width="49%" />
-  <img src="assets/screenshot-06.png" alt="Sessão de área de trabalho remota do JumpServer" width="49%" />
+  <img src="assets/screenshot-05.png" alt="Assistente de IA do JumpServer" title="Assistente de IA do JumpServer" width="49%" />
+  <img src="assets/screenshot-06.png" alt="Sessão de área de trabalho remota do JumpServer" title="Sessão de área de trabalho remota do JumpServer" width="49%" />
 </p>
 
 <p align="center">
-  <img src="assets/screenshot-07.png" alt="Painel de ativos do terminal do JumpServer no tema claro" width="49%" />
-  <img src="assets/screenshot-08.png" alt="Sessão SSH do JumpServer no tema claro" width="49%" />
+  <img src="assets/screenshot-07.png" alt="KoKo TUI asset browser with searchable authorized assets" title="KoKo TUI asset browser with searchable authorized assets" width="49%" />
+  <img src="assets/screenshot-08.png" alt="KoKo TUI multi-session manager for switching between active SSH sessions" title="KoKo TUI multi-session manager for switching between active SSH sessions" width="49%" />
 </p>
 
 <p align="center">
-  <img src="assets/screenshot-09.png" alt="Painel de ativos do terminal do JumpServer no tema escuro" width="49%" />
-  <img src="assets/screenshot-10.png" alt="Sessão SSH do JumpServer no tema escuro" width="49%" />
+  <img src="assets/screenshot-09.png" alt="KoKo classic text-mode home screen with connection shortcuts" title="KoKo classic text-mode home screen with connection shortcuts" width="49%" />
+  <img src="assets/screenshot-10.png" alt="KoKo classic text-mode asset list with authorized SSH targets" title="KoKo classic text-mode asset list with authorized SSH targets" width="49%" />
 </p>
 
 ## Componentes

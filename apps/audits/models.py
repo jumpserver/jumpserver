@@ -2,11 +2,9 @@ import os
 import uuid
 from datetime import timedelta, datetime
 from functools import lru_cache
-from importlib import import_module
 
 from django.apps import apps
 from django.conf import settings
-from django.core.cache import caches
 from django.db import models
 from django.db.models import Q, CharField, F, Value
 from django.db.models.functions import Cast, Coalesce, Concat
@@ -220,8 +218,9 @@ def user_display_expression():
 
 class PasswordChangeLog(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    user = models.CharField(max_length=128, verbose_name=_("User"))
-    change_by = models.CharField(max_length=128, verbose_name=_("Change by"))
+    # User displays contain name(username): 128 + 128 + 2 characters.
+    user = models.CharField(max_length=258, verbose_name=_("User"))
+    change_by = models.CharField(max_length=258, verbose_name=_("Change by"))
     remote_addr = models.CharField(
         max_length=128, verbose_name=_("Remote addr"), blank=True, null=True
     )
@@ -353,6 +352,13 @@ class UserLoginLog(models.Model):
     class Meta:
         ordering = ["-datetime", "username"]
         verbose_name = _("User login log")
+        indexes = [
+            models.Index(fields=['username', 'datetime'], name='login_log_username_date_idx'),
+            models.Index(
+                fields=['username', 'status', 'city', 'datetime'],
+                name='login_log_username_city_idx',
+            ),
+        ]
 
 
 class UserSession(models.Model):
@@ -387,16 +393,16 @@ class UserSession(models.Model):
 
     @property
     def date_expired(self) -> datetime:
-        session_store_cls = import_module(settings.SESSION_ENGINE).SessionStore
-        session_store = session_store_cls(session_key=self.key)
-        cache_key = session_store.cache_key
-        ttl = caches[settings.SESSION_CACHE_ALIAS].ttl(cache_key)
-        return timezone.now() + timedelta(seconds=ttl)
+        from common.sessions import session_expiry
+        return session_expiry(self.key)
 
     @classmethod
     def clear_expired_sessions(cls):
         keys = user_session_manager.get_keys()
-        cls.objects.exclude(key__in=keys).delete()
+        expired = cls.objects.exclude(key__in=keys)
+        matched = expired.count()
+        _, deleted = expired.delete()
+        return matched, deleted.get(cls._meta.label, 0)
 
     class Meta:
         ordering = ['-date_created']
@@ -408,9 +414,19 @@ class UserSession(models.Model):
 
 class IntegrationApplicationLog(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    remote_addr = models.GenericIPAddressField(verbose_name=_("Remote addr"))
+    remote_addr = models.GenericIPAddressField(null=True, verbose_name=_("Remote addr"))
     service = models.CharField(max_length=128, verbose_name=_("Application"))
     service_id = models.UUIDField(verbose_name=_("Application ID"))
     asset = models.CharField(max_length=128, verbose_name=_("Asset"))
     account = models.CharField(max_length=128, verbose_name=_("Account"))
     datetime = models.DateTimeField(auto_now=True, verbose_name=_("Datetime"))
+    org_id = models.CharField(max_length=36, blank=True, default='', db_index=True)
+    asset_id = models.UUIDField(null=True, blank=True)
+    account_id = models.UUIDField(null=True, blank=True)
+    credential_id = models.UUIDField(null=True, blank=True)
+    credential_key = models.CharField(max_length=64, blank=True, default='')
+    instance_id = models.CharField(max_length=128, blank=True, default='')
+    source = models.CharField(max_length=16, blank=True, default='')
+    result = models.CharField(max_length=16, default='success')
+    revision = models.PositiveIntegerField(null=True, blank=True)
+    summary = models.CharField(max_length=512, blank=True, default='')

@@ -509,6 +509,8 @@ class Migration(migrations.Migration):
                         "Can view backup account execution",
                     ),
                     ("add_backupaccountexecution", "Can add backup account execution"),
+                    ("view_verifyaccountexecution", "Can view verify account execution"),
+                    ("add_verifyaccountexecution", "Can add verify account execution"),
                 ],
                 "verbose_name": "Automation execution",
                 "verbose_name_plural": "Automation executions",

@@ -525,7 +525,7 @@ class AuthACLMixin:
             return
         if not acl.is_action(acl.ActionChoices.review):
             return
-        if acl.is_user_in_reviewers(user):
+        if not acl.workflow_id and acl.is_user_in_reviewers(user):
             # 如果用户在审核人列表中，则不需要审核，直接通过
             # 避免管理员admin创建一条针对所有用户的复核规则导致admin自己也无法登录了
             return
@@ -556,13 +556,13 @@ class AuthACLMixin:
             raise errors.LoginConfirmOtherError(ticket_id, status, username)
 
     def get_ticket(self):
-        from tickets.models import ApplyLoginTicket
+        from tickets.models import Ticket
         ticket_id = self.request.session.get("auth_ticket_id")
         logger.debug('Login confirm ticket id: {}'.format(ticket_id))
         if not ticket_id:
             ticket = None
         else:
-            ticket = ApplyLoginTicket.all().filter(id=ticket_id).first()
+            ticket = Ticket.all().filter(id=ticket_id, type='login_confirm').first()
         return ticket
 
 
@@ -664,6 +664,9 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, AuthFaceMixin, MFA
         cache.set(self.key_prefix_captcha.format(ip), 1, 3600)
 
     def check_is_need_captcha(self):
+        if settings.SECURITY_LOGIN_CAPTCHA_ALWAYS_REQUIRED:
+            return True
+
         # 最近有登录失败时需要填写验证码
         ip = get_request_ip(self.request)
         need = cache.get(self.key_prefix_captcha.format(ip))
@@ -671,8 +674,8 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, AuthFaceMixin, MFA
 
     def check_user_auth(self, valid_data=None):
         # pre check
-        self.check_is_block()
         username, password, public_key, ip, auto_login = self.get_auth_data(valid_data)
+        self._check_is_block(username)
         self._check_only_allow_exists_user_auth(username)
 
         # check auth

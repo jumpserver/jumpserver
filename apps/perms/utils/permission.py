@@ -151,7 +151,10 @@ class AssetPermissionUtil(object):
 
     @staticmethod
     def get_permissions(ids, with_expired=False):
-        perms = AssetPermission.objects.filter(id__in=ids)
+        from tickets.models import Ticket
+        # These grants only supplement existing access in the connection resolver.
+        transfer_tickets = Ticket.objects.filter(type='file_transfer').values('id')
+        perms = AssetPermission.objects.filter(id__in=ids).exclude(from_ticket=True, id__in=transfer_tickets)
         if not with_expired:
             perms = perms.valid()
         return perms.order_by('-date_expired')

@@ -10,28 +10,44 @@ from common.utils import is_macos
 from common.utils.yml import sanitize_ansible_inventory_json, sanitize_ansible_playbook
 
 from ..utils import get_ansible_log_verbosity
+from ..database import DATABASE_JOB_MODULES
 from .callback import DefaultCallback
 from .docker import (
     docker_extravars,
-    docker_isolation_kwargs,
-    ensure_ansible_docker_image,
     prepare_isolated_ansible_runtime,
     stage_inventory_for_docker,
-    use_ansible_docker_isolation,
 )
 from .exception import CommandInBlackListException
 from .interface import interface
+from .execution import use_ansible_ssh_executor
 from .utils import escape_jinja2_syntax, neutralize_jinja2_syntax
 
 __all__ = [
     'AdHocRunner', 'PlaybookRunner', 'SuperPlaybookRunner', 'UploadFileRunner',
-    'escape_jinja2_syntax', 'neutralize_jinja2_syntax',
+    'escape_jinja2_syntax', 'neutralize_jinja2_syntax', 'quote_ansible_module_arg',
 ]
+
+# Block user-supplied Ansible plugins and configuration, not remote task files.
+UNSAFE_PLAYBOOK_PATTERNS = (
+    'ansible.cfg', '.ansible.cfg',
+    'action_plugins', 'library', 'module_utils', 'plugins', 'modules', 'ansible_collections',
+    'callback_plugins', 'filter_plugins', 'lookup_plugins', 'vars_plugins',
+    'test_plugins', 'connection_plugins', 'inventory_plugins', 'cache_plugins',
+    'strategy_plugins', 'become_plugins', 'terminal_plugins', 'cliconf_plugins',
+    'netconf_plugins', 'httpapi_plugins', 'shell_plugins', 'doc_fragments',
+)
+
+
+def quote_ansible_module_arg(value):
+    """Keep user text inside one double-quoted Ansible module arg."""
+    if not isinstance(value, str):
+        return value
+    return value.replace('\\', '\\\\').replace('"', '\\"')
 
 
 class AdHocRunner:
     cmd_modules_choices = ('shell', 'raw', 'command', 'script', 'win_shell')
-    need_local_connection_modules_choices = ("mysql", "postgresql", "sqlserver", "huawei")
+    need_local_connection_modules_choices = (*DATABASE_JOB_MODULES, 'huawei')
 
     def __init__(self, inventory, job_module, module, module_args='', pattern='*', project_dir='/tmp/', extra_vars=None,
                  dry_run=False, timeout=-1):
@@ -82,7 +98,7 @@ class AdHocRunner:
             'envvars': self.envs,
             'host_pattern': self.pattern,
             'private_data_dir': self.project_dir,
-            'inventory': self.inventory,
+            'inventory': stage_inventory_for_docker(self.project_dir, self.inventory),
             'module': self.module,
             'module_args': self.module_args,
             'verbosity': verbosity,
@@ -90,9 +106,6 @@ class AdHocRunner:
             'status_handler': self.cb.status_handler,
             **kwargs,
         }
-        if use_ansible_docker_isolation():
-            run_kwargs.update(docker_isolation_kwargs(self.project_dir))
-            ensure_ansible_docker_image()
         interface.run(**run_kwargs)
         return self.cb
 
@@ -122,8 +135,35 @@ class PlaybookRunner:
         entry = os.path.basename(self.playbook)
         playbook_dir = os.path.dirname(self.playbook)
         project_playbook_dir = os.path.join(self.project_dir, "project")
+        # Platform automation already opts into Ansible's trusted execution mode.
+        trusted = bool(self.envs.get('ANSIBLE_SUPER_MODE'))
+        ignore = None if trusted else shutil.ignore_patterns(*UNSAFE_PLAYBOOK_PATTERNS)
         if os.path.realpath(playbook_dir) != os.path.realpath(project_playbook_dir):
-            shutil.copytree(playbook_dir, project_playbook_dir, dirs_exist_ok=True)
+            # Rebuild from scratch so stale files from a previous run cannot survive.
+            if os.path.exists(project_playbook_dir):
+                shutil.rmtree(project_playbook_dir)
+            shutil.copytree(
+                playbook_dir, project_playbook_dir,
+                ignore=ignore,
+                symlinks=not trusted,
+            )
+        if not trusted:
+            # Also sanitize playbooks already staged in the task's project directory.
+            for root, dirs, files in os.walk(project_playbook_dir):
+                ignored = ignore(root, dirs + files)
+                for name in list(dirs) + files:
+                    path = os.path.join(root, name)
+                    if os.path.islink(path):
+                        os.unlink(path)
+                    elif name in ignored:
+                        if name in dirs:
+                            shutil.rmtree(path)
+                        else:
+                            os.unlink(path)
+                    else:
+                        continue
+                    if name in dirs:
+                        dirs.remove(name)
         self.playbook = entry
 
     def prepare_safe_inputs(self):
@@ -160,10 +200,7 @@ class PlaybookRunner:
         inventory = stage_inventory_for_docker(self.project_dir, self.inventory)
 
         kwargs = dict(kwargs)
-        if use_ansible_docker_isolation():
-            kwargs.update(docker_isolation_kwargs(self.project_dir))
-            ensure_ansible_docker_image()
-        elif self.isolate and not is_macos():
+        if self.isolate and not is_macos() and not use_ansible_ssh_executor():
             kwargs['process_isolation'] = True
             kwargs['process_isolation_executable'] = 'bwrap'
 
@@ -175,7 +212,6 @@ class PlaybookRunner:
                 verbosity=verbosity,
                 event_handler=self.cb.event_handler,
                 status_handler=self.cb.status_handler,
-                # Docker EE workdir must be the staged playbook dir (not private_data_dir root).
                 host_cwd=self.playbook_project_dir,
                 envvars=self.envs,
                 extravars=docker_extravars(self.extra_vars),
@@ -216,7 +252,7 @@ class UploadFileRunner:
         self.dest_path = safe_join("/tmp", neutralize_jinja2_syntax(dest_path or ''))
 
     def stage_upload_files(self):
-        """Copy uploads into private_data_dir so Docker EE can read src for copy."""
+        """Keep upload sources inside the task directory sent to the executor."""
         if not os.path.isdir(self.share_src_dir):
             raise FileNotFoundError(f'Upload source directory not found: {self.share_src_dir}')
         staged_dir = os.path.join(self.project_dir, self.UPLOAD_STAGING_DIR)
@@ -236,7 +272,7 @@ class UploadFileRunner:
         run_kwargs = {
             'private_data_dir': self.project_dir,
             'host_pattern': "*",
-            'inventory': self.inventory,
+            'inventory': stage_inventory_for_docker(self.project_dir, self.inventory),
             'module': 'copy',
             'module_args': 'src={} dest={}'.format(
                 shlex.quote(src_path + '/'), shlex.quote(self.dest_path + '/')
@@ -244,13 +280,9 @@ class UploadFileRunner:
             'verbosity': verbosity,
             'event_handler': self.cb.event_handler,
             'status_handler': self.cb.status_handler,
-            'container_workdir': self.project_dir,
             'envvars': self.envs,
             **kwargs,
         }
-        if use_ansible_docker_isolation():
-            run_kwargs.update(docker_isolation_kwargs(self.project_dir))
-            ensure_ansible_docker_image()
         interface.run(**run_kwargs)
         try:
             shutil.rmtree(self.share_src_dir)

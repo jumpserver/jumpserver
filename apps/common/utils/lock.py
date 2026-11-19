@@ -43,7 +43,7 @@ class DistributedLock(RedisLock):
             是否可重入
         """
         self.kwargs_copy = copy_function_args(self.__init__, locals())
-        redis = get_redis_client()
+        redis = get_redis_client(cache_alias='blocking')
 
         if expire is None:
             expire = auto_renewal_seconds

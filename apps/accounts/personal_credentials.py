@@ -1,5 +1,7 @@
 from uuid import UUID
 
+from cryptography.exceptions import UnsupportedAlgorithm
+from cryptography.hazmat.primitives import serialization
 from django.db import IntegrityError, transaction
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -7,8 +9,8 @@ from rest_framework import serializers
 from rest_framework.exceptions import APIException, NotFound, PermissionDenied
 
 from accounts.const import AliasAccount, SecretType
-from accounts.utils import validate_account_username, validate_ssh_key
-from common.utils import is_uuid
+from accounts.utils import validate_account_username
+from common.utils import is_uuid, is_openssh_format_key
 from assets.const import AllTypes, Connectivity, Protocol
 from assets.models import Asset
 from orgs.utils import tmp_to_org
@@ -198,7 +200,7 @@ class PersonalCredentialVersionConflict(APIException):
 
 
 def get_personal_credential_permission_context(
-        user, asset, protocol, account_alias=AliasAccount.INPUT,
+        user, asset, protocol, account_alias=None,
 ):
     if not user or not user.is_valid:
         raise PermissionDenied(_('Invalid user'), code='invalid_user')
@@ -214,15 +216,38 @@ def get_personal_credential_permission_context(
     if not asset_protocol_exists or not platform_protocol:
         raise serializers.ValidationError({'protocol': _('Protocol is not supported by this asset')})
 
-    if account_alias != AliasAccount.INPUT and not is_uuid(account_alias):
+    virtual_aliases = (AliasAccount.INPUT, AliasAccount.USER)
+    if account_alias is not None and account_alias not in virtual_aliases and not is_uuid(account_alias):
         raise PermissionDenied(
-            _('Personal credentials require a manual or empty-secret asset account'),
+            _('Account not found'),
             code='personal_credential_account_denied',
         )
     try:
-        account = PermAssetDetailUtil(user, asset).validate_permission(
-            account_alias, protocol
-        )
+        utility = PermAssetDetailUtil(user, asset)
+        if account_alias is None:
+            # Management requests have no selected account. Prefer manual
+            # permission, then same-name permission (including mapped accounts).
+            with tmp_to_org(asset.org_id):
+                protocols = utility.get_permed_protocols_for_user(only_name=True)
+                accounts = utility.get_permed_accounts_for_user() if (
+                    'all' in protocols or protocol in protocols
+                ) else []
+            candidates = [
+                account for alias in virtual_aliases for account in accounts
+                if account.alias == alias
+            ] + [
+                account for account in accounts
+                if not account.is_virtual() and account.username == user.username
+                and not account.has_secret
+                and account.secret_type != SecretType.SSH_CERTIFICATE
+            ]
+            account = next((
+                account for account in candidates
+                if ActionChoices.contains(account.actions, ActionChoices.connect)
+                and account.date_expired >= timezone.now()
+            ), None)
+        else:
+            account = utility.validate_permission(account_alias, protocol)
     except Asset.DoesNotExist:
         account = None
     if not account or not ActionChoices.contains(account.actions, ActionChoices.connect):
@@ -232,7 +257,12 @@ def get_personal_credential_permission_context(
         )
     if account.date_expired < timezone.now():
         raise PermissionDenied(_('Permission expired'), code='permission_expired')
-    if account_alias != AliasAccount.INPUT and (
+    if account.alias == AliasAccount.USER:
+        # Personal credentials supply the secret even when AD/LDAP login
+        # password reuse is enabled for the same-name virtual account.
+        account.secret = ''
+        account.__dict__.pop('has_secret', None)
+    if account.alias not in virtual_aliases and (
         account.has_secret or not account.username
         or account.secret_type == SecretType.SSH_CERTIFICATE
     ):
@@ -267,7 +297,7 @@ def validate_personal_credential_test_acl(
         account_username=username,
     )
     acl = LoginAssetACL.get_match_rule_acls(user, remote_addr, acls)
-    if not acl or acl.is_action(acl.ActionChoices.accept):
+    if not acl or acl.allows_noninteractive_for(user, permission_account, asset):
         return
     raise PermissionDenied(
         _(
@@ -356,9 +386,38 @@ def validate_personal_credential_secret_type(
         })
 
 
+def validate_personal_credential_ssh_key(secret):
+    """Validate SSH key structure without decrypting or rewriting the secret."""
+    try:
+        data = secret.encode('utf-8')
+        if is_openssh_format_key(data):
+            key = serialization.load_ssh_private_key(data, password=None)
+        else:
+            key = serialization.load_pem_private_key(data, password=None)
+        key.public_key().public_bytes(
+            serialization.Encoding.OpenSSH, serialization.PublicFormat.OpenSSH,
+        )
+    except TypeError as error:
+        # Only accept a missing passphrase for encrypted formats Koko can load.
+        if str(error) in (
+            'Key is password-protected, but password was not provided.',
+            'Password was not given but private key is encrypted',
+        ) and data.startswith((
+            b'-----BEGIN OPENSSH PRIVATE KEY-----',
+            b'-----BEGIN RSA PRIVATE KEY-----',
+            b'-----BEGIN EC PRIVATE KEY-----',
+            b'-----BEGIN DSA PRIVATE KEY-----',
+        )):
+            return secret
+        raise serializers.ValidationError(_('private key invalid or passphrase error')) from error
+    except (ValueError, UnsupportedAlgorithm) as error:
+        raise serializers.ValidationError(_('private key invalid or passphrase error')) from error
+    return secret
+
+
 def get_personal_credential_for_use(
         user, asset, protocol, credential_id, version=None, include_secret=False,
-        permission_context=None,
+        permission_context=None, authentication_version=None,
 ):
     if permission_context is None:
         permission_context = get_personal_credential_permission_context(
@@ -375,6 +434,8 @@ def get_personal_credential_for_use(
         )
         if version is not None:
             queryset = queryset.filter(version=version)
+        if authentication_version is not None:
+            queryset = queryset.filter(authentication_version=authentication_version)
         if not include_secret:
             queryset = queryset.defer('_secret')
         credential = queryset.first()
@@ -387,6 +448,27 @@ def get_personal_credential_for_use(
     validate_personal_credential_secret_type(
         platform_protocol, credential.secret_type
     )
+    return credential
+
+
+def update_personal_credential(credential, *, user, updates):
+    """Update a row locked by the caller, preserving sessions for metadata edits."""
+    changes = {
+        field: value for field, value in updates.items()
+        if value != getattr(credential, field)
+    }
+    if not changes:
+        return credential
+
+    changes['version'] = credential.version + 1
+    if {'username', 'secret', 'secret_type', 'is_active'}.intersection(changes):
+        changes['authentication_version'] = changes['version']
+        changes['connectivity'] = Connectivity.UNKNOWN
+        changes['date_verified'] = None
+    changes['updated_by'] = str(user)
+    for field, value in changes.items():
+        setattr(credential, field, value)
+    credential.save(update_fields=[*changes, 'date_updated'])
     return credential
 
 
@@ -410,7 +492,7 @@ def save_personal_credential(
         platform_protocol, secret_type, field_name='input_secret_type'
     )
     if secret_type == 'ssh_key':
-        secret = validate_ssh_key(secret)
+        secret = validate_personal_credential_ssh_key(secret)
     with tmp_to_org(asset.org_id):
         if credential_id:
             credential = PersonalAssetCredential.objects.select_for_update().filter(
@@ -434,16 +516,13 @@ def save_personal_credential(
                 if is_idempotent_retry:
                     return credential
                 raise PersonalCredentialVersionConflict()
-            credential.username = username
-            credential.secret = secret
-            credential.secret_type = secret_type
-            credential.is_active = True
-            credential.version += 1
-            credential.connectivity = Connectivity.UNKNOWN
-            credential.date_verified = None
-            credential.updated_by = str(user)
             try:
-                credential.save()
+                update_personal_credential(credential, user=user, updates={
+                    'username': username,
+                    'secret': secret,
+                    'secret_type': secret_type,
+                    'is_active': True,
+                })
             except IntegrityError as error:
                 raise serializers.ValidationError({
                     'input_username': _(

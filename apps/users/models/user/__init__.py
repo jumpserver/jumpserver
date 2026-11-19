@@ -36,7 +36,49 @@ __all__ = [
 ]
 
 
-class UserManager(_UserManager):
+def _email_lookup(email):
+    if not isinstance(email, str) or '@' not in email:
+        raise ValueError('Email updates require a concrete email; use User.save() otherwise.')
+    lookup = text_hmac_sha256(email)
+    if not lookup:
+        raise ValueError('Unable to compute the email lookup.')
+    return lookup
+
+
+def _email_update_fields(fields):
+    if fields is None:
+        return None
+    fields = set(fields)
+    if 'email' in fields:
+        fields.add('email_lookup')
+    elif 'email_lookup' in fields:
+        raise ValueError('Update email together with its derived lookup.')
+    return fields
+
+
+class UserQuerySet(models.QuerySet):
+    """Keep the email lookup in sync for writes that skip User.save()."""
+
+    def bulk_create(self, objs, batch_size=None, ignore_conflicts=False,
+                    update_conflicts=False, update_fields=None, unique_fields=None):
+        objs = list(objs)
+        for obj in objs:
+            obj.prepare_for_save()
+        return super().bulk_create(
+            objs, batch_size=batch_size, ignore_conflicts=ignore_conflicts,
+            update_conflicts=update_conflicts, update_fields=_email_update_fields(update_fields),
+            unique_fields=unique_fields,
+        )
+
+    def update(self, **kwargs):
+        if 'email' in kwargs:
+            kwargs['email_lookup'] = _email_lookup(kwargs['email'])
+        elif 'email_lookup' in kwargs:
+            raise ValueError('Update email together with its derived lookup.')
+        return super().update(**kwargs)
+
+
+class UserManager(_UserManager.from_queryset(UserQuerySet)):
     def get_by_natural_key(self, username_or_mail):
         email_lookup = text_hmac_sha256(username_or_mail)
         q = (models.Q(username=username_or_mail) | models.Q(email_lookup=email_lookup))
@@ -65,9 +107,12 @@ class User(
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     username = models.CharField(max_length=128, unique=True, verbose_name=_("Username"))
     name = models.CharField(max_length=128, verbose_name=_("Name"))
-    email = fields.EncryptCharField(max_length=128, unique=True, verbose_name=_("Email"))
+    # 256 UTF-8 characters need up to 1440 base64 characters with AES-GCM metadata.
+    email = fields.EncryptCharField(
+        max_length=256, storage_max_length=1536, verbose_name=_("Email")
+    )
     email_lookup = models.CharField(
-        max_length=128, blank=True, null=True, verbose_name=_("Email lookup")
+        max_length=128, verbose_name=_("Email lookup")
     )
     groups = models.ManyToManyField(
         "users.UserGroup",
@@ -246,21 +291,28 @@ class User(
             return True
         return False
 
-    def set_required_attr_if_need(self):
+    def prepare_for_save(self, update_fields=None):
         if not self.name:
             self.name = self.username
+        if update_fields is not None and 'email' not in update_fields:
+            return
         if not self.email or "@" not in self.email:
-            email = "{}@{}".format(self.username, settings.EMAIL_SUFFIX)
             if "@" in self.username:
-                email = self.username
-            self.email = email
+                self.email = self.username
+            else:
+                self.email = f"{self.username}@{settings.EMAIL_SUFFIX}"
+        self.email_lookup = _email_lookup(self.email)
 
-    def save(self, *args, **kwargs):
-        self.set_required_attr_if_need()
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        update_fields = _email_update_fields(update_fields)
+        self.prepare_for_save(update_fields)
         if self.username == "admin":
             self.role = "Admin"
             self.is_active = True
-        return super().save(*args, **kwargs)
+        return super().save(
+            force_insert=force_insert, force_update=force_update,
+            using=using, update_fields=update_fields,
+        )
 
     def is_member_of(self, user_group):
         if user_group in self.groups.all():
@@ -309,6 +361,9 @@ class User(
     class Meta:
         ordering = ["username"]
         verbose_name = _("User")
+        constraints = [
+            models.UniqueConstraint(fields=['email_lookup'], name='users_user_email_lookup_uniq'),
+        ]
         unique_together = (
             ("dingtalk_id",),
             ("wecom_id",),

@@ -8,6 +8,9 @@ class MaxLimitOffsetPagination(LimitOffsetPagination):
 
     def get_count(self, queryset):
         try:
+            # Adding id to grouped queries would change the groups being counted.
+            if getattr(getattr(queryset, 'query', None), 'group_by', None):
+                return queryset.count()
             return queryset.values_list('id').order_by().count()
         except (AttributeError, TypeError, FieldError):
             return len(queryset)

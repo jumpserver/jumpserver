@@ -1,0 +1,100 @@
+"""SDK documentation selection, independent of programming and UI languages."""
+
+from pathlib import Path
+from shlex import quote
+import re
+
+from django.conf import settings
+from django.utils.translation import gettext_lazy as _
+from rest_framework.exceptions import ValidationError
+from accounts.clients.distribution import client_version
+from .artifacts import artifact_url
+
+SDK_LANGUAGES = {
+    'python': {'label': 'Python', 'example': 'subclass_demo.py', 'runtime': 'Python 3.9+', 'credential_policies': True},
+    'go': {'label': 'Go', 'example': 'cmd/hooks/main.go', 'runtime': 'Go 1.23+', 'credential_policies': True},
+    'java': {'label': 'Java', 'example': 'src/main/java/org/jumpserver/pam/EventsDemo.java', 'runtime': 'Java 11+', 'credential_policies': True},
+    'node': {'label': 'Node.js', 'example': 'hooks.js', 'runtime': 'Node.js 20.3+', 'credential_policies': True},
+    'curl': {'label': 'cURL', 'example': 'demo.sh', 'runtime': 'Bash / cURL / OpenSSL', 'credential_policies': False},
+}
+def client_source_command(language, endpoint='https://jumpserver.example.com'):
+    url = artifact_url(f'jms-pam-{language}-source.tar.gz', endpoint)
+    return f'curl -fL {quote(url)} -o jms-pam-clients.tar.gz &&\ntar -xzf jms-pam-clients.tar.gz'
+
+
+def sdk_install_commands(endpoint='https://jumpserver.example.com'):
+    commands = {
+        'go': (
+            'go mod edit -replace github.com/jumpserver/pam-clients/go=./jms-pam-clients/go &&\n'
+            f'go get github.com/jumpserver/pam-clients/go@v{client_version()}'
+        ),
+        'java': 'mvn -f ./jms-pam-clients/java/pom.xml install',
+        'node': 'npm install ./jms-pam-clients/node',
+    }
+    result = {language: f'{client_source_command(language, endpoint)} &&\n{command}'
+              for language, command in commands.items()}
+    wheel = artifact_url(f'jms_pam-{client_version()}-py3-none-any.whl', endpoint)
+    result['python'] = f'python3 -m pip install --upgrade --force-reinstall {quote(wheel)}'
+    return result
+
+
+SDK_INSTALL_COMMANDS = sdk_install_commands()
+DOCUMENTATION_LANGUAGES = ('en', 'zh-hans', 'zh-hant', 'ja', 'ko', 'pt-br', 'ru', 'vi', 'es', 'fr')
+LANGUAGE_ALIASES = {
+    'zh': 'zh-hans', 'zh-cn': 'zh-hans', 'zh-sg': 'zh-hans',
+    'zh-tw': 'zh-hant', 'zh-hk': 'zh-hant', 'zh-mo': 'zh-hant',
+    'pt': 'pt-br',
+}
+
+
+def documentation_language(language):
+    language = (language or 'en').replace('_', '-').lower()
+    language = LANGUAGE_ALIASES.get(language, language)
+    if language in DOCUMENTATION_LANGUAGES:
+        return language
+    prefix = '-'.join(language.split('-')[:2])
+    if prefix in DOCUMENTATION_LANGUAGES:
+        return prefix
+    base = language.split('-')[0]
+    base = LANGUAGE_ALIASES.get(base, base)
+    return base if base in DOCUMENTATION_LANGUAGES else 'en'
+
+
+def sdk_languages():
+    return [
+        {'value': key, 'label': value['label']}
+        for key, value in SDK_LANGUAGES.items() if value['credential_policies']
+    ]
+
+
+def sdk_example(sdk_language):
+    definition = SDK_LANGUAGES[sdk_language]
+    directory = Path(settings.APPS_DIR) / 'accounts' / 'clients' / sdk_language
+    return (directory / definition['example']).read_text(encoding='utf-8')
+
+
+def get_sdk_documentation(sdk_language, language):
+    if sdk_language not in SDK_LANGUAGES:
+        raise ValidationError({'language': _('Unsupported SDK language.')})
+    definition = SDK_LANGUAGES[sdk_language]
+    locale = documentation_language(language)
+    directory = Path(settings.APPS_DIR) / 'accounts' / 'clients' / sdk_language
+    path = directory / f'README.{locale}.md'
+    if not path.is_file():
+        locale = 'en'
+        path = directory / 'README.en.md'
+    download_path = f'/static/pam/{client_version()}/'
+    readme = re.sub(
+        r'(https://jumpserver\.example\.com)?' + re.escape(download_path),
+        lambda match: artifact_url('', 'https://jumpserver.example.com') if match[1] else artifact_url(''),
+        path.read_text(encoding='utf-8'),
+    )
+    return {
+        'language': sdk_language,
+        'documentation_language': locale,
+        'languages': sdk_languages(),
+        'runtime': definition['runtime'],
+        'credential_policies': definition['credential_policies'],
+        'readme': readme,
+        'code': sdk_example(sdk_language),
+    }

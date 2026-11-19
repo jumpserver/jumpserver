@@ -13,3 +13,7 @@ class PingAutomation(AssetBaseAutomation):
 
     class Meta:
         verbose_name = _("Ping asset")
+        permissions = [
+            ('view_pingexecution', _('Can view asset connectivity execution')),
+            ('add_pingexecution', _('Can add asset connectivity execution')),
+        ]

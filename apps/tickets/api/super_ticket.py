@@ -1,6 +1,6 @@
 from rest_framework.generics import RetrieveDestroyAPIView
 
-from orgs.utils import tmp_to_root_org
+from orgs.utils import tmp_to_root_org, tmp_to_org
 from ..models import Ticket
 from ..serializers import SuperTicketSerializer
 
@@ -19,4 +19,5 @@ class SuperTicketStatusAPI(RetrieveDestroyAPIView):
             return Ticket.objects.all()
 
     def perform_destroy(self, instance):
-        instance.close()
+        with tmp_to_org(instance.org_id):
+            instance.close()

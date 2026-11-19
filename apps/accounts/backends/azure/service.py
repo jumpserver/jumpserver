@@ -60,6 +60,8 @@ class AZUREVaultClient(object):
         self.client.begin_delete_secret(name)
 
     def update_metadata(self, name, metadata: dict):
+        from azure.core.exceptions import ResourceNotFoundError, ClientAuthenticationError
+
         try:
             self.client.update_secret_properties(name, tags=metadata)
         except (ResourceNotFoundError, ClientAuthenticationError) as e:

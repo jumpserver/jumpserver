@@ -13,16 +13,16 @@ class FTPLogReportExporter(BaseListReportExporter):
 
     def get_summary_sections(self):
         logs = self.records
-        success_logs = [item for item in logs if item.is_success]
-        failed_logs = [item for item in logs if not item.is_success]
-        downloadable_logs = [item for item in logs if item.has_file]
+        success_count = sum(1 for item in logs if item.is_success)
+        failed_count = len(logs) - success_count
+        downloadable_count = sum(1 for item in logs if item.has_file)
 
         overview = OrderedDict([
             (_('Total records'), len(logs)),
-            (_('Successful transfers'), len(success_logs)),
-            (_('Failed transfers'), len(failed_logs)),
-            (_('Success rate'), self.format_percent(len(success_logs), len(logs))),
-            (_('Downloadable files'), len(downloadable_logs)),
+            (_('Successful transfers'), success_count),
+            (_('Failed transfers'), failed_count),
+            (_('Success rate'), self.format_percent(success_count, len(logs))),
+            (_('Downloadable files'), downloadable_count),
             (_('Unique users'), len({item.user for item in logs if item.user})),
             (_('Unique assets'), len({item.asset for item in logs if item.asset})),
             (_('Unique accounts'), len({item.account for item in logs if item.account})),
@@ -139,14 +139,14 @@ class UserLoginLogReportExporter(BaseListReportExporter):
     def get_summary_sections(self):
         logs = self.records
         total = len(logs)
-        success_logs = [item for item in logs if item.status]
-        failed_logs = [item for item in logs if not item.status]
+        success_count = sum(1 for item in logs if item.status)
+        failed_count = total - success_count
 
         overview = OrderedDict([
             (_('Total records'), total),
-            (_('Successful logins'), len(success_logs)),
-            (_('Failed logins'), len(failed_logs)),
-            (_('Success rate'), self.format_percent(len(success_logs), total)),
+            (_('Successful logins'), success_count),
+            (_('Failed logins'), failed_count),
+            (_('Success rate'), self.format_percent(success_count, total)),
             (_('Unique users'), len({item.username for item in logs if item.username})),
             (_('Unique IPs'), len({item.ip for item in logs if item.ip})),
             (_('Unique cities'), len({item.city for item in logs if item.city})),
@@ -440,10 +440,10 @@ class JobsAuditReportExporter(BaseListReportExporter):
         jobs = self.records
         overview = OrderedDict([
             (_('Total records'), len(jobs)),
-            (_('Periodic jobs'), len([item for item in jobs if item.is_periodic])),
-            (_('One-time jobs'), len([item for item in jobs if not item.is_periodic])),
-            (_('Adhoc jobs'), len([item for item in jobs if item.type == 'adhoc'])),
-            (_('Playbook jobs'), len([item for item in jobs if item.type == 'playbook'])),
+            (_('Periodic jobs'), sum(1 for item in jobs if item.is_periodic)),
+            (_('One-time jobs'), sum(1 for item in jobs if not item.is_periodic)),
+            (_('Adhoc jobs'), sum(1 for item in jobs if item.type == 'adhoc')),
+            (_('Playbook jobs'), sum(1 for item in jobs if item.type == 'playbook')),
             (_('Unique creators'), len({
                 item.creator_id for item in jobs if getattr(item, 'creator_id', None)
             })),
@@ -516,28 +516,29 @@ class JobLogAuditReportExporter(BaseListReportExporter):
 
     def get_summary_sections(self):
         logs = self.records
-        success_logs = [item for item in logs if item.is_success]
-        finished_logs = [item for item in logs if item.is_finished]
-        unfinished_logs = [item for item in logs if not item.is_finished]
-
-        finished_durations = [
-            item.time_cost for item in finished_logs
-            if getattr(item, 'time_cost', None) is not None
-        ]
+        success_count = finished_count = duration_count = 0
+        duration_total = 0
+        for item in logs:
+            success_count += bool(item.is_success)
+            finished_count += bool(item.is_finished)
+            if item.is_finished and getattr(item, 'time_cost', None) is not None:
+                duration_total += item.time_cost
+                duration_count += 1
+        unfinished_count = len(logs) - finished_count
 
         overview = OrderedDict([
             (_('Total records'), len(logs)),
-            (_('Successful jobs'), len(success_logs)),
-            (_('Finished jobs'), len(finished_logs)),
-            (_('Unfinished jobs'), len(unfinished_logs)),
-            (_('Success rate'), self.format_percent(len(success_logs), len(logs))),
+            (_('Successful jobs'), success_count),
+            (_('Finished jobs'), finished_count),
+            (_('Unfinished jobs'), unfinished_count),
+            (_('Success rate'), self.format_percent(success_count, len(logs))),
             (_('Unique creators'), len({
                 item.creator_id for item in logs if getattr(item, 'creator_id', None)
             })),
             (_('Unique task ids'), len({str(item.task_id) for item in logs if item.task_id})),
             (_('Average duration'), '{:.2f}s'.format(
-                sum(finished_durations) / len(finished_durations)
-            ) if finished_durations else '0.00s'),
+                duration_total / duration_count
+            ) if duration_count else '0.00s'),
         ])
 
         trend_data = defaultdict(lambda: {'total': 0, 'success': 0, 'finished': 0, 'unfinished': 0})

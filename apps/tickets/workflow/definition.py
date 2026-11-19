@@ -1,0 +1,229 @@
+from django.utils.translation import gettext
+import json
+import re
+from collections import defaultdict, deque
+from uuid import UUID
+
+from .conditions import validate_condition
+from .errors import WorkflowConfigurationError
+
+RESOLVERS = {
+    'user', 'user_group', 'role', 'org_admin', 'asset_owner', 'user_selector', 'acl_reviewers',
+}
+ACL_TICKET_TYPES = {'login_confirm', 'login_asset_confirm', 'command_confirm'}
+
+
+def validate_user_filter_string(value, match):
+    if match == 'in':
+        if (not isinstance(value, list) or not value
+                or any(not isinstance(v, str) for v in value)):
+            raise ValueError('Invalid user filter.')
+    elif (match not in ('exact', 'not', 'contains', 'startswith', 'endswith', 'regex')
+          or not isinstance(value, str)):
+        raise ValueError('Invalid user filter.')
+    if match == 'regex':
+        try:
+            re.compile(value)
+        except re.error as exc:
+            raise ValueError('Invalid user filter.') from exc
+
+
+def validate_user_filter_attribute(attr):
+    if (not isinstance(attr, dict) or attr.keys() - {'name', 'match', 'value', 'rel', 'index'}
+            or 'name' not in attr or 'value' not in attr):
+        raise ValueError('Invalid user filter.')
+    name, value, match = attr['name'], attr['value'], attr.get('match', 'exact')
+    if name in ('system_roles', 'org_roles', 'groups', 'labels'):
+        if (match not in ('m2m', 'm2m_all') or not isinstance(value, list)
+                or not 1 <= len(value) <= 1000):
+            raise ValueError('Invalid user filter.')
+        for pk in value:
+            UUID(str(pk))
+    elif name in ('is_active', 'is_first_login'):
+        if match not in ('exact', 'not') or not isinstance(value, bool):
+            raise ValueError('Invalid user filter.')
+    elif name in ('name', 'username', 'email', 'comment'):
+        validate_user_filter_string(value, match)
+    else:
+        raise ValueError('Invalid user filter.')
+
+
+def validate_user_selector(selector):
+    """Validate the fields exposed by the existing user attribute selector."""
+    if isinstance(selector, dict) and selector == {'type': 'all'}:
+        return
+    if (not isinstance(selector, dict) or set(selector) != {'type', 'attrs'}
+            or selector['type'] != 'attrs' or not isinstance(selector['attrs'], list)
+            or not 1 <= len(selector['attrs']) <= 100):
+        raise ValueError('Invalid user filter.')
+    for attr in selector['attrs']:
+        validate_user_filter_attribute(attr)
+
+
+def json_snapshot(value, max_bytes=262144):
+    try:
+        encoded = json.dumps(value, allow_nan=False)
+    except (TypeError, ValueError, RecursionError):
+        raise WorkflowConfigurationError(gettext('Workflow data must contain only finite JSON values.'))
+    if len(encoded.encode()) > max_bytes:
+        raise WorkflowConfigurationError(gettext('Workflow data exceeds the size limit.'))
+    return json.loads(encoded)
+
+
+def validate_approvers(spec):
+    if not isinstance(spec, dict) or not isinstance(spec.get('type'), str) or spec['type'] not in RESOLVERS:
+        raise WorkflowConfigurationError(gettext('Unknown approver resolver.'))
+    if spec.keys() - {'type', 'value'}:
+        raise WorkflowConfigurationError(gettext('Unknown approver configuration field.'))
+    if spec['type'] == 'user_selector':
+        try:
+            validate_user_selector(spec.get('value'))
+        except (ValueError, TypeError) as exc:
+            raise WorkflowConfigurationError(gettext('Invalid user filter.')) from exc
+    elif spec['type'] in ('user', 'user_group', 'role'):
+        ids = spec.get('value')
+        if isinstance(ids, str):
+            ids = [ids]
+        if not isinstance(ids, list) or not 1 <= len(ids) <= 1000:
+            raise WorkflowConfigurationError(gettext('Approvers require between 1 and 1000 resource IDs.'))
+        try:
+            for value in ids:
+                UUID(value)
+        except (ValueError, TypeError, AttributeError):
+            raise WorkflowConfigurationError(gettext('Approver resource IDs must be UUIDs.'))
+        spec['value'] = list(dict.fromkeys(str(UUID(value)) for value in ids))
+    elif 'value' in spec:
+        raise WorkflowConfigurationError(gettext('This resolver reads IDs from the request snapshot or organization.'))
+
+
+def validate_approval(config):
+    if config.keys() - {'approvers', 'strategy', 'required', 'allow_transfer', 'allow_add_approver', 'timeout', 'timeout_action', 'exclude_applicant'}:
+        raise WorkflowConfigurationError(gettext('Unknown approval configuration field.'))
+    validate_approvers(config.get('approvers'))
+    strategy = config.setdefault('strategy', 'any')
+    if strategy not in ('any', 'all', 'quorum'):
+        raise WorkflowConfigurationError(gettext('Approval strategy must be any, all or quorum.'))
+    if strategy == 'quorum':
+        if type(config.get('required')) is not int or not 1 <= config['required'] <= 1000:
+            raise WorkflowConfigurationError(gettext('Quorum requires a positive approval count up to 1000.'))
+        approvers = config['approvers']
+        if approvers['type'] == 'user' and config['required'] > len(approvers['value']):
+            raise WorkflowConfigurationError(gettext(
+                'Select at least {required} approvers; currently {count} selected.'
+            ).format(required=config['required'], count=len(approvers['value'])))
+    elif 'required' in config:
+        raise WorkflowConfigurationError(gettext('Only quorum accepts a required approval count.'))
+    for key, default in [('allow_transfer', False), ('allow_add_approver', False), ('exclude_applicant', True)]:
+        if type(config.setdefault(key, default)) is not bool:
+            raise WorkflowConfigurationError(gettext('{key} must be a boolean.').format(key=key))
+    timeout = config.setdefault('timeout', 0)
+    if type(timeout) is not int or not 0 <= timeout <= 31536000 or timeout % 60:
+        raise WorkflowConfigurationError(gettext('Timeout must be whole minutes between 1 and 525600, or 0 for no deadline.'))
+    if config.setdefault('timeout_action', 'expire') not in ('expire', 'reject'):
+        raise WorkflowConfigurationError(gettext('Timeout action must be expire or reject.'))
+
+
+def validate_cc(config):
+    if set(config) != {'users'} or not isinstance(config['users'], list) or len(config['users']) > 1000:
+        raise WorkflowConfigurationError(gettext('A CC node accepts a list of up to 1000 user IDs.'))
+    try:
+        config['users'] = list(dict.fromkeys(str(UUID(value)) for value in config['users']))
+    except (ValueError, TypeError, AttributeError):
+        raise WorkflowConfigurationError(gettext('CC user IDs must be UUIDs.'))
+
+
+def validate_definition(definition):
+    """Return a canonical, bounded, exclusive-branch DAG; never execute source code."""
+    definition = json_snapshot(definition)
+    if not isinstance(definition, dict) or set(definition) != {'nodes', 'edges'}:
+        raise WorkflowConfigurationError(gettext('A workflow requires nodes and edges.'))
+    nodes, edges = definition['nodes'], definition['edges']
+    if not isinstance(nodes, list) or not 2 <= len(nodes) <= 128:
+        raise WorkflowConfigurationError(gettext('A workflow requires between 2 and 128 nodes.'))
+    if not isinstance(edges, list) or len(edges) > 256:
+        raise WorkflowConfigurationError(gettext('A workflow supports at most 256 edges.'))
+    by_id = {}
+    for node in nodes:
+        if not isinstance(node, dict) or node.keys() - {'id', 'type', 'name', 'config', 'position'}:
+            raise WorkflowConfigurationError(gettext('Invalid workflow node.'))
+        key, kind = node.get('id'), node.get('type')
+        if not isinstance(key, str) or not re.fullmatch(r'[\w-]{1,64}', key) or key in by_id:
+            raise WorkflowConfigurationError(gettext('Node IDs must be unique strings of up to 64 letters, digits, underscores or hyphens.'))
+        if kind not in ('start', 'approval', 'condition', 'cc', 'end'):
+            raise WorkflowConfigurationError(gettext('Unsupported node type.'))
+        node.setdefault('name', key)
+        if not isinstance(node['name'], str) or len(node['name']) > 128:
+            raise WorkflowConfigurationError(gettext('Node names must be strings of up to 128 characters.'))
+        config = node.setdefault('config', {})
+        if not isinstance(config, dict):
+            raise WorkflowConfigurationError(gettext('Node config must be an object.'))
+        if kind == 'approval':
+            validate_approval(config)
+        elif kind == 'condition':
+            validate_condition(config)
+        elif kind == 'cc':
+            validate_cc(config)
+        elif config:
+            raise WorkflowConfigurationError(gettext('Start and end nodes do not accept configuration.'))
+        position = node.setdefault('position', {'x': 0, 'y': 0})
+        if not isinstance(position, dict) or set(position) != {'x', 'y'} or any(
+            type(v) is not int or abs(v) > 1000000 for v in position.values()
+        ):
+            raise WorkflowConfigurationError(gettext('Positions require bounded integer x and y coordinates.'))
+        by_id[key] = node
+    starts = [n['id'] for n in nodes if n['type'] == 'start']
+    ends = [n['id'] for n in nodes if n['type'] == 'end']
+    if len(starts) != 1 or len(ends) != 1:
+        raise WorkflowConfigurationError(gettext('A workflow requires exactly one start and one end.'))
+    incoming, outgoing, pairs, normalized = defaultdict(list), defaultdict(list), set(), []
+    for edge in edges:
+        if isinstance(edge, list) and len(edge) == 2 and all(isinstance(v, str) for v in edge):
+            source, target = edge
+            condition = None
+            if ':' in source:
+                source, branch = source.rsplit(':', 1)
+                if branch not in ('true', 'false'):
+                    raise WorkflowConfigurationError(gettext('Branch suffix must be true or false.'))
+                condition = branch == 'true'
+            edge = {'source': source, 'target': target, 'condition': condition}
+        if not isinstance(edge, dict) or edge.keys() - {'source', 'target', 'condition', 'priority'}:
+            raise WorkflowConfigurationError(gettext('Invalid workflow edge.'))
+        source, target = edge.get('source'), edge.get('target')
+        if not isinstance(source, str) or not isinstance(target, str) or source not in by_id or target not in by_id:
+            raise WorkflowConfigurationError(gettext('Edges must reference existing nodes.'))
+        if source == target or (source, target) in pairs:
+            raise WorkflowConfigurationError(gettext('Duplicate edges and self loops are not allowed.'))
+        edge.setdefault('condition', None)
+        edge.setdefault('priority', 0)
+        if edge['condition'] is not None and type(edge['condition']) is not bool:
+            raise WorkflowConfigurationError(gettext('Branch conditions must be booleans.'))
+        if type(edge['priority']) is not int or not 0 <= edge['priority'] <= 1000000:
+            raise WorkflowConfigurationError(gettext('Edge priority must be a nonnegative bounded integer.'))
+        incoming[target].append(edge)
+        outgoing[source].append(edge)
+        pairs.add((source, target))
+        normalized.append(edge)
+    for key, node in by_id.items():
+        ins, outs, kind = incoming[key], outgoing[key], node['type']
+        if kind == 'start' and ins or kind != 'start' and not ins:
+            raise WorkflowConfigurationError(gettext('Only the start node may have no incoming edges.'))
+        if kind == 'condition':
+            if len(outs) != 2 or {e['condition'] for e in outs} != {True, False}:
+                raise WorkflowConfigurationError(gettext('Conditions require one true and one false branch.'))
+        elif len(outs) != (0 if kind == 'end' else 1) or any(e['condition'] is not None for e in outs):
+            raise WorkflowConfigurationError(gettext('Only condition nodes can branch; end nodes cannot have outgoing edges.'))
+    # Kahn's algorithm also rejects disconnected cycles. A unique source and sink
+    # with these degree rules guarantee every node is reachable and can finish.
+    indegrees = {key: len(incoming[key]) for key in by_id}
+    queue, visited = deque(starts), 0
+    while queue:
+        key = queue.popleft()
+        visited += 1
+        for edge in outgoing[key]:
+            indegrees[edge['target']] -= 1
+            if indegrees[edge['target']] == 0:
+                queue.append(edge['target'])
+    if visited != len(nodes):
+        raise WorkflowConfigurationError(gettext('Workflows must be acyclic and fully reachable.'))
+    definition['edges'] = normalized
+    return definition

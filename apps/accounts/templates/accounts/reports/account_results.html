@@ -1,0 +1,39 @@
+{% load i18n %}
+<section class="summary" aria-label="{% trans 'Accounts' %}">
+    <div class="metric"><span class="metric-label">{% trans 'Success accounts' %}</span><strong class="metric-value success">{{ summary.ok_accounts|default:0 }}</strong></div>
+    <div class="metric"><span class="metric-label">{% trans 'Failed accounts' %}</span><strong class="metric-value failed">{{ summary.fail_accounts|default:0 }}</strong></div>
+    <div class="metric"><span class="metric-label">{% trans 'Unverified accounts' %}</span><strong class="metric-value unverified">{{ summary.unverified_accounts|default:0 }}</strong></div>
+</section>
+{% include 'accounts/reports/asset_summary.html' %}
+
+<section class="report-section">
+    <h2>{% trans 'Execution results' %}</h2>
+    {% with failures=result.fail_accounts|length unverified=result.unverified_accounts|length %}
+    {% with has_errors=failures|add:unverified %}
+    <table>
+        <colgroup>
+            <col{% if has_errors %} class="asset-column"{% endif %}>
+            <col{% if has_errors %} class="account-column"{% endif %}>
+            <col class="status-column">
+            {% if has_errors %}<col>{% endif %}
+        </colgroup>
+        <thead>
+            <tr>
+                <th scope="col">{% trans 'Asset' %}</th>
+                <th scope="col">{% trans 'Username' %}</th>
+                <th scope="col">{% trans 'Status' %}</th>
+                {% if has_errors %}<th scope="col">{% trans 'Error' %}</th>{% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% include 'accounts/reports/account_rows.html' with accounts=result.fail_accounts tone='failed' label=_('Failed') %}
+            {% include 'accounts/reports/account_rows.html' with accounts=result.unverified_accounts tone='unverified' label=_('Unverified') %}
+            {% include 'accounts/reports/account_rows.html' with accounts=result.ok_accounts tone='success' label=_('Success') %}
+            {% if not result.fail_accounts and not result.unverified_accounts and not result.ok_accounts %}
+                <tr><td class="empty" colspan="{% if has_errors %}4{% else %}3{% endif %}">{% trans 'No execution details' %}</td></tr>
+            {% endif %}
+        </tbody>
+    </table>
+    {% endwith %}
+    {% endwith %}
+</section>

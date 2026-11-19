@@ -22,8 +22,8 @@ class FaceCallbackSerializer(serializers.Serializer):
 
 
 class FaceMonitorContextSerializer(serializers.Serializer):
-    session_id = serializers.CharField(required=True, allow_null=False, allow_blank=False)
-    face_monitor_token = serializers.CharField(required=True, allow_blank=False, allow_null=False)
+    session_id = serializers.UUIDField(required=True, allow_null=False)
+    face_monitor_token = serializers.RegexField(r'\A[A-Za-z0-9_-]{16,128}\Z', required=True, max_length=128, allow_blank=False, allow_null=False)
 
     def update(self, instance, validated_data):
         pass

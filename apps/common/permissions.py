@@ -95,6 +95,7 @@ class ServiceAccountSignaturePermission(permissions.BasePermission):
 
 
 class IsValidLicense(permissions.BasePermission):
+    code = 'license_required'
 
     def has_permission(self, request, view):
         return settings.XPACK_LICENSE_IS_VALID

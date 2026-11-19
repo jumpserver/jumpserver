@@ -3,6 +3,8 @@ from unittest.mock import patch
 from django.test import SimpleTestCase
 
 from assets.const.host import HostTypes
+from assets.const.database import DatabaseTypes
+from assets.const.device import DeviceTypes
 from assets.const.types import AllTypes
 
 
@@ -78,4 +80,56 @@ class HostTypesInternalPlatformsTestCase(SimpleTestCase):
         self.assertEqual(
             virtual_app_host['automation']['ansible_config'],
             {'ansible_connection': 'ssh'},
+        )
+
+
+class DeviceTypesInternalPlatformsTestCase(SimpleTestCase):
+    def test_vendor_platforms_use_distinct_types_in_community_edition(self):
+        platform_types = DeviceTypes.internal_platforms()
+        with self.settings(XPACK_LICENSE_IS_VALID=False):
+            choices = dict(DeviceTypes.get_choices())
+
+        for platform_type, name in (('cisco', 'Cisco'), ('huawei', 'Huawei'), ('h3c', 'H3C')):
+            with self.subTest(platform_type=platform_type):
+                self.assertEqual(platform_types[platform_type], [{'name': name}])
+                self.assertIn(platform_type, choices)
+
+        self.assertEqual(platform_types['general'], [{'name': 'General'}])
+
+
+class OceanBaseTypeTestCase(SimpleTestCase):
+    def test_mysql_wire_setting_exposes_modes_only_for_oceanbase(self):
+        from rest_framework.request import Request
+        from rest_framework.test import APIRequestFactory
+        from assets.serializers.platform import PlatformProtocolSerializer
+
+        factory = APIRequestFactory()
+        for asset_type in ('oceanbase', 'mysql', ''):
+            request = Request(factory.get('/', {'name': 'mysql', 'asset_type': asset_type}))
+            fields = PlatformProtocolSerializer(context={'request': request}).fields['setting'].serializer.fields
+            if asset_type == 'oceanbase':
+                self.assertEqual(set(fields['tenant_mode'].choices), {'mysql', 'oracle'})
+                self.assertEqual(fields['tenant_mode'].default, 'mysql')
+            else:
+                self.assertNotIn('tenant_mode', fields)
+
+        for mode in ('oracle', 'mysql', 'invalid'):
+            serializer = PlatformProtocolSerializer(data={'name': 'mysql', 'port': 2881, 'setting': {'tenant_mode': mode}})
+            self.assertEqual(serializer.is_valid(), mode != 'invalid', serializer.errors)
+            if mode != 'invalid':
+                self.assertEqual(serializer.validated_data['setting']['tenant_mode'], mode)
+
+    def test_oceanbase_is_enterprise_only_and_uses_mysql_wire(self):
+        self.assertNotIn(DatabaseTypes.OCEANBASE, DatabaseTypes.get_community_types())
+        self.assertEqual(
+            DatabaseTypes._get_protocol_constrains()[DatabaseTypes.OCEANBASE],
+            {'choices': ['mysql']},
+        )
+
+    def test_internal_platforms_select_tenant_mode_explicitly(self):
+        platforms = DatabaseTypes.internal_platforms()[DatabaseTypes.OCEANBASE]
+        self.assertEqual([p['name'] for p in platforms], ['OceanBase-MySQL', 'OceanBase-Oracle'])
+        self.assertEqual(
+            [p['protocols_setting']['mysql']['tenant_mode'] for p in platforms],
+            ['mysql', 'oracle'],
         )

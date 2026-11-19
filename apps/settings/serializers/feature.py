@@ -15,6 +15,7 @@ from rest_framework import serializers
 from common.serializers.fields import EncryptedField
 from common.utils import date_expired_default
 from ops.ansible.docker import ANSIBLE_EE_IMAGE
+from tickets.const import TicketApplyAssetScope
 
 __all__ = [
     'AnnouncementSettingSerializer', 'OpsSettingSerializer', 'VaultSettingSerializer',
@@ -25,11 +26,10 @@ __all__ = [
 
 ANSIBLE_DOCKER_HELP_TEXT = lazy(
     lambda: _(
-        'Run Ansible jobs in the Docker execution environment (%(image)s). '
+        'Run Ansible jobs in the persistent container (%(image)s) over SSH. '
         'To run jobs locally instead, disable "Docker isolation for Ansible" under '
         'System Settings > Feature Settings > Job Center. '
-        'If the image is missing, run this command on the Ansible worker: '
-        'docker pull %(image)s'
+        'Configure the executor address and SSH credentials before enabling isolation.'
     ) % {'image': ANSIBLE_EE_IMAGE},
     str,
 )()
@@ -239,6 +239,15 @@ class SSHCAOpenBaoSerializer(serializers.Serializer):
         validators=[validate_ssh_ca_source_addresses]
     )
 
+    def validate(self, attrs):
+        address_field = 'SSH_CA_OPENBAO_ADDR'
+        current_address = settings.SSH_CA_OPENBAO_ADDR or settings.VAULT_OPENBAO_ADDR
+        new_address = attrs.get(address_field, settings.SSH_CA_OPENBAO_ADDR)
+        # Pinning the inherited Vault address does not change the destination.
+        if (new_address or settings.VAULT_OPENBAO_ADDR) != current_address:
+            validate_secret_destination(attrs, 'SSH_CA_OPENBAO_TOKEN', (address_field,))
+        return attrs
+
 
 class HashicorpKVSerializer(BaseVaultSettingSerializer, serializers.Serializer):
     PREFIX_TITLE = _('HCP Vault')
@@ -353,6 +362,18 @@ class TicketSettingSerializer(serializers.Serializer):
     TICKETS_DIRECT_APPROVE = serializers.BooleanField(
         required=False, default=False, label=_("Approval without login"),
         help_text=_('Allow direct approval ticket without login')
+    )
+    TICKET_APPLY_ASSET_SCOPE = serializers.ChoiceField(
+        choices=TicketApplyAssetScope.choices, required=False,
+        label=_("Asset application scope"),
+        help_text=_(
+            "Specifies which assets users can select when requesting access via a ticket.<br>"
+            "<b>All assets:</b> All assets in the ticket's organization, even if the user has no existing permission.<br>"
+            "<b>Permed assets:</b> Assets included in permission rules assigned to the user or their user groups, "
+            "including inactive, expired and not-yet-effective rules.<br>"
+            "<b>Permed valid assets:</b> Assets included in valid permission rules assigned to the user or their "
+            "user groups. The rule must be enabled, and the current time must be between its start and end times."
+        )
     )
     TICKET_AUTHORIZE_DEFAULT_TIME = serializers.IntegerField(
         min_value=1, max_value=999999, required=False,

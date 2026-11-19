@@ -191,7 +191,7 @@ class PlaybookCallback(DefaultCallback):
         self.ansible_log.flush()
 
     def event_handler(self, data, **kwargs):
-        self.write_ansible_output(data.get('stdout'))
+        self.write_ansible_output(self.format_task_output(data))
         return super().event_handler(data, **kwargs)
 
     def close(self):
@@ -252,9 +252,19 @@ class BaseManager:
         self.result = defaultdict(list)
         self.duration = 0
         self.status = Status.success
+        self._verification_pending_only = False
 
     def get_assets_group_by_platform(self):
         return self.execution.all_assets_group_by_platform()
+
+    @staticmethod
+    def get_asset_result_metadata(asset):
+        """Snapshot asset identity for reports without querying live assets later."""
+        return {
+            'asset_id': str(asset.id) if asset else '',
+            'asset_name': asset.name if asset else '',
+            'asset_address': asset.address if asset else '',
+        }
 
     @staticmethod
     def print_log(message, level='info'):
@@ -302,9 +312,12 @@ class BaseManager:
         result.append(_("Failed: %(count)s") % {'count': failed})
         if total is not None:
             result.append(_("Total: %(count)s") % {'count': total})
+        execution_failed = (
+            self.status == Status.failed and not self._verification_pending_only
+        )
         final_level = (
             'error'
-            if failed or self.status in (Status.failed, Status.error)
+            if failed or self.status == Status.error or execution_failed
             else 'progress'
             if unverified or self.status == Status.canceled
             else 'success'
@@ -544,6 +557,28 @@ class PlaybookPrepareMixin:
             account_selector=self.get_inventory_account_selector(),
         )
         inventory.write_to_file(inventory_path)
+        inventory_hosts = self.get_inventory_hosts(inventory_path)
+        asset_details = self.result.setdefault('asset_details', {})
+        for host, detail in {
+            **inventory_hosts,
+            **inventory.exclude_host_details,
+        }.items():
+            asset = detail.get('jms_asset') or {}
+            if not asset.get('id'):
+                continue
+            # Keep only display metadata, never credentials from the inventory.
+            asset_details[host] = {
+                'asset_id': str(asset['id']),
+                'asset_name': asset.get('name', ''),
+                'asset_address': asset.get('origin_address') or asset.get('address', ''),
+            }
+        if str(self.method_type()) in ('ping', 'verify_account'):
+            from .account_results import account_snapshot
+            account_details = self.result.setdefault('account_details', {})
+            for host, detail in inventory_hosts.items():
+                snapshot = account_snapshot(detail, str(self.method_type()))
+                if snapshot:
+                    account_details[host] = snapshot
         self._inventory_host_labels = {
             host: self.format_inventory_host_label(host, detail)
             for host, detail in inventory.exclude_host_details.items()
@@ -656,7 +691,12 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
         self._inventory_host_labels = {}
 
     def get_assets_group_by_platform(self):
-        return self.execution.all_assets_group_by_platform()
+        groups = super().get_assets_group_by_platform()
+        asset_details = self.result.setdefault('asset_details', {})
+        for assets in groups.values():
+            for asset in assets:
+                asset_details[str(asset)] = self.get_asset_result_metadata(asset)
+        return groups
 
     def get_task_display_name(self):
         labels = {
@@ -882,6 +922,11 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
         missing_asset_ids = requested_asset_ids - available_asset_ids
         self.summary["total_assets"] += len(missing_asset_ids)
         for asset_id in sorted(missing_asset_ids):
+            self.result.setdefault('asset_details', {})[asset_id] = {
+                'asset_id': asset_id,
+                'asset_name': '',
+                'asset_address': '',
+            }
             self.on_inventory_host_error(
                 asset_id, _("Asset not found or inactive")
             )
@@ -964,12 +1009,19 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
 
     def post_run(self):
         try:
-            if self.status not in (Status.canceled, Status.error) and any(
-                    self.summary.get(key, 0) > 0
-                    for key in (
-                        "fail_assets", "fail_accounts",
-                        "unverified_accounts",
-                    )
+            has_failed_results = any(
+                self.summary.get(key, 0) > 0
+                for key in ("fail_assets", "fail_accounts")
+            )
+            has_unverified_results = self.summary.get("unverified_accounts", 0) > 0
+            # Pending verification must still block success, but should not
+            # color the summary as an execution failure. Preserve real errors.
+            self._verification_pending_only = (
+                self.status == Status.success
+                and has_unverified_results and not has_failed_results
+            )
+            if self.status not in (Status.canceled, Status.error) and (
+                has_failed_results or has_unverified_results
             ):
                 self.status = Status.failed
             super().post_run()
@@ -1303,6 +1355,15 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
         )
         return run_kwargs
 
+    def save_connectivity_records(self):
+        if self.execution.type in ('ping', 'verify_account'):
+            from accounts.automations.connectivity import save_connectivity_records
+            save_connectivity_records(self.execution)
+
+    def update_execution(self):
+        super().update_execution()
+        self.save_connectivity_records()
+
     def update_batch_progress(self, completed, total, current=None):
         self.summary['completed_batches'] = completed
         self.summary['total_batches'] = total
@@ -1318,6 +1379,7 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
         try:
             with safe_atomic_db_connection():
                 self.execution.save(update_fields=['summary', 'result'])
+                self.save_connectivity_records()
         except Exception:
             logger.exception(
                 'Save automation batch progress failed: execution=%s',

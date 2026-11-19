@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 #
+import re
 from functools import partial
 
 from django.conf import settings
+from django.db import IntegrityError, transaction
 from django.db.models import Exists, OuterRef
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from common.serializers import ResourceLabelsMixin, CommonBulkModelSerializer
+from common.serializers.common import UniqueBulkListSerializer
 from authentication.const import MFAType
 from common.serializers.fields import (
     EncryptedField,
@@ -37,6 +40,21 @@ __all__ = [
 ]
 
 logger = get_logger(__file__)
+
+
+def is_email_unique_error(error):
+    """Recognize only the email lookup constraint, without querying a stale snapshot."""
+    cause = error.__cause__ or error
+    constraint = 'users_user_email_lookup_uniq'
+    diagnostic = getattr(cause, 'diag', None)
+    if diagnostic is not None:
+        return getattr(diagnostic, 'constraint_name', None) == constraint
+    if str(cause) == f'UNIQUE constraint failed: {User._meta.db_table}.email_lookup':
+        return True
+    return (
+        len(cause.args) > 1 and cause.args[0] == 1062
+        and re.search(r"for key ['`](?:[^'`]+\.)?" + constraint + r"['`]$", str(cause.args[1])) is not None
+    )
 
 
 def default_system_roles():
@@ -112,6 +130,18 @@ class RolesSerializerMixin(serializers.Serializer):
         return fields
 
 
+class UserBulkListSerializer(UniqueBulkListSerializer):
+    unique_field = 'username'
+
+    def to_internal_value(self, data):
+        validated_data = super().to_internal_value(data)
+        # The database checks default addresses generated from the username at save time.
+        emails = (item.get('email') or '' for item in validated_data)
+        lookups = (text_hmac_sha256(email) if '@' in email else None for email in emails)
+        self.validate_unique_keys('email', lookups)
+        return validated_data
+
+
 class UserSerializer(
     RolesSerializerMixin, ResourceLabelsMixin, CommonBulkModelSerializer
 ):
@@ -137,6 +167,9 @@ class UserSerializer(
     )
     is_org_admin = serializers.BooleanField(
         read_only=True, label=_("Organization Administrator")
+    )
+    is_service_account = serializers.BooleanField(
+        read_only=True, label=_("Is service account")
     )
     can_public_key_auth = serializers.BooleanField(
         source="can_use_ssh_key_login",
@@ -180,6 +213,7 @@ class UserSerializer(
 
     class Meta:
         model = User
+        list_serializer_class = UserBulkListSerializer
         # mini 是指能识别对象的最小单元
         fields_mini = ["id", "name", "username"]
         # 只能写的字段, 这个虽然无法在框架上生效，但是更多对我们是提醒
@@ -274,7 +308,7 @@ class UserSerializer(
             "is_first_login": {"label": _("Is first login"), "read_only": True},
             "is_active": {"label": _("Is active"), "help_text": ""},
             "is_valid": {"label": _("Is valid")},
-            "is_service_account": {"label": _("Is service account")},
+            "is_service_account": {"label": _("Is service account"), "read_only": True},
             "is_org_admin": {"label": _("Is org admin")},
             "is_expired": {"label": _("Is expired")},
             "avatar_url": {"label": _("Avatar url")},
@@ -350,9 +384,8 @@ class UserSerializer(
     @staticmethod
     def clean_ukey_fields(attrs):
         for field in ("ukey_sn",):
-            value = attrs.get(field)
-            if value is None:
-                attrs.pop(field, None)
+            if field in attrs:
+                attrs[field] = attrs[field] or None
         return attrs
 
     def check_disallow_self_update_fields(self, attrs):
@@ -385,7 +418,7 @@ class UserSerializer(
             request.password_strategy = password_strategy
         return attrs
 
-    def save_and_set_custom_m2m_fields(self, validated_data, save_handler, created):
+    def save_and_set_custom_m2m_fields(self, validated_data, save_handler, created, instance=None):
         m2m_values = {}
         for f, default_roles in self.custom_m2m_fields.items():
             roles = validated_data.pop(f, None)
@@ -395,18 +428,35 @@ class UserSerializer(
                 ]
             m2m_values[f] = roles
 
-        instance = save_handler(validated_data)
-        for field_name, value in m2m_values.items():
-            if value is None:
-                continue
-            field = getattr(instance, field_name)
-            field.set(value)
-        return instance
+        try:
+            with transaction.atomic():
+                instance = save_handler(validated_data)
+                for field_name, value in m2m_values.items():
+                    if value is None:
+                        continue
+                    field = getattr(instance, field_name)
+                    field.set(value)
+                return instance
+        except IntegrityError as error:
+            if is_email_unique_error(error):
+                raise serializers.ValidationError(
+                    {'email': [_('This field must be unique.')]}, code='unique',
+                ) from error
+            # Query after the savepoint rolls back to keep the transaction usable.
+            username = validated_data.get('username', getattr(instance, 'username', None))
+            users = User.objects.filter(username=username)
+            if not created and instance is not None:
+                users = users.exclude(pk=instance.pk)
+            if users.exists():
+                raise serializers.ValidationError(
+                    {'username': _('This field must be unique.')}, code='unique',
+                )
+            raise
 
     def update(self, instance, validated_data):
         save_handler = partial(super().update, instance)
         instance = self.save_and_set_custom_m2m_fields(
-            validated_data, save_handler, created=False
+            validated_data, save_handler, created=False, instance=instance
         )
         if validated_data.get('public_key'):
             post_user_change_password.send(instance.__class__, user=instance)
@@ -511,7 +561,7 @@ class ServiceAccountSerializer(serializers.ModelSerializer):
         else:
             users = User.objects.all()
         email_lookup = text_hmac_sha256(email)
-        if users.filter(email_lookup=email_lookup) or users.filter(username=username):
+        if users.filter(email_lookup=email_lookup).exists() or users.filter(username=username).exists():
             raise serializers.ValidationError(_("name not unique"), code="unique")
         return name
 
@@ -519,5 +569,13 @@ class ServiceAccountSerializer(serializers.ModelSerializer):
         name = validated_data["name"]
         email = self.get_email()
         comment = validated_data.get("comment", "")
-        user, ak = User.create_service_account(name, email, comment)
+        try:
+            with transaction.atomic():
+                user, ak = User.create_service_account(name, email, comment)
+        except IntegrityError as error:
+            if is_email_unique_error(error):
+                raise serializers.ValidationError(
+                    {'name': [_('name not unique')]}, code='unique',
+                ) from error
+            raise
         return user

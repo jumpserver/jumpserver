@@ -435,6 +435,10 @@ class PhoneField(serializers.CharField):
 
 
 class JSONManyToManyField(serializers.JSONField):
+    def __init__(self, *args, allow_empty_ids=False, **kwargs):
+        self.allow_empty_ids = allow_empty_ids
+        super().__init__(*args, **kwargs)
+
     def to_representation(self, manager):
         if manager is None:
             return manager
@@ -457,7 +461,7 @@ class JSONManyToManyField(serializers.JSONField):
             data = {}
         try:
             data = super().to_internal_value(data)
-            ModelJSONManyToManyField.check_value(data)
+            ModelJSONManyToManyField.check_value(data, self.allow_empty_ids)
         except ValueError as e:
             raise serializers.ValidationError(e)
         return super().to_internal_value(data)

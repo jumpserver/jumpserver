@@ -4,11 +4,13 @@ import os
 import re
 import shlex
 import sys
+import tempfile
 from collections import defaultdict
 
 from django.utils.translation import gettext as _
 
 from assets import const
+from assets.clickhouse import CLICKHOUSE_HTTP_PROTOCOL
 from .utils import escape_jinja2_syntax
 
 __all__ = ['JMSInventory']
@@ -55,9 +57,8 @@ class JMSInventory:
 
     @staticmethod
     def get_username(asset, account):
-        if asset.category == const.Category.DS or (
-                asset.type == const.HostTypes.WINDOWS and account.is_ds_account()
-        ):
+        # 目录服务账号使用 UPN (user@domain) 登录，与 koko 保持一致
+        if asset.category == const.Category.DS or account.is_ds_account():
             return account.full_username
         return account.username
 
@@ -99,8 +100,14 @@ class JMSInventory:
             proxy_command_args.extend(["-W", "%h:%p", "-q", "--", gateway_target])
 
         if gateway.password:
-            password = escape_ssh_config_percent(gateway.password)
-            proxy_command_args = ["sshpass", "-p", password, *proxy_command_args]
+            # Keep secrets out of both sshpass and its parent SSH command line.
+            with tempfile.NamedTemporaryFile(
+                mode='w', encoding='utf-8', prefix='.gateway-password-', dir=path_dir, delete=False,
+            ) as password_file:
+                password_file.write(gateway.password)
+            proxy_command_args = [
+                "sshpass", "-f", escape_ssh_config_percent(password_file.name), *proxy_command_args,
+            ]
 
         proxy_command_value = "ProxyCommand=" + shell_join(proxy_command_args)
         return {"ansible_ssh_common_args": "-o " + shlex.quote(proxy_command_value)}
@@ -134,7 +141,7 @@ class JMSInventory:
         var = {
             'jms_custom_become': True,
             'jms_custom_become_method': su_method,
-            'jms_custom_become_user': su_from.username,
+            'jms_custom_become_user': escape_jinja2_syntax(su_from.full_username),
             'jms_custom_become_password': su_from_password,
             'jms_custom_become_private_key_path': (
                 su_from.get_private_key_path(path_dir)
@@ -144,8 +151,18 @@ class JMSInventory:
 
     @staticmethod
     def make_protocol_setting_vars(host, protocols):
+        spec = host['jms_asset'].get('spec_info', {})
+        options = {key: spec.get(key) for key in (
+            'use_ssl', 'allow_invalid_cert', 'ca_cert', 'client_cert', 'client_key',
+        ) if spec.get(key) is not None}
+        options['server_name'] = host['jms_asset'].get('origin_address', host['jms_asset']['address'])
+        options['tenant_mode'] = 'mysql'
+        host['jms_asset']['database_options'] = options
         # 针对协议的特殊处理
         for p in protocols:
+            if p.name == 'mysql':
+                setting = getattr(p, 'setting', {}) or {}
+                options['tenant_mode'] = setting.get('tenant_mode', 'mysql')
             if p.name == 'ssh':
                 if hasattr(p, 'setting'):
                     setting = getattr(p, 'setting')
@@ -208,7 +225,7 @@ class JMSInventory:
 
         su_from = account.su_from
         if platform.su_enabled and su_from:
-            su_from_auth = account.get_ansible_become_auth()
+            su_from_auth = account.get_ansible_become_auth(path_dir=path_dir)
             host.update(su_from_auth)
             host.update(self.make_custom_become_ansible_vars(account, su_from_auth, path_dir))
         elif platform.su_enabled and not su_from and \
@@ -263,7 +280,10 @@ class JMSInventory:
         protocol_priority = {'ssh': 10, 'winrm': 9, ansible_connection: 1}
         if self.protocol:
             protocol_priority.update({self.protocol: 0})
-        protocol_sorted = sorted(protocols, key=lambda x: protocol_priority.get(x.name, 999))
+        protocol_sorted = sorted(
+            (p for p in protocols if p.name != CLICKHOUSE_HTTP_PROTOCOL),
+            key=lambda p: protocol_priority.get(p.name, 999),
+        )
         protocol = protocol_sorted[0] if protocol_sorted else invalid_protocol
         return protocol
 
@@ -329,6 +349,7 @@ class JMSInventory:
                 host['jms_asset'].get('oracle_sysdba', False)
             )
             host['jms_account']['mode'] = 'sysdba' if use_sysdba else None
+            host['jms_asset']['database_options']['sysdba'] = bool(use_sysdba)
 
         ansible_config = self.fill_ansible_config(ansible_config, protocol)
         host.update(ansible_config)

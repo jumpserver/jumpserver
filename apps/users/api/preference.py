@@ -2,10 +2,11 @@
 #
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
+from drf_spectacular.utils import extend_schema
 from rest_framework import generics
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
-from rest_framework.serializers import Serializer
+from rest_framework.serializers import ChoiceField, Serializer
 
 from common.permissions import IsValidUser
 from common.utils import get_logger
@@ -14,20 +15,28 @@ from ..models import Preference
 
 logger = get_logger(__file__)
 
+CATEGORY_SERIALIZERS = {
+    'lina': serializers.LinaSerializer,
+    'luna': serializers.LunaSerializer,
+    'koko': serializers.KokoSerializer,
+}
 
+
+class PreferenceQuerySerializer(Serializer):
+    category = ChoiceField(
+        choices=tuple(CATEGORY_SERIALIZERS),
+        help_text=_('Preference category: lina (management interface), luna (web terminal), koko (terminal client).'),
+    )
+
+
+@extend_schema(parameters=[PreferenceQuerySerializer])
 class PreferenceApi(generics.RetrieveUpdateAPIView):
     permission_classes = (IsValidUser,)
     queryset = Preference.objects.all()
-    serializer_class_mapper = {
-        'lina': serializers.LinaSerializer,
-        'luna': serializers.LunaSerializer,
-        'koko': serializers.KokoSerializer,
-    }
 
-    def check_permissions(self, request):
-        if self.category not in self.serializer_class_mapper:
-            return self.permission_denied(request, 'category is invalid')
-        return super().check_permissions(request)
+    def initial(self, request, *args, **kwargs):
+        super().initial(request, *args, **kwargs)
+        PreferenceQuerySerializer(data=request.query_params).is_valid(raise_exception=True)
 
     @property
     def user(self):
@@ -38,8 +47,7 @@ class PreferenceApi(generics.RetrieveUpdateAPIView):
         return self.request.query_params.get('category')
 
     def get_serializer_class(self):
-        cls = self.serializer_class_mapper.get(self.category)
-        return cls
+        return CATEGORY_SERIALIZERS.get(self.category)
 
     def get_field_defaults(self, serializer):
         field_defaults = {}

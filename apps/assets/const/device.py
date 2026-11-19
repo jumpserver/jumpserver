@@ -15,6 +15,20 @@ class DeviceTypes(BaseType):
     FIREWALL = 'firewall', _("Firewall")
 
     @classmethod
+    def get_choices(cls):
+        choices = super().get_choices()
+        types = set(cls.get_community_types())
+        if len(choices) == len(types):
+            return choices
+        try:
+            from assets.models import Platform
+            types.update(Platform.objects.filter(category='device').values_list('type', flat=True))
+        except Exception:
+            # Models or their table may be unavailable during startup and migrations.
+            return choices
+        return [(value, label) for value, label in choices if value in types]
+
+    @classmethod
     def _get_base_constrains(cls) -> dict:
         return {
             '*': {
@@ -55,7 +69,10 @@ class DeviceTypes(BaseType):
     @classmethod
     def internal_platforms(cls):
         return {
-            cls.GENERAL: [{'name': 'General'}, {'name': 'Cisco'}, {'name': 'Huawei'}, {'name': 'H3C'}],
+            cls.GENERAL: [{'name': 'General'}],
+            cls.CISCO: [{'name': 'Cisco'}],
+            cls.HUAWEI: [{'name': 'Huawei'}],
+            cls.H3C: [{'name': 'H3C'}],
             cls.SWITCH: [],
             cls.ROUTER: [],
             cls.FIREWALL: []
@@ -64,5 +81,5 @@ class DeviceTypes(BaseType):
     @classmethod
     def get_community_types(cls):
         return [
-            cls.GENERAL, cls.SWITCH, cls.ROUTER, cls.FIREWALL
+            cls.GENERAL, cls.CISCO, cls.HUAWEI, cls.H3C, cls.SWITCH, cls.ROUTER, cls.FIREWALL
         ]

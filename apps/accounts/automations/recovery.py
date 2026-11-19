@@ -4,13 +4,14 @@ import shutil
 from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
+from django.utils.translation import gettext
 
 from accounts.const import (
     ChangeSecretRecordStatusChoice,
 )
 from common.const import Status
 from common.utils import get_logger
-from orgs.utils import tmp_to_root_org
+from orgs.utils import tmp_to_org, tmp_to_root_org
 
 logger = get_logger(__file__)
 
@@ -34,7 +35,7 @@ def _cleanup_interrupted_runtime(execution_id, snapshot):
     ))
     runtime_dir = os.path.realpath(runtime_dir)
     if os.path.commonpath([automation_root, runtime_dir]) != automation_root:
-        raise ValueError('Invalid interrupted automation runtime path')
+        raise ValueError(gettext('Invalid interrupted automation runtime path.'))
     shutil.rmtree(runtime_dir, ignore_errors=True)
 
 
@@ -224,6 +225,10 @@ def finalize_interrupted_execution(
                 'status', 'date_finished', 'duration', 'summary', 'result',
             ])
 
+    from accounts.credential_rotation.execution import reconcile
+    with tmp_to_org(execution.org_id):
+        reconcile(execution_id)
+
     # Cache operations are intentionally outside the database transaction.
     # A cache outage must not roll back the recovered database state.
     from accounts.utils import account_secret_task_status
@@ -236,9 +241,8 @@ def finalize_interrupted_execution(
                 account_secret_task_status.clear(account_id)
         except Exception:
             logger.exception(
-                'Clear interrupted account task status failed: '
-                'execution=%s account=%s',
-                execution_id, account_id,
+                gettext('Unable to clear interrupted account task status: execution=%(execution)s; account=%(account)s.'),
+                {'execution': execution_id, 'account': account_id},
             )
         try:
             lock = cache.lock(
@@ -250,22 +254,24 @@ def finalize_interrupted_execution(
                 lock.release()
         except Exception:
             logger.exception(
-                'Release interrupted account lock failed: '
-                'execution=%s account=%s',
-                execution_id, account_id,
+                gettext('Unable to release the interrupted account lock: execution=%(execution)s; account=%(account)s.'),
+                {'execution': execution_id, 'account': account_id},
             )
     try:
         _cleanup_interrupted_runtime(execution_id, snapshot)
     except Exception:
         logger.exception(
-            'Clean interrupted automation runtime failed: execution=%s',
-            execution_id,
+            gettext('Unable to clean the interrupted automation runtime: execution=%(execution)s.'),
+            {'execution': execution_id},
         )
 
     logger.warning(
-        'Interrupted account automation execution finalized: '
-        'execution=%s status=%s change_secret=%s push_secret=%s',
-        execution_id, status, change_count, push_count,
+        gettext('Interrupted account automation finalized: execution=%(execution)s; status=%(status)s; '
+                'password change records=%(changes)s; password push records=%(pushes)s.'),
+        {
+            'execution': execution_id, 'status': dict(Status.choices).get(status, status),
+            'changes': change_count, 'pushes': push_count,
+        },
     )
     return True
 

@@ -1,6 +1,6 @@
 <div align="center">
   <a name="readme-top"></a>
-  <a href="https://jumpserver.com" target="_blank"><img src="https://download.jumpserver.org/images/jumpserver-logo.svg" alt="JumpServer" width="300" /></a>
+  <a href="https://jumpserver.com" target="_blank"><img src="assets/jumpserver-logo.svg" alt="JumpServer" width="300" /></a>
   
 ## 오픈 소스 특권 접근 관리(PAM) 플랫폼(배스천 호스트)
 
@@ -12,7 +12,7 @@
 [![][github-release-shield]][github-release-link]
 [![][github-stars-shield]][github-stars-link]
 
-[English](/README.md) · [中文(简体)](/readmes/README.zh-hans.md) · [中文(繁體)](/readmes/README.zh-hant.md) · [日本語](/readmes/README.ja.md) · [Português (Brasil)](/readmes/README.pt-br.md) · [Español](/readmes/README.es.md) · [Русский](/readmes/README.ru.md) · [한국어](/readmes/README.ko.md) · [Tiếng Việt](/readmes/README.vi.md)
+[English](/README.md) · [中文(简体)](/readmes/README.zh-hans.md) · [中文(繁體)](/readmes/README.zh-hant.md) · [日本語](/readmes/README.ja.md) · [Português (Brasil)](/readmes/README.pt-br.md) · [Español](/readmes/README.es.md) · [Français](/readmes/README.fr.md) · [Русский](/readmes/README.ru.md) · [한국어](/readmes/README.ko.md) · [Tiếng Việt](/readmes/README.vi.md)
 
 </div>
 
@@ -22,7 +22,7 @@
 
 JumpServer는 AI 기능을 갖춘 오픈 소스 특권 접근 관리(PAM) 플랫폼입니다. DevOps 및 IT 팀이 SSH, RDP, Kubernetes, 데이터베이스, 웹사이트, RemoteApp, VirtualApp 등에 안전하게 접근할 수 있는 통합 작업 공간을 제공합니다.
 
-<img alt="JumpServer 아키텍처 다이어그램" src="assets/jumpserver-architecture.png" />
+<img alt="JumpServer 아키텍처 다이어그램" src="assets/jumpserver-architecture.gif" />
 
 ## 빠른 시작
 
@@ -32,7 +32,7 @@ CPU 코어 4개 이상, 메모리 8 GB 이상을 갖춘 깨끗한 64비트 Linux
 curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quick_start.sh | bash
 ```
 
-브라우저에서 JumpServer에 접속하세요: `http://your-jumpserver-ip/`
+브라우저에서 `https://<jumpserver-host>/`을 열고, `<jumpserver-host>`을 JumpServer가 실행 중인 호스트의 IP 주소 또는 도메인 이름으로 바꾸세요.
 
 - 사용자 이름: `admin`
 - 비밀번호: `ChangeMe`
@@ -40,28 +40,28 @@ curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quic
 ## 스크린샷
 
 <p align="center">
-  <img src="assets/screenshot-01.png" alt="JumpServer PAM 대시보드" width="49%" />
-  <img src="assets/screenshot-02.png" alt="JumpServer 자산 관리" width="49%" />
+  <img src="assets/screenshot-01.png" alt="JumpServer PAM 대시보드" title="JumpServer PAM 대시보드" width="49%" />
+  <img src="assets/screenshot-02.png" alt="JumpServer 자산 관리" title="JumpServer 자산 관리" width="49%" />
 </p>
 
 <p align="center">
-  <img src="assets/screenshot-03.png" alt="JumpServer SSH 연결 대화 상자" width="49%" />
-  <img src="assets/screenshot-04.png" alt="JumpServer 터미널 AI 질문" width="49%" />
+  <img src="assets/screenshot-03.png" alt="JumpServer SSH 연결 대화 상자" title="JumpServer SSH 연결 대화 상자" width="49%" />
+  <img src="assets/screenshot-04.png" alt="JumpServer 터미널 AI 질문" title="JumpServer 터미널 AI 질문" width="49%" />
 </p>
 
 <p align="center">
-  <img src="assets/screenshot-05.png" alt="JumpServer AI 어시스턴트" width="49%" />
-  <img src="assets/screenshot-06.png" alt="JumpServer 원격 데스크톱 세션" width="49%" />
+  <img src="assets/screenshot-05.png" alt="JumpServer AI 어시스턴트" title="JumpServer AI 어시스턴트" width="49%" />
+  <img src="assets/screenshot-06.png" alt="JumpServer 원격 데스크톱 세션" title="JumpServer 원격 데스크톱 세션" width="49%" />
 </p>
 
 <p align="center">
-  <img src="assets/screenshot-07.png" alt="JumpServer 밝은 테마의 터미널 자산 패널" width="49%" />
-  <img src="assets/screenshot-08.png" alt="JumpServer 밝은 테마의 SSH 세션" width="49%" />
+  <img src="assets/screenshot-07.png" alt="KoKo TUI asset browser with searchable authorized assets" title="KoKo TUI asset browser with searchable authorized assets" width="49%" />
+  <img src="assets/screenshot-08.png" alt="KoKo TUI multi-session manager for switching between active SSH sessions" title="KoKo TUI multi-session manager for switching between active SSH sessions" width="49%" />
 </p>
 
 <p align="center">
-  <img src="assets/screenshot-09.png" alt="JumpServer 어두운 테마의 터미널 자산 패널" width="49%" />
-  <img src="assets/screenshot-10.png" alt="JumpServer 어두운 테마의 SSH 세션" width="49%" />
+  <img src="assets/screenshot-09.png" alt="KoKo classic text-mode home screen with connection shortcuts" title="KoKo classic text-mode home screen with connection shortcuts" width="49%" />
+  <img src="assets/screenshot-10.png" alt="KoKo classic text-mode asset list with authorized SSH targets" title="KoKo classic text-mode asset list with authorized SSH targets" width="49%" />
 </p>
 
 ## 구성 요소

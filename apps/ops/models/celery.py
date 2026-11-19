@@ -71,7 +71,8 @@ class CeleryTask(models.Model):
         verbose_name = _("Celery Task")
         ordering = ('name',)
         permissions = [
-            ('view_taskmonitor', _('Can view task monitor'))
+            ('view_taskmonitor', _('Can view task monitor')),
+            ('stop_taskmonitor', _('Can stop tasks from task monitor')),
         ]
 
 
@@ -122,3 +123,6 @@ class CeleryTaskExecution(models.Model):
     class Meta:
         ordering = ['-date_start']
         verbose_name = _("Celery Task Execution")
+        indexes = [
+            models.Index(fields=['name', '-date_published', '-id'], name='ops_task_name_recent_idx'),
+        ]

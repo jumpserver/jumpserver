@@ -45,8 +45,7 @@ class AlibabaSMS(BaseSMSClient):
             logger.info(f'Alibaba sms send: '
                         f'phone_numbers={phone_numbers} '
                         f'sign_name={sign_name} '
-                        f'template_code={template_code} '
-                        f'template_param={template_param}')
+                        f'template_code={template_code}')
             response = self.client.send_sms(send_sms_request)
             # 这里只判断是否成功，失败抛出异常
             if response.body.code != 'OK':

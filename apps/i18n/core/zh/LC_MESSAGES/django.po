@@ -2230,6 +2230,10 @@ msgstr "人脸验证"
 msgid "Face online"
 msgstr "人脸在线"
 
+#: acls/serializers/login_asset_acl.py
+msgid "Select at least one notification recipient."
+msgstr "请至少选择一名通知接收人。"
+
 #: acls/const.py:14
 msgid "Secret rotation"
 msgstr "密码轮换"
@@ -2521,7 +2525,7 @@ msgid ""
 "With * indicating a match all. Such as: 192.168.10.1, 192.168.1.0/24, "
 "10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64 "
 msgstr ""
-"* 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:"
+"使用 * 匹配所有地址。例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:"
 "db8:2de::e13, 2001:db8:1a:1110::/64"
 
 #: acls/serializers/rules/rules.py:48 audits/reporting.py:246
@@ -4309,37 +4313,34 @@ msgstr "更新资产硬件信息"
 msgid "Update node asset hardware information: "
 msgstr "更新节点资产硬件信息: "
 
-#: assets/tasks/nodes_amount.py:16
-msgid "Check the amount of assets under the node"
-msgstr "检查节点下资产数量"
+#~ msgid "Check the amount of assets under the node"
+#~ msgstr "检查节点下资产数量"
 
-#: assets/tasks/nodes_amount.py:18
-msgid ""
-"Manually verifying asset quantities updates the asset count for nodes under "
-"the \n"
-"        current organization. This task will be called in the following two "
-"cases: when updating \n"
-"        nodes and when the number of nodes exceeds 100"
-msgstr ""
-"手动校对资产数量更新当前组织下的节点资产数量；更新节点，当节点数大于100这两种"
-"情况会调用该任务"
+#~ msgid ""
+#~ "Manually verifying asset quantities updates the asset count for nodes "
+#~ "under the \n"
+#~ "        current organization. This task will be called in the following "
+#~ "two cases: when updating \n"
+#~ "        nodes and when the number of nodes exceeds 100"
+#~ msgstr ""
+#~ "手动校对资产数量更新当前组织下的节点资产数量；更新节点，当节点数大于100这"
+#~ "两种情况会调用该任务"
 
-#: assets/tasks/nodes_amount.py:34
-msgid ""
-"The task of self-checking is already running and cannot be started repeatedly"
-msgstr "自检程序已经在运行，不能重复启动"
+#~ msgid ""
+#~ "The task of self-checking is already running and cannot be started "
+#~ "repeatedly"
+#~ msgstr "自检程序已经在运行，不能重复启动"
 
-#: assets/tasks/nodes_amount.py:40
-msgid "Periodic check the amount of assets under the node"
-msgstr "周期性检查节点下资产数量"
+#~ msgid "Periodic check the amount of assets under the node"
+#~ msgstr "周期性检查节点下资产数量"
 
-#: assets/tasks/nodes_amount.py:42
-msgid ""
-"Schedule the check_node_assets_amount_task to periodically update the asset "
-"count of \n"
-"        all nodes under all organizations"
-msgstr ""
-"定时调用check_node_assets_amount_task任务，更新所有组织下所有节点的资产数量"
+#~ msgid ""
+#~ "Schedule the check_node_assets_amount_task to periodically update the "
+#~ "asset count of \n"
+#~ "        all nodes under all organizations"
+#~ msgstr ""
+#~ "定时调用check_node_assets_amount_task任务，更新所有组织下所有节点的资产数"
+#~ "量"
 
 #: assets/tasks/ping.py:20 assets/tasks/ping.py:30
 msgid "Test assets connectivity"
@@ -7079,10 +7080,6 @@ msgstr "你的账号已创建成功"
 msgid "JumpServer - An open-source PAM"
 msgstr "JumpServer 开源堡垒机"
 
-#: jumpserver/views/celery_flower.py:22
-msgid "<h1>Flower service unavailable, check it</h1>"
-msgstr "Flower 服务不可用，请检查"
-
 #: jumpserver/views/other.py:28
 msgid ""
 "<div>Luna is a separately deployed program, you need to deploy Luna, koko, "
@@ -7217,9 +7214,12 @@ msgstr "任务 {} 不存在"
 msgid "Task {} args or kwargs error"
 msgstr "任务 {} 执行参数错误"
 
-#: ops/api/job.py:66
-msgid "Login to asset {}({}) is rejected by login asset ACL ({})"
-msgstr "登录资产 {}({}) 被拒绝，由登录资产规则 ACL ({}) 限制"
+#: ops/const.py:85
+#, python-brace-format
+msgid ""
+"Access to asset {asset} ({address}) is denied by a login control policy. "
+"Contact your administrator."
+msgstr "登录控制策略已拒绝访问资产 {asset}（{address}），请联系管理员。"
 
 #: ops/api/job.py:173
 msgid "Duplicate file exists"
@@ -7359,6 +7359,9 @@ msgstr "MariaDB"
 #: ops/const.py:69
 msgid "Oracle"
 msgstr "Oracle"
+
+msgid "OceanBase tenant mode"
+msgstr "OceanBase 租户模式"
 
 #: ops/const.py:76 settings/serializers/feature.py:103
 msgid "Timeout"
@@ -8427,9 +8430,8 @@ msgstr "发送邮件失败"
 msgid "Email sent successfully to "
 msgstr "发送邮件成功"
 
-#: settings/api/chat.py:41
-msgid "Chat AI is not enabled"
-msgstr "聊天 AI 没有开启"
+#~ msgid "Chat AI is not enabled"
+#~ msgstr "聊天 AI 没有开启"
 
 #: settings/api/chat.py
 msgid "The connection to the model provider timed out. Please check the Base URL, proxy, and network."
@@ -8472,6 +8474,42 @@ msgid "The model provider endpoint was not found. Please check the Base URL."
 msgstr "未找到模型服务接口，请检查服务地址。"
 
 #: settings/api/chat.py
+msgid "{detail} The provider must support the Responses API (/responses)."
+msgstr "{detail} 模型服务商必须支持 Responses API（/responses）。"
+
+#: settings/api/chat.py
+msgid "The provider did not return a Responses API event stream."
+msgstr "模型服务商未返回 Responses API 事件流。"
+
+#: settings/api/chat.py
+msgid "The Responses API stream failed: {detail}"
+msgstr "Responses API 流式响应失败：{detail}"
+
+#: settings/api/chat.py
+msgid "The Responses API stream ended without a successful completion event."
+msgstr "Responses API 流已结束，但未收到成功完成事件。"
+
+#: settings/api/chat.py
+msgid "The Responses API stream returned an incomplete output item."
+msgstr "Responses API 流返回了未完成的输出项。"
+
+#: settings/api/chat.py
+msgid "The Responses API text stream is missing or does not match the final output."
+msgstr "Responses API 缺少文本流式增量，或增量与最终输出不一致。"
+
+#: settings/api/chat.py
+msgid "The Responses API tool argument stream does not match the final tool call."
+msgstr "Responses API 的工具参数流与最终工具调用不一致。"
+
+#: settings/api/chat.py
+msgid "The Responses API returned an invalid health-check tool call (name, call ID, or arguments)."
+msgstr "Responses API 返回的健康检查工具调用无效，请检查工具名称、调用 ID 或参数。"
+
+#: settings/api/chat.py
+msgid "The model did not correctly return the health-check nonce after receiving the tool result."
+msgstr "模型收到工具结果后，未正确返回健康检查随机值。"
+
+#: settings/api/chat.py
 msgid "The model provider request limit was exceeded. Please try again later."
 msgstr "已超过模型服务商的请求频率限制，请稍后重试。"
 
@@ -8501,7 +8539,15 @@ msgstr "邮件已经发送{}, 请检查"
 msgid "Test smtp setting"
 msgstr "测试 smtp 设置"
 
-#: settings/api/ldap.py:92
+#: settings/api/ldap.py:41
+msgid "LDAP server is not configured. Please configure it in Authentication settings."
+msgstr "未配置 LDAP 服务器，请先在认证设置中完成配置。"
+
+#: settings/api/ldap.py:52
+msgid "Unable to load LDAP users. Please try again later or contact the administrator."
+msgstr "获取 LDAP 用户失败，请稍后重试或联系管理员。"
+
+#: settings/api/ldap.py:58
 msgid ""
 "Users are not synchronized, please click the user synchronization button"
 msgstr "用户未同步，请点击同步用户按钮"
@@ -8518,17 +8564,14 @@ msgstr "测试手机号 该字段是必填项。"
 msgid "App Settings"
 msgstr "系统设置"
 
-#: settings/const.py:13
-msgid "Embed"
-msgstr "嵌入"
+#~ msgid "Embed"
+#~ msgstr "嵌入"
 
-#: settings/const.py:22 settings/serializers/feature.py:200
-msgid "Custom gpt model"
-msgstr "自定义 GPT 模型"
+#~ msgid "Custom gpt model"
+#~ msgstr "自定义 GPT 模型"
 
-#: settings/const.py:43 settings/serializers/feature.py:204
-msgid "Custom DeepSeek model"
-msgstr "自定义 DeepSeek 模型"
+#~ msgid "Custom DeepSeek model"
+#~ msgstr "自定义 DeepSeek 模型"
 
 #: settings/models.py:41 users/models/preference.py:14
 msgid "Encrypted"
@@ -8963,10 +9006,10 @@ msgstr "授权端点地址"
 msgid "Token endpoint"
 msgstr "token 端点地址"
 
-#: settings/serializers/auth/oauth2.py:46 settings/serializers/auth/oidc.py:32
-#: settings/serializers/auth/sms.py:111
+#: accounts/models/application.py:99 settings/serializers/auth/oauth2.py:46
+#: settings/serializers/auth/oidc.py:32 settings/serializers/auth/sms.py:111
 msgid "Request method"
-msgstr "客户端认证方式"
+msgstr "请求方法"
 
 #: settings/serializers/auth/oauth2.py:50 settings/serializers/auth/oidc.py:90
 msgid "Userinfo endpoint"
@@ -9525,37 +9568,27 @@ msgstr "聊天 AI"
 msgid "Can use Chat AI"
 msgstr "可使用 Chat AI"
 
-#: settings/serializers/feature.py:158
-msgid "Method"
-msgstr "创建方式"
+#~ msgid "Method"
+#~ msgstr "创建方式"
 
 #: settings/serializers/feature.py:161 settings/serializers/feature.py:169
 #: settings/serializers/feature.py:184
 msgid "Base URL"
 msgstr "地址"
 
-#: settings/serializers/feature.py:162 settings/serializers/feature.py:170
-#: settings/serializers/feature.py:185
-msgid "The base URL of the Chat service."
-msgstr "聊天服务的基本地址。"
+#~ msgid "The base URL of the Chat service."
+#~ msgstr "聊天服务的基本地址。"
 
 #: settings/serializers/feature.py:173 settings/serializers/feature.py:188
 #: templates/_header_bar.html:96
 msgid "API Key"
 msgstr "API 密钥"
 
-#: settings/serializers/feature.py:177 settings/serializers/feature.py:192
-msgid ""
-"The proxy server address of the GPT service. For example: http://ip:port"
-msgstr "GPT 服务的代理服务器地址。例如：http://ip:port"
+#~ msgid "GPT Model"
+#~ msgstr "GPT 模型"
 
-#: settings/serializers/feature.py:181
-msgid "GPT Model"
-msgstr "GPT 模型"
-
-#: settings/serializers/feature.py:196
-msgid "DeepSeek Model"
-msgstr "DeepSeek 模型"
+#~ msgid "DeepSeek Model"
+#~ msgstr "DeepSeek 模型"
 
 #: settings/serializers/feature.py:213
 msgid "Approval without login"
@@ -9653,6 +9686,26 @@ msgstr "键盘布局"
 #: settings/serializers/luna.py:41 users/serializers/preference/luna.py:49
 msgid "RDP client option"
 msgstr "RDP 客户端选项"
+
+#: users/serializers/preference/luna.py:52
+msgid "Printer redirection"
+msgstr "打印机重定向"
+
+#: users/serializers/preference/luna.py:56
+msgid "Apply Windows key combinations"
+msgstr "Windows 组合键生效位置"
+
+#: users/const.py:38
+msgid "On the local computer"
+msgstr "在本地计算机上"
+
+#: users/const.py:39
+msgid "On the remote computer"
+msgstr "在远程计算机上"
+
+#: users/const.py:40
+msgid "Only when using full screen"
+msgstr "仅在全屏显示时"
 
 #: settings/serializers/luna.py:45 users/serializers/preference/luna.py:53
 msgid "RDP color quality"
@@ -14036,9 +14089,6 @@ msgstr "许可证导入成功"
 msgid "Invalid license"
 msgstr "许可证无效"
 
-#~ msgid "Ticket already closed"
-#~ msgstr "工单已经关闭"
-
 #: assets/models/asset/web.py assets/const/protocol.py
 msgid "Success selector"
 msgstr "登录成功选择器"
@@ -14208,12 +14258,14 @@ msgstr "资产授权即将到期"
 msgid "Expiration time"
 msgstr "到期时间"
 
-#. Error returned by the face liveness service and translated by FaceContextApi.
+#. Error returned by the face liveness service and translated by
+#. FaceContextApi.
 #: authentication/api/face.py
 msgid "Face verification timed out"
 msgstr "人脸验证超时，请重试。"
 
-#. Error returned by the face liveness service and translated by FaceContextApi.
+#. Error returned by the face liveness service and translated by
+#. FaceContextApi.
 #: authentication/api/face.py
 msgid "The liveness action was not completed in time"
 msgstr "未在规定时间内完成活体动作，请重试。"
@@ -16043,3 +16095,5066 @@ msgstr "连接资产 %s 成功（已通过 SSH 网关转发）"
 #, python-format
 msgid "Connect to asset %s success (SSH gateway forwarding; configured gateways: %s)"
 msgstr "连接资产 %s 成功（已通过 SSH 网关转发；配置网关：%s）"
+
+#: authentication/notifications.py
+msgid "Login failure alert"
+msgstr "登录失败告警"
+
+#: authentication/notifications.py
+#: authentication/templates/authentication/_msg_login_blocked.html
+msgid "Lockout type"
+msgstr "锁定类型"
+
+#: authentication/notifications.py
+#: authentication/templates/authentication/_msg_login_blocked.html
+msgid "Lockout duration (minutes)"
+msgstr "锁定时长（分钟）"
+
+#: authentication/templates/authentication/_msg_login_blocked.html
+msgid "The maximum number of failed login attempts has been reached. Login has been temporarily blocked."
+msgstr "登录失败次数已达到上限，登录已被临时锁定。"
+
+#: authentication/templates/authentication/_msg_login_blocked.html
+msgid "Please review the login logs and check for suspicious activity."
+msgstr "请查看登录日志，排查是否存在可疑活动。"
+
+#: reports/audit_contract.py
+msgid "Management Summary and Recommendations"
+msgstr "管理摘要与建议"
+
+#: reports/audit_contract.py
+msgid "Key Overview"
+msgstr "关键概况"
+
+#: reports/audit_contract.py
+msgid "Operations Activity Analysis"
+msgstr "运维活动分析"
+
+#: reports/audit_contract.py
+msgid "Security Event Analysis"
+msgstr "安全事件分析"
+
+#: reports/audit_contract.py
+msgid "Asset and Account Overview"
+msgstr "资产与账号概况"
+
+#: reports/audit_contract.py
+msgid "Account Operations Analysis"
+msgstr "账号运维分析"
+
+#: reports/audit_contract.py
+msgid "Comprehensive Audit Report"
+msgstr "综合审计报告"
+
+#: reports/audit_contract.py
+msgid "Summarize operations activity, security events, assets, and accounts for monthly, quarterly, or annual audits."
+msgstr "汇总运维活动、安全事件与资产账号情况，适合月度、季度和年度审计。"
+
+#: reports/audit_contract.py
+msgid "Operations Activity Report"
+msgstr "运维活动报告"
+
+#: reports/audit_contract.py
+msgid "Review who performed sessions, commands, and file operations on each asset."
+msgstr "了解谁在什么资产上进行了多少次会话、命令与文件操作。"
+
+#: reports/audit_contract.py
+msgid "Security Event Report"
+msgstr "安全事件报告"
+
+#: reports/audit_contract.py
+msgid "Review high-risk commands, login anomalies, and access denials, distinguishing failures from security events."
+msgstr "核查高风险命令、登录异常与访问拒绝，区分失败记录和风险事件。"
+
+#: reports/audit_contract.py
+msgid "Account Operations Report"
+msgstr "账号运维报告"
+
+#: reports/audit_contract.py
+msgid "Review the outcomes and failures of account automation tasks."
+msgstr "了解账号自动化任务的执行结果与失败情况，便于安排复核。"
+
+#: reports/api/audit.py
+msgid "You do not have permission to view data for this report theme."
+msgstr "当前用户无权查看这个报告主题的数据。"
+
+#: reports/api/audit.py
+msgid "The end date cannot be earlier than the start date."
+msgstr "结束日期不能早于开始日期。"
+
+#: reports/api/audit.py
+msgid "A report can cover at most 366 days. Select a shorter date range."
+msgstr "单份报告最多包含 366 天，请缩小日期范围。"
+
+#: reports/api/audit.py
+msgid "The end date cannot be later than today. For the current period, report through today."
+msgstr "结束日期不能晚于今天。当期报告请统计到今天。"
+
+#: reports/api/audit.py
+msgid "Chapters are duplicated or do not belong to the selected report theme."
+msgstr "章节重复或不属于所选报告主题。"
+
+#: reports/api/audit.py
+msgid "Select at least one chapter containing statistical data."
+msgstr "请至少选择一个包含统计数据的章节。"
+
+#: reports/services/audit_data.py
+msgid "Asset Sessions"
+msgstr "资产会话"
+
+#: reports/services/audit_data.py
+msgid "Command Records"
+msgstr "命令记录"
+
+#: reports/services/audit_data.py
+msgid "Login Logs"
+msgstr "登录日志"
+
+#: reports/services/audit_data.py
+msgid "Operation Logs"
+msgstr "操作日志"
+
+#: reports/services/audit_data.py
+msgid "File Transfers"
+msgstr "文件传输"
+
+#: reports/services/audit_data.py
+msgid "Current Assets"
+msgstr "当前资产"
+
+#: reports/services/audit_data.py
+msgid "Current Accounts"
+msgstr "当前账号"
+
+#: reports/services/audit_data.py
+msgid "Account Automation Tasks"
+msgstr "账号自动化任务"
+
+#: reports/services/audit_data.py
+msgid "Platform User Password Change Logs"
+msgstr "平台用户改密日志"
+
+#: reports/services/audit_data.py
+msgid " (available stores)"
+msgstr "（可用存储）"
+
+#: reports/services/audit_data.py
+msgid "Alerted Commands"
+msgstr "告警命令"
+
+#: reports/services/audit_data.py
+msgid "Commands Blocked by Rules"
+msgstr "规则阻断命令"
+
+#: reports/services/audit_data.py
+msgid "Approval-Rejected Commands"
+msgstr "审批拒绝命令"
+
+#: reports/services/audit_data.py
+msgid "Approval-Approved Commands"
+msgstr "审批通过命令"
+
+#: reports/services/audit_data.py
+msgid "Approval-Canceled Commands"
+msgstr "取消审批命令"
+
+#: reports/services/audit_data.py
+msgid "Unsupported report theme"
+msgstr "不支持的报告主题"
+
+#: reports/services/audit_data.py
+msgid "Select a start date and an end date"
+msgstr "请选择开始日期和结束日期"
+
+#: reports/services/audit_data.py
+msgid "The start date cannot be later than the end date, and the report can cover at most 366 days"
+msgstr "开始日期不能晚于结束日期，报告范围最多为 366 天"
+
+#: reports/services/audit_data.py
+msgid "The end date cannot be later than today"
+msgstr "结束日期不能晚于今天"
+
+#: reports/services/audit_data.py
+msgid "Select report chapters without duplicates"
+msgstr "请选择报告章节，且不要重复选择"
+
+#: reports/services/audit_data.py
+msgid "The selected chapters do not belong to this report theme"
+msgstr "所选章节不属于当前报告主题"
+
+#: reports/services/audit_data.py
+msgid "Session Count"
+msgstr "会话次数"
+
+#: reports/services/audit_data.py
+msgid "times"
+msgstr "次"
+
+#: reports/services/audit_data.py
+msgid "Active Users"
+msgstr "活跃用户"
+
+#: reports/services/audit_data.py
+msgid "users"
+msgstr "人"
+
+#: reports/services/audit_data.py
+msgid "Accessed Assets"
+msgstr "访问资产"
+
+#: reports/services/audit_data.py
+msgid "assets"
+msgstr "台"
+
+#: reports/services/audit_data.py
+msgid "Connection Failures"
+msgstr "连接失败"
+
+#: reports/services/audit_data.py
+msgid "Session Recording Status"
+msgstr "会话录像状态"
+
+#: reports/services/audit_data.py
+msgid "Top 5 Connection Failure Reasons"
+msgstr "连接失败原因 Top 5"
+
+#: reports/services/audit_data.py
+msgid "User Access Ranking"
+msgstr "用户访问排行"
+
+#: reports/services/audit_data.py
+msgid "Asset Access Ranking"
+msgstr "资产访问排行"
+
+#: reports/services/audit_data.py
+msgid "Connection Protocol Distribution"
+msgstr "连接协议分布"
+
+#: reports/services/audit_data.py
+msgid "Session Operation Types"
+msgstr "会话操作类型"
+
+#: reports/services/audit_data.py
+msgid "Platform Access Distribution"
+msgstr "平台访问分布"
+
+#: reports/services/audit_data.py
+msgid "Daily Asset Session Trend"
+msgstr "每日资产会话趋势"
+
+#: reports/services/audit_data.py
+msgid "Weekly Asset Session Trend"
+msgstr "每周资产会话趋势"
+
+#: reports/services/audit_data.py
+msgid "Monthly Asset Session Trend"
+msgstr "每月资产会话趋势"
+
+#: reports/services/audit_data.py
+msgid "Recent Asset Sessions"
+msgstr "最近资产会话明细"
+
+#: reports/services/audit_data.py
+msgid "Recordings Requiring Review"
+msgstr "录像待核查"
+
+#: reports/services/audit_data.py
+msgid "records"
+msgstr "条"
+
+#: reports/services/audit_data.py
+msgid "Command Approval Clues from the Same Session"
+msgstr "同会话命令审批线索"
+
+#: reports/services/audit_data.py
+msgid "Successful Logins"
+msgstr "成功登录次数"
+
+#: reports/services/audit_data.py
+msgid "Failed Logins"
+msgstr "失败登录次数"
+
+#: reports/services/audit_data.py
+msgid "Restricted Login Records"
+msgstr "登录受限记录"
+
+#: reports/services/audit_data.py
+msgid "Login Policy Denials"
+msgstr "登录策略拒绝"
+
+#: reports/services/audit_data.py
+msgid "Recent Failed Logins"
+msgstr "最近失败登录记录"
+
+#: reports/services/audit_data.py
+msgid "New-City Login Clues"
+msgstr "新城市登录线索"
+
+#: reports/services/audit_data.py
+msgid "New-City Login Review Clues"
+msgstr "新城市登录复核线索"
+
+#: reports/services/audit_data.py
+msgid "File Operation Types"
+msgstr "文件操作类型"
+
+#: reports/services/audit_data.py
+msgid "Top 5 Affected File Operation Targets"
+msgstr "文件失败影响范围 Top 5"
+
+#: reports/services/audit_data.py
+msgid "Recent Failed File Operations"
+msgstr "最近失败的文件操作"
+
+#: reports/services/audit_data.py
+msgid "Account Task Executions"
+msgstr "账号任务执行次数"
+
+#: reports/services/audit_data.py
+msgid "Successful Executions"
+msgstr "执行成功"
+
+#: reports/services/audit_data.py
+msgid "Failed or Errored Executions"
+msgstr "执行失败或错误"
+
+#: reports/services/audit_data.py
+msgid "Incomplete Executions"
+msgstr "尚未完成"
+
+#: reports/services/audit_data.py
+msgid "Account Task Types and Results"
+msgstr "账号任务类型与结果"
+
+#: reports/services/audit_data.py
+msgid "Recent Failed Account Tasks"
+msgstr "最近失败的账号任务"
+
+#: reports/services/audit_data.py
+msgid "Task Failure or Error Rate"
+msgstr "任务失败或错误占比"
+
+#: reports/services/audit_data.py
+msgid "Top 5 Password-Change Error Clues"
+msgstr "改密错误线索 Top 5"
+
+#: reports/services/audit_data.py
+msgid "Password-Change Accounts Requiring Review"
+msgstr "改密账号待核查清单"
+
+#: reports/services/audit_data.py
+msgid "Restricted logins or policy denials were recorded. Verify that the source, user identity, and access policy are expected."
+msgstr "存在登录受限或策略拒绝记录，建议核对访问来源、用户身份和访问策略是否符合预期。"
+
+#: reports/services/audit_data.py
+msgid "Command Count"
+msgstr "命令次数"
+
+#: reports/services/audit_data.py
+msgid "Command Decisions Requiring Review"
+msgstr "需复核的命令处置记录"
+
+#: reports/services/audit_data.py
+msgid "No separate rejection reason was saved; review the ticket discussion"
+msgstr "未保存独立拒绝理由，请查看工单讨论"
+
+#: reports/services/audit_data.py
+msgid "Not recorded"
+msgstr "未记录"
+
+#: reports/services/audit_data.py
+msgid "Loopback Address Login Records"
+msgstr "回环地址登录记录"
+
+#: reports/services/audit_data.py
+msgid "Rejected"
+msgstr "拒绝"
+
+#: reports/services/audit_data.py
+msgid "Platform Operation Count"
+msgstr "平台操作次数"
+
+#: reports/services/audit_data.py
+msgid "Operation Policy Denials"
+msgstr "操作策略拒绝"
+
+#: reports/services/audit_data.py
+msgid "Policy Denial Details"
+msgstr "策略拒绝明细"
+
+#: reports/services/audit_data.py
+msgid "File Operation Count"
+msgstr "文件操作次数"
+
+#: reports/services/audit_data.py
+msgid "Failed File Operations"
+msgstr "文件操作失败"
+
+#: reports/services/audit_data.py
+msgid "File Operation Failure Rate"
+msgstr "文件操作失败占比"
+
+#: reports/services/audit_data.py
+msgid "Current Asset Total"
+msgstr "当前资产总数"
+
+#: reports/services/audit_data.py
+msgid "Currently Enabled Assets"
+msgstr "当前启用资产"
+
+#: reports/services/audit_data.py
+msgid "Current Asset Distribution by Platform"
+msgstr "当前平台资产分布"
+
+#: reports/services/audit_data.py
+msgid "accounts"
+msgstr "个"
+
+#: reports/services/audit_data.py
+msgid "Currently Enabled Accounts"
+msgstr "当前启用账号"
+
+#: reports/services/audit_data.py
+msgid "Asset Account Count Ranking"
+msgstr "资产账号数量排行"
+
+#: reports/services/audit_data.py
+msgid "Assets with Password Changes Requiring Review"
+msgstr "改密待核查资产"
+
+#: reports/services/audit_data.py
+msgid "Accounts with Password Changes Requiring Review"
+msgstr "改密待核查账号"
+
+#: reports/services/audit_data.py
+msgid "Asset deleted"
+msgstr "资产已删除"
+
+#: reports/services/audit_data.py
+msgid "Platform User Password Changes"
+msgstr "平台用户改密次数"
+
+#: reports/services/audit_data.py
+msgid "Recent Platform User Password Changes"
+msgstr "最近平台用户密码变更"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s alerted or rejected commands were recorded. Review their purpose and approval basis in the session context."
+msgstr "记录到 %(count)s 条告警或被拒绝的命令，请结合会话上下文复核命令用途与审批依据。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "The operation log contains %(count)s policy denials. Check the denied resources and policies in the audit details."
+msgstr "操作日志包含 %(count)s 条策略拒绝记录，请在审计明细中确认被拒绝的资源和策略。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s platform user password changes were recorded. Review the operators and change rationale as needed."
+msgstr "本周期记录 %(count)s 次平台用户密码变更，请按需核对操作人与变更依据。"
+
+#: reports/services/audit_data.py
+msgid "Recording Status"
+msgstr "录像状态"
+
+#: reports/services/audit_data.py
+msgid "Recorded Reason"
+msgstr "日志记录的原因"
+
+#: reports/services/audit_data.py
+msgid "Failure Count"
+msgstr "失败次数"
+
+#: reports/services/audit_data.py
+msgid "Start Time"
+msgstr "开始时间"
+
+#: reports/services/audit_data.py
+msgid "Platform User"
+msgstr "平台用户"
+
+#: reports/services/audit_data.py
+msgid "Asset Account"
+msgstr "资产账号"
+
+#: reports/services/audit_data.py
+msgid "Connection Result"
+msgstr "连接结果"
+
+#: reports/services/audit_data.py
+msgid "Connection Failure Reason"
+msgstr "连接失败原因"
+
+#: reports/services/audit_data.py
+msgid "Original Session"
+msgstr "原始会话"
+
+#: reports/services/audit_data.py
+msgid "No reviewer recorded"
+msgstr "尚未记录处理人"
+
+#: reports/services/audit_data.py
+msgid "Approval Ticket"
+msgstr "审批单"
+
+#: reports/services/audit_data.py
+msgid "Request Time"
+msgstr "申请时间"
+
+#: reports/services/audit_data.py
+msgid "Requested Command"
+msgstr "申请命令"
+
+#: reports/services/audit_data.py
+msgid "Rule at the Time"
+msgstr "当时规则"
+
+#: reports/services/audit_data.py
+msgid "Reviewer"
+msgstr "处理人"
+
+#: reports/services/audit_data.py
+msgid "Rejection Reason"
+msgstr "拒绝理由"
+
+#: reports/services/audit_data.py
+msgid "Related Session"
+msgstr "关联会话"
+
+#: reports/services/audit_data.py
+msgid "Source IP"
+msgstr "来源 IP"
+
+#: reports/services/audit_data.py
+msgid "City"
+msgstr "城市"
+
+#: reports/services/audit_data.py
+msgid "Operation Count"
+msgstr "次数"
+
+#: reports/services/audit_data.py
+msgid "File Path"
+msgstr "文件路径"
+
+#: reports/services/audit_data.py
+msgid "Task Type"
+msgstr "任务类型"
+
+#: reports/services/audit_data.py
+msgid "Execution Count"
+msgstr "执行次数"
+
+#: reports/services/audit_data.py
+msgid "Original Execution Record"
+msgstr "原始执行记录"
+
+#: reports/services/audit_data.py
+msgid "Error Clue Category"
+msgstr "错误线索分类"
+
+#: reports/services/audit_data.py
+msgid "Account Record Count"
+msgstr "账号记录数"
+
+#: reports/services/audit_data.py
+msgid "Record Time"
+msgstr "记录时间"
+
+#: reports/services/audit_data.py
+msgid "Error Clue"
+msgstr "错误线索"
+
+#: reports/services/audit_data.py
+msgid "Execution Record"
+msgstr "执行记录"
+
+#: reports/services/audit_data.py
+msgid "Asset deleted or platform not recorded"
+msgstr "资产已删除或平台未记录"
+
+#: reports/services/audit_data.py
+msgid "Decision"
+msgstr "处理结果"
+
+#: reports/services/audit_data.py
+msgid "Historical rule name not recorded"
+msgstr "历史规则名称未记录"
+
+#: reports/services/audit_data.py
+msgid "Asset Count"
+msgstr "资产数"
+
+#: reports/services/audit_data.py
+msgid "Account Count"
+msgstr "账号数"
+
+#: reports/services/audit_data.py
+msgid "Operator"
+msgstr "操作人"
+
+#: reports/services/evidence.py
+msgid "Recording marked present"
+msgstr "有录像记录"
+
+#: reports/services/evidence.py
+msgid "Recording unsupported"
+msgstr "不支持录像"
+
+#: reports/services/evidence.py
+msgid "Session in progress"
+msgstr "会话进行中"
+
+#: reports/services/evidence.py
+msgid "Recording creation failed"
+msgstr "录像创建失败"
+
+#: reports/services/evidence.py
+msgid "Recording upload failed"
+msgstr "录像上传失败"
+
+#: reports/services/evidence.py
+msgid "Recording conversion failed"
+msgstr "录像转换失败"
+
+#: reports/services/evidence.py
+msgid "No recording flag"
+msgstr "未标记有录像"
+
+#: reports/services/evidence.py
+msgid "Connection failed; not applicable"
+msgstr "连接失败，不适用"
+
+#: reports/services/evidence.py
+msgid "Connection failed (no further reason recorded)"
+msgstr "连接失败（未记录更详细原因）"
+
+#: reports/services/evidence.py
+msgid "Connection failure reason not recorded"
+msgstr "未记录连接失败原因"
+
+#: reports/services/evidence.py
+msgid "Authentication-related"
+msgstr "身份验证相关"
+
+#: reports/services/evidence.py
+msgid "Execution or connection timeout"
+msgstr "执行或连接超时"
+
+#: reports/services/evidence.py
+msgid "Network or connection-related"
+msgstr "网络或连接相关"
+
+#: reports/services/evidence.py
+msgid "Permission denial-related"
+msgstr "权限拒绝相关"
+
+#: reports/services/evidence.py
+msgid "Target missing or unavailable"
+msgstr "目标不存在或不可用"
+
+#: reports/services/evidence.py
+msgid "Result verification-related"
+msgstr "结果验证相关"
+
+#: reports/services/evidence.py
+msgid "Error reason not recorded"
+msgstr "未记录错误原因"
+
+#: reports/services/evidence.py
+msgid "Other error (review the original record)"
+msgstr "其他错误（需查看原始记录）"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Connection reason"
+msgstr "连接原因"
+
+#: acls/serializers/login_asset_acl.py
+msgid "MFA verification"
+msgstr "MFA 验证"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Require approval"
+msgstr "需要审批"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Send notification"
+msgstr "发送通知"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Face verification"
+msgstr "人脸验证"
+
+#: acls/serializers/login_asset_acl.py
+msgctxt "Asset connection ACL"
+msgid "Push account"
+msgstr "推送账号"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Rotate password"
+msgstr "轮换密码"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Exemption period"
+msgstr "免审时长"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Allow applies the connection controls; Reject blocks the connection."
+msgstr "允许时应用连接控制，拒绝时阻止连接。"
+
+#: acls/serializers/login_asset_acl.py
+msgid ""
+"Account usernames or @ALL (all accounts), @SPEC with specified usernames, "
+"and @USER (the current user's same-name account)."
+msgstr "使用 @ALL 匹配全部账号，@SPEC 加用户名匹配指定账号，@USER 匹配当前用户的同名账号。"
+
+#: acls/serializers/login_asset_acl.py
+msgid ""
+"1-100; lower values have higher priority.\n"
+"Select the highest-priority group from the rules that match. Any Reject in that group blocks the connection; if all Allow, combine their enabled connection controls."
+msgstr ""
+"1–100，数值越小，优先级越高。\n"
+"从符合匹配条件的规则中，选取优先级最高的一组；组内任一规则拒绝则拒绝连接，全部允许则合并各规则启用的连接控制。"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Select reviewers when approval is enabled. Connections are blocked if no reviewers are available."
+msgstr "开启审批后必须选择审批人；无可用审批人时无法连接。"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Select at least one active, unexpired reviewer from this organization."
+msgstr "请至少选择一名本组织内已激活且未过期的审批人。"
+
+#: acls/models/login_asset_acl.py
+msgid "No available reviewers. Contact an administrator."
+msgstr "审批人不可用，请联系管理员。"
+
+#: acls/serializers/login_asset_acl.py
+msgid ""
+"After approval, allow reconnects by the same user to the same asset and "
+"account under this rule for this many hours. 0 requires approval every time."
+" Changes do not affect existing exemptions."
+msgstr "审批通过后，同一用户在指定小时内通过本规则重连同一资产、账号可免审。0 表示每次审批；修改时长不影响已有免审资格。"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Enter a reason before connecting."
+msgstr "连接前必须填写原因。"
+
+#: acls/serializers/login_asset_acl.py
+msgid ""
+"Verify an enrolled MFA code before connecting. Block connections if no code-"
+"based MFA method is enrolled."
+msgstr "连接前验证已绑定的 MFA 验证码；未绑定时无法连接。"
+
+#: acls/serializers/login_asset_acl.py
+msgid ""
+"Verify the user's face before connecting. Requires system face recognition "
+"and an enrolled face."
+msgstr "连接前验证人脸；需开启系统人脸识别并完成人脸录入。"
+
+#: acls/serializers/login_asset_acl.py
+msgid ""
+"Require approval before connecting, except during a valid exemption period."
+msgstr "连接前须审批通过；有效免审期内无需重复审批。"
+
+#: acls/serializers/login_asset_acl.py
+msgid ""
+"Notify the selected recipients when a user requests an asset connection. A "
+"notification does not mean the connection succeeded."
+msgstr "用户发起资产连接时通知所选接收人，通知不代表连接成功。"
+
+#: acls/serializers/login_asset_acl.py
+msgid ""
+"Automatically provision only same-name accounts before their first "
+"connection; reuse existing managed accounts without provisioning them again."
+" Requires account provisioning support on the asset platform."
+msgstr "仅同名账号首次连接前自动推送，已有托管账号则复用不推送；需资产平台支持账号推送。"
+
+#: acls/serializers/login_asset_acl.py
+msgid ""
+"Web Terminal only: verify the user's face before connecting and monitor "
+"throughout the session. Requires system face recognition and an enrolled "
+"face."
+msgstr "仅支持 Web 终端，连接前验证人脸，会话期间持续检测；需开启人脸识别并完成人脸录入。"
+
+#: acls/serializers/login_asset_acl.py
+msgid ""
+"Rotate the connected account's secret after the session ends. Requires "
+"system rotation after session end and automatic rotation on an active "
+"account."
+msgstr "会话结束后自动改密；需开启系统“会话结束后改密”和账号“自动改密”，且账号已激活。"
+
+#: acls/serializers/login_asset_acl.py
+msgctxt "Asset connection ACL"
+msgid "Face online"
+msgstr "人脸在线"
+
+#: authentication/services/connection_acl.py
+msgid "This field cannot be submitted."
+msgstr "不允许提交此字段。"
+
+#: authentication/services/connection_acl.py
+msgid "This field does not belong to the current step."
+msgstr "此字段不属于当前步骤。"
+
+#: authentication/services/connection_acl.py
+msgid "The same-name account username is determined by the server."
+msgstr "同名账号的用户名由服务端确定。"
+
+#: authentication/services/connection_acl.py
+msgid "Same-name account provisioning uses server-managed credentials."
+msgstr "同名账号推送使用服务端生成的凭据。"
+
+#: authentication/services/connection_acl.py
+msgid "Account push failed. Contact an administrator with the task ID."
+msgstr "账号推送失败，请将任务编号提供给管理员处理。"
+
+#: authentication/services/connection_acl.py
+msgid "Account is ready."
+msgstr "账号已准备完成。"
+
+#: authentication/services/connection_acl.py
+msgid "Face verification session is no longer current"
+msgstr "人脸验证已失效，请重新验证。"
+
+#: authentication/services/connection_acl.py
+msgid "Administrator permission is no longer available"
+msgstr "管理员权限已失效。"
+
+#: authentication/services/connection_acl.py
+msgid "Connection approval is no longer valid"
+msgstr "连接审批已失效，请重新申请。"
+
+#: authentication/services/connection_acl.py authentication/api/connection_token.py
+msgid "Connection is no longer available"
+msgstr "本次连接已失效，请重新发起连接。"
+
+#: authentication/services/connection_acl.py
+msgid "Online face monitoring context is no longer available"
+msgstr "人脸在线监测已失效，请重新连接。"
+
+#: authentication/services/connection_acl.py
+msgid "Face verification does not belong to this connection"
+msgstr "人脸验证与当前连接不匹配。"
+
+#: authentication/services/connection_acl.py
+msgid "Face verification is no longer available"
+msgstr "当前连接无法继续人脸验证。"
+
+#: authentication/services/connection_acl.py
+msgid "ACL changed; start a new connection"
+msgstr "访问规则已变更，请重新连接。"
+
+#: authentication/services/connection_acl.py
+msgid "Complete the current connection step first"
+msgstr "请先完成当前连接步骤。"
+
+#: authentication/services/connection_acl.py
+msgid "Face monitoring does not belong to this session"
+msgstr "人脸在线监测与当前会话不匹配。"
+
+#: terminal/serializers/session.py
+msgid "Connection token does not match this session."
+msgstr "连接 Token 与当前会话不匹配。"
+
+#: tickets/serializers/ticket/ticket.py
+msgid "Connection details"
+msgstr "连接明细"
+
+msgid "A valid license is required"
+msgstr "需要有效的许可证。"
+
+msgid "Account permission is no longer available"
+msgstr "账号权限已失效。"
+
+msgid "Account preparation has not succeeded. Contact an administrator."
+msgstr "账号准备未成功，请联系管理员。"
+
+msgid "Account push is not enabled for this asset platform."
+msgstr "此资产平台未启用账号推送。"
+
+msgid "Automatic same-name account push is not authorized."
+msgstr "未授权自动推送同名账号。"
+
+msgid "Cancel connections individually."
+msgstr "请逐一取消连接。"
+
+msgid "Connection ACL context"
+msgstr "连接 ACL 上下文"
+
+msgid "Connection ACL requirements are incomplete"
+msgstr "连接 ACL 校验尚未完成。"
+
+msgid "Connection parameters cannot be changed; create a new connection token"
+msgstr "连接参数不可修改，请创建新的连接 Token。"
+
+msgid "Connection review was rejected or closed"
+msgstr "连接审批已拒绝或关闭。"
+
+msgid "Creating the account and configuring its login credentials."
+msgstr "正在创建账号并配置登录凭据。"
+
+msgid "Duplicate connection tokens."
+msgstr "存在重复的连接 Token。"
+
+msgid "Enter a connection reason (up to 4096 characters)."
+msgstr "请输入连接原因，最多 4096 个字符。"
+
+msgid "Face monitoring context belongs to a different user"
+msgstr "人脸监测上下文属于其他用户。"
+
+msgid "Face verification failed"
+msgstr "人脸验证失败。"
+
+msgid "Face verification session expired; retry verification"
+msgstr "人脸验证会话已过期，请重新验证。"
+
+msgid "First-login same-name account push"
+msgstr "首次连接同名账号推送"
+
+msgid "Online face monitoring context is required"
+msgstr "缺少人脸在线监测上下文。"
+
+msgid "Online face verification requires Web Terminal"
+msgstr "人脸在线验证需要使用 Web 终端。"
+
+msgid "Permission to connect to this account is no longer available."
+msgstr "连接此账号的权限已失效。"
+
+msgid "Prepare the same-name account before connecting."
+msgstr "请先完成同名账号准备再连接。"
+
+msgid "Push same-name account on first connection"
+msgstr "首次连接时推送同名账号"
+
+msgid "Secret rotation after session end is disabled"
+msgstr "未启用会话结束后改密。"
+
+msgid "Select an active MFA method; enroll MFA first if none are available."
+msgstr "请选择可用的 MFA 方式；若无可用方式，请先绑定 MFA。"
+
+msgid "The existing same-name account is inactive. Contact an administrator."
+msgstr "已有同名账号未激活，请联系管理员。"
+
+msgid "This MFA method does not send a verification code"
+msgstr "此 MFA 方式不发送验证码。"
+
+msgid "This connection does not require this step"
+msgstr "本次连接无需执行此步骤。"
+
+msgid "This push method does not support create-only mode"
+msgstr "此推送方式不支持仅创建模式。"
+
+msgid "This username cannot be provisioned automatically."
+msgstr "此用户名不支持自动推送。"
+
+msgid "Use Web Terminal to complete face verification"
+msgstr "请使用 Web 终端完成人脸验证。"
+
+msgid "Waiting to push the same-name account."
+msgstr "等待推送同名账号。"
+
+#: reports/audit_contract.py reports/services/audit_data.py
+msgid "Account Health"
+msgstr "账号健康"
+
+#: reports/services/audit_data.py
+msgid "Account Tasks to Review"
+msgstr "待核查账号任务"
+
+#: reports/services/audit_data.py
+msgid "Assets with Pending Risks"
+msgstr "存在待处理风险的资产"
+
+#: reports/services/audit_data.py
+msgid "Awaiting review"
+msgstr "待核查"
+
+#: reports/services/audit_data.py
+msgid "Candidate credential verified"
+msgstr "候选凭据验证通过"
+
+#: reports/services/audit_data.py
+msgid "Check connection conditions and the original session before retrying."
+msgstr "重试前请检查连接条件和原始会话。"
+
+#: reports/services/audit_data.py
+msgid "Check recording creation, upload, and storage for the original session."
+msgstr "请检查原始会话的录像生成、上传和存储情况。"
+
+#: reports/services/audit_data.py
+msgid "Command Decisions to Review"
+msgstr "待核查命令处置"
+
+#: reports/services/audit_data.py
+msgid "Compare the detected change with approved access and confirm the handling result."
+msgstr "请将检测到的变化与已批准的访问权限进行比较，并确认处置结果。"
+
+#: reports/services/audit_data.py
+msgid "Confirm that the newer credential is synchronized and access works."
+msgstr "请确认较新的凭据已同步且能够正常访问。"
+
+#: reports/services/audit_data.py
+msgid "Confirm whether the location change matches travel, proxy use, or expected access."
+msgstr "请确认地点变化是否符合出差、代理使用或预期访问情况。"
+
+#: reports/services/audit_data.py
+msgid "Confirmed Risk Records"
+msgstr "已确认风险记录"
+
+#: reports/services/audit_data.py
+msgid "Connection Failures to Review"
+msgstr "待核查连接失败"
+
+#: reports/services/audit_data.py
+msgid "Credential verification failed"
+msgstr "凭据验证失败"
+
+#: reports/services/audit_data.py
+msgid "Credential verification in progress"
+msgstr "凭据验证中"
+
+#: reports/services/audit_data.py
+msgid "Current Account Risk Details"
+msgstr "当前账号风险明细"
+
+#: reports/services/audit_data.py
+msgid "Current Account Risks"
+msgstr "当前账号风险"
+
+#: reports/services/audit_data.py
+msgid "Current Risk Records"
+msgstr "当前风险记录"
+
+#: reports/services/audit_data.py
+msgid "Failed Logins to Review"
+msgstr "待核查登录失败"
+
+#: reports/services/audit_data.py
+msgid "File Operations to Review"
+msgstr "待核查文件操作"
+
+#: reports/services/audit_data.py
+msgid "Handling Progress"
+msgstr "处置进度"
+
+#: reports/services/audit_data.py
+msgid "Ignored Risk Records"
+msgstr "已忽略风险记录"
+
+#: reports/services/audit_data.py
+msgid "Issue"
+msgstr "问题"
+
+#: reports/services/audit_data.py
+msgid "Later password change succeeded"
+msgstr "后续改密成功"
+
+#: reports/services/audit_data.py
+msgid "New-City Logins to Review"
+msgstr "待核查异地登录"
+
+#: reports/services/audit_data.py
+msgid "Next Step"
+msgstr "下一步操作"
+
+#: reports/services/audit_data.py
+msgid "No account risk records are currently available."
+msgstr "当前没有可用的账号风险记录。"
+
+#: reports/services/audit_data.py
+msgid "Original Record"
+msgstr "原始记录"
+
+#: reports/services/audit_data.py
+msgid "Pending Risk Records"
+msgstr "待处理风险记录"
+
+#: reports/services/audit_data.py
+msgid "Pending Risks by Type"
+msgstr "待处理风险类型分布"
+
+#: reports/services/audit_data.py
+msgid "Policy Denials to Review"
+msgstr "待核查策略拒绝"
+
+#: reports/services/audit_data.py
+msgid "Recordings to Review"
+msgstr "待核查录像"
+
+#: reports/audit_contract.py reports/services/audit_data.py
+msgid "Remediation Checklist"
+msgstr "异常处置清单"
+
+#: reports/services/audit_data.py
+msgid "Review and synchronize the verified candidate credential; verification alone does not confirm recovery."
+msgstr "请核查并同步已通过验证的候选凭据；仅验证通过并不能确认已恢复。"
+
+#: reports/services/audit_data.py
+msgid "Review the command purpose, matched rule, and approval trail in the original session."
+msgstr "请在原始会话中核查命令用途、命中规则和审批记录。"
+
+#: reports/services/audit_data.py
+msgid "Review the denied operation and confirm that the access policy is expected."
+msgstr "请核查被拒绝的操作，确认访问策略符合预期。"
+
+#: reports/services/audit_data.py
+msgid "Review the execution log and affected targets, correct the cause, then retry."
+msgstr "请查看执行日志和受影响对象，纠正原因后重试。"
+
+#: reports/services/audit_data.py
+msgid "Review the file path, access permissions, and original session before retrying."
+msgstr "重试前请核查文件路径、访问权限和原始会话。"
+
+#: reports/services/audit_data.py
+msgid "Review the verification result and original execution before retrying."
+msgstr "重试前请核查验证结果和原始执行记录。"
+
+#: reports/services/audit_data.py
+msgid "Review whether the reason for ignoring this failure still applies."
+msgstr "请核查忽略此次失败的原因是否仍然适用。"
+
+#: reports/services/audit_data.py
+msgid "Review whether the reason for ignoring this risk still applies."
+msgstr "请核查忽略此风险的原因是否仍然适用。"
+
+#: reports/services/audit_data.py
+msgid "Risk Count"
+msgstr "风险数量"
+
+#: reports/services/audit_data.py
+msgid "Updated"
+msgstr "更新时间"
+
+#: reports/services/audit_data.py
+msgid "Verification Time"
+msgstr "验证时间"
+
+#: reports/services/audit_data.py
+msgid "Verify the candidate credential and synchronize it only after confirming that access works."
+msgstr "请验证候选凭据，确认能够正常访问后再同步。"
+
+#: reports/services/audit_data.py
+msgid "Verify the login source and account identity, then review the authentication log."
+msgstr "请核实登录来源及账号身份，然后查看认证日志。"
+
+#: reports/services/audit_data.py
+msgid "Wait for verification to finish before deciding whether to synchronize the credential."
+msgstr "请等待验证完成，再决定是否同步凭据。"
+
+#: reports/services/assessment.py
+msgid "Readable"
+msgstr "可读取"
+
+#: reports/services/assessment.py
+msgid "Reference"
+msgstr "参考依据"
+
+#: reports/services/assessment.py
+msgid "Record ID"
+msgstr "记录 ID"
+
+#: reports/services/audit_data.py
+msgid "Review failed connections using the affected assets, accounts, and recorded reasons."
+msgstr "根据涉及的资产、账号及记录原因核查连接失败。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s completed successful sessions require recording review. Check recording creation, upload, and storage."
+msgstr "已结束且连接成功的会话中，有 %(count)s 次需要核查录像。请检查录像生成、上传及存储。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s new-city login records require review of user identity and access location."
+msgstr "%(count)s 条新城市登录记录需要核查用户身份和访问地点。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s platform login records use loopback source addresses. Confirm whether these are local accesses or proxy-forwarded requests."
+msgstr "%(count)s 条平台登录记录使用回环来源地址。请确认是本机访问还是经代理转发的请求。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s platform logins failed. Review the affected users, source addresses, and recorded reasons."
+msgstr "%(count)s 次平台登录失败。请核查涉及的用户、来源地址及记录原因。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(failed)s of %(total)s file operations failed (%(rate)s%%). Review the affected assets, accounts, file paths, and original sessions."
+msgstr "%(total)s 次文件操作中有 %(failed)s 次失败（%(rate)s%%）。请核查涉及的资产、账号、文件路径及原始会话。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(sessions)s asset sessions were recorded: %(success)s connections succeeded and %(failed)s failed, involving %(users)s users and %(assets)s assets."
+msgstr "共记录 %(sessions)s 次资产会话，其中 %(success)s 次连接成功、%(failed)s 次连接失败，涉及 %(users)s 名用户和 %(assets)s 台资产。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(total)s account tasks were executed: %(success)s succeeded, %(failed)s failed or errored, and %(pending)s remain incomplete."
+msgstr "共执行 %(total)s 次账号任务，其中 %(success)s 次成功、%(failed)s 次失败或错误，%(pending)s 次尚未完成。"
+
+#: reports/services/audit_data.py
+msgid "Account Risks to Review"
+msgstr "待处理账号风险"
+
+#: reports/services/audit_data.py
+msgid "Accounts Identified in Pending Risks"
+msgstr "待处理风险涉及账号"
+
+#: reports/services/audit_data.py
+msgid "Affected Accounts"
+msgstr "涉及账号数"
+
+#: reports/services/audit_data.py
+msgid "Affected Assets"
+msgstr "涉及资产数"
+
+#: reports/services/audit_data.py
+msgid "Assets with Latest Check Successful"
+msgstr "最近检测成功的资产"
+
+#: reports/services/audit_data.py
+msgid "Assign a unique credential to each affected account, synchronize dependent services, and verify access."
+msgstr "为每个受影响账号设置独立凭据，同步依赖服务并验证访问。"
+
+#: reports/services/audit_data.py
+msgid "Check Result"
+msgstr "检测结果"
+
+#: reports/services/audit_data.py
+msgid "Compare authorized keys with approved keys, and remove unapproved keys."
+msgstr "核对授权密钥与已批准密钥，移除未经批准的密钥。"
+
+#: reports/services/audit_data.py
+msgid "Compare group membership changes with approved access, and remove unapproved privileges."
+msgstr "对照已批准权限核查用户组变更，移除未经批准的权限。"
+
+#: reports/services/audit_data.py
+msgid "Compare sudo permission changes with approved access, and remove unapproved privileges."
+msgstr "对照已批准权限核查 sudo 权限变更，移除未经批准的权限。"
+
+#: reports/services/audit_data.py
+msgid "Confirm the account owner and purpose, then manage approved accounts or disable unauthorized accounts."
+msgstr "确认账号归属与用途，将已批准账号纳入管理，或禁用未获授权账号。"
+
+#: reports/services/audit_data.py
+msgid "Confirm whether deletion was approved, then reconcile the managed account inventory."
+msgstr "确认账号删除是否经过批准，再核对纳管账号清单。"
+
+#: reports/services/audit_data.py
+msgid "Confirm whether the account is still needed, then disable unused accounts after approval."
+msgstr "确认账号是否仍需使用，经批准后禁用闲置账号。"
+
+#: reports/services/audit_data.py
+msgid "Current Managed Accounts"
+msgstr "当前纳管账号"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "Currently, %(pending)s pending account risk records involve %(accounts)s distinct accounts on %(assets)s assets. Review the affected accounts by risk type."
+msgstr "当前 %(pending)s 条待处理账号风险记录涉及 %(assets)s 台资产上的 %(accounts)s 个不同账号。请按风险类型核查涉及的账号。"
+
+#: reports/services/audit_data.py
+msgid "Latest Check Failed"
+msgstr "最近检测失败"
+
+#: reports/services/audit_data.py
+msgid "Latest Check Successful"
+msgstr "最近检测成功"
+
+#: reports/services/audit_data.py
+msgid "Managed Accounts with Latest Check Successful"
+msgstr "最近检测成功的纳管账号"
+
+#: reports/services/audit_data.py
+msgid "Most Recent Stored Check"
+msgstr "最近记录的检测时间"
+
+#: reports/services/audit_data.py
+msgid "No Check Result"
+msgstr "无检测结果"
+
+#: reports/services/audit_data.py
+msgid "No listed security events were found in the available records for this period."
+msgstr "本周期可用记录中未发现所列安全事件。"
+
+#: reports/services/audit_data.py
+msgid "Not Applicable"
+msgstr "不适用"
+
+#: reports/services/audit_data.py
+msgid "Password Changes with Subsequent Progress"
+msgstr "已有后续进展的改密记录"
+
+#: reports/services/audit_data.py
+msgid "Renew the expired credential and verify dependent tasks and account access."
+msgstr "更新已过期的凭据，并验证依赖任务及账号访问。"
+
+#: reports/services/audit_data.py
+msgid "Replace the weak password with a strong unique password, then verify account access."
+msgstr "将弱密码更换为独立的高强度密码，再验证账号访问。"
+
+#: reports/services/audit_data.py
+msgid "Review failed task logs and affected accounts; prioritize unresolved items before records with subsequent progress."
+msgstr "核查失败任务日志及涉及账号，优先处理尚未解决的项目，再复核已有后续进展的记录。"
+
+#: reports/services/audit_data.py
+msgid "Review risks"
+msgstr "查看风险"
+
+#: reports/services/audit_data.py
+msgid "Review the confirmed finding and verify the current account state."
+msgstr "复核已确认的风险，并检查账号当前状态。"
+
+#: reports/services/audit_data.py
+msgid "Risk Accounts Matched to Managed Accounts"
+msgstr "匹配纳管账号的风险账号"
+
+#: reports/services/audit_data.py
+msgid "Risk Accounts Not Matched to Managed Accounts"
+msgstr "未匹配纳管账号的风险账号"
+
+#: reports/services/audit_data.py
+msgid "Risk List"
+msgstr "风险列表"
+
+#: reports/services/audit_data.py
+msgid "Risk Records"
+msgstr "风险记录数"
+
+#: reports/services/audit_data.py
+msgid "Rotate the credential according to the rotation policy and verify dependent services."
+msgstr "按轮换策略更换凭据，并验证依赖服务。"
+
+#: reports/services/audit_data.py
+msgid "Rotate the potentially exposed credential, review recent access, and verify dependent services."
+msgstr "更换可能泄露的凭据，复核近期访问并验证依赖服务。"
+
+#: reports/services/audit_data.py
+msgid "Stored Asset Connectivity Results"
+msgstr "资产连通性检测结果"
+
+#: reports/services/audit_data.py
+msgid "Stored Managed Account Connectivity Results"
+msgstr "纳管账号连通性检测结果"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "There are currently %(total)s assets, of which %(active)s are enabled."
+msgstr "当前共有 %(total)s 台资产，其中 %(active)s 台已启用。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "There are currently %(total)s managed account records, of which %(active)s are enabled."
+msgstr "当前共有 %(total)s 条纳管账号记录，其中 %(active)s 条已启用。"
+
+#: reports/services/audit_data.py
+msgid "There are currently no pending account risk records."
+msgstr "当前没有待处理账号风险记录。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s account task executions were canceled."
+msgstr "%(count)s 次账号任务执行已取消。"
+
+msgid "Please upgrade the JumpServer client to use the configured login policy."
+msgstr "请升级 JumpServer 客户端后使用当前登录策略。"
+
+msgid "Client login session expired. Please authenticate again."
+msgstr "客户端登录已失效，请重新验证身份。"
+
+msgid "Log in again after exiting the client"
+msgstr "客户端退出后重新登录"
+
+msgid ""
+"When enabled, log in again after the desktop application exits and restarts."
+" Minimizing or hiding the application does not count as exiting."
+msgstr "开启后，客户端进程退出并重新启动时需要重新登录。最小化或隐藏窗口不属于退出。"
+
+msgid "Client login idle timeout (minute)"
+msgstr "空闲超时 (分)"
+
+msgid "Log in again when the idle timeout is reached. 0 disables the limit (default). Real keyboard and mouse input in the main window, separate asset windows and built-in websites counts as activity. An open connection, background output and automatic refresh do not count. Input in external software such as Xshell or MSTSC, and in some cross-origin embedded pages, cannot be captured. Using only these areas, watching without input for a long time, or failed reports due to network issues may still trigger the idle timeout. Time is measured from the last activity confirmed by the server."
+msgstr "达到空闲超时后需重新登录。0 表示不启用（默认）。主窗口、独立资产窗口及内置网站中的真实键盘、鼠标操作会计入活动；连接在线、后台输出和自动刷新不算活动。Xshell、MSTSC 等外部软件和部分跨域内嵌页面中的操作无法采集。仅在这些区域操作、长时间只观看，或网络异常导致上报失败时，仍可能触发空闲超时；以服务器最后确认的活动时间为准。"
+
+msgid "Maximum client login lifetime (minute)"
+msgstr "客户端最长登录有效期 (分)"
+
+msgid "Measured from client login; activity and token refresh do not extend it. 0 disables the lifetime limit (default). Exit and idle timeout settings still apply. Log in again when the lifetime ends."
+msgstr "从客户端登录开始计时，用户操作和令牌刷新均不延长有效期。0 表示不限制登录时长（默认），退出和空闲超时设置仍然生效。到期后需重新登录。"
+
+msgid "Client exit"
+msgstr "客户端退出"
+
+msgid "Idle timeout"
+msgstr "空闲超时"
+
+msgid "Maximum login time"
+msgstr "登录有效期结束"
+
+msgid "Client login policy changed"
+msgstr "客户端登录策略已变更"
+
+msgid "Authorization revoked"
+msgstr "授权已撤销"
+
+#: assets/models/asset/common.py assets/serializers/asset/common.py
+msgid "Asset owner"
+msgstr "资产负责人"
+
+msgid "Manager"
+msgstr "直属负责人"
+
+msgid "Workflow"
+msgstr "审批流程"
+
+msgid "Approval workflow"
+msgstr "审批流程"
+
+msgid "Workflow version"
+msgstr "流程版本"
+
+msgid "Workflow instance"
+msgstr "流程实例"
+
+msgid "Workflow node"
+msgstr "流程节点"
+
+msgid "Workflow edge"
+msgstr "流程连线"
+
+msgid "Workflow node instance"
+msgstr "节点实例"
+
+msgid "Approval task"
+msgstr "审批任务"
+
+msgid "Workflow event"
+msgstr "流程事件"
+
+#: tickets/plugins
+msgid "View account password"
+msgstr "查看账号密码"
+
+#: tickets/plugins
+msgid "Change account password"
+msgstr "账号改密"
+
+#: tickets/plugins
+msgid "File upload / download"
+msgstr "文件上传下载"
+
+#: tickets/plugins
+msgid "Download session recording"
+msgstr "会话录屏下载"
+
+#: tickets/plugins
+msgid "Authorized users"
+msgstr "授权用户"
+
+#: tickets/plugins
+msgid "Request parameters"
+msgstr "申请参数"
+
+#: tickets/plugins
+msgid "Validity (seconds)"
+msgstr "有效时长（秒）"
+
+#: tickets/plugins
+msgid "File paths"
+msgstr "文件路径"
+
+#: tickets/plugins
+msgid "Direction"
+msgstr "方向"
+
+#: tickets/serializers/ticket/ticket.py
+#: tickets/serializers/ticket/apply_asset.py
+#: tickets/plugins/view_secret/serializer.py
+msgid "Purpose and resource description"
+msgstr "申请用途／资源说明"
+
+#: apps/perms/templates/perms/_asset_permission_renewal_links.html:3
+msgid "Apply for renewal"
+msgstr "申请续期"
+
+msgid "WinRM file transfer root"
+msgstr "WinRM 文件传输根目录"
+
+msgid "Absolute Windows directory; home uses the connected account home directory."
+msgstr "Windows 绝对目录；home 表示连接账号的用户目录。"
+
+msgid "Select one Linux SSH/SFTP or Windows WinRM account."
+msgstr "请选择一个 Linux SSH/SFTP 或 Windows WinRM 账号。"
+
+#: accounts/api/account/ticket_secret.py:46 accounts/ticket_secret.py:21
+#: tickets/plugins/view_secret/plugin.py:31
+#: tickets/plugins/view_secret/plugin.py:41
+msgid "Account password viewing is disabled."
+msgstr "账号密码查看功能已关闭。"
+
+#: accounts/api/account/ticket_secret.py:53
+msgid "The requested password account is no longer available."
+msgstr "申请查看密码的账号已不可用。"
+
+#: accounts/api/account/ticket_secret.py:91
+#, python-format
+msgid "View password for %(account)s"
+msgstr "查看 %(account)s 的密码"
+
+#: accounts/ticket_secret.py:28 accounts/ticket_secret.py:30
+msgid "No active approval for this account."
+msgstr "此账号没有有效的审批授权。"
+
+#: accounts/ticket_secret.py:32
+msgid "The approved user is no longer in this organization."
+msgstr "获批用户已不属于此组织。"
+
+#: accounts/ticket_secret.py:40
+msgid "The approved account is no longer available."
+msgstr "获批账号已不可用。"
+
+#: accounts/ticket_secret.py:43
+msgid "The approved account has no password."
+msgstr "获批账号没有密码。"
+
+#: assets/serializers/asset/common.py:216
+msgid "Select an organization before assigning an asset owner."
+msgstr "请先选择组织，再指定资产负责人。"
+
+#: assets/serializers/asset/common.py:219
+msgid "The asset owner must be an active user in the asset organization."
+msgstr "资产负责人必须是资产所属组织内已启用的用户。"
+
+#: authentication/backends/drf.py:98
+msgid "Invalid token."
+msgstr "令牌无效。"
+
+#: authentication/utils.py:46
+msgid "Invalid RDP security layer."
+msgstr "RDP 安全层无效。"
+
+#: common/utils/verify_code.py:51
+msgid "Send verify code email"
+msgstr "发送验证码邮件"
+
+#: common/utils/verify_code.py:55
+msgid ""
+"When resetting a password, forgetting a password, or verifying MFA, this task needs to\n"
+"        be executed to send verification code emails"
+msgstr "在重置密码、忘记密码或验证 MFA 时，执行此任务发送验证码邮件。"
+
+#: jumpserver/context_processor.py:31
+msgid "FIT2CLOUD"
+msgstr "飞致云"
+
+#: ops/api/celery.py:211
+msgid ""
+"Verification code tasks cannot be run again. Please request a new code from "
+"the verification page."
+msgstr "验证码任务不能重新执行，请在验证页面获取新的验证码。"
+
+#: settings/serializers/feature.py:28
+#, python-format
+msgid ""
+"Run Ansible jobs in the persistent container (%(image)s) over SSH. To run "
+"jobs locally instead, disable \"Docker isolation for Ansible\" under System "
+"Settings > Feature Settings > Job Center. Configure the executor address and"
+" SSH credentials before enabling isolation."
+msgstr ""
+"通过 SSH 在常驻容器（%(image)s）中运行 Ansible 作业。如需在本地运行，请在系统设置 > 功能设置 > 作业中心关闭“Ansible"
+" Docker 隔离”。启用隔离前，请配置执行器地址和 SSH 凭据。"
+
+#: terminal/api/applet/host.py:120
+msgid "This builtin applet is retired and cannot be published again."
+msgstr "此内置应用已停用，不能再次发布。"
+
+#: tickets/api/plugin.py:24 tickets/api/plugin.py:44
+#: tickets/serializers/ticket/ticket.py:298
+msgid "Select a concrete organization."
+msgstr "请选择具体组织。"
+
+#: tickets/api/plugin.py:38
+msgid "This ticket type does not accept files."
+msgstr "此工单类型不支持上传文件。"
+
+#: tickets/api/plugin.py:49
+msgid "Upload one file at a time."
+msgstr "请每次上传一个文件。"
+
+#: tickets/api/ticket.py:169 tickets/api/ticket.py:173
+msgid "Use the approval-task endpoint with an exact task ID."
+msgstr "请使用具体审批任务 ID，通过审批任务入口操作。"
+
+#: tickets/api/ticket.py:185
+msgid "Use exact approval-task IDs."
+msgstr "请指定具体的审批任务 ID。"
+
+#: tickets/api/workflow.py:146 tickets/serializers/ticket/ticket.py:305
+msgid "Select an active member of this organization."
+msgstr "请选择此组织内已启用的成员。"
+
+#: tickets/const.py:32
+msgid "Manual request"
+msgstr "手动申请"
+
+#: tickets/const.py:33
+msgid "System triggered"
+msgstr "系统触发"
+
+#: tickets/filters.py:20
+msgid "Beneficiary ID"
+msgstr "使用者 ID"
+
+#: tickets/filters.py:48 tickets/models/ticket/general.py:280
+#: tickets/serializers/ticket/ticket.py:97
+msgid "Ticket origin"
+msgstr "工单来源"
+
+#: tickets/models/instance.py:17 tickets/models/instance.py:37
+msgid "Workflow context and identity are immutable."
+msgstr "不能修改流程上下文和身份信息。"
+
+#: tickets/models/relation.py:30
+msgid "Ticket beneficiary"
+msgstr "工单使用者"
+
+#: tickets/models/workflow.py:31
+msgid "Apply for asset access on behalf of another user"
+msgstr "为其他用户申请资产授权"
+
+#: tickets/models/workflow.py:52 tickets/workflow/const.py:6
+msgid "Start"
+msgstr "开始"
+
+#: tickets/models/workflow.py:52 tickets/workflow/const.py:10
+msgid "End"
+msgstr "结束"
+
+#: tickets/models/workflow.py:57
+#, python-brace-format
+msgid "Approval {level}"
+msgstr "第 {level} 级审批"
+
+#: tickets/models/workflow.py:78
+msgid "Published workflow versions are immutable. Create a new version."
+msgstr "已发布的流程版本不能修改，请创建新版本。"
+
+#: tickets/models/workflow.py:89
+msgid "Workflow definition identity cannot be updated in bulk."
+msgstr "不能批量修改流程定义的标识信息。"
+
+#: tickets/models/workflow.py:100
+msgid "Create workflow versions through the publication service."
+msgstr "请通过流程发布操作创建流程版本。"
+
+#: tickets/models/workflow.py:102
+msgid "Workflow definitions do not support upserts."
+msgstr "流程定义不支持在批量创建冲突时更新。"
+
+#: tickets/models/workflow.py:122
+msgid "Workflow definition identity cannot be changed."
+msgstr "不能修改流程定义的标识信息。"
+
+#: tickets/models/workflow.py:194
+msgid "Workflow edges must connect nodes in the same version."
+msgstr "流程连线只能连接同一版本内的节点。"
+
+#: tickets/notifications.py:191
+msgid "An asset authorization request for you has been processed"
+msgstr "为您申请的资产授权工单已处理"
+
+#: tickets/plugins/apply_asset/handler.py:16
+msgid "Select active organization members as authorized users."
+msgstr "请选择组织内已启用的成员作为授权用户。"
+
+#: tickets/plugins/apply_asset/handler.py:27
+msgid "A requested node was deleted or moved."
+msgstr "申请的节点已被删除或移动。"
+
+#: tickets/plugins/apply_asset/handler.py:31
+msgid "A requested node belongs to another organization."
+msgstr "申请的节点属于其他组织。"
+
+#: tickets/plugins/apply_asset/handler.py:39
+msgid "Select existing assets and accounts before submitting the request."
+msgstr "请先选择现有资产和账号，再提交申请。"
+
+#: tickets/plugins/apply_asset/handler.py:41
+msgid "A valid access period is required."
+msgstr "请设置有效的访问时间范围。"
+
+#: tickets/plugins/apply_asset/handler.py:58
+msgid "Select valid asset actions."
+msgstr "请选择有效的资产操作权限。"
+
+#: tickets/plugins/apply_asset/handler.py:87
+msgid "An authorized user is no longer an active organization member."
+msgstr "授权用户已不再是组织内的有效成员。"
+
+#: tickets/plugins/apply_asset/handler.py:91
+msgid "A dynamic account username changed. Submit a new request."
+msgstr "动态账号的用户名已变更，请重新申请。"
+
+#: tickets/plugins/apply_asset/handler.py:96
+msgid "A requested asset was deleted or moved. Submit a new request."
+msgstr "申请的资产已被删除或移动，请重新申请。"
+
+#: tickets/plugins/apply_asset/handler.py:109
+msgid "The requested access period has already expired."
+msgstr "申请的访问时间范围已过期。"
+
+#: tickets/plugins/apply_asset/plugin.py:62
+#: tickets/serializers/ticket/apply_asset.py:85
+msgid ""
+"Requests for another user require organization administrator approval on "
+"every path."
+msgstr "为其他用户申请时，每条审批路径都必须经过组织管理员审批。"
+
+#: tickets/plugins/apply_asset/reapply.py:45
+msgid "Only the applicant or authorized beneficiary can reuse this request."
+msgstr "仅申请人或获授权的使用者可以再次申请此工单。"
+
+#: tickets/plugins/apply_asset/reapply.py:67
+msgid "Select active assets currently available for application."
+msgstr "请选择当前可申请且已启用的资产。"
+
+#: tickets/plugins/apply_asset/reapply.py:71
+msgid "Select existing active accounts on the requested assets."
+msgstr "请选择申请资产上现有且已启用的账号。"
+
+#: tickets/plugins/apply_asset/reapply.py:73
+msgid "A beneficiary can only renew access for themselves."
+msgstr "使用者只能为自己续期访问权限。"
+
+#: tickets/plugins/apply_asset/reapply.py:75
+msgid "Select a future expiration time."
+msgstr "请选择晚于当前时间的过期时间。"
+
+#: tickets/plugins/apply_asset/reapply.py:87 tickets/plugins/reapply.py:46
+msgid "This request cannot be reapplied for by this user."
+msgstr "此用户不能再次申请该工单。"
+
+#: tickets/plugins/apply_asset/resources.py:32
+#: tickets/plugins/view_secret/serializer.py:39
+#: tickets/serializers/ticket/common.py:17
+msgid "Resources must belong to the selected organization."
+msgstr "资源必须属于所选组织。"
+
+#: tickets/plugins/base.py:86
+msgid "Unknown ticket action."
+msgstr "未知的工单操作。"
+
+#: tickets/plugins/base.py:126 tickets/plugins/download_replay/plugin.py:100
+#: tickets/workflow/resources.py:202
+msgid "Unknown resource field."
+msgstr "未知的资源字段。"
+
+#: tickets/plugins/base.py:128
+msgid "This ticket type has no resource options."
+msgstr "此工单类型没有可选资源。"
+
+#: tickets/plugins/change_secret/execution.py:34
+msgid "The requested accounts changed. Submit a new request."
+msgstr "申请的账号已变更，请重新申请。"
+
+#: tickets/plugins/change_secret/execution.py:36
+msgid "The applicant is no longer eligible for this operation."
+msgstr "申请人已无权执行此操作。"
+
+#: tickets/plugins/change_secret/execution.py:60
+msgid "The password change execution conflicts with an existing task."
+msgstr "此次改密执行与现有任务冲突。"
+
+#: tickets/plugins/change_secret/execution.py:114
+msgid "The execution no longer matches the approved resources."
+msgstr "执行内容与获批资源已不一致。"
+
+#: tickets/plugins/change_secret/serializer.py:10
+msgid "Select active password accounts that allow password changes."
+msgstr "请选择已启用且允许改密的密码账号。"
+
+#: tickets/plugins/change_secret/serializer.py:16
+msgid "A valid license is required to change account passwords."
+msgstr "修改账号密码需要有效的许可证。"
+
+#: tickets/plugins/change_secret/serializer.py:24
+msgid "Enable password changes on the asset platform first."
+msgstr "请先在资产平台中启用改密功能。"
+
+#: tickets/plugins/command_confirm/plugin.py:21
+msgid "The command session asset no longer exists."
+msgstr "命令会话对应的资产已不存在。"
+
+#: tickets/plugins/download_replay/actions.py:29
+msgid "No active approval for this session recording."
+msgstr "此会话录像没有有效的审批授权。"
+
+#: tickets/plugins/download_replay/actions.py:38
+msgid "The approved session recording changed."
+msgstr "获批的会话录像已变更。"
+
+#: tickets/plugins/download_replay/actions.py:50
+#: tickets/plugins/download_replay/plugin.py:46
+msgid "The requested session recording is no longer available."
+msgstr "申请的会话录像已不可用。"
+
+#: tickets/plugins/download_replay/plugin.py:42
+msgid "The session recording approval is not valid."
+msgstr "会话录像审批授权无效。"
+
+#: tickets/plugins/download_replay/plugin.py:129
+msgid "The requested session no longer exists."
+msgstr "申请的会话已不存在。"
+
+#: tickets/plugins/download_replay/serializer.py:23
+msgid "Select an accessible session in this organization."
+msgstr "请选择此组织内有权访问的会话。"
+
+#: tickets/plugins/file_transfer/actions.py:30
+msgid "The file is no longer available."
+msgstr "文件已不可用。"
+
+#: tickets/plugins/file_transfer/actions.py:46
+msgid ""
+"Execution uses the approved files and paths; parameters cannot be changed."
+msgstr "执行时使用获批的文件和路径，不能修改参数。"
+
+#: tickets/plugins/file_transfer/actions.py:75
+msgid "Only the applicant and assigned reviewers can inspect uploaded files."
+msgstr "仅申请人和指定审批人可以查看上传的文件。"
+
+#: tickets/plugins/file_transfer/actions.py:89
+msgid "This file has not been retrieved successfully."
+msgstr "此文件尚未成功获取。"
+
+#: tickets/plugins/file_transfer/plugin.py:40
+msgid "Existing access to every requested account is required."
+msgstr "必须已拥有所有申请账号的访问权限。"
+
+#: tickets/plugins/file_transfer/plugin.py:65
+msgid "The uploaded files expired. Submit a new request."
+msgstr "上传的文件已过期，请重新申请。"
+
+#: tickets/plugins/file_transfer/plugin.py:83
+msgid "The requested account access changed. Submit a new request."
+msgstr "申请账号的访问权限已变更，请重新申请。"
+
+#: tickets/plugins/file_transfer/policy.py:28
+msgid ""
+"Use an absolute Windows drive path without device names, streams or "
+"wildcards."
+msgstr "请使用 Windows 驱动器绝对路径，不得包含设备名称、数据流或通配符。"
+
+#: tickets/plugins/file_transfer/policy.py:33
+msgid "Use an absolute Linux path without wildcards or relative components."
+msgstr "请使用 Linux 绝对路径，不得包含通配符或相对路径片段。"
+
+#: tickets/plugins/file_transfer/policy.py:55
+msgid "Invalid file transfer approval."
+msgstr "文件传输审批授权无效。"
+
+#: tickets/plugins/file_transfer/policy.py:57
+msgid "Only the applicant can execute or download this transfer."
+msgstr "仅申请人可以执行传输或下载传输文件。"
+
+#: tickets/plugins/file_transfer/policy.py:60
+msgid "No active file transfer approval."
+msgstr "没有有效的文件传输审批授权。"
+
+#: tickets/plugins/file_transfer/policy.py:64
+msgid "The approved asset or applicant is no longer available."
+msgstr "获批资产或申请人已不可用。"
+
+#: tickets/plugins/file_transfer/policy.py:73
+msgid "The approved account access changed."
+msgstr "获批账号的访问权限已变更。"
+
+#: tickets/plugins/file_transfer/policy.py:76
+msgid "The approved asset connection changed."
+msgstr "获批资产的连接信息已变更。"
+
+#: tickets/plugins/file_transfer/policy.py:80
+msgid "The connection is restricted by an access control rule."
+msgstr "此连接受到访问控制规则限制。"
+
+#: tickets/plugins/file_transfer/policy.py:89
+msgid "File transfer is excluded by the asset permission policy."
+msgstr "资产授权规则不允许文件传输。"
+
+#: tickets/plugins/file_transfer/serializer.py:15
+msgid "Target directory"
+msgstr "目标目录"
+
+#: tickets/plugins/file_transfer/serializer.py:17
+msgid "Files"
+msgstr "文件"
+
+#: tickets/plugins/file_transfer/serializer.py:20
+msgid "Select active accounts with existing access."
+msgstr "请选择已启用且已有访问权限的账号。"
+
+#: tickets/plugins/file_transfer/serializer.py:39
+msgid "Select an unambiguous password or SSH key account."
+msgstr "请选择可唯一确定的密码或 SSH 密钥账号。"
+
+#: tickets/plugins/file_transfer/serializer.py:43
+msgid "Provide files and a target directory for upload."
+msgstr "请提供要上传的文件和目标目录。"
+
+#: tickets/plugins/file_transfer/serializer.py:51
+msgid "Upload available files belonging to this organization."
+msgstr "请上传属于此组织的有效文件。"
+
+#: tickets/plugins/file_transfer/serializer.py:58
+msgid "Duplicate file names are not allowed."
+msgstr "文件名不能重复。"
+
+#: tickets/plugins/file_transfer/serializer.py:61
+msgid "Provide exact file paths for download."
+msgstr "请提供要下载的文件的完整路径。"
+
+#: tickets/plugins/file_transfer/serializer.py:66
+msgid "Provide distinct file paths."
+msgstr "文件路径不能重复。"
+
+#: tickets/plugins/file_transfer/storage.py:34
+msgid "File exceeds the transfer size limit."
+msgstr "文件超出传输大小限制。"
+
+#: tickets/plugins/file_transfer/storage.py:48
+msgid "Invalid file name or file exceeds the transfer size limit."
+msgstr "文件名无效，或文件超出传输大小限制。"
+
+#: tickets/plugins/file_transfer/storage.py:54
+msgid ""
+"Too many retained ticket files. Wait for expired files to be cleaned up."
+msgstr "保留的工单文件过多，请等待过期文件清理后重试。"
+
+#: tickets/plugins/file_transfer/storage.py:85
+msgid "Files are missing, already submitted, or have duplicate names."
+msgstr "文件不存在、已提交，或文件名重复。"
+
+#: tickets/plugins/file_transfer/storage.py:88
+msgid "The uploaded file is no longer available."
+msgstr "上传的文件已不可用。"
+
+#: tickets/plugins/login_asset_confirm/plugin.py:23
+#: tickets/plugins/resources.py:71
+msgid "The requested asset no longer exists."
+msgstr "申请的资产已不存在。"
+
+#: tickets/plugins/reapply.py:32
+msgid "Only the applicant can reuse an available manual request."
+msgstr "仅申请人可以再次申请有效的手动申请工单。"
+
+#: tickets/plugins/reapply.py:67
+msgid "Inactive asset."
+msgstr "资产未启用。"
+
+#: tickets/plugins/reapply.py:72
+msgid "Recording unavailable."
+msgstr "会话录像不可用。"
+
+#: tickets/plugins/registry.py:80
+#, python-brace-format
+msgid "Unknown ticket type: {ticket_type}"
+msgstr "未知的工单类型：{ticket_type}"
+
+#: tickets/plugins/resources.py:35
+msgid "Select an asset available for application in this organization."
+msgstr "请选择此组织内可申请的资产。"
+
+#: tickets/plugins/resources.py:75
+msgid "A requested account no longer exists."
+msgstr "申请的账号已不存在。"
+
+#: tickets/plugins/resources.py:86
+msgid "The requested asset was deleted or moved."
+msgstr "申请的资产已被删除或移动。"
+
+#: tickets/plugins/view_secret/plugin.py:46
+#: tickets/plugins/view_secret/plugin.py:52
+msgid "The requested password accounts are no longer available."
+msgstr "申请查看密码的账号已不可用。"
+
+#: tickets/plugins/view_secret/serializer.py:17
+#: tickets/plugins/view_secret/serializer.py:34
+msgid "Select active password accounts."
+msgstr "请选择已启用的密码账号。"
+
+#: tickets/serializers/plugin.py:26
+msgid "This ticket type is created by its business entrypoint."
+msgstr "此类工单需要从对应的业务入口发起。"
+
+#: tickets/serializers/plugin.py:29
+msgid "Request parameters must be an object."
+msgstr "申请参数必须是对象。"
+
+#: tickets/serializers/plugin.py:36
+msgid "Unknown request parameters."
+msgstr "包含未知的申请参数。"
+
+#: tickets/serializers/ticket/apply_asset.py:29
+msgid "Authorized user"
+msgstr "授权用户"
+
+#: tickets/serializers/ticket/apply_asset.py:78
+msgid "Select one active organization member."
+msgstr "请选择一名组织内已启用的成员。"
+
+#: tickets/serializers/ticket/apply_asset.py:82
+msgid "You cannot apply for asset access on behalf of another user."
+msgstr "您无权为其他用户申请资产授权。"
+
+#: tickets/serializers/ticket/ticket.py:295
+msgid "Submitted requests are immutable. Withdraw and submit a new request."
+msgstr "已提交的申请不能修改，请撤回后重新提交。"
+
+#: tickets/serializers/ticket/ticket.py:302
+msgid ""
+"The applicant must be the submitting user. Select authorized users in the "
+"request parameters."
+msgstr "申请人必须是提交用户，请在申请参数中选择授权用户。"
+
+#: tickets/serializers/ticket/ticket.py:315
+msgid "Select an enabled, published workflow for this organization and type."
+msgstr "请选择适用于此组织和工单类型、已发布且已启用的审批流程。"
+
+#: tickets/serializers/workflow.py:31
+msgid "A published workflow cannot change ticket type."
+msgstr "已发布的审批流程不能修改工单类型。"
+
+#: tickets/serializers/workflow.py:33
+msgid "Publish a version before enabling the workflow."
+msgstr "请先发布流程版本，再启用审批流程。"
+
+#: tickets/serializers/workflow.py:40
+msgid "A workflow with this name and type already exists."
+msgstr "已存在同名且同类型的审批流程。"
+
+#: tickets/tasks.py:12
+msgid "Expire overdue ticket approvals"
+msgstr "处理超时工单审批"
+
+#: tickets/tasks.py:13
+msgid ""
+"Check approval deadlines every minute and apply the configured timeout "
+"action."
+msgstr "每分钟检查审批截止时间，并按配置执行超时处理。"
+
+#: tickets/tasks.py:30
+msgid "Execute ticket password change"
+msgstr "执行工单改密"
+
+#: tickets/tasks.py:31
+msgid "Change account passwords according to the approved ticket resources."
+msgstr "根据工单获批资源修改账号密码。"
+
+#: tickets/tasks.py:39
+msgid "Dispatch ticket password changes"
+msgstr "调度工单改密任务"
+
+#: tickets/tasks.py:40
+msgid "Dispatch pending password change executions every minute."
+msgstr "每分钟调度待执行的工单改密任务。"
+
+#: tickets/tasks.py:54
+msgid "Execute ticket file transfer"
+msgstr "执行工单文件传输"
+
+#: tickets/tasks.py:55
+msgid "Transfer files according to the approved ticket resources."
+msgstr "根据工单获批资源执行文件传输。"
+
+#: tickets/tasks.py:63
+msgid "Maintain ticket file transfers"
+msgstr "维护工单文件传输任务"
+
+#: tickets/tasks.py:64
+msgid ""
+"Check queued and running file transfers every five minutes and handle "
+"expired transfers."
+msgstr "每五分钟检查排队中和执行中的文件传输，并处理已过期的传输任务。"
+
+#: tickets/tasks.py:73
+msgid "Clean ticket transfer files"
+msgstr "清理工单传输文件"
+
+#: tickets/tasks.py:74
+msgid "Clean expired temporary files from ticket transfers every hour."
+msgstr "每小时清理工单传输中已过期的临时文件。"
+
+#: tickets/workflow/approvers.py:32
+msgid "The snapshot does not contain the required approver IDs."
+msgstr "快照中缺少所需的审批人 ID。"
+
+#: tickets/workflow/approvers.py:36
+msgid "Invalid approver IDs in the snapshot."
+msgstr "快照中的审批人 ID 无效。"
+
+#: tickets/workflow/approvers.py:59
+msgid "An approver group is missing or belongs to another organization."
+msgstr "审批用户组不存在或属于其他组织。"
+
+#: tickets/workflow/approvers.py:70
+msgid "The snapshot does not contain asset owners."
+msgstr "快照中缺少资产负责人。"
+
+#: tickets/workflow/approvers.py:75 tickets/workflow/definition.py:25
+msgid "Unknown approver resolver."
+msgstr "未知的审批人选择方式。"
+
+#: tickets/workflow/approvers.py:79
+msgid ""
+"A configured approver is inactive, missing, or outside the organization."
+msgstr "配置的审批人未启用、不存在或不属于此组织。"
+
+#: tickets/workflow/approvers.py
+#, python-brace-format
+msgid ""
+"Approval {level} has no eligible approvers after excluding the applicant or authorized users. "
+"Adjust the approvers or select another workflow."
+msgstr "第 {level} 级审批排除申请人或授权用户后，无可用审批人。请调整审批人配置或选择其他流程。"
+
+#: tickets/workflow/approvers.py:85
+msgid "An approval node must resolve between 1 and 1000 eligible approvers."
+msgstr "审批节点需要匹配 1 至 1000 名符合条件的审批人。"
+
+#: tickets/workflow/business.py:35
+msgid "Select a published workflow."
+msgstr "请选择已发布的审批流程。"
+
+#: tickets/workflow/business.py:37
+msgid "The applicant must be an active organization member."
+msgstr "申请人必须是组织内已启用的成员。"
+
+#: tickets/workflow/business.py:58 tickets/workflow/composition.py:42
+msgid "Configure reviewers or select a workflow on the ACL."
+msgstr "请在访问控制规则中配置审批人或选择审批流程。"
+
+#: tickets/workflow/business.py:94
+msgid "The applicant is no longer eligible for access."
+msgstr "申请人已不再具备访问资格。"
+
+#: tickets/workflow/business.py:99 tickets/workflow/engine.py:220
+msgid "Complete and save the requested resources before approval."
+msgstr "请先补全并保存申请资源，再通过审批。"
+
+#: tickets/workflow/business.py:103
+msgid "Invalid ticket execution mode."
+msgstr "工单执行方式无效。"
+
+#: tickets/workflow/composition.py:56
+msgid "The generated workflow name is already in use."
+msgstr "自动生成的流程名称已被使用。"
+
+#: tickets/workflow/conditions.py:16
+msgid "Conditions must be objects nested at most eight levels."
+msgstr "条件必须是对象，最多嵌套 8 层。"
+
+#: tickets/workflow/conditions.py:20
+msgid "A compound condition must have exactly one operator."
+msgstr "组合条件必须且只能包含一个运算符。"
+
+#: tickets/workflow/conditions.py:24
+msgid "Condition groups must contain between 1 and 32 conditions."
+msgstr "条件组必须包含 1 至 32 个条件。"
+
+#: tickets/workflow/conditions.py:29
+msgid "Conditions require field, operator and value."
+msgstr "条件必须包含字段、运算符和值。"
+
+#: tickets/workflow/conditions.py:32
+msgid "Invalid condition field path."
+msgstr "条件字段路径无效。"
+
+#: tickets/workflow/conditions.py:34
+#, python-brace-format
+msgid "Unknown workflow context field: {field}."
+msgstr "未知的流程上下文字段：{field}。"
+
+#: tickets/workflow/conditions.py:36
+msgid "Unknown condition operator."
+msgstr "未知的条件运算符。"
+
+#: tickets/workflow/conditions.py:38
+msgid "The condition quantifier must be any or all."
+msgstr "条件匹配方式必须为 any（任意）或 all（全部）。"
+
+#: tickets/workflow/conditions.py:40
+msgid "exists requires a boolean value."
+msgstr "exists 运算符要求布尔值。"
+
+#: tickets/workflow/conditions.py:42
+msgid "in and not_in require a list value."
+msgstr "in 和 not_in 运算符要求列表值。"
+
+#: tickets/workflow/conditions.py:47
+msgid "Risk comparisons require low, medium, high or critical."
+msgstr "风险等级比较只支持 low、medium、high 或 critical。"
+
+#: tickets/workflow/conditions.py:49
+msgid "Ordered comparisons require a number or a known risk level."
+msgstr "大小比较要求数值或有效的风险等级。"
+
+#: tickets/workflow/conditions.py:87
+#, python-brace-format
+msgid "Missing condition context: {field}."
+msgstr "条件上下文缺少字段：{field}。"
+
+#: tickets/workflow/conditions.py:90
+#, python-brace-format
+msgid "Incompatible condition value types: {field}."
+msgstr "条件值类型不匹配：{field}。"
+
+#: tickets/workflow/conditions.py:101
+#, python-brace-format
+msgid "Invalid contains operand: {field}."
+msgstr "contains 运算符的操作数无效：{field}。"
+
+#: tickets/workflow/conditions.py:104
+msgid "Unknown risk level in the snapshot."
+msgstr "快照中的风险等级未知。"
+
+#: tickets/workflow/conditions.py:107
+#, python-brace-format
+msgid "Invalid ordered comparison: {field}."
+msgstr "大小比较无效：{field}。"
+
+#: tickets/workflow/const.py:8
+msgid "Condition"
+msgstr "条件"
+
+#: tickets/workflow/const.py:9
+msgid "CC"
+msgstr "抄送"
+
+#: tickets/workflow/const.py:16 tickets/workflow/const.py:25
+#: tickets/workflow/const.py:33
+msgid "Approved"
+msgstr "已通过"
+
+#: tickets/workflow/const.py:18 tickets/workflow/const.py:28
+#: tickets/workflow/const.py:36
+msgid "Cancelled"
+msgstr "已取消"
+
+#: tickets/workflow/const.py:27
+msgid "Skipped"
+msgstr "已跳过"
+
+#: tickets/workflow/const.py:35
+msgid "Transferred"
+msgstr "已转交"
+
+#: tickets/workflow/context.py:23
+msgid "Requested assets are missing or outside the ticket organization."
+msgstr "申请的资产不存在或不属于工单所在组织。"
+
+#: tickets/workflow/context.py:58
+msgid "No accounts matched the request. Select explicit accounts."
+msgstr "没有匹配的账号，请明确选择账号。"
+
+#: tickets/workflow/definition.py:17
+msgid "Workflow data must contain only finite JSON values."
+msgstr "流程数据必须是有效的 JSON，且不能包含无穷值或非数值。"
+
+#: tickets/workflow/definition.py:19
+msgid "Workflow data exceeds the size limit."
+msgstr "流程数据超出大小限制。"
+
+#: tickets/workflow/definition.py:27
+msgid "Unknown approver configuration field."
+msgstr "未知的审批人配置字段。"
+
+#: tickets/workflow/definition.py:33
+msgid "Approvers require between 1 and 1000 resource IDs."
+msgstr "审批人配置需要 1 至 1000 个资源 ID。"
+
+#: tickets/workflow/definition.py:38
+msgid "Approver resource IDs must be UUIDs."
+msgstr "审批人资源 ID 必须为 UUID。"
+
+#: tickets/workflow/definition.py:41
+msgid "This resolver reads IDs from the request snapshot or organization."
+msgstr "此审批人选择方式从申请快照或组织读取 ID。"
+
+#: tickets/workflow/definition.py:46
+msgid "Unknown approval configuration field."
+msgstr "未知的审批配置字段。"
+
+#: tickets/workflow/definition.py:50
+msgid "Approval strategy must be any, all or quorum."
+msgstr "审批策略必须为 any（或签）、all（会签）或 quorum（指定人数）。"
+
+#: tickets/workflow/definition.py:53
+msgid "Quorum requires a positive approval count up to 1000."
+msgstr "指定审批人数必须为 1 至 1000 的整数。"
+
+#: tickets/workflow/definition.py:57
+#, python-brace-format
+msgid "Select at least {required} approvers; currently {count} selected."
+msgstr "至少选择 {required} 名审批人，当前已选择 {count} 名。"
+
+#: tickets/workflow/definition.py:55
+msgid "Only quorum accepts a required approval count."
+msgstr "只有指定人数审批策略可以设置所需审批人数。"
+
+#: tickets/workflow/definition.py:58
+#, python-brace-format
+msgid "{key} must be a boolean."
+msgstr "{key} 必须为布尔值。"
+
+#: tickets/workflow/definition.py:61
+msgid "Timeout must be whole minutes between 1 and 525600, or 0 for no deadline."
+msgstr "超时时间必须为 1 至 525600 的整分钟数，0 表示不超时。"
+
+#: tickets/workflow/definition.py:63
+msgid "Timeout action must be expire or reject."
+msgstr "超时处理必须为 expire（过期）或 reject（拒绝）。"
+
+#: tickets/workflow/definition.py:68
+msgid "A CC node accepts a list of up to 1000 user IDs."
+msgstr "抄送节点最多接受 1000 个用户 ID。"
+
+#: tickets/workflow/definition.py:72
+msgid "CC user IDs must be UUIDs."
+msgstr "抄送用户 ID 必须为 UUID。"
+
+#: tickets/workflow/definition.py:79
+msgid "A workflow requires nodes and edges."
+msgstr "审批流程必须包含节点和连线。"
+
+#: tickets/workflow/definition.py:82
+msgid "A workflow requires between 2 and 128 nodes."
+msgstr "审批流程必须包含 2 至 128 个节点。"
+
+#: tickets/workflow/definition.py:84
+msgid "A workflow supports at most 256 edges."
+msgstr "审批流程最多支持 256 条连线。"
+
+#: tickets/workflow/definition.py:88
+msgid "Invalid workflow node."
+msgstr "流程节点无效。"
+
+#: tickets/workflow/definition.py:91
+msgid ""
+"Node IDs must be unique strings of up to 64 letters, digits, underscores or "
+"hyphens."
+msgstr "节点 ID 必须唯一，最多包含 64 个字母、数字、下划线或连字符。"
+
+#: tickets/workflow/definition.py:93
+msgid "Unsupported node type."
+msgstr "不支持此节点类型。"
+
+#: tickets/workflow/definition.py:96
+msgid "Node names must be strings of up to 128 characters."
+msgstr "节点名称必须是字符串，且不能超过 128 个字符。"
+
+#: tickets/workflow/definition.py:99
+msgid "Node config must be an object."
+msgstr "节点配置必须是对象。"
+
+#: tickets/workflow/definition.py:107
+msgid "Start and end nodes do not accept configuration."
+msgstr "开始和结束节点不接受配置。"
+
+#: tickets/workflow/definition.py:112
+msgid "Positions require bounded integer x and y coordinates."
+msgstr "节点位置的 x、y 坐标必须是有效范围内的整数。"
+
+#: tickets/workflow/definition.py:117
+msgid "A workflow requires exactly one start and one end."
+msgstr "审批流程必须且只能包含一个开始节点和一个结束节点。"
+
+#: tickets/workflow/definition.py:126
+msgid "Branch suffix must be true or false."
+msgstr "分支后缀必须为 true 或 false。"
+
+#: tickets/workflow/definition.py:130
+msgid "Invalid workflow edge."
+msgstr "流程连线无效。"
+
+#: tickets/workflow/definition.py:133
+msgid "Edges must reference existing nodes."
+msgstr "连线必须引用已存在的节点。"
+
+#: tickets/workflow/definition.py:135
+msgid "Duplicate edges and self loops are not allowed."
+msgstr "不能重复连线或将节点连接到自身。"
+
+#: tickets/workflow/definition.py:139
+msgid "Branch conditions must be booleans."
+msgstr "分支条件必须为布尔值。"
+
+#: tickets/workflow/definition.py:141
+msgid "Edge priority must be a nonnegative bounded integer."
+msgstr "连线优先级必须是有效范围内的非负整数。"
+
+#: tickets/workflow/definition.py:149
+msgid "Only the start node may have no incoming edges."
+msgstr "只有开始节点可以没有输入连线。"
+
+#: tickets/workflow/definition.py:152
+msgid "Conditions require one true and one false branch."
+msgstr "条件节点必须同时包含满足和不满足两个分支。"
+
+#: tickets/workflow/definition.py:154
+msgid "Only condition nodes can branch; end nodes cannot have outgoing edges."
+msgstr "只有条件节点可以分支，结束节点不能有输出连线。"
+
+#: tickets/workflow/definition.py:167
+msgid "Workflows must be acyclic and fully reachable."
+msgstr "审批流程不能形成环路，且所有节点都必须可达。"
+
+#: tickets/workflow/engine.py:33
+msgid "Workflow instances must belong to a concrete organization."
+msgstr "流程实例必须属于具体组织。"
+
+#: tickets/workflow/engine.py:35 tickets/workflow/engine.py:65
+msgid "This workflow belongs to another organization."
+msgstr "此审批流程属于其他组织。"
+
+#: tickets/workflow/engine.py:55
+msgid "The ticket already has a different workflow."
+msgstr "此工单已关联其他审批流程。"
+
+#: tickets/workflow/engine.py:58
+msgid "Only new tickets without legacy approval steps can start a workflow."
+msgstr "只有未包含旧版审批步骤的新工单可以启动流程。"
+
+#: tickets/workflow/engine.py:68 tickets/workflow/engine.py:71
+msgid "Select an enabled workflow with a published version."
+msgstr "请选择已有发布版本且已启用的审批流程。"
+
+#: tickets/workflow/engine.py:73
+msgid "The workflow type does not match the ticket."
+msgstr "审批流程类型与工单不匹配。"
+
+#: tickets/workflow/engine.py:76
+msgid "The context snapshot must be an object."
+msgstr "上下文快照必须是对象。"
+
+#: tickets/workflow/engine.py:79
+msgid "A workflow requires an applicant."
+msgstr "审批流程必须有申请人。"
+
+#: tickets/workflow/engine.py:105
+msgid "Only the assigned, active organization member may process this task."
+msgstr "只有被指派且仍在组织内启用的成员可以处理此任务。"
+
+#: tickets/workflow/engine.py:108
+msgid "This user cannot process this approval task."
+msgstr "此用户无权处理此审批任务。"
+
+#: tickets/workflow/engine.py:132
+msgid "The quorum exceeds the number of eligible approvers."
+msgstr "所需审批人数超过符合条件的审批人数。"
+
+#: tickets/workflow/engine.py:253
+msgid "Only the applicant may withdraw this workflow."
+msgstr "仅申请人可以撤回此流程。"
+
+#: tickets/workflow/engine.py:263
+msgid "The target must be an active member of this organization."
+msgstr "目标用户必须是此组织内已启用的成员。"
+
+#: tickets/workflow/engine.py:266
+msgid "This user cannot approve this node."
+msgstr "此用户无权审批此节点。"
+
+#: tickets/workflow/engine.py:268
+msgid "The target already participated in this approval node."
+msgstr "目标用户已经参与此审批节点。"
+
+#: tickets/workflow/engine.py:270
+msgid "An approval node supports at most 1000 tasks."
+msgstr "一个审批节点最多支持 1000 个审批任务。"
+
+#: tickets/workflow/engine.py:277
+msgid "Transfer is disabled for this node."
+msgstr "此节点不允许转交。"
+
+#: tickets/workflow/engine.py:293
+msgid "Adding approvers is disabled for this node."
+msgstr "此节点不允许加签。"
+
+#: tickets/workflow/errors.py:7
+msgid "The workflow state has changed. Refresh before trying again."
+msgstr "流程状态已变更，请刷新后重试。"
+
+#: tickets/workflow/publication.py:21
+msgid "CC recipients must be active organization members."
+msgstr "抄送人必须是组织内已启用的成员。"
+
+#: tickets/workflow/publication.py:24
+msgid "A newer version was published. Reload before publishing."
+msgstr "已有更新的版本发布，请刷新后再发布。"
+
+#: tickets/workflow/resources.py:33
+msgid "This ticket type does not support resource adjustment."
+msgstr "此工单类型不支持调整资源。"
+
+#: tickets/workflow/resources.py:42
+msgid "Select assets available for application in this organization."
+msgstr "请选择此组织内可申请的资产。"
+
+#: tickets/workflow/resources.py:56
+msgid "Select nodes available for application in this organization."
+msgstr "请选择此组织内可申请的节点。"
+
+#: tickets/workflow/resources.py:84
+msgid "Select the available resources before submitting."
+msgstr "请先选择可用资源，再提交申请。"
+
+#: tickets/workflow/resources.py:96
+msgid "This request cannot be adjusted now."
+msgstr "当前无法调整此申请。"
+
+#: tickets/workflow/resources.py:102
+msgid ""
+"Adjusting resources requires asset and account query permissions in this "
+"organization."
+msgstr "调整资源需要此组织内的资产和账号查询权限。"
+
+#: tickets/workflow/resources.py:138
+msgid "The request was adjusted. Refresh and review the current resources."
+msgstr "申请已调整，请刷新并确认当前资源。"
+
+#: tickets/workflow/resources.py:181
+msgid "An adjusted request must pass an approval node before completion."
+msgstr "调整后的申请必须经过审批节点才能完成。"
+
+#: tickets/workflow/resources.py:206
+msgid "Select active assets in the ticket organization."
+msgstr "请选择工单所在组织内已启用的资产。"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:108
+msgid "domain_name"
+msgstr "域名称"
+
+#: tickets/models/workflow.py:45
+msgid "Legacy ticket approval"
+msgstr "历史工单审批"
+
+#: tickets/models/workflow.py:46
+msgid "Combined approval workflow"
+msgstr "组合审批流程"
+
+msgid "Client idle lock (minute)"
+msgstr "空闲锁屏 (分)"
+
+msgid ""
+"0 disables idle locking (default). When enabled, the client starts locked. "
+"Only the active site and account are checked for system keyboard or mouse "
+"inactivity. Lock the main page and managed asset windows without ending "
+"login or connections. Unlock only on the main page with the current account "
+"client lock password. Set the password in Personal settings > Login "
+"authentication > Client credentials. External applications are not covered "
+"by the client lock."
+msgstr ""
+"0 表示关闭空闲锁屏。 "
+"主页面和客户端管理的资产窗口一起锁定，只能在主页面输入当前账号的锁屏密码解锁。登录和连接保持；外部软件不受此锁屏保护。启用后，新登录及恢复的登录默认锁定。"
+" 根据本机系统键鼠输入判断空闲，其他程序中的操作也计入；只对当前激活的站点和账号计时，无需向服务器上报活动。"
+
+msgid "Client lock password"
+msgstr "客户端锁屏密码"
+
+msgid "Set a client lock password in the web personal settings first."
+msgstr "尚未设置客户端锁屏密码。请前往此站点、此账号的 Web 个人设置中设置，返回后点击刷新。"
+
+msgid "The client lock password is incorrect."
+msgstr "解锁失败，请检查锁屏密码和网络后重试。"
+
+msgid ""
+"Calculated from each login time using the latest setting. Activity and token"
+" refresh do not extend it. 0 means unlimited. If a change makes a login "
+"overdue, allow up to 10 minutes before sign-out and signing in again."
+msgstr "从每次登录时间起，按最新配置计算。用户操作和令牌刷新不续期。0 表示不限。配置修改后已超时的，最多再保留 10 分钟，到期后需要重新登录。"
+
+msgid ""
+"{} - Encryption password not set - Please go to Personal Settings → Login "
+"authentication → Client credentials → File Encryption Password to set it."
+msgstr "{} - 未设置加密密码，请前往个人设置 → 登录认证 → 客户端凭证 → 文件加密密码进行设置。"
+
+msgid ""
+"0 disables automatic idle locking (default). System keyboard and mouse input"
+" determines inactivity for the active site and account only. Activity is not"
+" reported for each action; an idle timeout or manual lock sends one request "
+"to lock this login on the server. Idle timeout locks the main page and its "
+"managed asset windows even without a lock password. Unlock only on the main "
+"page after server password verification. New logins open normally; "
+"previously locked logins stay locked after restoration. External application"
+" windows are not protected."
+msgstr ""
+"0 "
+"表示关闭自动空闲锁屏。根据本机系统键鼠输入判断空闲，只对当前激活的站点和账号计时。平时不逐次上报活动；达到空闲超时或手动锁定时，通知服务器锁定本次登录。"
+" "
+"空闲超时即锁定主页面和对应资产窗口，即使尚未设置密码。只能在主页面通过后端验证密码后解锁。新登录正常进入，已锁定的登录恢复后仍锁定。外部软件窗口不受保护。"
+
+msgid "The web session is locked. Unlock it before authorizing a client."
+msgstr "Web 会话已锁定，请先解锁后再授权客户端。"
+
+msgid "Client is locked. Unlock it on the main page."
+msgstr "客户端已锁定，请在主页面解锁。"
+
+msgid ""
+"Default: 15 minutes. 0 disables automatic locking. After the configured "
+"period without system keyboard or mouse input, lock the main page and asset "
+"windows for the current site and account. Unlock on the main page by "
+"verifying the lock password online. Locking also applies if no password is "
+"configured; set it in web personal settings. External application windows "
+"are not protected."
+msgstr ""
+"默认 15 分钟。 0 "
+"表示关闭自动锁屏。本机无键鼠操作达到设定时长后，锁定当前站点账号的主页面和资产窗口。解锁需在主页面联网验证锁屏密码。未设置密码也会锁定，可前往 Web "
+"个人设置中设置密码。外部软件窗口不受保护。"
+
+msgid ""
+"{} - Encryption password not set - Please go to Personal Settings → User "
+"authentication → File Encryption to set it."
+msgstr "{} - 未设置加密密码，请前往个人设置 → 用户认证 → 文件加密进行设置。"
+
+#: rbac/tree.py
+msgid "Audit reports"
+msgstr "审计报告"
+
+#: rbac/tree.py
+msgid "Legacy reports"
+msgstr "旧版报表"
+
+#: rbac/models/menu.py
+msgid "Can view comprehensive audit report"
+msgstr "可以查看综合审计报告"
+
+#: rbac/models/menu.py
+msgid "Can view operations activity report"
+msgstr "可以查看运维活动报告"
+
+#: rbac/models/menu.py
+msgid "Can view security event report"
+msgstr "可以查看安全事件报告"
+
+#: rbac/models/menu.py
+msgid "Can view asset and account overview"
+msgstr "可以查看资产与账号概况"
+
+#: rbac/models/menu.py
+msgid "Can view account operations report"
+msgstr "可以查看账号运维报告"
+
+msgid "Locked"
+msgstr "锁屏状态"
+
+msgid "Screen lock password"
+msgstr "锁屏密码"
+
+msgid "Idle screen lock (minute)"
+msgstr "空闲锁屏 (分)"
+
+msgid "Set a lock password after signing in again."
+msgstr "请重新登录后设置锁屏密码。"
+
+msgid "The lock password is incorrect."
+msgstr "锁屏密码不正确。"
+
+msgid ""
+"Configure an identity verification method before changing the lock password."
+msgstr "请先配置身份验证方式，再修改锁屏密码。"
+
+msgid "This verification method is not available."
+msgstr "此验证方式不可用。"
+
+msgid ""
+"Default: 15 minutes. 0 disables automatic locking. Shared by the desktop "
+"client, console and Web terminal. Desktop uses system keyboard/mouse "
+"activity; Web combines activity in tabs on this site. Idle locks even "
+"without a password. Unlock requires online password verification; if unset, "
+"sign out and sign in again to set it. External applications are not "
+"protected."
+msgstr ""
+"默认 15 分钟，0 表示关闭自动锁屏。客户端、控制台和 Web 终端共用。客户端按系统键鼠活动计时，Web "
+"汇总同站点各标签页的活动。空闲到时即锁屏，未设置密码也会锁定。解锁需在线验证锁屏密码；未设置时可退出并重新登录后设置。外部软件窗口不受保护。"
+
+msgid ""
+"Too many incorrect screen lock passwords. This session has been signed out."
+msgstr "锁屏密码连续错误 5 次，本次登录已注销。"
+
+msgid ""
+"Default: 15 minutes. 0 disables automatic locking. Uses system "
+"keyboard/mouse activity. Locks the desktop client and its asset windows even"
+" without a lock password. Unlock on the main window with online password "
+"verification. External applications are not protected."
+msgstr ""
+"默认 15 分钟，0 "
+"表示关闭自动锁屏。根据本机系统的键鼠活动判断空闲，到时锁定客户端及其资产窗口，即使未设置锁屏密码也会锁定。只能在主窗口经后端验证密码后解锁，外部软件窗口不受保护。"
+
+msgid ""
+"Default: 15 minutes. 0 disables automatic locking. Shared by the console and"
+" Web terminal. Uses keyboard/mouse activity across tabs on this site; other "
+"sites and external applications cannot be monitored. Locks the current Web "
+"login even without a lock password. If unset, sign out and sign in again."
+msgstr ""
+"默认 15 分钟，0 表示关闭自动锁屏。控制台和 Web "
+"终端共用，同站点标签页汇总键鼠活动，其他网站和外部软件的活动无法采集。即使未设置密码也会锁屏，此时可退出后重新登录。"
+
+#~ msgid "Ticket already closed"
+#~ msgstr "工单已经关闭"
+
+msgid "Web session lifetime (second)"
+msgstr "Web 会话有效时长 (秒)"
+
+msgid "Renew session on request"
+msgstr "请求续期"
+
+msgid ""
+"SESSION_COOKIE_AGE, in seconds. Change it in Core config.yml and restart "
+"Core. New or renewed sessions use the new duration; stored expiry times are "
+"not immediately rewritten. This is not a fixed maximum since login. Web and "
+"desktop login policies are independent."
+msgstr ""
+"配置项 SESSION_COOKIE_AGE，单位为秒。修改 Core 的 config.yml 后重启 "
+"Core。新建或续期的会话使用新时长，已保存的到期时间不会立即批量改写。这不是从登录开始计算的固定最长有效期。Web 与客户端登录策略相互独立。"
+
+msgid ""
+"SESSION_SAVE_EVERY_REQUEST. Change it in Core config.yml and restart Core. "
+"When enabled, ordinary requests renew the Web session for the configured "
+"duration. Disabling it does not impose a fixed maximum: writing to the "
+"session can still renew it. Keyboard/mouse inactivity does not sign out the "
+"user; idle screen locking is configured separately."
+msgstr ""
+"配置项 SESSION_SAVE_EVERY_REQUEST，修改 Core 的 config.yml 后重启 "
+"Core。开启后，普通请求按会话有效时长延长到期时间；关闭也不等于固定最长有效期，写入 Session "
+"仍可能续期。键鼠空闲不会直接退出登录，空闲锁屏单独配置。"
+
+msgid ""
+"0 means unlimited. Calculated from each login time using the latest setting."
+" Activity and token refresh do not extend it. Settings sync about every 60 "
+"seconds. If a change makes a login overdue, allow up to 10 minutes before "
+"sign-out. Extending the limit during grace cancels sign-out if the login is "
+"within the new limit."
+msgstr ""
+"0 表示不限制。按每次登录时间和最新配置计算，操作和 Token 刷新不会延长。配置约每 60 秒同步；新配置下已超时的，最多再保留 10 "
+"分钟。宽限期内延长后未超时的，取消退出。"
+
+msgid "Web idle screen lock (minute)"
+msgstr "Web 端空闲锁屏 (分)"
+
+msgid "Client idle screen lock (minute)"
+msgstr "客户端空闲锁屏 (分)"
+
+msgid ""
+"Leave blank to follow the administrator. A personal value must not exceed "
+"the administrator limit."
+msgstr "留空跟随管理员设置，个人设置不能超过管理员上限。"
+
+#, python-format
+msgid ""
+"The administrator limit is %(minutes)s minutes. Leave blank to follow it."
+msgstr "管理员上限为 %(minutes)s 分钟，留空表示跟随管理员设置。"
+
+msgid ""
+"Global default and maximum. Users who have not customized it follow this "
+"value. Personal values must not exceed it. Lowering the maximum also lowers "
+"larger personal values; raising it keeps customized values."
+msgstr ""
+"这是全局默认值和上限。未自行设置的用户始终跟随此值；个人设置只能小于或等于此值。调小上限时，超出的个人值会一并调小；调大时，已自行设置的值保持不变。"
+
+msgid "Choose either setting or clearing the lock password."
+msgstr "不能同时设置和清空锁屏密码。"
+
+msgid ""
+"When the global value is 0, users may choose 0 to disable locking or a "
+"positive personal timeout."
+msgstr "全局值为 0 时，用户可设置 0 关闭锁屏，也可设置正数自行开启。"
+
+msgid "The administrator requires reauthentication after client exit."
+msgstr "管理员要求退出客户端后重新登录，不能关闭。"
+
+msgid ""
+"Users may enable it themselves when the administrator does not require it."
+msgstr "管理员未要求开启时，用户可以自行开启。"
+
+msgid ""
+"SESSION_COOKIE_AGE, in seconds. Change it in Core config.yml and restart "
+"Core. New logins use the new duration. Existing expiry times are not "
+"immediately rewritten. Renewals use the new duration unless the session has "
+"its own saved duration; sign in again to apply the new duration to those "
+"sessions. This is not a fixed maximum since login. Web and desktop login "
+"policies are independent."
+msgstr ""
+"会话有效时长和请求续期需修改 Core 的 config.yml 并重启 "
+"Core。新登录采用新配置；已有截止时间不会批量改写。保存了独立时长的已有会话，续期时也可能继续使用原时长，需要重新登录才能采用新时长。 "
+"SESSION_COOKIE_AGE "
+"是会话保存时采用的有效时长，单位为秒，不是从最初登录开始计算的固定上限。个人信息中显示的当前到期时间，才是服务器保存的本次截止时间。"
+
+msgid ""
+"Default Web session duration, in seconds, after login or renewal. It is not "
+"a fixed maximum since the first login. Change SESSION_COOKIE_AGE in Core "
+"config.yml and restart Core. Existing sessions may keep their saved "
+"duration; sign in again to apply the new duration."
+msgstr ""
+"默认的 Web 登录或续期后有效时长，单位为秒，不是从首次登录计算的固定上限。修改 Core 的 config.yml 中 "
+"SESSION_COOKIE_AGE 并重启后生效。已有会话可能保留原时长，重新登录后采用新时长。"
+
+msgid ""
+"Enabled: ordinary HTTP requests, including background requests, renew the "
+"session. Disabled: ordinary read-only requests do not renew it, but session "
+"writes such as identity verification still can. Change "
+"SESSION_SAVE_EVERY_REQUEST in Core config.yml and restart Core."
+msgstr ""
+"开启：普通 HTTP 请求会续期，后台请求也可能续期。关闭：普通只读请求不续期，但重新验证身份等修改 Session 的操作仍可能续期。修改 Core "
+"的 config.yml 中 SESSION_SAVE_EVERY_REQUEST 并重启后生效。"
+
+msgid ""
+"Enabled: closing the browser normally requires signing in again. Browser "
+"session restore may keep login cookies; use Sign out to end the login "
+"reliably. This does not set a fixed maximum login duration."
+msgstr ""
+"开启后，关闭浏览器通常需要重新登录。浏览器恢复功能可能保留登录 Cookie；需要确保退出时，请点击「退出登录」。这不是固定最长登录时长的设置。"
+
+msgid ""
+"Default duration, in seconds.<br>Each renewal restarts the clock: expiry = "
+"renewal time + duration.<br>Ordinary requests renew it when request renewal "
+"is enabled; session writes such as identity verification can still renew it "
+"when disabled.<br>This is not a fixed maximum from the first "
+"login.<br>Change SESSION_COOKIE_AGE in Core config.yml and restart Core. "
+"Existing sessions may retain their saved duration; sign in again to apply "
+"the new duration."
+msgstr ""
+"默认有效时长，单位为秒。<br>每次续期后重新计时：到期时间 = 续期时间 + "
+"有效时长。<br>开启「请求续期」时，普通请求会续期；关闭时，重新验证身份等修改 Session "
+"的操作仍可能续期。<br>这不是从首次登录计算的固定最长有效期。<br>修改 Core 的 config.yml 中 "
+"SESSION_COOKIE_AGE 并重启后生效。已有会话可能保留原时长，重新登录后采用新时长。"
+
+msgid ""
+"Enabled: most API requests using a valid Web session renew it, including GET"
+" queries and background business polling. Mouse or keyboard activity is not "
+"required.<br>Excluded read-only queries: profile, online status (user-"
+"session), and lock status (session-lock/status).<br>Disabled: ordinary read-"
+"only requests do not renew it, but identity verification and other session "
+"writes still can.<br>Why: the project writes the verification result to "
+"Session; Django saves the modified session and recalculates its relative "
+"expiry by default.<br>Change SESSION_SAVE_EVERY_REQUEST in Core config.yml "
+"and restart Core."
+msgstr ""
+"开启：大多数携带有效 Web 会话的 API 请求都会续期，包括 GET "
+"查询和后台业务轮询，不要求有键鼠操作。<br>不续期的只读查询：个人信息、在线状态（user-session）、锁屏状态（session-"
+"lock/status）。<br>关闭：普通只读请求不续期，但重新验证身份等修改 Session 的操作仍可能续期。<br>原因：项目把验证结果写入 "
+"Session；Django 默认在保存被修改的 Session 时重新计算相对有效期。<br>修改 Core 的 config.yml 中 "
+"SESSION_SAVE_EVERY_REQUEST 并重启后生效。"
+
+msgid ""
+"Enabled: after quitting the entire browser application, opening it again "
+"normally requires signing in.<br>Closing a tab or window, or minimizing it, "
+"is not the same as quitting the application; the browser may still be "
+"running in the background.<br>Browser session restore may preserve login "
+"cookies. Use the site Sign out action to reliably end the login.<br>This "
+"does not set a fixed maximum login duration."
+msgstr ""
+"开启后，退出整个浏览器应用，再次打开通常需要重新登录。<br>仅关闭标签页或窗口、最小化不等于退出应用，浏览器可能仍在后台运行。<br>浏览器恢复功能可能保留登录"
+" Cookie；需要确保退出时，请点击站点的「退出登录」。<br>此项不设置固定最长登录时长。"
+
+#: apps/settings/serializers/security.py
+msgid ""
+"Require a new login after exiting and restarting. Minimizing or hiding the "
+"client does not count as exiting."
+msgstr "开启后，退出并重新启动需重新登录，最小化或隐藏不受影响。"
+
+#: apps/settings/serializers/security.py
+msgid ""
+"0 means unlimited. Counted from login. Sign in again when it expires; "
+"activity does not extend it. A login already overdue after a change gets up "
+"to 10 more minutes."
+msgstr "0 表示不限制。 从登录时间起计算，到期需重新登录，操作不会延长。 修改后已超时的登录最多保留 10 分钟。"
+
+#: apps/settings/serializers/security.py
+msgid ""
+"0 disables automatic locking. Locks after the idle timeout. Switching "
+"accounts does not reset the previous account’s idle time. Enter the lock "
+"password to unlock. External application windows are not protected."
+msgstr "0 表示关闭自动锁屏。空闲超时后锁定，切换账号不会重置原账号的空闲时间。输入锁屏密码解锁，外部软件窗口不受保护。"
+
+#: settings/serializers/feature.py
+msgid "Asset application scope"
+msgstr "资产申请范围"
+
+#: settings/serializers/feature.py
+msgid "Specifies which assets users can select when requesting access via a ticket.<br><b>All assets:</b> All assets in the ticket's organization, even if the user has no existing permission.<br><b>Permed assets:</b> Assets included in permission rules assigned to the user or their user groups, including inactive, expired and not-yet-effective rules.<br><b>Permed valid assets:</b> Assets included in valid permission rules assigned to the user or their user groups. The rule must be enabled, and the current time must be between its start and end times."
+msgstr "设置用户申请资产授权时可在工单中选择的资产范围。<br><b>所有资产：</b>可选择工单所属组织内的全部资产，无需事先获得授权。<br><b>授权的资产：</b>可选择本人或所属用户组的授权规则中包含的资产，包括规则已停用、已过期或尚未生效的情况。<br><b>有效授权的资产：</b>仅可选择本人或所属用户组的有效授权规则中包含的资产。规则须已启用、已到开始时间且未到结束时间。"
+
+msgid "Can view verify account execution"
+msgstr "可以查看账号连接性测试执行记录"
+
+msgid "Can add verify account execution"
+msgstr "可以执行账号连接性测试"
+
+msgid "Can view asset connectivity execution"
+msgstr "可以查看资产连接性测试执行记录"
+
+msgid "Can add asset connectivity execution"
+msgstr "可以执行资产连接性测试"
+
+msgid "Account usernames. Leave empty to test all active accounts on the selected assets."
+msgstr "账号用户名。留空表示测试所选资产上的所有启用账号。"
+
+msgid "Asset / Account"
+msgstr "资产 / 账号"
+
+#: assets/templates/assets/connectivity_report.html
+msgid "Unsupported"
+msgstr "不支持"
+
+#: assets/templates/assets/connectivity_report.html
+msgid "Execution results"
+msgstr "执行结果"
+
+#: assets/templates/assets/connectivity_report.html
+msgid "No execution results"
+msgstr "暂无执行结果"
+
+#: accounts/templates/accounts/reports/account_results.html
+msgid "No execution details"
+msgstr "暂无执行明细"
+
+#: accounts/templates/accounts/reports/account_results.html
+msgid "No account changes"
+msgstr "暂无账号变化"
+
+#: chat_ai/models.py
+msgid "Chat AI conversation audit"
+msgstr "AI 会话审计"
+
+#: accounts/api/account/application.py:60
+msgid "Credential policies currently support the Python SDK only."
+msgstr "凭据策略目前仅支持 Python SDK。"
+
+#: accounts/api/account/application.py:143
+msgid "Select a supported webhook event."
+msgstr "请选择受支持的 Webhook 事件。"
+
+#: accounts/api/account/application.py:146
+#: accounts/serializers/account/credential.py:143
+#: accounts/serializers/account/service.py:185
+msgid "Select at least one application."
+msgstr "请至少选择一个应用。"
+
+#: accounts/api/account/application.py:164
+msgid "URL is required to test the webhook."
+msgstr "测试 Webhook 时 URL 为必填项。"
+
+#: accounts/api/account/application.py:166
+msgid "Select one of the subscribed webhook events."
+msgstr "请选择已订阅的 Webhook 事件。"
+
+#: accounts/api/account/credential.py:67
+msgid "The credential client request date is invalid."
+msgstr "凭据客户端请求日期无效。"
+
+#: accounts/api/account/credential.py:71
+msgid "The credential client request has expired."
+msgstr "凭据客户端请求已过期。"
+
+#: accounts/api/account/credential.py:79
+msgid "The credential client request body is invalid."
+msgstr "凭据客户端请求体无效。"
+
+#: accounts/api/account/credential.py:87
+msgid "The credential client request ID is invalid."
+msgstr "凭据客户端请求 ID 无效。"
+
+#: accounts/api/account/credential.py:96
+msgid "Credential client replay protection is unavailable."
+msgstr "凭据客户端重放保护不可用。"
+
+#: accounts/api/account/credential.py:101
+msgid "The credential client request has already been used."
+msgstr "凭据客户端请求已被使用。"
+
+#: accounts/api/account/credential.py:136
+msgid "A rotating credential policy cannot be deleted."
+msgstr "轮换中的凭据策略不能删除。"
+
+#: accounts/api/account/credential.py:138
+msgid ""
+"Remove this credential from client access configurations before deleting it."
+msgstr "删除前请先从客户端接入配置中移除此凭据策略。"
+
+#: accounts/api/account/credential.py:219
+msgid "No active rotation."
+msgstr "没有进行中的轮换。"
+
+#: accounts/api/account/credential.py:244
+msgid "An application cannot be unbound during rotation."
+msgstr "轮换期间不能解绑应用。"
+
+#: accounts/api/account/credential.py:246
+msgid ""
+"Remove the credential from client access configurations before unbinding it."
+msgstr "解绑前请先从客户端接入配置中移除此凭据策略。"
+
+#: accounts/api/account/credential.py:271
+msgid "An online client cannot be deleted."
+msgstr "不能删除在线客户端。"
+
+#: accounts/api/account/credential.py:276
+msgid "Disable the rotating client with a reason before deleting it."
+msgstr "删除前请先禁用该轮换客户端并填写原因。"
+
+#: accounts/api/account/credential.py:300
+msgid "The client protocol or configuration format is not supported."
+msgstr "不支持该客户端协议或配置格式。"
+
+#: accounts/api/account/credential.py:392
+msgid ""
+"Disable the client configuration instead of deleting it during rotation."
+msgstr "轮换期间请禁用客户端接入配置，不要将其删除。"
+
+#: accounts/api/automations/base.py:125
+msgid "Invalid automation task type."
+msgstr "无效的数据"
+
+#: accounts/automations/base/manager.py:447
+msgid "This account belongs to an active credential policy rotation."
+msgstr "该账号属于进行中的凭据策略轮换。"
+
+#: accounts/const/application.py:6
+msgid "Administrator"
+msgstr "超级管理员"
+
+#: accounts/const/application.py:7 accounts/models/credential.py:162
+msgid "SDK"
+msgstr "SDK"
+
+#: accounts/const/application.py:8 accounts/models/credential.py:163
+msgid "Agent"
+msgstr "Agent"
+
+#: accounts/const/application.py:9
+msgid "JumpServer"
+msgstr "JumpServer"
+
+#: accounts/const/application.py:13
+msgid "Configuration created"
+msgstr "接入配置已创建"
+
+#: accounts/const/application.py:14 accounts/const/application.py:39
+msgid "Configuration updated"
+msgstr "接入配置已更新"
+
+#: accounts/const/application.py:15
+msgid "Configuration deleted"
+msgstr "接入配置已删除"
+
+#: accounts/const/application.py:16
+msgid "Authorization granted"
+msgstr "账号授权已授予"
+
+#: accounts/const/application.py:18
+msgid "Client registered"
+msgstr "客户端已注册"
+
+#: accounts/const/application.py:19
+msgid "Client enabled"
+msgstr "客户端已启用"
+
+#: accounts/const/application.py:20
+msgid "Client disabled"
+msgstr "客户端已禁用"
+
+#: accounts/const/application.py:21
+msgid "Credential fetched"
+msgstr "凭据已获取"
+
+#: accounts/const/application.py:22
+msgid "Credential confirmed"
+msgstr "凭据已确认"
+
+#: accounts/const/application.py:23
+msgid "Credential published"
+msgstr "凭据已发布"
+
+#: accounts/const/application.py:24
+msgid "Credential stream connected"
+msgstr "凭据事件流已连接"
+
+#: accounts/const/application.py:25
+msgid "Credential stream disconnected"
+msgstr "凭据事件流已断开"
+
+#: accounts/const/application.py:26
+msgid "Secret change started"
+msgstr "改密已开始"
+
+#: accounts/const/application.py:27
+msgid "Secret change completed"
+msgstr "改密已完成"
+
+#: accounts/const/application.py:28 accounts/models/credential.py:29
+msgid "Secret change failed"
+msgstr "最近改密失败"
+
+#: accounts/const/application.py:29
+msgid "Application secret reset"
+msgstr "重置应用密钥"
+
+#: accounts/const/application.py:30 accounts/const/application.py:43
+msgid "Rotation started"
+msgstr "轮换已开始"
+
+#: accounts/const/application.py:31
+msgid "Rotation step"
+msgstr "轮换步骤"
+
+#: accounts/const/application.py:32 accounts/models/credential.py:59
+msgid "Rotation cancelled"
+msgstr "轮换已取消"
+
+#: accounts/const/application.py:33
+msgid "Application notification"
+msgstr "应用事件通知"
+
+#: accounts/const/application.py:37
+msgid "Credential updated"
+msgstr "凭据已更新"
+
+#: accounts/const/application.py:38
+msgid "Credential revoked"
+msgstr "凭据已撤销"
+
+#: accounts/const/application.py:40
+msgid "Credential change started"
+msgstr "凭据改密已开始"
+
+#: accounts/const/application.py:41
+msgid "Credential change completed"
+msgstr "凭据改密已完成"
+
+#: accounts/const/application.py:42
+msgid "Credential change failed"
+msgstr "凭据改密失败"
+
+#: accounts/const/application.py:44
+msgid "Rotation waiting for application"
+msgstr "轮换正在等待应用确认"
+
+#: accounts/const/application.py:45
+msgid "Rotation completed"
+msgstr "轮换已完成"
+
+#: accounts/const/application.py:46
+msgid "Rotation failed"
+msgstr "轮换失败"
+
+#: accounts/credential_client/audit_signals.py:218
+msgid "Delete the linked rotation tasks before deleting this credential."
+msgstr "删除此凭据策略前，请先删除关联的轮换任务。"
+
+#: accounts/credential_client/audit_signals.py:233
+msgid "An active rotation task or execution cannot be deleted."
+msgstr "不能删除进行中的轮换任务或执行记录。"
+
+#: accounts/credential_client/audit_signals.py:250
+#: accounts/serializers/account/credential.py:520
+msgid "Explain why the rotating credential should stop participating."
+msgstr "请说明轮换中的凭据停止参与的原因。"
+
+#: accounts/credential_client/manager.py:42
+msgid "The Agent client instance is disabled."
+msgstr "Agent 客户端实例已禁用。"
+
+#: accounts/credential_client/manager.py:47
+#: accounts/credential_client/manager.py:50
+msgid "This field is required for SDK access."
+msgstr "该字段是必填项。"
+
+#: accounts/credential_client/manager.py:57
+msgid "The SDK client access configuration is disabled or invalid."
+msgstr "SDK 客户端接入配置已禁用或无效。"
+
+#: accounts/credential_client/manager.py:65
+msgid "The SDK client instance is disabled."
+msgstr "SDK 客户端实例已禁用。"
+
+#: accounts/credential_client/manager.py:77
+#: accounts/credential_client/manager.py:87
+msgid "Credential policy not found."
+msgstr "未找到凭据策略。"
+
+#: accounts/credential_client/manager.py:80
+msgid "The client access configuration does not include this credential."
+msgstr "客户端接入配置未包含此凭据策略。"
+
+#: accounts/credential_client/manager.py:83
+msgid "The credential policy is not bound to this application."
+msgstr "凭据策略未绑定到此应用。"
+
+#: accounts/credential_client/manager.py:93
+#: accounts/credential_client/manager.py:122
+msgid "The application is not authorized for this credential account."
+msgstr "企业应用未授权所选应用凭据关联的全部账号。"
+
+#: accounts/credential_client/manager.py:98
+msgid "The application is not authorized for every credential account."
+msgstr "企业应用未授权所选应用凭据关联的全部账号。"
+
+#: accounts/credential_client/manager.py:114
+msgid ""
+"The client access configuration does not include an active credential change "
+"subscription."
+msgstr "客户端接入配置未包含启用的凭据变更订阅。"
+
+#: accounts/credential_client/manager.py:186
+msgid "Credential change subscriptions do not require confirmation."
+msgstr "凭据变更订阅不需要确认。"
+
+#: accounts/credential_client/manager.py:195
+#: accounts/credential_client/manager.py:199
+msgid "Fetch the credential before confirming it."
+msgstr "请先获取凭据，再确认版本。"
+
+#: accounts/credential_client/manager.py:197
+msgid "The credential revision is no longer current."
+msgstr "该凭据版本已不是当前版本。"
+
+#: accounts/credential_client/manager.py:295
+msgid "Agent synchronization requires an Agent client."
+msgstr "Agent 同步需要使用 Agent 客户端。"
+
+#: accounts/credential_client/manager.py:366
+msgid "Invalid or expired registration token."
+msgstr "注册令牌无效或已过期。"
+
+#: accounts/credential_client/manager.py:380
+msgid "Client access configuration not found."
+msgstr "未找到客户端接入配置。"
+
+#: accounts/credential_client/manager.py:386
+msgid ""
+"This client instance already exists. Reuse its local configuration. If that "
+"configuration was lost, review and remove the unused instance or choose a "
+"different instance ID; registration will not replace its identity."
+msgstr ""
+"此客户端实例已存在。请复用其本地配置。若配置已丢失，请检查并移除未使用的实"
+"例，或使用其他实例 ID；重新注册不会替换其身份。"
+
+#: accounts/credential_client/manager.py:392
+msgid ""
+"Registration token has already been used. Check whether the instance was "
+"created before generating a new token."
+msgstr "注册令牌已被使用。生成新令牌前，请先检查实例是否已创建。"
+
+#: accounts/credential_client/manager.py:432
+msgid "The client access configuration is disabled."
+msgstr "客户端接入配置已禁用。"
+
+#: accounts/credential_client/manager.py:437
+#: accounts/serializers/account/credential.py:551
+msgid "SDK access configurations cannot mix credential policy modes."
+msgstr "SDK 接入配置不能混合选择不同模式的凭据策略。"
+
+#: accounts/credential_rotation/execution.py:29
+msgid "This rotation is no longer active."
+msgstr "此轮换已不再进行。"
+
+#: accounts/credential_rotation/execution.py:43
+#: accounts/credential_rotation/manager.py:104
+msgid "Wait for all enabled clients to apply the target account."
+msgstr "请等待所有已启用客户端应用目标账号。"
+
+#: accounts/credential_rotation/execution.py:57
+msgid ""
+"A rotation task must target only the account being replaced, run once, and "
+"verify the secret after changing it."
+msgstr "轮换任务只能针对待替换账号执行一次，并在改密后验证凭据。"
+
+#: accounts/credential_rotation/execution.py:87
+msgid "Only a confirmed unchanged secret can be retried; provide a reason."
+msgstr "仅确认凭据未变化后才能重试，并需填写原因。"
+
+#: accounts/credential_rotation/execution.py:89
+#: accounts/credential_rotation/manager.py:101
+msgid "The credential policy is not ready for secret change."
+msgstr "凭据策略尚未进入可改密状态。"
+
+#: accounts/credential_rotation/execution.py:93
+msgid "Save a change secret task for this rotation before executing it."
+msgstr "执行前请先保存此轮换的改密任务。"
+
+#: accounts/credential_rotation/execution.py:95
+msgid "The rotation task is inactive or belongs to another organization."
+msgstr "轮换任务已禁用或属于其他组织。"
+
+#: accounts/credential_rotation/execution.py:100
+msgid ""
+"The account version changed outside this rotation; verification is required."
+msgstr "账号版本在本轮换之外发生了变化，需要重新验证。"
+
+#: accounts/credential_rotation/execution.py:225
+msgid "The execution result requires verification."
+msgstr "执行结果需要验证。"
+
+#: accounts/credential_rotation/manager.py:52
+msgid "The alternating account configuration is incomplete."
+msgstr "交替账号配置不完整。"
+
+#: accounts/credential_rotation/manager.py:89
+msgid "The credential policy is not waiting for the account switch."
+msgstr "凭据策略当前未等待账号切换。"
+
+#: accounts/credential_rotation/manager.py:125
+msgid "No secret change is running for this credential policy."
+msgstr "此凭据策略没有进行中的改密。"
+
+#: accounts/credential_rotation/manager.py:175
+msgid "The credential policy is not waiting for account reversion."
+msgstr "凭据策略当前未等待账号切回。"
+
+#: accounts/credential_rotation/manager.py:189
+msgid "Verify that the secret is unchanged and provide a cancellation reason."
+msgstr "请确认凭据未变化并填写取消原因。"
+
+#: accounts/credential_rotation/manager.py:195
+msgid "This credential rotation cannot be cancelled."
+msgstr "此凭据轮换不能取消。"
+
+#: accounts/credential_rotation/preflight.py:21
+msgid ""
+"Target account verification failed. The current account remains published."
+msgstr "目标账号验证失败，当前账号保持发布状态。"
+
+#: accounts/credential_rotation/preflight.py:22
+msgid ""
+"Target account verification timed out. Retry verification; rotation has not "
+"started."
+msgstr "目标账号验证超时。请重试验证，轮换尚未开始。"
+
+#: accounts/credential_rotation/preflight.py:23
+msgid ""
+"The account or credential changed during verification. Start verification "
+"again."
+msgstr "验证期间账号或凭据发生变化，请重新开始验证。"
+
+#: accounts/credential_rotation/preflight.py:24
+msgid "Unable to dispatch target account verification. Please retry."
+msgstr "无法下发目标账号验证任务，请重试。"
+
+#: accounts/credential_rotation/preflight.py:33
+#, python-brace-format
+msgid ""
+"Account \"{name}\" does not allow secret reset. Enable secret reset before "
+"starting rotation."
+msgstr "账号“{name}”不允许重置凭据，请启用凭据重置后再开始轮换。"
+
+#: accounts/credential_rotation/preflight.py:46
+#, python-brace-format
+msgid ""
+"This account is already used by credential policy \"{name}\". Choose another "
+"account or reuse that credential policy."
+msgstr "该账号已被凭据策略“{name}”使用，请选择其他账号或复用该凭据策略。"
+
+#: accounts/credential_rotation/preflight.py:57
+msgid "Only active, idle alternating rotation policies can start rotation."
+msgstr "只有已启用且空闲的双账号交替轮换策略可以开始轮换。"
+
+#: accounts/credential_rotation/preflight.py:60
+msgid "The rotation account configuration is incomplete."
+msgstr "轮换账号配置不完整。"
+
+#: accounts/credential_rotation/preflight.py:66
+msgid ""
+"The initial and alternate accounts must be different and use the same asset "
+"and secret type."
+msgstr "初始账号和交替账号必须不同，且属于同一资产并使用相同凭据类型。"
+
+#: accounts/credential_rotation/preflight.py:71
+msgid ""
+"The rotation accounts and asset must belong to the credential organization."
+msgstr "轮换账号和资产必须属于凭据策略所在组织。"
+
+#: accounts/credential_rotation/preflight.py:73
+#, python-brace-format
+msgid "Account \"{name}\" or its asset is disabled."
+msgstr "账号“{name}”或其资产已禁用。"
+
+#: accounts/credential_rotation/preflight.py:75
+#, python-brace-format
+msgid "Account \"{name}\" has no password or key."
+msgstr "账号“{name}”没有密码或密钥。"
+
+#: accounts/credential_rotation/preflight.py:85
+msgid "An account change is already running. Wait before starting rotation."
+msgstr "账号改密正在进行中，请等待完成后再开始轮换。"
+
+#: accounts/credential_rotation/preflight.py:153
+msgid "The verification task name is already in use."
+msgstr "验证任务名称已被使用。"
+
+#: accounts/models/application.py:93 accounts/models/credential.py:73
+#: accounts/serializers/account/credential.py:71
+#: accounts/serializers/account/service.py:128
+msgid "Integration applications"
+msgstr "集成应用"
+
+#: accounts/models/application.py:101
+msgid "Request headers"
+msgstr "请求头"
+
+#: accounts/models/application.py:102
+msgid "Events"
+msgstr "事件"
+
+#: accounts/models/application.py:104
+msgid "Body template"
+msgstr "请求体模板"
+
+#: accounts/models/application.py:109
+msgid "Application webhook"
+msgstr "应用 Webhook"
+
+#: accounts/models/credential.py:21
+msgid "Credential change subscription"
+msgstr "凭据变更订阅"
+
+#: accounts/models/credential.py:22
+msgid "Alternating dual-account rotation"
+msgstr "双账号交替轮换"
+
+#: accounts/models/credential.py:25
+msgid "Idle"
+msgstr "空闲"
+
+#: accounts/models/credential.py:26
+msgid "Waiting for account switch"
+msgstr "等待账号切换"
+
+#: accounts/models/credential.py:27
+msgid "Ready for secret change"
+msgstr "等待改密"
+
+#: accounts/models/credential.py:28
+msgid "Changing secret"
+msgstr "改密"
+
+#: accounts/models/credential.py:30
+msgid "Recovery required"
+msgstr "需要恢复"
+
+#: accounts/models/credential.py:31
+msgid "Waiting for account revert"
+msgstr "等待账号切回"
+
+#: accounts/models/credential.py:37
+msgid "Mode"
+msgstr "模式"
+
+#: accounts/models/credential.py:47
+#: accounts/serializers/account/credential.py:60
+msgid "Alternate account"
+msgstr "交替账号"
+
+#: accounts/models/credential.py:52
+#: accounts/serializers/account/credential.py:64
+msgid "Active account"
+msgstr "当前账号"
+
+#: accounts/models/credential.py:54
+msgid "Revision"
+msgstr "版本"
+
+#: accounts/models/credential.py:61
+msgid "Date rotation started"
+msgstr "轮换开始时间"
+
+#: accounts/models/credential.py:64
+msgid "Date last rotated"
+msgstr "最近轮换时间"
+
+#: accounts/models/credential.py:69 accounts/models/credential.py:310
+msgid "Change secret execution"
+msgstr "创建改密执行"
+
+#: accounts/models/credential.py:79 accounts/models/credential.py:144
+#: accounts/models/credential.py:314
+#: accounts/serializers/account/credential.py:280
+#: accounts/serializers/account/credential.py:403
+msgid "Credential policy"
+msgstr "凭据策略"
+
+#: accounts/models/credential.py:148 accounts/models/credential.py:169
+#: accounts/models/credential.py:272
+#: accounts/serializers/account/credential.py:306
+#: accounts/serializers/account/credential.py:407
+msgid "Integration application"
+msgstr "集成应用"
+
+#: accounts/models/credential.py:154
+msgid "Credential application binding"
+msgstr "凭据应用绑定"
+
+#: accounts/models/credential.py:173 accounts/models/credential.py:295
+msgid "Client access configuration"
+msgstr "客户端接入配置"
+
+#: accounts/models/credential.py:178
+msgid "Client version"
+msgstr "客户端版本"
+
+#: accounts/models/credential.py:179
+msgid "Protocol version"
+msgstr "协议版本"
+
+#: accounts/models/credential.py:181
+msgid "Configuration schema version"
+msgstr "配置结构版本"
+
+#: accounts/models/credential.py:183
+msgid "Configuration digest"
+msgstr "配置摘要"
+
+#: accounts/models/credential.py:184
+msgid "Sync status"
+msgstr "同步状态"
+
+#: accounts/models/credential.py:185
+msgid "Sync error"
+msgstr "同步错误"
+
+#: accounts/models/credential.py:186
+msgid "Date last synced"
+msgstr "最后同步日期"
+
+#: accounts/models/credential.py:187 accounts/models/credential.py:245
+msgid "Date last seen"
+msgstr "最近在线时间"
+
+#: accounts/models/credential.py:193
+msgid "Credential client instance"
+msgstr "凭据客户端实例"
+
+#: accounts/models/credential.py:226
+msgid "Application binding"
+msgstr "应用绑定"
+
+#: accounts/models/credential.py:230
+msgid "Client instance"
+msgstr "客户端实例"
+
+#: accounts/models/credential.py:232
+msgid "Fetched revision"
+msgstr "已获取版本"
+
+#: accounts/models/credential.py:233
+msgid "Delivered revision"
+msgstr "已交付版本"
+
+#: accounts/models/credential.py:234
+msgid "Applied revision"
+msgstr "已应用版本"
+
+#: accounts/models/credential.py:237
+#: accounts/serializers/account/credential.py:282
+msgid "Applied account"
+msgstr "已应用账号"
+
+#: accounts/models/credential.py:240
+msgid "Required revision"
+msgstr "要求版本"
+
+#: accounts/models/credential.py:243
+msgid "Rotation participant"
+msgstr "轮换参与者"
+
+#: accounts/models/credential.py:246
+msgid "Date fetched"
+msgstr "获取时间"
+
+#: accounts/models/credential.py:247
+msgid "Date delivered"
+msgstr "交付时间"
+
+#: accounts/models/credential.py:248
+msgid "Date applied"
+msgstr "应用时间"
+
+#: accounts/models/credential.py:253
+msgid "Credential client status"
+msgstr "凭据客户端状态"
+
+#: accounts/models/credential.py:261
+msgid "JSON files"
+msgstr "JSON 文件"
+
+#: accounts/models/credential.py:262
+msgid "Environment files"
+msgstr "环境变量文件"
+
+#: accounts/models/credential.py:263
+msgid "Unix socket"
+msgstr "Unix 套接字"
+
+#: accounts/models/credential.py:266
+msgid "Reload"
+msgstr "重新加载"
+
+#: accounts/models/credential.py:267
+msgid "Restart"
+msgstr "重启"
+
+#: accounts/models/credential.py:276
+msgid "Credential policies"
+msgstr "凭据策略"
+
+#: accounts/models/credential.py:279
+msgid "Application user"
+msgstr "应用用户"
+
+#: accounts/models/credential.py:280
+msgid "Install path"
+msgstr "安装路径"
+
+#: accounts/models/credential.py:283
+msgid "Delivery mode"
+msgstr "交付方式"
+
+#: accounts/models/credential.py:285
+msgid "Systemd unit"
+msgstr "Systemd 单元"
+
+#: accounts/models/credential.py:288
+msgid "Systemd action"
+msgstr "Systemd 操作"
+
+#: accounts/models/credential.py:318
+msgid "Source account"
+msgstr "来源账号"
+
+#: accounts/models/credential.py:322
+msgid "Target account"
+msgstr "目标账号"
+
+#: accounts/models/credential.py:326
+msgid "Account to change"
+msgstr "待改密账号"
+
+#: accounts/models/credential.py:329
+msgid "Account version at start"
+msgstr "账号版本"
+
+#: accounts/models/credential.py:337
+msgid "Participant snapshot"
+msgstr "参与实例快照"
+
+#: accounts/models/credential.py:342
+msgid "Credential rotation record"
+msgstr "凭据轮换记录"
+
+#: accounts/personal_credentials.py:173
+msgid "You do not have manual account permission for this asset"
+msgstr "你没有当前作业的权限。"
+
+#: accounts/serializers/account/credential.py:68
+msgid "Blockers"
+msgstr "阻塞项"
+
+#: accounts/serializers/account/credential.py:152
+#, python-brace-format
+msgid ""
+"These applications are not authorized for every credential account: {names}"
+msgstr "以下应用未获授权访问全部凭据账号：{names}"
+
+#: accounts/serializers/account/credential.py:161
+msgid "Remove this credential from the application access configuration first."
+msgstr "请先从应用接入配置中移除此凭据策略。"
+
+#: accounts/serializers/account/credential.py:169
+#: accounts/serializers/account/credential.py:173
+msgid "Credential settings cannot be changed during rotation."
+msgstr "轮换期间不能修改凭据设置。"
+
+#: accounts/serializers/account/credential.py:175
+msgid "The credential policy mode cannot be changed."
+msgstr "凭据策略模式不能修改。"
+
+#: accounts/serializers/account/credential.py:186
+#: accounts/serializers/account/credential.py:190
+msgid "This field is required for alternating dual-account rotation."
+msgstr "双账号交替轮换必须填写此字段。"
+
+#: accounts/serializers/account/credential.py:195
+msgid "The initial and alternate accounts must be different."
+msgstr "初始账号和交替账号必须不同。"
+
+#: accounts/serializers/account/credential.py:197
+msgid "The initial and alternate accounts must belong to the same asset."
+msgstr "初始账号和交替账号必须属于同一资产。"
+
+#: accounts/serializers/account/credential.py:199
+msgid ""
+"The initial and alternate accounts must belong to the same organization."
+msgstr "初始账号和交替账号必须属于同一组织。"
+
+#: accounts/serializers/account/credential.py:201
+msgid "The initial and alternate accounts must use the same secret type."
+msgstr "初始账号和交替账号必须使用相同的凭据类型。"
+
+#: accounts/serializers/account/credential.py:308
+msgid "Online"
+msgstr "在线"
+
+#: accounts/serializers/account/credential.py:366
+msgid "Explain why the rotating client should be excluded."
+msgstr "请说明将该客户端排除出当前轮换的原因。"
+
+#: accounts/serializers/account/credential.py:428
+msgid "Provide exactly one of key or account_id."
+msgstr "请且仅请提供 key 或 account_id 其中一个。"
+
+#: accounts/serializers/account/credential.py:512
+msgid "The application and access type cannot be changed."
+msgstr "应用和接入类型不能修改。"
+
+#: accounts/serializers/account/credential.py:530
+msgid "Select at least one credential."
+msgstr "请至少选择一个凭据策略。"
+
+#: accounts/serializers/account/credential.py:535
+msgid "The selected credential policy is not bound to this application."
+msgstr "所选凭据策略未绑定到此应用。"
+
+#: accounts/serializers/account/credential.py:543
+msgid ""
+"The application is not authorized for every selected credential account."
+msgstr "企业应用未授权所选应用凭据关联的全部账号。"
+
+#: accounts/serializers/account/credential.py:556
+msgid "This field is required for Agent access."
+msgstr "Agent 接入必须填写此字段。"
+
+#: accounts/serializers/account/credential.py:559
+msgid "Enter an absolute installation directory."
+msgstr "请输入绝对安装目录。"
+
+#: accounts/serializers/account/credential.py:567
+msgid "Enter one systemd .service unit name."
+msgstr "请输入一个 systemd .service 单元名称。"
+
+#: accounts/serializers/account/service.py:187
+msgid "URL is required when webhook is enabled."
+msgstr "启用 Webhook 时 URL 为必填项。"
+
+#: accounts/serializers/account/service.py:189
+msgid "Select at least one event."
+msgstr "请至少选择一个事件。"
+
+#: accounts/serializers/automations/change_secret.py:84
+msgid "The task cannot be assigned to another rotation."
+msgstr "该任务不能分配给其他轮换。"
+
+#: accounts/serializers/automations/change_secret.py:94
+msgid "Rotation not found."
+msgstr "旋转 (度)"
+
+#: accounts/serializers/automations/change_secret.py:96
+msgid "The rotation task cannot be edited at this stage."
+msgstr "当前阶段不能编辑轮换任务。"
+
+#: accounts/serializers/automations/change_secret.py:100
+msgid "This rotation already has a change secret task."
+msgstr "此轮换已有改密任务。"
+
+#: accounts/tasks/application_events.py:132
+msgid "Deliver application webhook"
+msgstr "发送应用 Webhook 通知"
+
+#: accounts/tasks/application_events.py:157
+msgid "Expire application event deliveries"
+msgstr "处理过期的应用事件通知"
+
+#: accounts/tasks/application_events.py:182
+msgid "Clean application records"
+msgstr "清理应用记录"
+
+#: accounts/tasks/application_events.py:183
+msgid ""
+"Clean expired application audits and completed webhook delivery records."
+msgstr "清理过期的应用审计记录和已完成的 Webhook 投递记录。"
+
+#: accounts/tasks/common.py:13
+msgid "Credential rotation precheck"
+msgstr "凭据轮换预检查"
+
+#: accounts/tasks/common.py:36
+msgid "Execute credential rotation secret change"
+msgstr "执行凭据轮换改密"
+
+#: accounts/webhooks.py:33
+msgid "Event ID"
+msgstr "事件 ID"
+
+#: accounts/webhooks.py:34
+msgid "Event code"
+msgstr "事件代码"
+
+#: accounts/webhooks.py:35
+msgid "Event result"
+msgstr "事件结果"
+
+#: accounts/webhooks.py:36
+msgid "Occurred at"
+msgstr "发生时间"
+
+#: accounts/webhooks.py:37
+msgid "Event summary"
+msgstr "事件摘要"
+
+#: accounts/webhooks.py:39
+msgid "Application name"
+msgstr "应用名称"
+
+#: accounts/webhooks.py:41
+msgid "Credential name"
+msgstr "凭据策略名称"
+
+#: accounts/webhooks.py:42
+msgid "Credential key"
+msgstr "凭据策略标识"
+
+#: accounts/webhooks.py:43
+msgid "Credential revision"
+msgstr "凭据版本"
+
+#: accounts/webhooks.py:44
+msgid "Configuration ID"
+msgstr "接入配置 ID"
+
+#: accounts/webhooks.py:45
+msgid "Configuration name"
+msgstr "接入配置名称"
+
+#: accounts/webhooks.py:46
+msgid "Client instance ID"
+msgstr "客户端实例 ID"
+
+#: accounts/webhooks.py:50
+msgid "Rotation ID"
+msgstr "轮换 ID"
+
+#: accounts/webhooks.py:81
+msgid "URL credentials are not allowed."
+msgstr "URL 中不能包含身份凭据。"
+
+#: accounts/webhooks.py:83
+msgid "URL fragments are not allowed."
+msgstr "URL 中不能包含片段。"
+
+#: accounts/webhooks.py:86
+msgid "URL port must be between 1 and 65535."
+msgstr "URL 端口必须介于 1 到 65535 之间。"
+
+#: accounts/webhooks.py:95
+msgid "URL resolves to a forbidden address."
+msgstr "URL 解析到了禁止访问的地址。"
+
+#: accounts/webhooks.py:99
+msgid "Enter a valid and resolvable HTTP(S) URL."
+msgstr "请输入有效且可解析的 HTTP(S) URL。"
+
+#: accounts/webhooks.py:117
+msgid "Request headers must be an object."
+msgstr "请求头必须是对象。"
+
+#: accounts/webhooks.py:119
+msgid "No more than 32 request headers are allowed."
+msgstr "请求头不能超过 32 个。"
+
+#: accounts/webhooks.py:124
+msgid "Request header name is invalid."
+msgstr "请求头名称无效。"
+
+#: accounts/webhooks.py:126
+msgid "Request header names must be unique."
+msgstr "请求头名称必须唯一。"
+
+#: accounts/webhooks.py:129
+msgid "Request header is reserved by JumpServer."
+msgstr "该请求头由 JumpServer 保留。"
+
+#: accounts/webhooks.py:131
+msgid "Request header values must be strings up to 4096 characters."
+msgstr "请求头值必须是长度不超过 4096 个字符的字符串。"
+
+#: accounts/webhooks.py:133
+msgid "Request header values contain invalid control characters."
+msgstr "请求头值包含无效控制字符。"
+
+#: accounts/webhooks.py:138
+msgid "Request header values must contain only ISO-8859-1 characters."
+msgstr "请求头值只能包含 ISO-8859-1 字符。"
+
+#: accounts/webhooks.py:141
+msgid "Request headers cannot contain template variables."
+msgstr "请求头不能包含模板变量。"
+
+#: accounts/webhooks.py:143
+msgid "Request headers are too large."
+msgstr "请求头过大。"
+
+#: accounts/webhooks.py:149
+msgid "Webhook template is too deeply nested."
+msgstr "Webhook 模板嵌套层级过深。"
+
+#: accounts/webhooks.py:153
+msgid "Webhook template keys must be static strings."
+msgstr "Webhook 模板键必须是静态字符串。"
+
+#: accounts/webhooks.py:160 accounts/webhooks.py:164
+msgid "Webhook template contains an invalid expression."
+msgstr "Webhook 模板包含无效表达式。"
+
+#: accounts/webhooks.py:167
+#, python-format
+msgid "Unknown webhook template variable: %s"
+msgstr "未知的 Webhook 模板变量：%s"
+
+#: accounts/webhooks.py:172
+msgid "Webhook template must be a JSON object."
+msgstr "Webhook 模板必须是 JSON 对象。"
+
+#: accounts/webhooks.py:176
+msgid "Webhook template must contain valid JSON values."
+msgstr "Webhook 模板必须包含有效的 JSON 值。"
+
+#: accounts/webhooks.py:178
+msgid "Webhook template cannot exceed 64 KiB."
+msgstr "Webhook 模板不能超过 64 KiB。"
+
+#: accounts/webhooks.py:215
+msgid "Rendered webhook body cannot exceed 64 KiB."
+msgstr "渲染后的 Webhook 请求体不能超过 64 KiB。"
+
+#: authentication/api/connection_token.py:764
+#: authentication/models/connection_token.py:205
+msgid "Personal credentials can only be used with the manual account"
+msgstr ""
+
+#: settings/serializers/cleaning.py:56
+msgid "Application record retention days"
+msgstr "应用记录保留天数"
+
+#~ msgid "Subscription snapshot"
+#~ msgstr "订阅 ID"
+
+#~ msgid "Credential unavailable"
+#~ msgstr "账号无效"
+
+#~ msgid "Access revoked"
+#~ msgstr "访问令牌"
+
+#~ msgid "Application credential not found."
+#~ msgstr "账号未找到"
+
+#~ msgid ""
+#~ "The primary account secret has not been changed and verified successfully."
+#~ msgstr "你的账号已创建成功"
+
+#~ msgid "The application credential is not waiting for the primary account."
+#~ msgstr "企业应用未授权所选应用凭据关联的全部账号。"
+
+#~ msgid "Fixed account"
+#~ msgstr "失败账号"
+
+#~ msgid "Account rotation"
+#~ msgstr "账号版本"
+
+#~ msgid "Dual accounts"
+#~ msgstr "虚拟账号"
+
+#~ msgid "Waiting for primary account"
+#~ msgstr "创建目标账号"
+
+#~ msgid "Primary account"
+#~ msgstr "验证账号"
+
+#~ msgid "Published account"
+#~ msgstr "账号推送"
+
+#~ msgid "Application credential"
+#~ msgstr "应用用户"
+
+#~ msgid "Event notifications"
+#~ msgstr "通知"
+
+#~ msgid "Notification URL"
+#~ msgstr "通知"
+
+#~ msgid "Application credentials"
+#~ msgstr "无效的证书"
+
+#~ msgid "Preparing face recognition"
+#~ msgstr "人脸识别"
+
+#~ msgid "Camera preview"
+#~ msgstr "PAM"
+
+#~ msgid "Connecting"
+#~ msgstr "连接数"
+
+#~ msgid "Face recognition unavailable"
+#~ msgstr "人脸识别"
+
+#~ msgid "Unable to connect to face recognition"
+#~ msgstr "无法连接到主机"
+
+#~ msgid "Face capture token is invalid or expired"
+#~ msgstr "令牌错误或失效"
+
+#~ msgid "Face recognition connection closed"
+#~ msgstr "人脸识别"
+
+#~ msgid "Online face monitor"
+#~ msgstr "可以查看任务监控"
+
+#~ msgid "Camera is ready"
+#~ msgstr "Lark 已经绑定"
+
+#~ msgid "Verification complete"
+#~ msgstr "校验错误"
+
+#~ msgid "Monitored session paused"
+#~ msgstr "可以监控会话"
+
+#~ msgid "Online monitoring"
+#~ msgstr "在线会话"
+
+#~ msgid "This browser cannot access a camera"
+#~ msgstr "该文件不能重命名"
+
+#: accounts/notifications.py
+msgid "Account rotation preparation is ready"
+msgstr "账号轮换准备已就绪"
+
+#: accounts/notifications.py
+msgid "Credential policy \"{name}\" is aligned. No application has requested the standby account Secret for {days} days. Sign in and manually start account switching."
+msgstr "凭据策略“{name}”已完成账号对齐，备用账号已连续 {days} 天没有被应用调用 API 获取凭据。请登录系统，手动发起账号切换。"
+
+#: accounts/credential_client/commands.py
+msgid "Select enabled connection instances belonging to this application."
+msgstr "请选择属于当前应用且已启用的连接实例。"
+
+#: accounts/credential_client/commands.py
+msgid "Select an authorized account rotation policy for this application."
+msgstr "请选择当前应用已授权的账号轮换策略。"
+
+#: accounts/credential_client/commands.py
+msgid "Select an account rotation policy."
+msgstr "请选择账号轮换策略。"
+
+#: accounts/credential_client/commands.py
+msgid "Wait for the account secret change to finish."
+msgstr "请等待账号改密完成。"
+
+#: accounts/credential_client/commands.py
+msgid "The selected connection instances do not all have access to this credential."
+msgstr "部分所选连接实例没有该凭据的接入权限。"
+
+#: accounts/credential_client/commands.py
+msgid "The selected Agent must be configured to restart its application service."
+msgstr "所选 Agent 必须已配置为允许重启应用服务。"
+
+#: accounts/credential_client/commands.py
+msgid "Claim the event before reporting an execution result."
+msgstr "请先申请执行事件，再回报执行结果。"
+
+#: accounts/credential_client/commands.py
+msgid "Confirm the requested account version before reporting success."
+msgstr "请先确认实际使用请求中的账号版本，再回报成功。"
+
+#: accounts/credential_client/commands.py
+msgid "Invalid command ID."
+msgstr "无效的事件执行编号。"
+
+msgid "Only active, idle policies can start a new cycle."
+msgstr "只有已启用且空闲的策略才能发起新周期。"
+
+msgid "No authorized subscription accounts are available for notification."
+msgstr "没有可通知的已授权订阅账号。"
+
+msgid "Wait for the current account secret changes to finish before republishing."
+msgstr "请等待当前账号改密结束后，再重新发布凭据通知。"
+
+msgid "Credential notification republished"
+msgstr "重新发布凭据通知"
+
+msgid "Completed policy cycles are retained from their end time. Active cycles, cycles requiring attention, and their dependent audit and confirmation records are preserved."
+msgstr "已结束周期从结束时间起计算保留期。进行中、需要处理的周期及其依赖的审计和应用确认记录将保留。"
+
+msgid "Clean expired application audits, completed policy cycles and webhook delivery records."
+msgstr "清理过期的应用审计、已结束的策略周期和 Webhook 投递记录。"
+
+msgid "The start time must be earlier than the end time."
+msgstr "开始时间必须早于结束时间。"
+
+msgid "Verify backup account before switching"
+msgstr "切换前验证备用账号"
+
+msgid "Verify the backup account from the server before switching. When disabled, ensure the backup account is usable yourself."
+msgstr "切换前由服务端验证备用账号；关闭后，请自行确保备用账号可用。"
+
+msgid "Backup account verification skipped by policy"
+msgstr "已按策略跳过备用账号验证"
+
+#: authentication/serializers/confirm.py
+msgid "Confirmation type returned by GET /api/v1/authentication/confirm/."
+msgstr "GET /api/v1/authentication/confirm/ 返回的确认类型。"
+
+#: authentication/serializers/confirm.py
+msgid "Required for MFA confirmation. Select an enabled method of the current user, such as otp."
+msgstr "MFA 确认时必填。请选择当前用户已启用的验证方式，例如 otp。"
+
+#: authentication/serializers/confirm.py
+msgid "Current user's password or MFA code. Required for password and code-based MFA confirmation."
+msgstr "当前用户的密码或 MFA 验证码。密码确认和使用验证码的 MFA 确认时必填。"
+
+#: authentication/serializers/confirm.py authentication/confirm/mfa.py
+msgid "This field is required for MFA confirmation."
+msgstr "MFA 确认时必须填写此字段。"
+
+#: authentication/serializers/confirm.py
+msgid "This field is required for password confirmation."
+msgstr "密码确认时必须填写此字段。"
+
+#: authentication/confirm/mfa.py
+msgid "This field is required for code-based MFA confirmation."
+msgstr "使用验证码进行 MFA 确认时必须填写此字段。"
+
+#: authentication/api/confirm.py
+msgid "No available confirmation method for the current user. Configure and enable MFA, then retry."
+msgstr "当前用户没有可用的身份确认方式。请先配置并启用 MFA，再重试。"
+
+#: authentication/permissions.py
+msgid "The confirmation belongs to a different user."
+msgstr "此确认状态属于其他用户。"
+
+#: authentication/permissions.py
+msgid "No identity confirmation was found in the current session."
+msgstr "当前会话中没有身份确认记录。"
+
+#: authentication/permissions.py
+msgid "The current confirmation does not meet the required level."
+msgstr "当前身份确认未达到此操作要求的确认级别。"
+
+#: authentication/permissions.py
+#, python-format
+msgid "The identity confirmation has expired (valid for %(ttl)s seconds)."
+msgstr "身份确认已过期（有效期为 %(ttl)s 秒）。"
+
+#: authentication/permissions.py
+#, python-format
+msgid "Confirm the current user with %(confirm_type)s, then retry with the same session cookie. This confirmation is valid for %(ttl)s seconds while the session remains valid."
+msgstr "请使用 %(confirm_type)s 确认当前用户身份，然后携带同一会话 Cookie 重试。在会话仍有效的前提下，此类确认的有效期为 %(ttl)s 秒。"
+
+#: apps/settings/serializers/security.py
+msgid ""
+"0 disables idle locking. Locks the console and Web terminal after the "
+"specified idle time. Enter the lock password to unlock. With idle locking "
+"enabled, closing all pages also locks this login after 10 seconds. Close-"
+"page sign-out takes priority. Refreshing or reopening within 10 seconds "
+"cancels this. Administrator settings are defaults and limits. Users may "
+"choose stricter settings; otherwise they follow the administrator."
+msgstr ""
+"0 表示关闭空闲锁屏。 空闲达到设定时间后锁定控制台和 Web 终端，输入锁屏密码解锁。 开启空闲锁屏后，关闭全部页面 10 "
+"秒后也会锁定；开启关闭页面退出则优先注销，刷新或 10 秒内重开可取消。 管理员设置为默认值和上限，用户可设置得更严格；未自行设置则跟随管理员。"
+
+#: apps/settings/serializers/security.py:222
+msgid ""
+"When renewal is disabled, the login expires after this duration, even if the"
+" session is saved or identity is verified again. When renewal is enabled, "
+"each renewal grants this duration again. Changes apply to new logins without"
+" restarting Core."
+msgstr "关闭续期时，从登录成功开始固定计时，保存会话或再次验证身份不延长。开启续期时，每次续期重新获得此时长。修改后新登录生效，无需重启。"
+
+#: apps/settings/serializers/security.py:230
+msgid ""
+"Requests can extend the session at most once per minute. Background business"
+" requests also count; profile, online-status and lock-status polling do not."
+" Disabled: the expiry time stays fixed. Changes apply to new logins without "
+"restarting Core."
+msgstr "普通请求最多每分钟续期一次，后台业务请求也会续期；个人资料、在线状态和锁屏状态轮询除外。关闭后固定到期。修改后新登录生效，无需重启。"
+
+#: apps/settings/serializers/security.py:299
+msgid "Log in again after exiting the browser"
+msgstr "浏览器退出后重新登录"
+
+#: apps/settings/serializers/security.py:299
+msgid ""
+"Require a new login after quitting the browser application. Closing a tab or"
+" window does not count. Browser session restore may preserve the login; use "
+"Sign out to reliably end it. Changes apply to new logins."
+msgstr "退出整个浏览器应用后需要重新登录，关闭标签页或窗口不属于退出。浏览器恢复功能可能保留登录，可靠结束请点击退出登录。修改后新登录生效。"
+
+msgid "Log in again after exiting the browser or closing all JumpServer pages"
+msgstr "浏览器退出或关闭全部页面后重新登录"
+
+msgid ""
+"End this login 10 seconds after all console and Web terminal pages for it "
+"close. Refreshing or reopening a page within 10 seconds cancels sign-out. A "
+"browser crash may prevent the close report; use Sign out to reliably end the"
+" login. Changes apply to new logins."
+msgstr ""
+"开启后，同次登录的控制台和 Web 终端页面全部关闭约 10 "
+"秒后注销；刷新或期间重新打开会取消注销。浏览器异常退出可能无法上报，可靠结束请点击退出登录。修改后新登录生效。"
+
+msgid "Session policy"
+msgstr "会话策略"
+
+msgid "Log in again when the browser closes"
+msgstr "浏览器关闭时重新登录"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "External ID"
+msgstr "云资源 ID"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Last seen at"
+msgstr "最近发现时间"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Stale since"
+msgstr "首次缺失时间"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Missing count"
+msgstr "连续未发现次数"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Stale"
+msgstr "待复核"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Conflict"
+msgstr "冲突"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Cloud resource was not found in a complete scan"
+msgstr "完整扫描中未发现该云资源"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The resource no longer matches the synchronization strategy"
+msgstr "该云资源不再匹配同步策略"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The region was removed from the synchronization scope"
+msgstr "该地域已移出同步范围"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud resource binding needs manual review"
+msgstr "云资源绑定存在冲突，需要人工复核"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The discovered resource was not selected for import"
+msgstr "发现了该云资源，但未选择导入"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The resource was discovered but was not imported"
+msgstr "发现了该云资源，但尚未导入"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud resource changed, but automatic update is disabled"
+msgstr "云资源已变化，但未启用自动更新"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud region scan timed out"
+msgstr "云地域扫描超时"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud region scan did not return a complete result"
+msgstr "云地域扫描结果不完整"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud region scan returned an invalid result"
+msgstr "云地域返回了无效的扫描结果"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud region could not be scanned"
+msgstr "云地域扫描失败"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "No additional details"
+msgstr "无补充说明"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "First seen at"
+msgstr "首次发现时间"
+
+#: settings/api/settings.py
+msgid "Invalid settings category."
+msgstr "无效的配置分组。"
+
+#: settings/serializers/security.py
+msgid "Provide either ip or a non-empty ips list."
+msgstr "请提供 ip 或非空的 ips 列表。"
+
+#: settings/serializers/security.py
+msgid "Provide only one of ip or ips."
+msgstr "ip 和 ips 只能提供其中一个。"
+
+#: terminal/api/component/storage.py
+msgid "Deleting storage of type \"{}\" is not allowed"
+msgstr "不允许删除类型为“{}”的存储配置"
+
+#: xpack/plugins/cloud/manager.py
+#, python-format
+msgid ""
+"Resources: new %(new)s, updated %(updated)s, unchanged %(nochange)s, to "
+"review %(stale)s, failed %(failed)s, skipped %(skip)s, released %(released)s"
+msgstr ""
+"资源统计：新增 %(new)s，更新 %(updated)s，无变化 %(nochange)s，待复核 %(stale)s，失败 "
+"%(failed)s，跳过 %(skip)s，已释放 %(released)s"
+
+#: xpack/plugins/cloud/manager.py
+#, python-format
+msgid ""
+"Regions: total %(total)s, succeeded %(succeeded)s, failed %(failed)s, "
+"incomplete %(incomplete)s, not scanned %(unscanned)s"
+msgstr ""
+"地域扫描：共 %(total)s，成功 %(succeeded)s，失败 %(failed)s，扫描不完整 %(incomplete)s，未扫描 "
+"%(unscanned)s"
+
+#: xpack/plugins/cloud/manager.py
+msgid "Interactive import does not automatically release assets."
+msgstr "本次为交互式导入，不执行自动释放。"
+
+#: xpack/plugins/cloud/manager.py
+msgid ""
+"Automatic release is enabled for resources confirmed missing by a complete "
+"scan."
+msgstr "本次已启用自动释放，仅处理完整扫描确认缺失的云资源。"
+
+#: xpack/plugins/cloud/manager.py
+msgid ""
+"Automatic release is disabled; missing cloud resources require manual "
+"review."
+msgstr "本次未启用自动释放，缺失的云资源保留为待复核。"
+
+#: xpack/plugins/cloud/manager.py
+msgid ""
+"Resource failures and scan or task errors are counted separately. A task can"
+" fail even when no individual resource failed."
+msgstr "资源失败数与扫描或任务错误分别统计；即使失败资源数为 0，任务仍可能失败。"
+
+#: xpack/plugins/cloud/const.py
+msgid "Partial"
+msgstr "部分成功"
+
+#: tickets/workflow/approvers.py
+#, python-brace-format
+msgid "Asset \"{asset}\" has no owner. Set its owner on the asset edit page."
+msgstr "资产“{asset}”未配置负责人，请在资产编辑页面设置负责人。"
+
+#: tickets/workflow/approvers.py
+#, python-brace-format
+msgid ""
+"Asset \"{asset}\" has invalid owner information. Set its owner on the asset "
+"edit page."
+msgstr "资产“{asset}”的负责人信息无效，请在资产编辑页面重新设置负责人。"
+
+#: tickets/workflow/approvers.py
+msgid ""
+"This request has no assets. Select assets or use another approver source."
+msgstr "当前申请没有资产，请选择资产或使用其他审批人来源。"
+
+#: tickets/workflow/approvers.py
+msgid "Invalid asset information in the request."
+msgstr "申请中的资产信息无效。"
+
+#: tickets/workflow/approvers.py
+#, python-brace-format
+msgid ""
+"The owners of these assets are unavailable (inactive, expired, deleted, or "
+"outside this organization): {assets}. Set valid owners on the asset edit "
+"page."
+msgstr "以下资产的负责人不可用（未启用、已过期、已删除或不属于当前组织）：{assets}。请在资产编辑页面设置有效负责人。"
+
+#: authentication/views/login.py
+msgid "The login approval workflow is misconfigured. Unable to log in. Please contact your administrator."
+msgstr "登录复核流程配置异常，无法完成登录。请联系管理员检查审批流程。"
+
+#: tickets/workflow/publication.py
+#, python-brace-format
+msgid "Login confirmation cannot use organization administrators in node \"{node}\". Select specific users or a system role."
+msgstr "登录复核的「{node}」节点不能使用组织管理员，请选择指定用户或系统角色。"
+
+#: tickets/workflow/publication.py
+#, python-brace-format
+msgid "Login confirmation has no assets and cannot use asset owners in node \"{node}\". Select another approver source."
+msgstr "登录复核不涉及资产，「{node}」节点不能使用资产负责人，请选择其他审批人来源。"
+
+#: tickets/serializers/workflow.py tickets/workflow/publication.py
+msgid "Login confirmation workflows can only be configured in the global organization."
+msgstr "登录复核流程仅支持在全局组织中配置。"
+
+msgid "Unable to cancel the login request. Please try again."
+msgstr "撤销登录申请失败，请重试。"
+
+#: authentication/serializers/connection_token.py
+msgid "Account preparation required"
+msgstr "需要准备账号"
+
+
+msgid "ClickHouse HTTP backend port for DBX and the default DBeaver driver. The protocol port remains the Native TCP port."
+msgstr "DBX 和 DBeaver 默认驱动使用的 ClickHouse HTTP 后端端口。协议端口仍用于 Native TCP。"
+
+#: terminal/tasks.py:42
+#, python-format
+msgid "Checking terminal status records older than %(days)s days."
+msgstr "正在检查超过 %(days)s 天的终端状态记录。"
+
+#: terminal/tasks.py:47 ops/tasks.py:235
+#, python-format
+msgid "Expired records matched: %(checked)s; deleted: %(deleted)s."
+msgstr "匹配的过期记录：%(checked)s 条；实际删除：%(deleted)s 条。"
+
+#: terminal/tasks.py:65
+msgid "Checking unfinished sessions; active sessions will be kept."
+msgstr "正在检查未结束的会话，仍活跃的会话将保留。"
+
+#: terminal/tasks.py:82
+#, python-format
+msgid "Sessions checked: %(checked)s; marked finished: %(finished)s; skipped because still active: %(active)s; related tasks marked finished: %(tasks)s."
+msgstr "检查会话：%(checked)s 个；标记结束：%(finished)s 个；仍活跃而跳过：%(active)s 个；关联任务标记完成：%(tasks)s 个。"
+
+#: terminal/tasks.py:51 ops/tasks.py:239
+msgid "Nothing to clean: no records exceeded the retention period."
+msgstr "无需清理：没有超过保留期限的记录。"
+
+#: terminal/tasks.py:87
+msgid "Nothing to process: no unfinished sessions."
+msgstr "无需处理：没有未结束的会话。"
+
+#: ops/celery/utils.py:38
+#, python-format
+msgid "Checking periodic task: %(name)s."
+msgstr "正在检查定时任务：%(name)s。"
+
+#: ops/celery/utils.py:61
+#, python-format
+msgid "Schedule: every %(seconds)s seconds."
+msgstr "执行计划：每 %(seconds)s 秒一次。"
+
+#: ops/celery/utils.py:46
+#, python-format
+msgid "Skipped periodic task %(name)s: the scheduling database is unavailable."
+msgstr "跳过定时任务 %(name)s：调度数据库不可用。"
+
+#: ops/celery/utils.py:77
+#, python-format
+msgid "Schedule (cron): %(cron)s; time zone: %(timezone)s."
+msgstr "执行计划（cron）：%(cron)s；时区：%(timezone)s。"
+
+#: ops/celery/utils.py:81
+#, python-format
+msgid "Skipped periodic task %(name)s: no valid interval or cron expression is configured."
+msgstr "跳过定时任务 %(name)s：未配置有效的执行间隔或 cron 表达式。"
+
+#: ops/celery/utils.py:66
+#, python-format
+msgid "Skipped periodic task %(name)s: the cron expression must contain five fields."
+msgstr "跳过定时任务 %(name)s：cron 表达式必须包含五个字段。"
+
+#: ops/tasks.py:123
+msgid "Checking periodic tasks; tasks still registered in the worker will be kept."
+msgstr "正在检查定时任务，Worker 中仍已注册的任务将保留。"
+
+#: ops/tasks.py:144
+#, python-format
+msgid "Periodic tasks checked: %(checked)s; deleted: %(cleaned)s; kept because still registered: %(kept)s; cleanup failures: %(failed)s."
+msgstr "检查定时任务：%(checked)s 个；删除：%(cleaned)s 个；仍已注册而保留：%(kept)s 个；清理失败：%(failed)s 个。"
+
+#: ops/tasks.py:161
+msgid "Starting periodic task registration."
+msgstr "开始注册定时任务。"
+
+#: ops/tasks.py:172
+#, python-format
+msgid "Periodic tasks checked: %(checked)s; created: %(created)s; updated: %(updated)s; skipped: %(skipped)s."
+msgstr "检查定时任务：%(checked)s 个；创建：%(created)s 个；更新：%(updated)s 个；跳过：%(skipped)s 个。"
+
+#: ops/tasks.py:203
+#, python-format
+msgid "Checking running jobs; jobs older than %(hours)s hours will be marked failed."
+msgstr "正在检查运行中的作业，超过 %(hours)s 小时的作业将标记为失败。"
+
+#: ops/tasks.py:208
+#, python-format
+msgid "Jobs checked: %(checked)s; marked failed: %(cleaned)s; skipped because within the time limit: %(skipped)s."
+msgstr "检查作业：%(checked)s 个；标记失败：%(cleaned)s 个；未超过时限而跳过：%(skipped)s 个。"
+
+#: ops/tasks.py:229
+#, python-format
+msgid "Checking job execution records older than %(days)s days."
+msgstr "正在检查超过 %(days)s 天的作业执行记录。"
+
+#: ops/tasks.py:133
+#, python-format
+msgid "Removing periodic task %(name)s: its task is no longer registered."
+msgstr "正在删除定时任务 %(name)s：对应任务已不再注册。"
+
+#: ops/tasks.py:213
+msgid "Nothing to process: no running jobs."
+msgstr "无需处理：没有运行中的作业。"
+
+#: ops/tasks.py:143
+#, python-format
+msgid "Periodic task %(name)s still exists after cleanup."
+msgstr "清理后定时任务 %(name)s 仍然存在。"
+
+#: settings/tasks/ldap.py:88
+#, python-format
+msgid "Checking LDAP periodic sync configuration: %(name)s."
+msgstr "正在检查 LDAP 定期同步配置：%(name)s。"
+
+#: settings/tasks/ldap.py:95
+#, python-format
+msgid "Skipped registration: LDAP periodic sync is disabled; schedules kept disabled: %(count)s."
+msgstr "跳过注册：LDAP 定期同步未启用；保持禁用的执行计划：%(count)s 个。"
+
+#: users/tasks.py:97
+msgid "Checking active local users with unexpired accounts and passwords."
+msgstr "正在检查账号和密码均未过期的已启用本地用户。"
+
+#: users/tasks.py:113 users/tasks.py:187
+#, python-format
+msgid "Users checked: %(checked)s; reminders queued: %(notified)s; skipped because inactive or expired: %(invalid)s; skipped because outside the reminder window: %(outside)s."
+msgstr "检查用户：%(checked)s 个；提醒已提交：%(notified)s 个；未启用或已过期而跳过：%(invalid)s 个；未到提醒时间而跳过：%(outside)s 个。"
+
+#: users/tasks.py:156
+#, python-format
+msgid "Checking active local users expiring within %(first)s days; remind %(first)s days before expiry and daily within %(daily)s days."
+msgstr "正在检查 %(first)s 天内到期的已启用本地用户；在到期前 %(first)s 天提醒，并在最后 %(daily)s 天内每日提醒。"
+
+#: users/tasks.py:107
+#, python-format
+msgid "Queuing a password expiration reminder for %(user)s: %(days)s days remaining."
+msgstr "正在提交用户 %(user)s 的密码到期提醒：剩余 %(days)s 天。"
+
+#: users/tasks.py:119 users/tasks.py:193
+msgid "Nothing to process: no users matched the check criteria."
+msgstr "无需处理：没有符合检查条件的用户。"
+
+#: users/tasks.py:181
+#, python-format
+msgid "Queuing an account expiration reminder for %(user)s: %(days)s days remaining."
+msgstr "正在提交用户 %(user)s 的账号到期提醒：剩余 %(days)s 天。"
+
+#: accounts/tasks/openbao.py:114
+#, python-format
+msgid "OpenBao tokens checked: 1; rotated: 1; new TTL: %(ttl)s seconds."
+msgstr "检查 OpenBao 令牌：1 个；轮换：1 个；新令牌有效期：%(ttl)s 秒。"
+
+#: accounts/tasks/openbao.py:124
+msgid "Checking OpenBao token rotation configuration."
+msgstr "正在检查 OpenBao 令牌轮换配置。"
+
+#: accounts/tasks/openbao.py:126
+msgid "Skipped token rotation: the OpenBao vault backend is not enabled."
+msgstr "跳过令牌轮换：未启用 OpenBao 密钥保管库后端。"
+
+#: accounts/tasks/openbao.py:130
+msgid "Skipped token rotation: no enabled rotation AppRole is configured."
+msgstr "跳过令牌轮换：未配置已启用的轮换 AppRole。"
+
+#: accounts/tasks/openbao.py:137
+msgid "Skipped token rotation: another rotation task is running."
+msgstr "跳过令牌轮换：另一个轮换任务正在运行。"
+
+#: accounts/tasks/openbao.py:82
+#, python-format
+msgid "OpenBao tokens checked: 1; rotated: 0; skipped: 1. The token is still valid for %(ttl)s seconds, above the rotation threshold of %(threshold)s seconds."
+msgstr "检查 OpenBao 令牌：1 个；轮换：0 个；跳过：1 个。令牌剩余有效期为 %(ttl)s 秒，超过轮换阈值 %(threshold)s 秒。"
+
+#: ops/celery/utils.py
+#, python-format
+msgid "Created periodic task %(name)s; enabled: %(enabled)s."
+msgstr "已创建定时任务 %(name)s；是否启用：%(enabled)s。"
+
+#: ops/celery/utils.py
+#, python-format
+msgid "Updated periodic task %(name)s; enabled: %(enabled)s."
+msgstr "已更新定时任务 %(name)s；是否启用：%(enabled)s。"
+
+#: tickets/tasks.py perms/tasks.py tickets/plugins/file_transfer/execution.py
+msgid "The batch limit was reached; remaining records will be checked next time."
+msgstr "已达到本次处理上限，剩余记录将在下一次检查。"
+
+#: perms/tasks.py
+msgid "No reminder was queued; recipients are missing or publication failed."
+msgstr "未提交提醒：没有接收人或消息提交失败。"
+
+#: perms/tasks.py
+msgid "No users or administrators are available to receive reminders."
+msgstr "没有可接收提醒的用户或管理员。"
+
+#: perms/tasks.py authentication/tasks.py
+msgid "Notifications queued"
+msgstr "已提交的通知"
+
+#: perms/tasks.py
+msgid "The permission is outside the reminder window."
+msgstr "授权尚未到提醒时间。"
+
+#: perms/tasks.py
+msgid "Unable to queue a notification."
+msgstr "通知提交失败。"
+
+#: terminal/tasks.py
+msgid "Alert notifications queued"
+msgstr "已提交的告警通知"
+
+#: terminal/tasks.py
+#, python-format
+msgid "Storage check failed: %(name)s (%(type)s)."
+msgstr "存储检查失败：%(name)s（%(type)s）。"
+
+#: terminal/tasks.py
+msgid "Storage connectivity or credential validation failed."
+msgstr "存储连通性或凭据验证失败。"
+
+#: users/tasks.py
+msgid "Automatic disabling of unused users is not enabled."
+msgstr "未启用长期未使用用户的自动禁用功能。"
+
+#: users/tasks.py
+#, python-format
+msgid "Checking users with no login or API key use for %(days)s days; admin is excluded."
+msgstr "正在检查 %(days)s 天内未登录且未使用 API 密钥的用户，不包含 admin。"
+
+#: users/tasks.py ops/celery/task_logging.py accounts/tasks/automation.py tickets/plugins/file_transfer/execution.py
+msgid "The record was already handled by another task."
+msgstr "记录已被其他任务处理。"
+
+#: users/tasks.py
+msgid "The unused-user threshold is outside the enabled range of 1–998 days."
+msgstr "长期未使用用户的阈值不在启用范围内（1–998 天）。"
+
+#: users/tasks.py
+msgid "Users disabled"
+msgstr "已禁用的用户"
+
+#: users/signal_handlers.py
+msgid "Sessions deleted"
+msgstr "已删除的会话"
+
+#: ops/tasks.py
+msgid "Components with health alerts"
+msgstr "存在健康告警的组件"
+
+#: ops/tasks.py
+msgid "No health alerts to send."
+msgstr "没有需要发送的健康告警。"
+
+#: ops/tasks.py
+msgid "Service performance checks are disabled by configuration."
+msgstr "配置已关闭服务性能检查。"
+
+#: ops/tasks.py
+msgid "The component is inactive."
+msgstr "组件未启用。"
+
+#: authentication/tasks.py
+msgid "Client login session cleanup"
+msgstr "客户端登录会话清理"
+
+#: authentication/tasks.py
+msgid "Credential activity records included"
+msgstr "汇总包含的凭据活动记录"
+
+#: authentication/tasks.py
+msgid "No recent credential activity matched this user."
+msgstr "该用户没有符合条件的近期凭据活动。"
+
+#: authentication/tasks.py
+msgid "OAuth credential cleanup categories"
+msgstr "OAuth 凭据分类清理"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Expired ID tokens deleted"
+msgstr "已删除的过期 ID 令牌"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Expired access tokens deleted"
+msgstr "已删除的过期访问令牌"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Expired grant tokens deleted"
+msgstr "已删除的过期授权码"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Expired refresh tokens deleted"
+msgstr "已删除的过期刷新令牌"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "No expired records in this credential category."
+msgstr "该凭据类别没有过期记录。"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Orphaned refresh tokens deleted"
+msgstr "已删除的孤立刷新令牌"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Refresh-token retention settings require these tokens to be kept."
+msgstr "刷新令牌保留策略要求保留这些令牌。"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Revoked refresh tokens deleted"
+msgstr "已删除的已撤销刷新令牌"
+
+#: notifications/notifications.py
+#, python-format
+msgid "Channel %(channel)s: matched recipients %(matched)s; recipients with a channel account %(bound)s; unbound %(unbound)s."
+msgstr "渠道 %(channel)s：匹配接收人 %(matched)s 个；已绑定渠道账号 %(bound)s 个；未绑定 %(unbound)s 个。"
+
+#: notifications/notifications.py
+msgid "No recipients have an account for this notification channel."
+msgstr "接收人未绑定该通知渠道的账号，或已不存在。"
+
+#: notifications/notifications.py
+msgid "Notification channel calls completed"
+msgstr "已完成的通知渠道调用"
+
+#: notifications/notifications.py
+msgid "The notification channel does not support this message."
+msgstr "该通知渠道不支持此类消息。"
+
+#: notifications/notifications.py
+msgid "The notification channel raised an error."
+msgstr "通知渠道处理出错。"
+
+#: authentication/services/client_login_session.py
+msgid "Client sessions revoked"
+msgstr "已撤销的客户端会话"
+
+#: authentication/services/client_login_session.py
+msgid "The client login session is still valid."
+msgstr "客户端登录会话仍然有效。"
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Failed %(count)s: %(reason)s"
+msgstr "失败 %(count)s：%(reason)s"
+
+#: ops/celery/task_logging.py
+msgid "No matching records to process."
+msgstr "没有符合条件的待处理记录。"
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Result count — %(name)s: %(count)s."
+msgstr "处理结果 — %(name)s：%(count)s。"
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Skipped %(count)s: %(reason)s"
+msgstr "跳过 %(count)s：%(reason)s"
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Task interrupted after %(checked)s checks; changes may have been rolled back. See the task error for details."
+msgstr "任务在完成 %(checked)s 次检查后中断，修改可能已回滚。具体原因请查看任务错误日志。"
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Task started: %(name)s."
+msgstr "开始任务：%(name)s。"
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Task summary: checked %(checked)s; processed %(processed)s; skipped %(skipped)s; failed %(failed)s."
+msgstr "任务汇总：检查 %(checked)s；处理 %(processed)s；跳过 %(skipped)s；失败 %(failed)s。"
+
+#: accounts/tasks/remove_account.py
+msgid "History cleanup is disabled by the retention limit."
+msgstr "保留上限配置已禁用历史记录清理。"
+
+#: accounts/tasks/remove_account.py
+#, python-format
+msgid "Keeping %(count)s history records per account, including the current version."
+msgstr "每个账号保留 %(count)s 条历史记录，包含当前版本。"
+
+#: accounts/tasks/automation.py
+msgid "Another instance of this maintenance task is running."
+msgstr "另一个相同的维护任务正在运行。"
+
+#: accounts/tasks/automation.py
+msgid "Records belong to a credential rotation that is still running."
+msgstr "记录属于仍在运行的凭据轮换任务。"
+
+#: accounts/tasks/automation.py xpack/plugins/cloud/tasks.py
+#, python-format
+msgid "Retention period: %(days)s days."
+msgstr "保留期限：%(days)s 天。"
+
+#: accounts/tasks/automation.py
+msgid "The latest unsuccessful first-login result must be retained."
+msgstr "必须保留最近一次未成功的首次登录结果。"
+
+#: accounts/tasks/automation.py
+msgid "The owning worker has not replied and the hard timeout has not elapsed."
+msgstr "所属 Worker 未回复，且尚未超过最长执行时限。"
+
+#: accounts/tasks/automation.py
+msgid "The task is still running on a worker."
+msgstr "任务仍在 Worker 上运行。"
+
+#: accounts/tasks/automation.py
+msgid "The task is still within the startup grace period."
+msgstr "任务仍处于启动宽限期内。"
+
+#: accounts/tasks/automation.py
+msgid "Unable to acquire the task lock."
+msgstr "无法获取任务锁。"
+
+#: accounts/tasks/automation.py
+msgid "Unable to release the task lock."
+msgstr "无法释放任务锁。"
+
+#: accounts/tasks/automation.py
+msgid "Waiting for repeated confirmation that the task is missing."
+msgstr "等待再次确认任务是否已消失。"
+
+#: accounts/tasks/automation.py
+msgid "Worker status is unavailable; recovery cannot be confirmed."
+msgstr "无法获取 Worker 状态，暂不能确认是否需要恢复。"
+
+#: accounts/tasks/application_events.py
+msgid "Deliveries marked expired"
+msgstr "已标记过期的投递"
+
+#: accounts/tasks/application_events.py tickets/plugins/change_secret/execution.py tickets/plugins/file_transfer/execution.py
+msgid "Executions queued"
+msgstr "已提交到队列的执行任务"
+
+#: accounts/tasks/application_events.py tickets/plugins/change_secret/execution.py tickets/plugins/file_transfer/execution.py
+msgid "Unable to queue an execution; it will be retried later."
+msgstr "执行任务入队失败，将在后续重试。"
+
+#: accounts/tasks/credential_preparation.py
+msgid "Unable to check credential rotation readiness."
+msgstr "无法检查凭据轮换准备状态。"
+
+#: accounts/tasks/credential_preparation.py
+msgid "Waiting for client confirmation or the source-account quiet period."
+msgstr "等待客户端确认或源账号静默期结束。"
+
+#: tickets/workflow/engine.py
+msgid "The workflow has changed or its approval deadline has not elapsed."
+msgstr "审批流程状态已变化，或尚未超过审批截止时间。"
+
+#: tickets/plugins/change_secret/execution.py tickets/plugins/file_transfer/execution.py
+msgid "The execution is no longer eligible for dispatch."
+msgstr "执行记录已不符合调度条件。"
+
+#: tickets/plugins/file_transfer/execution.py
+msgid "Files belong to a transfer that is still running."
+msgstr "文件属于仍在运行的传输任务。"
+
+#: tickets/plugins/file_transfer/execution.py
+msgid "Interrupted transfers marked for verification"
+msgstr "已标记待核验的中断传输"
+
+#: tickets/plugins/file_transfer/execution.py
+msgid "Unable to remove a temporary file; it will be retried later."
+msgstr "无法删除临时文件，将在后续重试。"
+
+#: xpack/plugins/cloud/tasks.py
+msgid "Cleanup is disabled because the retention period is not positive."
+msgstr "保留期限不大于零，已禁用清理。"
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Reason: %(reason)s"
+msgstr "说明：%(reason)s"
+
+#: notifications/notifications.py
+msgid "No notification channels are configured."
+msgstr "没有配置通知渠道。"
+
+#: accounts/tasks/application_events.py:46
+#, python-format
+msgid "Unable to dispatch application webhook delivery %(delivery)s."
+msgstr "无法调度应用 Webhook 投递 %(delivery)s。"
+
+#: accounts/tasks/automation.py:139
+msgid "Skipped interrupted account task inspection: no Celery worker replied."
+msgstr "跳过中断账号任务检查：没有 Celery Worker 响应。"
+
+#: accounts/tasks/automation.py:132
+msgid "Unable to inspect active Celery tasks."
+msgstr "无法检查正在执行的 Celery 任务。"
+
+#: accounts/tasks/automation.py:169
+#, python-format
+msgid "Unable to confirm interrupted task status: execution=%(execution)s."
+msgstr "无法确认中断任务状态：执行记录=%(execution)s。"
+
+#: accounts/tasks/automation.py:180
+#, python-format
+msgid "Unable to clear the interrupted task confirmation marker: execution=%(execution)s."
+msgstr "无法清除中断任务确认标记：执行记录=%(execution)s。"
+
+#: accounts/tasks/automation.py:202
+msgid "Unable to acquire the interrupted account task recovery lock."
+msgstr "无法获取中断账号任务恢复锁。"
+
+#: accounts/tasks/automation.py:218
+msgid "Unable to release the interrupted account task recovery lock."
+msgstr "无法释放中断账号任务恢复锁。"
+
+#: accounts/tasks/credential_preparation.py:12 accounts/tasks/credential_preparation.py:15
+msgid "Check credential rotation readiness"
+msgstr "检查凭据轮换准备状态"
+
+#: accounts/tasks/credential_preparation.py:33
+#, python-format
+msgid "Unable to check rotation readiness: credential=%(credential)s."
+msgstr "无法检查轮换准备状态：凭据=%(credential)s。"
+
+#: accounts/tasks/openbao.py:28
+msgid "JumpServer must use the OpenBao vault backend."
+msgstr "JumpServer 必须使用 OpenBao 密钥库后端。"
+
+#: accounts/tasks/openbao.py:30
+msgid "OpenBao token rotation requires HTTPS with TLS verification."
+msgstr "OpenBao 令牌轮换要求使用 HTTPS 并启用 TLS 验证。"
+
+#: accounts/tasks/openbao.py:62
+#, python-format
+msgid "OpenBao token lookup returned HTTP %(status)s."
+msgstr "OpenBao 令牌查询返回 HTTP %(status)s。"
+
+#: accounts/tasks/openbao.py:70
+msgid "OpenBao address changed. Reconfigure the rotation AppRole."
+msgstr "OpenBao 地址已变更，请重新配置轮换 AppRole。"
+
+#: accounts/tasks/openbao.py:98
+msgid "OpenBao did not issue a distinct token."
+msgstr "OpenBao 未签发不同于原令牌的新令牌。"
+
+#: accounts/tasks/openbao.py:102
+msgid "The new OpenBao token must support self lookup and last over seven days."
+msgstr "新的 OpenBao 令牌必须支持自身查询，且有效期超过七天。"
+
+#: accounts/tasks/openbao.py:104
+msgid "The new token failed the JumpServer OpenBao operation check."
+msgstr "新令牌未通过 JumpServer OpenBao 操作检查。"
+
+#: accounts/tasks/openbao.py:94
+#, python-format
+msgid "OpenBao AppRole login returned HTTP %(status)s."
+msgstr "OpenBao AppRole 登录返回 HTTP %(status)s。"
+
+#: accounts/tasks/openbao.py:109
+msgid "The configured OpenBao token changed during rotation."
+msgstr "已配置的 OpenBao 令牌在轮换期间发生变更。"
+
+#: accounts/tasks/openbao.py:120
+msgid "Check and rotate the OpenBao vault token"
+msgstr "检查并轮换 OpenBao 密钥库令牌"
+
+#: accounts/tasks/openbao.py:133
+msgid "OpenBao rotation requires encrypted AppRole credentials."
+msgstr "OpenBao 轮换要求加密存储 AppRole 凭据。"
+
+#: authentication/services/client_login_session.py:411
+msgid "Access tokens deleted"
+msgstr "已删除的访问令牌"
+
+#: authentication/services/client_login_session.py:412
+msgid "Refresh tokens deleted"
+msgstr "已删除的刷新令牌"
+
+#: authentication/services/client_login_session.py:419
+msgid "Client login sessions deleted"
+msgstr "已删除的客户端登录会话"
+
+#: perms/tasks.py:141
+#, python-format
+msgid "Unable to queue an asset permission expiration reminder: permission=%(permission)s; user=%(user)s."
+msgstr "资产授权到期提醒入队失败：授权=%(permission)s；用户=%(user)s。"
+
+#: terminal/tasks.py:268
+#, python-brace-format
+msgid "Test failure: {error}"
+msgstr "测试失败：{error}"
+
+#: tickets/plugins/change_secret/execution.py:100
+#, python-format
+msgid "Unable to queue password change for ticket %(ticket)s (%(error)s)."
+msgstr "工单 %(ticket)s 的改密任务入队失败（%(error)s）。"
+
+#: tickets/plugins/file_transfer/execution.py:50
+#, python-format
+msgid "Unable to queue ticket transfer %(ticket)s (%(error)s)."
+msgstr "工单传输 %(ticket)s 入队失败（%(error)s）。"
+
+#: tickets/plugins/file_transfer/execution.py:249
+#, python-format
+msgid "Unable to purge ticket transfer file %(file)s (%(error)s)."
+msgstr "无法清理工单传输文件 %(file)s（%(error)s）。"
+
+#: accounts/automations/recovery.py:38
+msgid "Invalid interrupted automation runtime path."
+msgstr "中断自动化任务的运行目录路径无效。"
+
+#: accounts/automations/recovery.py:269
+#, python-format
+msgid "Interrupted account automation finalized: execution=%(execution)s; status=%(status)s; password change records=%(changes)s; password push records=%(pushes)s."
+msgstr "已完成中断账号自动化任务的收尾：执行记录=%(execution)s；状态=%(status)s；改密记录=%(changes)s；密码推送记录=%(pushes)s。"
+
+#: accounts/automations/recovery.py:264
+#, python-format
+msgid "Unable to clean the interrupted automation runtime: execution=%(execution)s."
+msgstr "无法清理中断自动化任务的运行目录：执行记录=%(execution)s。"
+
+#: accounts/automations/recovery.py:244
+#, python-format
+msgid "Unable to clear interrupted account task status: execution=%(execution)s; account=%(account)s."
+msgstr "无法清除中断账号任务状态：执行记录=%(execution)s；账号=%(account)s。"
+
+#: accounts/automations/recovery.py:257
+#, python-format
+msgid "Unable to release the interrupted account lock: execution=%(execution)s; account=%(account)s."
+msgstr "无法释放中断账号锁：执行记录=%(execution)s；账号=%(account)s。"
+
+#: accounts/models/application.py:56
+msgid "The application account scope exceeds the configured limit."
+msgstr "应用的账号范围超出配置上限，请缩小账号范围后重试。"
+
+#: accounts/serializers/account/service.py:127
+#, python-format
+msgid ""
+"The application account scope has %(count)s accounts; the configured limit "
+"is %(limit)s."
+msgstr ""
+"当前应用的账号范围包含 %(count)s 个账号，超过配置上限 %(limit)s 个。"
+"请缩小账号范围后重试。"
+
+#: accounts/serializers/account/service.py
+msgid "Select at least one account."
+msgstr "请至少选择一个账号。"
+
+#: tickets/workflow/definition.py tickets/workflow/approvers.py
+msgid "Invalid user filter."
+msgstr "用户筛选规则无效。"
+
+#: tickets/workflow/publication.py
+msgid "ACL reviewers are only available for ACL approval workflows."
+msgstr "ACL 指定审批人仅适用于 ACL 审批流程。"
+
+#: assets/api/asset/asset.py
+msgid "Not accessed for over three months"
+msgstr "超过3个月未访问"
+
+#: assets/api/asset/asset.py
+msgid "No valid permission"
+msgstr "无有效授权"

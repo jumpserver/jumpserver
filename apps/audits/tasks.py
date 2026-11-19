@@ -6,7 +6,7 @@ import os
 from celery import shared_task
 from django.conf import settings
 from django.core.files.storage import default_storage
-from django.db import transaction
+from django.db import router, transaction
 from django.utils import timezone
 from django.utils._os import safe_join
 from django.utils.translation import gettext_lazy as _
@@ -26,25 +26,41 @@ from .models import UserLoginLog, OperateLog, FTPLog, ActivityLog, PasswordChang
 logger = get_logger(__name__)
 
 
+def delete_audit_records_in_batches(queryset, batch_size=500):
+    # Global delete signals make Django collect full model instances. Limit each
+    # collector while retaining the original filters, signals and atomicity.
+    using = queryset._db or router.db_for_write(queryset.model, **queryset._hints)
+    queryset = queryset.using(using).order_by('pk')
+    last_pk = None
+    with transaction.atomic(using=using):
+        while True:
+            page = queryset if last_pk is None else queryset.filter(pk__gt=last_pk)
+            pks = list(page.values_list('pk', flat=True)[:batch_size])
+            if not pks:
+                break
+            queryset.filter(pk__in=pks).delete()
+            last_pk = pks[-1]
+
+
 def clean_login_log_period():
     now = timezone.now()
     days = get_log_keep_day('LOGIN_LOG_KEEP_DAYS')
     expired_day = now - datetime.timedelta(days=days)
-    UserLoginLog.objects.filter(datetime__lt=expired_day).delete()
+    delete_audit_records_in_batches(UserLoginLog.objects.filter(datetime__lt=expired_day))
 
 
 def clean_operation_log_period():
     now = timezone.now()
     days = get_log_keep_day('OPERATE_LOG_KEEP_DAYS')
     expired_day = now - datetime.timedelta(days=days)
-    OperateLog.objects.filter(datetime__lt=expired_day).delete()
+    delete_audit_records_in_batches(OperateLog.objects.filter(datetime__lt=expired_day))
 
 
 def clean_password_change_log_period():
     now = timezone.now()
     days = get_log_keep_day('PASSWORD_CHANGE_LOG_KEEP_DAYS')
     expired_day = now - datetime.timedelta(days=days)
-    PasswordChangeLog.objects.filter(datetime__lt=expired_day).delete()
+    delete_audit_records_in_batches(PasswordChangeLog.objects.filter(datetime__lt=expired_day))
     logger.info("Clean password change log done")
 
 
@@ -52,7 +68,7 @@ def clean_activity_log_period():
     now = timezone.now()
     days = get_log_keep_day('ACTIVITY_LOG_KEEP_DAYS')
     expired_day = now - datetime.timedelta(days=days)
-    ActivityLog.objects.filter(datetime__lt=expired_day).delete()
+    delete_audit_records_in_batches(ActivityLog.objects.filter(datetime__lt=expired_day))
 
 
 def clean_ftp_log_period():
@@ -60,7 +76,7 @@ def clean_ftp_log_period():
     days = get_log_keep_day('FTP_LOG_KEEP_DAYS')
     expired_day = now - datetime.timedelta(days=days)
     file_store_dir = safe_join(default_storage.base_location, FTPLog.upload_to)
-    FTPLog.objects.filter(date_start__lt=expired_day).delete()
+    delete_audit_records_in_batches(FTPLog.objects.filter(date_start__lt=expired_day))
     find_and_delete_files(file_store_dir, mtime_days=days)
     find_and_delete_empty_dirs(file_store_dir)
     logger.info("Clean FTP file done")
@@ -71,9 +87,13 @@ def clean_celery_tasks_period():
     expire_days = get_log_keep_day('TASK_LOG_KEEP_DAYS')
     days_ago = timezone.now() - timezone.timedelta(days=expire_days)
     tasks = CeleryTaskExecution.objects.filter(date_start__lt=days_ago)
-    tasks.delete()
-    tasks = CeleryTaskExecution.objects.filter(date_start__isnull=True)
-    tasks.delete()
+    delete_audit_records_in_batches(tasks)
+    # Do not sweep in new pending tasks while the older pages are deleted.
+    pending_cutoff = timezone.now()
+    tasks = CeleryTaskExecution.objects.filter(
+        date_start__isnull=True, date_published__lte=pending_cutoff,
+    )
+    delete_audit_records_in_batches(tasks)
     find_and_delete_files(settings.CELERY_LOG_DIR, name_pattern="*.log", mtime_days=expire_days)
     if os.path.isdir(settings.ANSIBLE_LOG_DIR):
         find_and_delete_files(

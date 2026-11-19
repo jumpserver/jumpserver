@@ -17,3 +17,31 @@ class TicketSession(models.Model):
         if relation:
             return relation.ticket
         return None
+
+
+class TicketBeneficiary(models.Model):
+    """People who receive an approved ticket's result, independent of its applicant."""
+    ticket = models.ForeignKey('tickets.Ticket', related_name='beneficiaries', on_delete=models.CASCADE)
+    user = models.ForeignKey('users.User', related_name='benefiting_tickets', on_delete=models.CASCADE)
+
+    class Meta:
+        default_permissions = ()
+        unique_together = (('ticket', 'user'),)
+        verbose_name = _('Ticket beneficiary')
+
+
+class TicketSecretAccess(models.Model):
+    """An approved, account-scoped opportunity to reveal a password."""
+    id = models.BigAutoField(primary_key=True)
+    ticket = models.ForeignKey('tickets.Ticket', related_name='secret_accesses', on_delete=models.CASCADE)
+    account_id = models.UUIDField()
+    user_id = models.UUIDField()
+    org_id = models.CharField(max_length=36)
+    expires_at = models.DateTimeField()
+    is_active = models.BooleanField(default=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        default_permissions = ()
+        constraints = [models.UniqueConstraint(fields=['ticket', 'account_id'], name='tickets_secret_ticket_account_uniq')]
+        indexes = [models.Index(fields=['user_id', 'expires_at'], name='tickets_secret_user_expire')]

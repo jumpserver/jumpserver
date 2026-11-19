@@ -1,0 +1,234 @@
+from contextlib import contextmanager
+
+from django.core.exceptions import ValidationError
+from django.db import models, transaction
+from django.utils.functional import cached_property
+from django.utils.translation import gettext_lazy as _, override
+
+from common.db.models import JMSBaseModel
+from orgs.mixins.models import JMSOrgBaseModel
+from tickets.plugins import ticket_type_choices
+from tickets.workflow.const import NodeType
+
+__all__ = ['Workflow', 'WorkflowVersion', 'WorkflowNode', 'WorkflowEdge']
+
+
+class Workflow(JMSOrgBaseModel):
+    name = models.CharField(max_length=128, verbose_name=_('Name'))
+    type = models.CharField(max_length=64, choices=ticket_type_choices, verbose_name=_('Type'))
+    enabled = models.BooleanField(default=False, verbose_name=_('Enabled'))
+    is_system = models.BooleanField(default=False, editable=False)
+    active_version = models.ForeignKey(
+        'WorkflowVersion', null=True, blank=True, on_delete=models.PROTECT,
+        related_name='+', editable=False,
+    )
+    # Used only by the one-off importer, never to execute a legacy definition.
+    legacy_flow_id = models.UUIDField(null=True, unique=True, editable=False)
+    migration_notes = models.JSONField(default=dict, editable=False)
+
+    class Meta:
+        verbose_name = _('Approval workflow')
+        default_permissions = ('add', 'change', 'view')
+        permissions = [('apply_assetforothers', _('Apply for asset access on behalf of another user'))]
+        ordering = ['name', 'id']
+        constraints = [
+            models.UniqueConstraint(fields=['org_id', 'type', 'name'], name='tickets_workflow_org_name_uniq'),
+        ]
+
+    def __str__(self):
+        return str(self.display_name)
+
+    @property
+    def requires_acl_reviewers(self):
+        return bool(self.active_version_id and self.active_version.acl_reviewer_keys)
+
+    @property
+    def display_name(self):
+        if self.is_system and self.created_by == 'Legacy ticket import':
+            return _('Legacy ticket approval')
+        if self.is_system:
+            if self.name.startswith('ACL combined '):
+                return _('Combined approval workflow')
+            if self.name.startswith(f'ACL {self.type} '):
+                return self.get_type_display()
+        if self.created_by in ('System', 'Legacy workflow import'):
+            with override(None):
+                source_name = str(self.get_type_display())
+            with override('en'):
+                default_name = str(self.get_type_display())
+            if self.name in (source_name, default_name):
+                return self.get_type_display()
+        return self.name
+
+    def node_display_name(self, node):
+        if self.is_system and node.type == 'approval' and node.name == 'Review':
+            if self.name.startswith(f'ACL {self.type} ') and node.key == 'review':
+                return _('Review')
+            if self.name.startswith('ACL combined '):
+                source = self._combined_source_nodes.get(node.key)
+                if source:
+                    return source.version.workflow.node_display_name(source)
+        # Generated labels remain defaults when a workflow version is copied.
+        if self.created_by in ('System', 'Legacy workflow import', 'Legacy ticket import'):
+            labels = {'start': _('Start'), 'end': _('End'), 'approval': _('Approval'), 'cc': _('CC users')}
+            if node.name.lower() == node.type:
+                return labels.get(node.type, node.name)
+            level = node.name.removeprefix('Approval ')
+            if node.type == 'approval' and node.name.startswith('Approval ') and level.isdecimal():
+                return _('Approval {level}').format(level=level)
+        return node.name
+
+    @cached_property
+    def _combined_source_nodes(self):
+        source_ids = self.migration_notes.get('source_versions', [])
+        versions = WorkflowVersion.objects.filter(pk__in=source_ids).select_related('workflow').prefetch_related('nodes')
+        by_id = {str(version.pk): version for version in versions}
+        # Composition keys follow source version order, then source node key order.
+        return {
+            f'p{index}_{offset}': node
+            for index, version_id in enumerate(source_ids) if version_id in by_id
+            for offset, node in enumerate(sorted(
+                by_id[version_id].nodes.all(), key=lambda item: item.key,
+            ))
+        }
+
+    @classmethod
+    def get_org_related_flows(cls, org_id):
+        from orgs.models import Organization
+        from orgs.utils import tmp_to_root_org
+        with tmp_to_root_org():
+            local = cls.objects.filter(org_id=org_id, is_system=False)
+            inherited = cls.objects.filter(org_id=Organization.ROOT_ID)
+            for ticket_type, name in local.values_list('type', 'name'):
+                inherited = inherited.exclude(type=ticket_type, name__iexact=name)
+            return local | inherited
+
+
+@contextmanager
+def editable_versions(version_ids, using):
+    """Serialize graph writes with publication, including bulk ORM writes."""
+    with transaction.atomic(using=using):
+        versions = list(WorkflowVersion.objects.using(using).select_for_update().filter(pk__in=version_ids))
+        if any(version.published_at is not None for version in versions):
+            raise ValidationError(_('Published workflow versions are immutable. Create a new version.'))
+        yield
+
+
+class DefinitionQuerySet(models.QuerySet):
+    def version_ids(self):
+        field = 'pk' if self.model.__name__ == 'WorkflowVersion' else 'version_id'
+        return list(self.values_list(field, flat=True))
+
+    def update(self, **kwargs):
+        if {'version', 'version_id', 'workflow', 'workflow_id', 'published_at'} & kwargs.keys():
+            raise ValidationError(_('Workflow definition identity cannot be updated in bulk.'))
+        with editable_versions(self.version_ids(), self.db):
+            return super().update(**kwargs)
+
+    def delete(self):
+        with editable_versions(self.version_ids(), self.db):
+            return super().delete()
+
+    def bulk_create(self, objs, **kwargs):
+        objs = list(objs)
+        if self.model.__name__ == 'WorkflowVersion':
+            raise ValidationError(_('Create workflow versions through the publication service.'))
+        if kwargs.get('update_conflicts'):
+            raise ValidationError(_('Workflow definitions do not support upserts.'))
+        with editable_versions([obj.version_id for obj in objs], self.db):
+            for obj in objs:
+                obj.clean()
+            return super().bulk_create(objs, **kwargs)
+
+
+class DefinitionModel(JMSBaseModel):
+    objects = DefinitionQuerySet.as_manager()
+
+    class Meta:
+        abstract = True
+
+    def save(self, *args, **kwargs):
+        using = kwargs.get('using') or self._state.db or 'default'
+        is_version = isinstance(self, WorkflowVersion)
+        old = type(self).objects.using(using).filter(pk=self.pk).first()
+        if old:
+            identity = ('workflow_id', 'number') if is_version else ('version_id',)
+            if any(getattr(old, field) != getattr(self, field) for field in identity):
+                raise ValidationError(_('Workflow definition identity cannot be changed.'))
+        ids = [self.pk] if is_version else [self.version_id]
+        with editable_versions(ids, using):
+            self.clean()
+            return super().save(*args, **kwargs)
+
+    def delete(self, using=None, **kwargs):
+        return type(self).objects.using(using or self._state.db).filter(pk=self.pk).delete()
+
+
+class WorkflowVersion(DefinitionModel):
+    workflow = models.ForeignKey(Workflow, on_delete=models.PROTECT, related_name='versions')
+    number = models.PositiveIntegerField()
+    published_at = models.DateTimeField(null=True, editable=False)
+
+    class Meta:
+        verbose_name = _('Workflow version')
+        default_permissions = ()
+        ordering = ['-number']
+        constraints = [
+            models.UniqueConstraint(fields=['workflow', 'number'], name='tickets_workflow_version_uniq'),
+        ]
+
+    @cached_property
+    def acl_reviewer_keys(self):
+        return [node.key for node in self.nodes.all()
+                if node.type == 'approval' and node.config['approvers']['type'] == 'acl_reviewers']
+
+    def as_definition(self):
+        return {
+            'nodes': [
+                {'id': node.key, 'type': node.type, 'name': node.name, 'config': node.config,
+                 'position': {'x': node.position_x, 'y': node.position_y}}
+                for node in self.nodes.order_by('key')
+            ],
+            'edges': [
+                {'source': edge.source.key, 'target': edge.target.key,
+                 'condition': edge.condition, 'priority': edge.priority}
+                for edge in self.edges.select_related('source', 'target').order_by('priority', 'id')
+            ],
+        }
+
+
+class WorkflowNode(DefinitionModel):
+    version = models.ForeignKey(WorkflowVersion, on_delete=models.CASCADE, related_name='nodes')
+    key = models.CharField(max_length=64)
+    type = models.CharField(max_length=16, choices=NodeType.choices)
+    name = models.CharField(max_length=128, blank=True)
+    config = models.JSONField(default=dict)
+    position_x = models.IntegerField(default=0)
+    position_y = models.IntegerField(default=0)
+
+    class Meta:
+        verbose_name = _('Workflow node')
+        default_permissions = ()
+        constraints = [
+            models.UniqueConstraint(fields=['version', 'key'], name='tickets_workflow_node_key_uniq'),
+        ]
+
+
+class WorkflowEdge(DefinitionModel):
+    version = models.ForeignKey(WorkflowVersion, on_delete=models.CASCADE, related_name='edges')
+    source = models.ForeignKey(WorkflowNode, on_delete=models.CASCADE, related_name='outgoing')
+    target = models.ForeignKey(WorkflowNode, on_delete=models.CASCADE, related_name='incoming')
+    condition = models.BooleanField(null=True)
+    priority = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        verbose_name = _('Workflow edge')
+        default_permissions = ()
+        constraints = [
+            models.UniqueConstraint(fields=['version', 'source', 'target'], name='tickets_workflow_edge_uniq'),
+        ]
+
+    def clean(self):
+        super().clean()
+        if self.source.version_id != self.version_id or self.target.version_id != self.version_id:
+            raise ValidationError(_('Workflow edges must connect nodes in the same version.'))

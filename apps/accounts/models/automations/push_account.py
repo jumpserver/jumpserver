@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from accounts.const import AutomationTypes, SecretType
@@ -39,5 +40,7 @@ class PushAccountAutomation(ChangeSecretMixin, AccountBaseAutomation):
 
 
 class PushSecretRecord(BaseSecretRecord):
+    is_first_login = models.BooleanField(default=False)
+
     class Meta:
         verbose_name = _("Push secret record")

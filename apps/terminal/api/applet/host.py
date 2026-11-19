@@ -6,13 +6,14 @@ from django_filters import rest_framework as filters
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 from common.api import JMSBulkModelViewSet
 from common.drf.filters import BaseFilterSet
 from common.permissions import IsServiceAccount
 from orgs.utils import tmp_to_builtin_org
-from terminal.models import AppletHost, AppletHostDeployment
+from terminal.models import Applet, AppletHost, AppletHostDeployment
 from terminal.utils.tinker import get_tinker_version_status
 from terminal.serializers import (
     AppletHostSerializer, AppletHostDeploymentSerializer,
@@ -110,6 +111,14 @@ class AppletHostDeploymentViewSet(viewsets.ModelViewSet):
     def applets(self, request, *args, **kwargs):
         hosts = request.data.get('hosts', [])
         applet_id = request.data.get('applet_id', '')
+        if applet_id:
+            applet_id = str(AppletSetupSerializer().fields['applet_id'].run_validation(applet_id))
+            if Applet.objects.filter(
+                id=applet_id, name__in=('chrome', 'dbeaver'), builtin=True,
+            ).exists():
+                raise ValidationError({
+                    'applet_id': gettext('This builtin applet is retired and cannot be published again.'),
+                })
         model = self.get_queryset().model
         hosts_qs = AppletHost.objects.filter(id__in=hosts)
         if not hosts_qs.exists():

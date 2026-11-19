@@ -1,8 +1,6 @@
 import threading
 import signal
 import time
-import daemon
-from daemon import pidfile
 from .hands import *
 from .hands import __version__
 from .services.base import BaseService
@@ -27,13 +25,45 @@ class ServicesUtil(object):
     def start_and_watch(self):
         logging.info(time.ctime())
         logging.info(f'JumpServer version {__version__}, more see https://www.jumpserver.com')
-        self.start()
-        if self.run_daemon:
-            self.show_status()
-            with self.daemon_context:
-                self.watch()
-        else:
-            self.watch()
+        self.exec_lightweight_supervisor()
+
+    def exec_lightweight_supervisor(self):
+        import json
+        import tempfile
+
+        if self.run_daemon and self.daemon_pid and self.daemon_is_running:
+            raise RuntimeError(f'JumpServer daemon is already running: {self.daemon_pid}')
+        services = []
+        for service in self._services:
+            if service.is_running:
+                raise RuntimeError(f'{service.name} is already running: {service.pid}')
+            services.append({
+                'name': service.name,
+                'cmd': service.cmd,
+                'cwd': service.cwd,
+                'log_path': service.log_filepath,
+                'pid_path': service.pid_filepath,
+            })
+        os.makedirs(TMP_DIR, exist_ok=True)
+        with tempfile.NamedTemporaryFile(
+            mode='w', prefix='service-plan-', suffix='.json', dir=TMP_DIR, delete=False,
+        ) as stream:
+            json.dump({
+                'services': services,
+                'daemon': {
+                    'pid_path': self.daemon_pid_filepath,
+                    'log_path': self.daemon_log_filepath,
+                } if self.run_daemon else None,
+            }, stream)
+            plan_path = stream.name
+        supervisor = os.path.join(BASE_DIR, 'utils', 'service_supervisor.py')
+        try:
+            sys.stdout.flush()
+            sys.stderr.flush()
+            os.execv(sys.executable, [sys.executable, '-u', supervisor, plan_path])
+        except BaseException:
+            os.unlink(plan_path)
+            raise
 
     def start(self):
         for service in self._services:
@@ -86,9 +116,15 @@ class ServicesUtil(object):
 
     # -- daemon --
     def _stop_daemon(self):
-        if self.daemon_pid and self.daemon_is_running:
-            os.kill(self.daemon_pid, 15)
-        self.remove_daemon_pid()
+        pid = self.daemon_pid
+        if pid > 0:
+            try:
+                os.kill(pid, 15)
+                return
+            except ProcessLookupError:
+                pass
+        if self.daemon_pid == pid:
+            self.remove_daemon_pid()
 
     def remove_daemon_pid(self):
         if os.path.isfile(self.daemon_pid_filepath):
@@ -122,19 +158,4 @@ class ServicesUtil(object):
     def daemon_log_filepath(self):
         return os.path.join(LOG_DIR, 'jms.log')
 
-    @property
-    def daemon_context(self):
-        daemon_log_file = open(self.daemon_log_filepath, 'a')
-        context = daemon.DaemonContext(
-            pidfile=pidfile.TimeoutPIDLockFile(self.daemon_pid_filepath),
-            signal_map={
-                signal.SIGTERM: lambda x, y: self.clean_up(),
-                signal.SIGHUP: 'terminate',
-            },
-            stdout=daemon_log_file,
-            stderr=daemon_log_file,
-            files_preserve=list(self.files_preserve_map.values()),
-            detach_process=True,
-        )
-        return context
     # -- end daemon --

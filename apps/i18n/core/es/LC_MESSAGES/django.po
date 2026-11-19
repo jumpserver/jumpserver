@@ -2600,7 +2600,7 @@ msgid ""
 "With * indicating a match all. Such as: 192.168.10.1, 192.168.1.0/24, "
 "10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64 "
 msgstr ""
-"* El asterisco indica que se coincide con todos. Por ejemplo: 192.168.10.1, "
+"El carácter * El asterisco indica que se coincide con todos. Por ejemplo: 192.168.10.1, "
 "192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64"
 
 #: acls/serializers/rules/rules.py:48 audits/reporting.py:246
@@ -7312,10 +7312,6 @@ msgstr "Tu cuenta ha sido creada con éxito"
 msgid "JumpServer - An open-source PAM"
 msgstr "JumpServer, bastión de código abierto."
 
-#: jumpserver/views/celery_flower.py:22
-msgid "<h1>Flower service unavailable, check it</h1>"
-msgstr "<h1>El servicio Flower no está disponible; compruébelo</h1>"
-
 #: jumpserver/views/other.py:28
 msgid ""
 "<div>Luna is a separately deployed program, you need to deploy Luna, koko, "
@@ -8750,6 +8746,42 @@ msgid "The model provider endpoint was not found. Please check the Base URL."
 msgstr "No se encontró el punto de conexión del proveedor de modelos. Compruebe la URL base."
 
 #: settings/api/chat.py
+msgid "{detail} The provider must support the Responses API (/responses)."
+msgstr "{detail} El proveedor debe admitir la API Responses (/responses)."
+
+#: settings/api/chat.py
+msgid "The provider did not return a Responses API event stream."
+msgstr "El proveedor no devolvió un flujo de eventos de la API Responses."
+
+#: settings/api/chat.py
+msgid "The Responses API stream failed: {detail}"
+msgstr "El flujo de la API Responses falló: {detail}"
+
+#: settings/api/chat.py
+msgid "The Responses API stream ended without a successful completion event."
+msgstr "El flujo de la API Responses terminó sin un evento de finalización correcta."
+
+#: settings/api/chat.py
+msgid "The Responses API stream returned an incomplete output item."
+msgstr "El flujo de la API Responses devolvió un elemento de salida incompleto."
+
+#: settings/api/chat.py
+msgid "The Responses API text stream is missing or does not match the final output."
+msgstr "Faltan los fragmentos del flujo de texto de la API Responses o no coinciden con la salida final."
+
+#: settings/api/chat.py
+msgid "The Responses API tool argument stream does not match the final tool call."
+msgstr "El flujo de argumentos de la herramienta de la API Responses no coincide con la llamada final a la herramienta."
+
+#: settings/api/chat.py
+msgid "The Responses API returned an invalid health-check tool call (name, call ID, or arguments)."
+msgstr "La API Responses devolvió una llamada no válida a la herramienta de comprobación de estado (nombre, ID de llamada o argumentos)."
+
+#: settings/api/chat.py
+msgid "The model did not correctly return the health-check nonce after receiving the tool result."
+msgstr "El modelo no devolvió correctamente el nonce de comprobación de estado tras recibir el resultado de la herramienta."
+
+#: settings/api/chat.py
 msgid "The model provider request limit was exceeded. Please try again later."
 msgstr "Se superó el límite de solicitudes del proveedor de modelos. Inténtelo de nuevo más tarde."
 
@@ -10000,6 +10032,26 @@ msgstr "Distribución del teclado"
 #: settings/serializers/luna.py:41 users/serializers/preference/luna.py:49
 msgid "RDP client option"
 msgstr "Opciones del cliente RDP"
+
+#: users/serializers/preference/luna.py:52
+msgid "Printer redirection"
+msgstr "Redirección de impresoras"
+
+#: users/serializers/preference/luna.py:56
+msgid "Apply Windows key combinations"
+msgstr "Aplicar combinaciones de teclas de Windows"
+
+#: users/const.py:38
+msgid "On the local computer"
+msgstr "En el equipo local"
+
+#: users/const.py:39
+msgid "On the remote computer"
+msgstr "En el equipo remoto"
+
+#: users/const.py:40
+msgid "Only when using full screen"
+msgstr "Solo al usar pantalla completa"
 
 #: settings/serializers/luna.py:45 users/serializers/preference/luna.py:53
 msgid "RDP color quality"
@@ -14576,9 +14628,6 @@ msgstr "Importación de licencia exitosa"
 msgid "Invalid license"
 msgstr "Licencia no válida"
 
-#~ msgid "Ticket already closed"
-#~ msgstr "El ticket ya ha sido cerrado"
-
 #: templates/resource_download.html
 #, python-format
 msgid "Download %(vendor)s Client"
@@ -16675,3 +16724,2540 @@ msgstr "Asunto del correo"
 #: xpack/plugins/jdmc/serializers.py:8
 msgid "Message of the email"
 msgstr "Mensaje del correo"
+
+#: reports/audit_contract.py
+msgid "Management Summary and Recommendations"
+msgstr "Resumen ejecutivo y recomendaciones"
+
+#: reports/audit_contract.py
+msgid "Key Overview"
+msgstr "Resumen de indicadores"
+
+#: reports/audit_contract.py
+msgid "Operations Activity Analysis"
+msgstr "Análisis de actividades operativas"
+
+#: reports/audit_contract.py
+msgid "Security Event Analysis"
+msgstr "Análisis de eventos de seguridad"
+
+#: reports/audit_contract.py
+msgid "Asset and Account Overview"
+msgstr "Resumen de activos y cuentas"
+
+#: reports/audit_contract.py
+msgid "Account Operations Analysis"
+msgstr "Análisis de operaciones de cuentas"
+
+#: reports/audit_contract.py
+msgid "Comprehensive Audit Report"
+msgstr "Informe integral de auditoría"
+
+#: reports/audit_contract.py
+msgid "Summarize operations activity, security events, assets, and accounts for monthly, quarterly, or annual audits."
+msgstr "Resumen de actividades de operaciones, eventos de seguridad, activos y cuentas para auditorios mensuales, trimestrales o anuales."
+
+#: reports/audit_contract.py
+msgid "Operations Activity Report"
+msgstr "Informe de actividad operativa"
+
+#: reports/audit_contract.py
+msgid "Review who performed sessions, commands, and file operations on each asset."
+msgstr "Revisa quién realizó sesiones, comandos y operaciones de archivo en cada activo."
+
+#: reports/audit_contract.py
+msgid "Security Event Report"
+msgstr "Informe de eventos de seguridad"
+
+#: reports/audit_contract.py
+msgid "Review high-risk commands, login anomalies, and access denials, distinguishing failures from security events."
+msgstr "Revisa los comandos de alto riesgo, las anomalías de login y las denegaciones de acceso, diferenciando los fallos de los eventos de seguridad."
+
+#: reports/audit_contract.py
+msgid "Account Operations Report"
+msgstr "Informe de operaciones de cuentas"
+
+#: reports/audit_contract.py
+msgid "Review the outcomes and failures of account automation tasks."
+msgstr "Revisa los resultados y fallos de las tareas de automatización de cuentas."
+
+#: reports/api/audit.py
+msgid "You do not have permission to view data for this report theme."
+msgstr "Usted no tiene permiso para ver los datos para este tema del informe."
+
+#: reports/api/audit.py
+msgid "The end date cannot be earlier than the start date."
+msgstr "La fecha de fin no puede ser anterior a la fecha de inicio."
+
+#: reports/api/audit.py
+msgid "A report can cover at most 366 days. Select a shorter date range."
+msgstr "Un informe puede abarcar como máximo 366 días. Seleccione un período más corto."
+
+#: reports/api/audit.py
+msgid "The end date cannot be later than today. For the current period, report through today."
+msgstr "La fecha de fin no puede ser posterior a hoy. Para el período actual, incluya datos hasta hoy."
+
+#: reports/api/audit.py
+msgid "Chapters are duplicated or do not belong to the selected report theme."
+msgstr "Los capítulos se duplican o no pertenecen al tema del informe seleccionado."
+
+#: reports/api/audit.py
+msgid "Select at least one chapter containing statistical data."
+msgstr "Seleccione al menos un capítulo que contiene datos estadísticos."
+
+#: reports/services/audit_data.py
+msgid "Asset Sessions"
+msgstr "Sesiones de activos"
+
+#: reports/services/audit_data.py
+msgid "Command Records"
+msgstr "Registros de comandos"
+
+#: reports/services/audit_data.py
+msgid "Login Logs"
+msgstr "Registros de inicio de sesión"
+
+#: reports/services/audit_data.py
+msgid "Operation Logs"
+msgstr "Registros de operaciones"
+
+#: reports/services/audit_data.py
+msgid "File Transfers"
+msgstr "Transferencias de archivos"
+
+#: reports/services/audit_data.py
+msgid "Current Assets"
+msgstr "Activos actuales"
+
+#: reports/services/audit_data.py
+msgid "Current Accounts"
+msgstr "Cuentas actuales"
+
+#: reports/services/audit_data.py
+msgid "Account Automation Tasks"
+msgstr "Tareas de automatización de cuentas"
+
+#: reports/services/audit_data.py
+msgid "Platform User Password Change Logs"
+msgstr "Registros de cambio de contraseña de usuarios de la plataforma"
+
+#: reports/services/audit_data.py
+msgid " (available stores)"
+msgstr "（almacenamientos disponibles）"
+
+#: reports/services/audit_data.py
+msgid "Alerted Commands"
+msgstr "Comandos con alerta"
+
+#: reports/services/audit_data.py
+msgid "Commands Blocked by Rules"
+msgstr "Comandos bloqueados por reglas"
+
+#: reports/services/audit_data.py
+msgid "Approval-Rejected Commands"
+msgstr "Comandos rechazados en la aprobación"
+
+#: reports/services/audit_data.py
+msgid "Approval-Approved Commands"
+msgstr "Comandos aprobados"
+
+#: reports/services/audit_data.py
+msgid "Approval-Canceled Commands"
+msgstr "Comandos con aprobación cancelada"
+
+#: reports/services/audit_data.py
+msgid "Unsupported report theme"
+msgstr "Tema de informe no compatible"
+
+#: reports/services/audit_data.py
+msgid "Select a start date and an end date"
+msgstr "Seleccione una fecha de inicio y una de fin"
+
+#: reports/services/audit_data.py
+msgid "The start date cannot be later than the end date, and the report can cover at most 366 days"
+msgstr "La fecha de inicio no puede ser posterior a la fecha de final, y el informe puede cubrir hasta 366 días."
+
+#: reports/services/audit_data.py
+msgid "The end date cannot be later than today"
+msgstr "La fecha de fin no puede ser posterior a hoy"
+
+#: reports/services/audit_data.py
+msgid "Select report chapters without duplicates"
+msgstr "Seleccione las secciones sin duplicarlas"
+
+#: reports/services/audit_data.py
+msgid "The selected chapters do not belong to this report theme"
+msgstr "Los capítulos seleccionados no pertenecen al tema de este informe"
+
+#: reports/services/audit_data.py
+msgid "Session Count"
+msgstr "Número de sesiones"
+
+#: reports/services/audit_data.py
+msgid "times"
+msgstr "veces"
+
+#: reports/services/audit_data.py
+msgid "Active Users"
+msgstr "Usuarios activos"
+
+#: reports/services/audit_data.py
+msgid "users"
+msgstr "usuarios"
+
+#: reports/services/audit_data.py
+msgid "Accessed Assets"
+msgstr "Activos visitados"
+
+#: reports/services/audit_data.py
+msgid "assets"
+msgstr "activos"
+
+#: reports/services/audit_data.py
+msgid "Connection Failures"
+msgstr "Fallos de conexión"
+
+#: reports/services/audit_data.py
+msgid "Session Recording Status"
+msgstr "Estado de grabación de la sesión"
+
+#: reports/services/audit_data.py
+msgid "Top 5 Connection Failure Reasons"
+msgstr "5 principales motivos de fallos de conexión"
+
+#: reports/services/audit_data.py
+msgid "User Access Ranking"
+msgstr "Clasificación de acceso por usuario"
+
+#: reports/services/audit_data.py
+msgid "Asset Access Ranking"
+msgstr "Clasificación de acceso por activo"
+
+#: reports/services/audit_data.py
+msgid "Connection Protocol Distribution"
+msgstr "Distribución de protocolos de conexión"
+
+#: reports/services/audit_data.py
+msgid "Session Operation Types"
+msgstr "Tipos de operación de sesión"
+
+#: reports/services/audit_data.py
+msgid "Platform Access Distribution"
+msgstr "Distribución de accesos por plataforma"
+
+#: reports/services/audit_data.py
+msgid "Daily Asset Session Trend"
+msgstr "Tendencia diaria de sesiones de activos"
+
+#: reports/services/audit_data.py
+msgid "Weekly Asset Session Trend"
+msgstr "Tendencia semanal de sesiones de activos"
+
+#: reports/services/audit_data.py
+msgid "Monthly Asset Session Trend"
+msgstr "Tendencia mensual de sesiones de activos"
+
+#: reports/services/audit_data.py
+msgid "Recent Asset Sessions"
+msgstr "Sesiones recientes de activos"
+
+#: reports/services/audit_data.py
+msgid "Recordings Requiring Review"
+msgstr "Grabaciones que requieren revisión"
+
+#: reports/services/audit_data.py
+msgid "records"
+msgstr "registros"
+
+#: reports/services/audit_data.py
+msgid "Command Approval Clues from the Same Session"
+msgstr "Pistas de aprobación de comandos de la misma sesión"
+
+#: reports/services/audit_data.py
+msgid "Successful Logins"
+msgstr "Inicios de sesión correctos"
+
+#: reports/services/audit_data.py
+msgid "Failed Logins"
+msgstr "Inicios de sesión fallidos"
+
+#: reports/services/audit_data.py
+msgid "Restricted Login Records"
+msgstr "Registros de acceso restringido"
+
+#: reports/services/audit_data.py
+msgid "Login Policy Denials"
+msgstr "Rechazos de la política de inicio de sesión"
+
+#: reports/services/audit_data.py
+msgid "Recent Failed Logins"
+msgstr "Inicios de sesión fallidos recientes"
+
+#: reports/services/audit_data.py
+msgid "New-City Login Clues"
+msgstr "Indicios de acceso desde una ciudad nueva"
+
+#: reports/services/audit_data.py
+msgid "New-City Login Review Clues"
+msgstr "Indicios para revisar accesos desde ciudades nuevas"
+
+#: reports/services/audit_data.py
+msgid "File Operation Types"
+msgstr "Tipos de operación de archivo"
+
+#: reports/services/audit_data.py
+msgid "Top 5 Affected File Operation Targets"
+msgstr "5 principales destinos afectados por fallos de archivo"
+
+#: reports/services/audit_data.py
+msgid "Recent Failed File Operations"
+msgstr "Operaciones de archivo fallidas recientes"
+
+#: reports/services/audit_data.py
+msgid "Account Task Executions"
+msgstr "Ejecuciones de tareas de cuentas"
+
+#: reports/services/audit_data.py
+msgid "Successful Executions"
+msgstr "Ejecuciones correctas"
+
+#: reports/services/audit_data.py
+msgid "Failed or Errored Executions"
+msgstr "Ejecuciones fallidas o con errores"
+
+#: reports/services/audit_data.py
+msgid "Incomplete Executions"
+msgstr "Ejecuciones sin finalizar"
+
+#: reports/services/audit_data.py
+msgid "Account Task Types and Results"
+msgstr "Tipos y resultados de tareas de cuentas"
+
+#: reports/services/audit_data.py
+msgid "Recent Failed Account Tasks"
+msgstr "Tareas de cuentas fallidas recientes"
+
+#: reports/services/audit_data.py
+msgid "Task Failure or Error Rate"
+msgstr "Porcentaje de tareas fallidas o con errores"
+
+#: reports/services/audit_data.py
+msgid "Top 5 Password-Change Error Clues"
+msgstr "5 principales indicios de error al cambiar contraseñas"
+
+#: reports/services/audit_data.py
+msgid "Password-Change Accounts Requiring Review"
+msgstr "Cuentas con cambio de contraseña pendiente de revisión"
+
+#: reports/services/audit_data.py
+msgid "Restricted logins or policy denials were recorded. Verify that the source, user identity, and access policy are expected."
+msgstr "Se registraron las entradas restringidas o las denegaciones de políticas. Verifique que se espera la fuente, la identidad del usuario y la política de acceso."
+
+#: reports/services/audit_data.py
+msgid "Command Count"
+msgstr "Número de comandos"
+
+#: reports/services/audit_data.py
+msgid "Command Decisions Requiring Review"
+msgstr "Decisiones sobre comandos que requieren revisión"
+
+#: reports/services/audit_data.py
+msgid "No separate rejection reason was saved; review the ticket discussion"
+msgstr "No se guardó un motivo de rechazo independiente; consulte la conversación del ticket"
+
+#: reports/services/audit_data.py
+msgid "Not recorded"
+msgstr "No registrado"
+
+#: reports/services/audit_data.py
+msgid "Loopback Address Login Records"
+msgstr "Registros de acceso con dirección de bucle local"
+
+#: reports/services/audit_data.py
+msgid "Rejected"
+msgstr "rechazado"
+
+#: reports/services/audit_data.py
+msgid "Platform Operation Count"
+msgstr "Número de operaciones de la plataforma"
+
+#: reports/services/audit_data.py
+msgid "Operation Policy Denials"
+msgstr "Rechazos de la política de operaciones"
+
+#: reports/services/audit_data.py
+msgid "Policy Denial Details"
+msgstr "Detalles de rechazos de política"
+
+#: reports/services/audit_data.py
+msgid "File Operation Count"
+msgstr "Número de operaciones de archivo"
+
+#: reports/services/audit_data.py
+msgid "Failed File Operations"
+msgstr "Operaciones de archivo fallidas"
+
+#: reports/services/audit_data.py
+msgid "File Operation Failure Rate"
+msgstr "Porcentaje de fallos en operaciones de archivo"
+
+#: reports/services/audit_data.py
+msgid "Current Asset Total"
+msgstr "Total actual de activos"
+
+#: reports/services/audit_data.py
+msgid "Currently Enabled Assets"
+msgstr "Activos habilitados actualmente"
+
+#: reports/services/audit_data.py
+msgid "Current Asset Distribution by Platform"
+msgstr "Distribución actual de activos por plataforma"
+
+#: reports/services/audit_data.py
+msgid "accounts"
+msgstr "cuentas"
+
+#: reports/services/audit_data.py
+msgid "Currently Enabled Accounts"
+msgstr "Cuentas habilitadas actualmente"
+
+#: reports/services/audit_data.py
+msgid "Asset Account Count Ranking"
+msgstr "Clasificación de activos por número de cuentas"
+
+#: reports/services/audit_data.py
+msgid "Assets with Password Changes Requiring Review"
+msgstr "Activos con cambios de contraseña pendientes de revisión"
+
+#: reports/services/audit_data.py
+msgid "Accounts with Password Changes Requiring Review"
+msgstr "Cuentas con cambios de contraseña pendientes de revisión"
+
+#: reports/services/audit_data.py
+msgid "Asset deleted"
+msgstr "Activo eliminado"
+
+#: reports/services/audit_data.py
+msgid "Platform User Password Changes"
+msgstr "Cambios de contraseña de usuarios de la plataforma"
+
+#: reports/services/audit_data.py
+msgid "Recent Platform User Password Changes"
+msgstr "Cambios recientes de contraseña de usuarios de la plataforma"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s alerted or rejected commands were recorded. Review their purpose and approval basis in the session context."
+msgstr "Se registraron %(count)s comandos con alerta o rechazados. Revise su finalidad y el fundamento de la aprobación en el contexto de la sesión."
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "The operation log contains %(count)s policy denials. Check the denied resources and policies in the audit details."
+msgstr "El log de operaciones contiene %(count)s deniales de políticas. Véase los recursos y políticas negados en los detalles de la auditoría."
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s platform user password changes were recorded. Review the operators and change rationale as needed."
+msgstr "%(count)s cambios de contraseña de usuario de la plataforma se registraron. Revisa los operadores y cambia la razón cuando sea necesario."
+
+#: reports/services/audit_data.py
+msgid "Recording Status"
+msgstr "Estado de grabación"
+
+#: reports/services/audit_data.py
+msgid "Recorded Reason"
+msgstr "Motivo registrado"
+
+#: reports/services/audit_data.py
+msgid "Failure Count"
+msgstr "Número de fallos"
+
+#: reports/services/audit_data.py
+msgid "Start Time"
+msgstr "Hora de inicio"
+
+#: reports/services/audit_data.py
+msgid "Platform User"
+msgstr "Usuario de la plataforma"
+
+#: reports/services/audit_data.py
+msgid "Asset Account"
+msgstr "Cuenta del activo"
+
+#: reports/services/audit_data.py
+msgid "Connection Result"
+msgstr "Resultado de conexión"
+
+#: reports/services/audit_data.py
+msgid "Connection Failure Reason"
+msgstr "Motivo del fallo de conexión"
+
+#: reports/services/audit_data.py
+msgid "Original Session"
+msgstr "Sesión original"
+
+#: reports/services/audit_data.py
+msgid "No reviewer recorded"
+msgstr "No se registró ningún responsable"
+
+#: reports/services/audit_data.py
+msgid "Approval Ticket"
+msgstr "Solicitud de aprobación"
+
+#: reports/services/audit_data.py
+msgid "Request Time"
+msgstr "Hora de solicitud"
+
+#: reports/services/audit_data.py
+msgid "Requested Command"
+msgstr "Comando solicitado"
+
+#: reports/services/audit_data.py
+msgid "Rule at the Time"
+msgstr "Regla vigente en ese momento"
+
+#: reports/services/audit_data.py
+msgid "Reviewer"
+msgstr "Responsable"
+
+#: reports/services/audit_data.py
+msgid "Rejection Reason"
+msgstr "Motivo del rechazo"
+
+#: reports/services/audit_data.py
+msgid "Related Session"
+msgstr "Sesión relacionada"
+
+#: reports/services/audit_data.py
+msgid "Source IP"
+msgstr "IP de origen"
+
+#: reports/services/audit_data.py
+msgid "City"
+msgstr "Ciudad"
+
+#: reports/services/audit_data.py
+msgid "Operation Count"
+msgstr "Número de operaciones"
+
+#: reports/services/audit_data.py
+msgid "File Path"
+msgstr "Ruta del archivo"
+
+#: reports/services/audit_data.py
+msgid "Task Type"
+msgstr "Tipo de tarea"
+
+#: reports/services/audit_data.py
+msgid "Execution Count"
+msgstr "Número de ejecuciones"
+
+#: reports/services/audit_data.py
+msgid "Original Execution Record"
+msgstr "Registro de ejecución original"
+
+#: reports/services/audit_data.py
+msgid "Error Clue Category"
+msgstr "Categoría del indicio de error"
+
+#: reports/services/audit_data.py
+msgid "Account Record Count"
+msgstr "Número de registros de cuentas"
+
+#: reports/services/audit_data.py
+msgid "Record Time"
+msgstr "Hora del registro"
+
+#: reports/services/audit_data.py
+msgid "Error Clue"
+msgstr "Indicio de error"
+
+#: reports/services/audit_data.py
+msgid "Execution Record"
+msgstr "Registro de ejecución"
+
+#: reports/services/audit_data.py
+msgid "Asset deleted or platform not recorded"
+msgstr "Activo eliminado o plataforma no registrada"
+
+#: reports/services/audit_data.py
+msgid "Decision"
+msgstr "Resultado de la decisión"
+
+#: reports/services/audit_data.py
+msgid "Historical rule name not recorded"
+msgstr "Nombre de la regla histórica no registrado"
+
+#: reports/services/audit_data.py
+msgid "Asset Count"
+msgstr "Número de activos"
+
+#: reports/services/audit_data.py
+msgid "Account Count"
+msgstr "Número de cuentas"
+
+#: reports/services/audit_data.py
+msgid "Operator"
+msgstr "Operador"
+
+#: reports/services/evidence.py
+msgid "Recording marked present"
+msgstr "Grabación marcada como disponible"
+
+#: reports/services/evidence.py
+msgid "Recording unsupported"
+msgstr "Grabación no compatible"
+
+#: reports/services/evidence.py
+msgid "Session in progress"
+msgstr "Sesión en curso"
+
+#: reports/services/evidence.py
+msgid "Recording creation failed"
+msgstr "Error al crear la grabación"
+
+#: reports/services/evidence.py
+msgid "Recording upload failed"
+msgstr "Error al subir la grabación"
+
+#: reports/services/evidence.py
+msgid "Recording conversion failed"
+msgstr "Error al convertir la grabación"
+
+#: reports/services/evidence.py
+msgid "No recording flag"
+msgstr "Sin marca de grabación"
+
+#: reports/services/evidence.py
+msgid "Connection failed; not applicable"
+msgstr "Conexión fallida; no aplicable"
+
+#: reports/services/evidence.py
+msgid "Connection failed (no further reason recorded)"
+msgstr "Conexión fallida (sin más detalles registrados)"
+
+#: reports/services/evidence.py
+msgid "Connection failure reason not recorded"
+msgstr "Motivo del fallo de conexión no registrado"
+
+#: reports/services/evidence.py
+msgid "Authentication-related"
+msgstr "Relacionado con autenticación"
+
+#: reports/services/evidence.py
+msgid "Execution or connection timeout"
+msgstr "Tiempo de espera de ejecución o conexión agotado"
+
+#: reports/services/evidence.py
+msgid "Network or connection-related"
+msgstr "Relacionado con red o conexión"
+
+#: reports/services/evidence.py
+msgid "Permission denial-related"
+msgstr "Relacionado con denegación de permisos"
+
+#: reports/services/evidence.py
+msgid "Target missing or unavailable"
+msgstr "Destino inexistente o no disponible"
+
+#: reports/services/evidence.py
+msgid "Result verification-related"
+msgstr "Relacionado con la verificación del resultado"
+
+#: reports/services/evidence.py
+msgid "Error reason not recorded"
+msgstr "Motivo del error no registrado"
+
+#: reports/services/evidence.py
+msgid "Other error (review the original record)"
+msgstr "Otro error (revise el registro original)"
+
+msgid ""
+"1-100; lower values have higher priority.\n"
+"Select the highest-priority group from the rules that match. Any Reject in that group blocks the connection; if all Allow, combine their enabled connection controls."
+msgstr ""
+"1–100; cuanto menor sea el valor, mayor será la prioridad.\n"
+"De las reglas coincidentes, seleccione el grupo de mayor prioridad. Si alguna regla rechaza la conexión, se bloquea; si todas la permiten, se combinan sus controles de conexión habilitados."
+
+msgid "A valid license is required"
+msgstr "Se requiere una licencia válida."
+
+msgid "ACL changed; start a new connection"
+msgstr "La ACL ha cambiado; inicie una nueva conexión."
+
+msgid "Account is ready."
+msgstr "La cuenta está lista."
+
+msgid "Account permission is no longer available"
+msgstr "El permiso de la cuenta ya no está disponible."
+
+msgid "Account preparation has not succeeded. Contact an administrator."
+msgstr "No se pudo preparar la cuenta. Contacte con un administrador."
+
+msgid "Account push failed. Contact an administrator with the task ID."
+msgstr ""
+"Falló el aprovisionamiento de la cuenta. Facilite el ID de la tarea a un "
+"administrador."
+
+msgid "Account push is not enabled for this asset platform."
+msgstr ""
+"El aprovisionamiento de cuentas no está habilitado para esta plataforma de "
+"activos."
+
+msgid ""
+"Account usernames or @ALL (all accounts), @SPEC with specified usernames, "
+"and @USER (the current user's same-name account)."
+msgstr ""
+"Nombres de usuario, @ALL para todas las cuentas, @SPEC junto con los nombres"
+" especificados o @USER para la cuenta con el mismo nombre que el usuario "
+"actual."
+
+msgid "Administrator permission is no longer available"
+msgstr "El permiso de administrador ya no está disponible."
+
+msgid ""
+"After approval, allow reconnects by the same user to the same asset and "
+"account under this rule for this many hours. 0 requires approval every time."
+" Changes do not affect existing exemptions."
+msgstr ""
+"Tras la aprobación, el mismo usuario puede volver a conectarse al mismo "
+"activo y cuenta mediante esta regla durante el número de horas indicado. 0 "
+"exige aprobación cada vez. Los cambios no afectan a las exenciones "
+"existentes."
+
+msgid "Allow applies the connection controls; Reject blocks the connection."
+msgstr ""
+"Permitir aplica los controles de conexión; Rechazar bloquea la conexión."
+
+msgid "Automatic same-name account push is not authorized."
+msgstr ""
+"El aprovisionamiento automático de cuentas con el mismo nombre no está "
+"autorizado."
+
+msgid ""
+"Automatically provision only same-name accounts before their first "
+"connection; reuse existing managed accounts without provisioning them again."
+" Requires account provisioning support on the asset platform."
+msgstr ""
+"Aprovisiona automáticamente solo las cuentas con el mismo nombre antes de su"
+" primera conexión; reutiliza las cuentas gestionadas existentes. La "
+"plataforma del activo debe admitir el aprovisionamiento de cuentas."
+
+msgid "Cancel connections individually."
+msgstr "Cancele las conexiones de forma individual."
+
+msgid "Complete the current connection step first"
+msgstr "Complete primero el paso actual de la conexión."
+
+msgid "Connection ACL context"
+msgstr "Contexto de ACL de conexión"
+
+msgid "Connection ACL requirements are incomplete"
+msgstr "Las comprobaciones de ACL de la conexión no se han completado."
+
+msgid "Connection approval is no longer valid"
+msgstr "La aprobación de la conexión ya no es válida."
+
+msgid "Connection details"
+msgstr "Detalles de la conexión"
+
+msgid "Connection is no longer available"
+msgstr "Esta conexión ya no está disponible. Inicie una nueva conexión."
+
+msgid "Connection parameters cannot be changed; create a new connection token"
+msgstr ""
+"No se pueden cambiar los parámetros de conexión; cree un nuevo token de "
+"conexión."
+
+msgid "Connection reason"
+msgstr "Motivo de la conexión"
+
+msgid "Connection review was rejected or closed"
+msgstr "La solicitud de aprobación de la conexión fue rechazada o cerrada."
+
+msgid "Connection token does not match this session."
+msgstr "El token de conexión no corresponde a esta sesión."
+
+msgid "Creating the account and configuring its login credentials."
+msgstr "Creando la cuenta y configurando sus credenciales de acceso."
+
+msgid "Duplicate connection tokens."
+msgstr "Hay tokens de conexión duplicados."
+
+msgid "Enter a connection reason (up to 4096 characters)."
+msgstr "Introduzca el motivo de la conexión (máximo 4096 caracteres)."
+
+msgid "Enter a reason before connecting."
+msgstr "Introduzca un motivo antes de conectarse."
+
+msgid "Exemption period"
+msgstr "Periodo de exención"
+
+msgid "Face monitoring context belongs to a different user"
+msgstr "El contexto de supervisión facial pertenece a otro usuario."
+
+msgid "Face monitoring does not belong to this session"
+msgstr "La supervisión facial no corresponde a esta sesión."
+
+msgid "Face verification"
+msgstr "Verificación facial"
+
+msgid "Face verification does not belong to this connection"
+msgstr "La verificación facial no corresponde a esta conexión."
+
+msgid "Face verification failed"
+msgstr "La verificación facial ha fallado."
+
+msgid "Face verification is no longer available"
+msgstr "La verificación facial ya no está disponible."
+
+msgid "Face verification session expired; retry verification"
+msgstr "La sesión de verificación facial ha caducado; repita la verificación."
+
+msgid "Face verification session is no longer current"
+msgstr "La sesión de verificación facial ya no es la actual."
+
+msgid "First-login same-name account push"
+msgstr ""
+"Aprovisionamiento de cuenta con el mismo nombre en la primera conexión"
+
+msgid "MFA verification"
+msgstr "Verificación MFA"
+
+msgid "No available reviewers. Contact an administrator."
+msgstr "No hay aprobadores disponibles. Contacte con un administrador."
+
+msgid ""
+"Notify the selected recipients when a user requests an asset connection. A "
+"notification does not mean the connection succeeded."
+msgstr ""
+"Notifica a los destinatarios seleccionados cuando un usuario solicita "
+"conectarse a un activo. La notificación no significa que la conexión se haya"
+" realizado correctamente."
+
+msgid "Online face monitoring context is no longer available"
+msgstr "El contexto de supervisión facial continua ya no está disponible."
+
+msgid "Online face monitoring context is required"
+msgstr "Se requiere el contexto de supervisión facial continua."
+
+msgid "Online face verification requires Web Terminal"
+msgstr "La verificación facial continua requiere el terminal web."
+
+msgid "Permission to connect to this account is no longer available."
+msgstr "El permiso para conectarse con esta cuenta ya no está disponible."
+
+msgid "Prepare the same-name account before connecting."
+msgstr "Prepare la cuenta con el mismo nombre antes de conectarse."
+
+msgid "Push same-name account on first connection"
+msgstr "Aprovisionar la cuenta con el mismo nombre en la primera conexión"
+
+msgid "Require approval"
+msgstr "Requerir aprobación"
+
+msgid ""
+"Require approval before connecting, except during a valid exemption period."
+msgstr ""
+"Requiere aprobación antes de conectarse, salvo durante un periodo de "
+"exención válido."
+
+msgid "Rotate password"
+msgstr "Rotar contraseña"
+
+msgid ""
+"Rotate the connected account's secret after the session ends. Requires "
+"system rotation after session end and automatic rotation on an active "
+"account."
+msgstr ""
+"Cambia las credenciales de la cuenta conectada al finalizar la sesión. "
+"Requiere habilitar la rotación al finalizar la sesión en el sistema y la "
+"rotación automática en una cuenta activa."
+
+msgid "Same-name account provisioning uses server-managed credentials."
+msgstr ""
+"El aprovisionamiento de cuentas con el mismo nombre usa credenciales "
+"gestionadas por el servidor."
+
+msgid "Secret rotation after session end is disabled"
+msgstr ""
+"La rotación de credenciales al finalizar la sesión está deshabilitada."
+
+msgid "Select an active MFA method; enroll MFA first if none are available."
+msgstr ""
+"Seleccione un método MFA activo; si no hay ninguno disponible, configure MFA"
+" primero."
+
+msgid "Select at least one active, unexpired reviewer from this organization."
+msgstr ""
+"Seleccione al menos un aprobador activo y no caducado de esta organización."
+
+msgid "Select at least one notification recipient."
+msgstr "Seleccione al menos un destinatario de notificación."
+
+msgid ""
+"Select reviewers when approval is enabled. Connections are blocked if no "
+"reviewers are available."
+msgstr ""
+"Seleccione aprobadores al habilitar la aprobación. Si no hay aprobadores "
+"disponibles, se bloquean las conexiones."
+
+msgid "Send notification"
+msgstr "Enviar notificación"
+
+msgid "The existing same-name account is inactive. Contact an administrator."
+msgstr ""
+"La cuenta existente con el mismo nombre está inactiva. Contacte con un "
+"administrador."
+
+msgid "The same-name account username is determined by the server."
+msgstr ""
+"El servidor determina el nombre de usuario de la cuenta con el mismo nombre."
+
+msgid "This MFA method does not send a verification code"
+msgstr "Este método MFA no envía códigos de verificación."
+
+msgid "This connection does not require this step"
+msgstr "Esta conexión no requiere este paso."
+
+msgid "This field cannot be submitted."
+msgstr "No se permite enviar este campo."
+
+msgid "This field does not belong to the current step."
+msgstr "Este campo no pertenece al paso actual."
+
+msgid "This push method does not support create-only mode"
+msgstr "Este método de aprovisionamiento no admite el modo de solo creación."
+
+msgid "This username cannot be provisioned automatically."
+msgstr "Este nombre de usuario no admite el aprovisionamiento automático."
+
+msgid "Use Web Terminal to complete face verification"
+msgstr "Use el terminal web para completar la verificación facial."
+
+msgid ""
+"Verify an enrolled MFA code before connecting. Block connections if no code-"
+"based MFA method is enrolled."
+msgstr ""
+"Verifica un código MFA configurado antes de conectarse. Bloquea las "
+"conexiones si no hay ningún método MFA basado en códigos configurado."
+
+msgid ""
+"Verify the user's face before connecting. Requires system face recognition "
+"and an enrolled face."
+msgstr ""
+"Verifica el rostro del usuario antes de conectarse. Requiere habilitar el "
+"reconocimiento facial del sistema y registrar el rostro."
+
+msgid "Waiting to push the same-name account."
+msgstr "Esperando para aprovisionar la cuenta con el mismo nombre."
+
+msgid ""
+"Web Terminal only: verify the user's face before connecting and monitor "
+"throughout the session. Requires system face recognition and an enrolled "
+"face."
+msgstr ""
+"Solo para el terminal web: verifica el rostro antes de conectarse y lo "
+"supervisa durante toda la sesión. Requiere habilitar el reconocimiento "
+"facial del sistema y registrar el rostro."
+
+msgctxt "Asset connection ACL"
+msgid "Face online"
+msgstr "Supervisión facial continua"
+
+msgctxt "Asset connection ACL"
+msgid "Push account"
+msgstr "Aprovisionar cuenta"
+
+#: reports/services/audit_data.py
+msgid "Account Health"
+msgstr "Estado de las cuentas"
+
+#: reports/services/audit_data.py
+msgid "Account Tasks to Review"
+msgstr "Tareas de cuentas por revisar"
+
+#: reports/services/audit_data.py
+msgid "Assets with Pending Risks"
+msgstr "Activos con riesgos pendientes"
+
+#: reports/services/audit_data.py
+msgid "Awaiting review"
+msgstr "Pendiente de revisión"
+
+#: reports/services/audit_data.py
+msgid "Candidate credential verified"
+msgstr "Credencial candidata verificada"
+
+#: reports/services/audit_data.py
+msgid "Check connection conditions and the original session before retrying."
+msgstr "Compruebe las condiciones de conexión y la sesión original antes de volver a intentarlo."
+
+#: reports/services/audit_data.py
+msgid "Check recording creation, upload, and storage for the original session."
+msgstr "Compruebe la creación, la carga y el almacenamiento de la grabación de la sesión original."
+
+#: reports/services/audit_data.py
+msgid "Command Decisions to Review"
+msgstr "Decisiones sobre comandos por revisar"
+
+#: reports/services/audit_data.py
+msgid "Compare the detected change with approved access and confirm the handling result."
+msgstr "Compare el cambio detectado con el acceso aprobado y confirme el resultado de la gestión."
+
+#: reports/services/audit_data.py
+msgid "Confirm that the newer credential is synchronized and access works."
+msgstr "Confirme que la credencial más reciente esté sincronizada y que el acceso funcione."
+
+#: reports/services/audit_data.py
+msgid "Confirm whether the location change matches travel, proxy use, or expected access."
+msgstr "Confirme si el cambio de ubicación corresponde a un viaje, al uso de un proxy o a un acceso previsto."
+
+#: reports/services/audit_data.py
+msgid "Confirmed Risk Records"
+msgstr "Registros de riesgos confirmados"
+
+#: reports/services/audit_data.py
+msgid "Connection Failures to Review"
+msgstr "Fallos de conexión por revisar"
+
+#: reports/services/audit_data.py
+msgid "Credential verification failed"
+msgstr "Error en la verificación de la credencial"
+
+#: reports/services/audit_data.py
+msgid "Credential verification in progress"
+msgstr "Verificación de la credencial en curso"
+
+#: reports/services/audit_data.py
+msgid "Current Account Risk Details"
+msgstr "Detalles de los riesgos actuales de las cuentas"
+
+#: reports/services/audit_data.py
+msgid "Current Account Risks"
+msgstr "Riesgos actuales de las cuentas"
+
+#: reports/services/audit_data.py
+msgid "Current Risk Records"
+msgstr "Registros de riesgos actuales"
+
+#: reports/services/audit_data.py
+msgid "Failed Logins to Review"
+msgstr "Inicios de sesión fallidos por revisar"
+
+#: reports/services/audit_data.py
+msgid "File Operations to Review"
+msgstr "Operaciones de archivos por revisar"
+
+#: reports/services/audit_data.py
+msgid "Handling Progress"
+msgstr "Progreso de la gestión"
+
+#: reports/services/audit_data.py
+msgid "Ignored Risk Records"
+msgstr "Registros de riesgos ignorados"
+
+#: reports/services/audit_data.py
+msgid "Issue"
+msgstr "Problema"
+
+#: reports/services/audit_data.py
+msgid "Later password change succeeded"
+msgstr "Un cambio de contraseña posterior se completó correctamente"
+
+#: reports/services/audit_data.py
+msgid "New-City Logins to Review"
+msgstr "Inicios de sesión desde nuevas ciudades por revisar"
+
+#: reports/services/audit_data.py
+msgid "Next Step"
+msgstr "Siguiente paso"
+
+#: reports/services/audit_data.py
+msgid "No account risk records are currently available."
+msgstr "Actualmente no hay registros de riesgos de cuentas disponibles."
+
+#: reports/services/audit_data.py
+msgid "Original Record"
+msgstr "Registro original"
+
+#: reports/services/audit_data.py
+msgid "Pending Risk Records"
+msgstr "Registros de riesgos pendientes"
+
+#: reports/services/audit_data.py
+msgid "Pending Risks by Type"
+msgstr "Riesgos pendientes por tipo"
+
+#: reports/services/audit_data.py
+msgid "Policy Denials to Review"
+msgstr "Denegaciones por políticas por revisar"
+
+#: reports/services/audit_data.py
+msgid "Recordings to Review"
+msgstr "Grabaciones por revisar"
+
+#: reports/services/audit_data.py
+msgid "Remediation Checklist"
+msgstr "Lista de comprobación de medidas correctivas"
+
+#: reports/services/audit_data.py
+msgid "Review and synchronize the verified candidate credential; verification alone does not confirm recovery."
+msgstr "Revise y sincronice la credencial candidata verificada; la verificación por sí sola no confirma la recuperación."
+
+#: reports/services/audit_data.py
+msgid "Review the command purpose, matched rule, and approval trail in the original session."
+msgstr "Revise el propósito del comando, la regla coincidente y el historial de aprobación en la sesión original."
+
+#: reports/services/audit_data.py
+msgid "Review the denied operation and confirm that the access policy is expected."
+msgstr "Revise la operación denegada y confirme que la política de acceso sea la prevista."
+
+#: reports/services/audit_data.py
+msgid "Review the execution log and affected targets, correct the cause, then retry."
+msgstr "Revise el registro de ejecución y los destinos afectados, corrija la causa y vuelva a intentarlo."
+
+#: reports/services/audit_data.py
+msgid "Review the file path, access permissions, and original session before retrying."
+msgstr "Revise la ruta del archivo, los permisos de acceso y la sesión original antes de volver a intentarlo."
+
+#: reports/services/audit_data.py
+msgid "Review the verification result and original execution before retrying."
+msgstr "Revise el resultado de la verificación y la ejecución original antes de volver a intentarlo."
+
+#: reports/services/audit_data.py
+msgid "Review whether the reason for ignoring this failure still applies."
+msgstr "Revise si el motivo para ignorar este fallo sigue siendo válido."
+
+#: reports/services/audit_data.py
+msgid "Review whether the reason for ignoring this risk still applies."
+msgstr "Revise si el motivo para ignorar este riesgo sigue siendo válido."
+
+#: reports/services/audit_data.py
+msgid "Risk Count"
+msgstr "Número de riesgos"
+
+#: reports/services/audit_data.py
+msgid "Updated"
+msgstr "Actualizado"
+
+#: reports/services/audit_data.py
+msgid "Verification Time"
+msgstr "Hora de verificación"
+
+#: reports/services/audit_data.py
+msgid "Verify the candidate credential and synchronize it only after confirming that access works."
+msgstr "Verifique la credencial candidata y sincronícela solo después de confirmar que el acceso funciona."
+
+#: reports/services/audit_data.py
+msgid "Verify the login source and account identity, then review the authentication log."
+msgstr "Verifique el origen del inicio de sesión y la identidad de la cuenta; después, revise el registro de autenticación."
+
+#: reports/services/audit_data.py
+msgid "Wait for verification to finish before deciding whether to synchronize the credential."
+msgstr "Espere a que finalice la verificación antes de decidir si sincronizar la credencial."
+
+#: reports/services/assessment.py
+msgid "Readable"
+msgstr "Legible"
+
+#: reports/services/assessment.py
+msgid "Record ID"
+msgstr "ID del registro"
+
+#: reports/services/assessment.py
+msgid "Reference"
+msgstr "Referencia"
+
+msgid "%(count)s account task executions were canceled."
+msgstr "Se cancelaron %(count)s ejecuciones de tareas de cuentas."
+
+msgid "%(count)s completed successful sessions require recording review. Check recording creation, upload, and storage."
+msgstr "%(count)s sesiones finalizadas correctamente requieren revisar la grabación. Compruebe su creación, carga y almacenamiento."
+
+msgid "%(count)s new-city login records require review of user identity and access location."
+msgstr "%(count)s registros de inicio de sesión desde una ciudad nueva requieren verificar la identidad del usuario y la ubicación de acceso."
+
+msgid "%(count)s platform login records use loopback source addresses. Confirm whether these are local accesses or proxy-forwarded requests."
+msgstr "%(count)s registros de inicio de sesión en la plataforma utilizan direcciones de origen de bucle local. Confirme si son accesos locales o solicitudes reenviadas por un proxy."
+
+msgid "%(count)s platform logins failed. Review the affected users, source addresses, and recorded reasons."
+msgstr "Se produjeron %(count)s fallos de inicio de sesión en la plataforma. Revise los usuarios afectados, las direcciones de origen y los motivos registrados."
+
+msgid "%(failed)s of %(total)s file operations failed (%(rate)s%%). Review the affected assets, accounts, file paths, and original sessions."
+msgstr "Fallaron %(failed)s de %(total)s operaciones de archivos (%(rate)s%%). Revise los activos, las cuentas y las rutas de archivo afectados, así como las sesiones originales."
+
+msgid "%(sessions)s asset sessions were recorded: %(success)s connections succeeded and %(failed)s failed, involving %(users)s users and %(assets)s assets."
+msgstr "Se registraron %(sessions)s sesiones de activos: %(success)s conexiones correctas y %(failed)s fallidas, con %(users)s usuarios y %(assets)s activos."
+
+msgid "%(total)s account tasks were executed: %(success)s succeeded, %(failed)s failed or errored, and %(pending)s remain incomplete."
+msgstr "Se ejecutaron %(total)s tareas de cuentas: %(success)s correctas, %(failed)s fallidas o con errores y %(pending)s aún sin completar."
+
+msgid "Account Risks to Review"
+msgstr "Riesgos de cuentas por revisar"
+
+msgid "Accounts Identified in Pending Risks"
+msgstr "Cuentas identificadas en riesgos pendientes"
+
+msgid "Affected Accounts"
+msgstr "Cuentas afectadas"
+
+msgid "Affected Assets"
+msgstr "Activos afectados"
+
+msgid "Assets with Latest Check Successful"
+msgstr "Activos cuya última comprobación fue correcta"
+
+msgid "Assign a unique credential to each affected account, synchronize dependent services, and verify access."
+msgstr "Asigne una credencial única a cada cuenta afectada, sincronice los servicios dependientes y verifique el acceso."
+
+msgid "Check Result"
+msgstr "Resultado de la comprobación"
+
+msgid "Compare authorized keys with approved keys, and remove unapproved keys."
+msgstr "Compare las claves autorizadas con las aprobadas y elimine las que no estén aprobadas."
+
+msgid "Compare group membership changes with approved access, and remove unapproved privileges."
+msgstr "Compare los cambios de pertenencia a grupos con el acceso aprobado y retire los privilegios no aprobados."
+
+msgid "Compare sudo permission changes with approved access, and remove unapproved privileges."
+msgstr "Compare los cambios de permisos sudo con el acceso aprobado y retire los privilegios no aprobados."
+
+msgid "Confirm the account owner and purpose, then manage approved accounts or disable unauthorized accounts."
+msgstr "Confirme el propietario y la finalidad de la cuenta; después, incorpore las cuentas aprobadas a la gestión o deshabilite las no autorizadas."
+
+msgid "Confirm whether deletion was approved, then reconcile the managed account inventory."
+msgstr "Confirme si la eliminación estaba aprobada y después actualice el inventario de cuentas gestionadas."
+
+msgid "Confirm whether the account is still needed, then disable unused accounts after approval."
+msgstr "Confirme si la cuenta sigue siendo necesaria y deshabilite las cuentas sin uso tras obtener la aprobación."
+
+msgid "Current Managed Accounts"
+msgstr "Cuentas gestionadas actuales"
+
+msgid "Currently, %(pending)s pending account risk records involve %(accounts)s distinct accounts on %(assets)s assets. Review the affected accounts by risk type."
+msgstr "Actualmente, %(pending)s registros de riesgo de cuentas pendientes afectan a %(accounts)s cuentas distintas en %(assets)s activos. Revise las cuentas afectadas por tipo de riesgo."
+
+msgid "Latest Check Failed"
+msgstr "Última comprobación fallida"
+
+msgid "Latest Check Successful"
+msgstr "Última comprobación correcta"
+
+msgid "Managed Accounts with Latest Check Successful"
+msgstr "Cuentas gestionadas cuya última comprobación fue correcta"
+
+msgid "Most Recent Stored Check"
+msgstr "Comprobación registrada más reciente"
+
+msgid "No Check Result"
+msgstr "Sin resultado de comprobación"
+
+msgid "No listed security events were found in the available records for this period."
+msgstr "No se encontraron los eventos de seguridad indicados en los registros disponibles de este período."
+
+msgid "Not Applicable"
+msgstr "No aplicable"
+
+msgid "Password Changes with Subsequent Progress"
+msgstr "Cambios de contraseña con avances posteriores"
+
+msgid "Renew the expired credential and verify dependent tasks and account access."
+msgstr "Renueve la credencial caducada y verifique las tareas dependientes y el acceso a la cuenta."
+
+msgid "Replace the weak password with a strong unique password, then verify account access."
+msgstr "Sustituya la contraseña débil por una contraseña segura y única, y después verifique el acceso a la cuenta."
+
+msgid "Review failed connections using the affected assets, accounts, and recorded reasons."
+msgstr "Revise las conexiones fallidas a partir de los activos y las cuentas afectados y los motivos registrados."
+
+msgid "Review failed task logs and affected accounts; prioritize unresolved items before records with subsequent progress."
+msgstr "Revise los registros de tareas fallidas y las cuentas afectadas; priorice los elementos sin resolver frente a los registros con avances posteriores."
+
+msgid "Review risks"
+msgstr "Revisar riesgos"
+
+msgid "Review the confirmed finding and verify the current account state."
+msgstr "Revise el hallazgo confirmado y verifique el estado actual de la cuenta."
+
+msgid "Risk Accounts Matched to Managed Accounts"
+msgstr "Cuentas con riesgo coincidentes con cuentas gestionadas"
+
+msgid "Risk Accounts Not Matched to Managed Accounts"
+msgstr "Cuentas con riesgo sin coincidencia con cuentas gestionadas"
+
+msgid "Risk List"
+msgstr "Lista de riesgos"
+
+msgid "Risk Records"
+msgstr "Registros de riesgo"
+
+msgid "Rotate the credential according to the rotation policy and verify dependent services."
+msgstr "Cambie la credencial conforme a la política de rotación y verifique los servicios dependientes."
+
+msgid "Rotate the potentially exposed credential, review recent access, and verify dependent services."
+msgstr "Cambie la credencial posiblemente expuesta, revise los accesos recientes y verifique los servicios dependientes."
+
+msgid "Stored Asset Connectivity Results"
+msgstr "Resultados registrados de conectividad de activos"
+
+msgid "Stored Managed Account Connectivity Results"
+msgstr "Resultados registrados de conectividad de cuentas gestionadas"
+
+msgid "There are currently %(total)s assets, of which %(active)s are enabled."
+msgstr "Actualmente hay %(total)s activos, de los cuales %(active)s están habilitados."
+
+msgid "There are currently %(total)s managed account records, of which %(active)s are enabled."
+msgstr "Actualmente hay %(total)s registros de cuentas gestionadas, de los cuales %(active)s están habilitados."
+
+msgid "There are currently no pending account risk records."
+msgstr "Actualmente no hay registros de riesgo de cuentas pendientes."
+
+msgid "Please upgrade the JumpServer client to use the configured login policy."
+msgstr "Actualice el cliente de JumpServer para utilizar la política de inicio de sesión configurada."
+
+msgid "Client login session expired. Please authenticate again."
+msgstr "La sesión del cliente ha caducado. Vuelva a autenticarse."
+
+msgid "Log in again after exiting the client"
+msgstr "Volver a iniciar sesión al salir del cliente"
+
+msgid ""
+"When enabled, log in again after the desktop application exits and restarts."
+" Minimizing or hiding the application does not count as exiting."
+msgstr ""
+"Si se activa, deberá volver a iniciar sesión al cerrar y reiniciar la "
+"aplicación de escritorio. Minimizar u ocultar la aplicación no se considera "
+"salir."
+
+msgid "Client login idle timeout (minute)"
+msgstr "Tiempo de inactividad (minutos)"
+
+msgid "Log in again when the idle timeout is reached. 0 disables the limit (default). Real keyboard and mouse input in the main window, separate asset windows and built-in websites counts as activity. An open connection, background output and automatic refresh do not count. Input in external software such as Xshell or MSTSC, and in some cross-origin embedded pages, cannot be captured. Using only these areas, watching without input for a long time, or failed reports due to network issues may still trigger the idle timeout. Time is measured from the last activity confirmed by the server."
+msgstr "Vuelva a iniciar sesión al alcanzar el tiempo de espera por inactividad. 0 desactiva el límite (predeterminado). Las acciones reales del teclado y el ratón en la ventana principal, en ventanas independientes de activos y en sitios web integrados cuentan como actividad. Una conexión abierta, la salida en segundo plano y la actualización automática no cuentan. No se pueden registrar las acciones en programas externos como Xshell o MSTSC ni en algunas páginas integradas de otro origen. Usar solo esas áreas, observar durante mucho tiempo sin interactuar o sufrir fallos de envío por problemas de red puede provocar el tiempo de espera por inactividad. El tiempo se calcula desde la última actividad confirmada por el servidor."
+
+msgid "Maximum client login lifetime (minute)"
+msgstr "Duración máxima del inicio de sesión del cliente (min)"
+
+msgid "Measured from client login; activity and token refresh do not extend it. 0 disables the lifetime limit (default). Exit and idle timeout settings still apply. Log in again when the lifetime ends."
+msgstr "Se cuenta desde el inicio de sesión en el cliente; la actividad y la renovación del token no la prolongan. 0 desactiva el límite de duración (valor predeterminado). Los ajustes de salida e inactividad siguen vigentes. Vuelva a iniciar sesión cuando termine este plazo."
+
+msgid "Client exit"
+msgstr "Salida del cliente"
+
+msgid "Idle timeout"
+msgstr "Tiempo de inactividad agotado"
+
+msgid "Maximum login time"
+msgstr "Duración máxima de la sesión"
+
+msgid "Client login policy changed"
+msgstr "Se ha modificado la política de inicio de sesión del cliente"
+
+msgid "Authorization revoked"
+msgstr "Autorización revocada"
+
+#: assets/models/asset/common.py assets/serializers/asset/common.py
+msgid "Asset owner"
+msgstr "Responsable del activo"
+
+msgid "Manager"
+msgstr "Manager"
+
+msgid "Workflow"
+msgstr "Workflow"
+
+msgid "Approval workflow"
+msgstr "Approval workflow"
+
+msgid "Workflow version"
+msgstr "Workflow version"
+
+msgid "Workflow instance"
+msgstr "Workflow instance"
+
+msgid "Workflow node"
+msgstr "Workflow node"
+
+msgid "Workflow edge"
+msgstr "Workflow edge"
+
+msgid "Workflow node instance"
+msgstr "Workflow node instance"
+
+msgid "Approval task"
+msgstr "Approval task"
+
+msgid "Workflow event"
+msgstr "Workflow event"
+
+msgid "Client idle lock (minute)"
+msgstr "Bloqueo por inactividad (minuto)"
+
+msgid ""
+"0 disables idle locking (default). When enabled, the client starts locked. "
+"Only the active site and account are checked for system keyboard or mouse "
+"inactivity. Lock the main page and managed asset windows without ending "
+"login or connections. Unlock only on the main page with the current account "
+"client lock password. Set the password in Personal settings > Login "
+"authentication > Client credentials. External applications are not covered "
+"by the client lock."
+msgstr ""
+"0 desactiva el bloqueo automático. La página principal y las ventanas "
+"gestionadas se bloquean juntas; solo se desbloquean desde la página "
+"principal. La sesión y las conexiones continúan. Las aplicaciones externas "
+"no están protegidas. Las sesiones nuevas y restauradas comienzan bloqueadas "
+"si está habilitado. El teclado y el ratón del sistema, incluso en "
+"aplicaciones externas, reinician solo el temporizador del sitio y cuenta "
+"activos. No se envía actividad al servidor."
+
+msgid "Client lock password"
+msgstr "Contraseña de bloqueo del cliente"
+
+msgid "Set a client lock password in the web personal settings first."
+msgstr ""
+"No hay contraseña de bloqueo. Configúrala en los ajustes personales web de "
+"este sitio y cuenta, vuelve y actualiza."
+
+msgid "The client lock password is incorrect."
+msgstr "No se pudo desbloquear. Comprueba la contraseña y la conexión."
+
+msgid ""
+"Calculated from each login time using the latest setting. Activity and token"
+" refresh do not extend it. 0 means unlimited. If a change makes a login "
+"overdue, allow up to 10 minutes before sign-out and signing in again."
+msgstr ""
+"Se calcula desde cada inicio de sesión con la configuración más reciente. La"
+" actividad y la renovación de tokens no la amplían. 0 significa sin límite. "
+"Si un cambio deja la sesión fuera de plazo, se conceden hasta 10 minutos "
+"antes del cierre y se debe iniciar sesión de nuevo."
+
+msgid ""
+"{} - Encryption password not set - Please go to Personal Settings → Login "
+"authentication → Client credentials → File Encryption Password to set it."
+msgstr ""
+"{} - Contraseña de cifrado no configurada. Ve a Ajustes personales → "
+"Autenticación de inicio de sesión → Credenciales del cliente → Contraseña de"
+" cifrado de archivos."
+
+msgid ""
+"0 disables automatic idle locking (default). System keyboard and mouse input"
+" determines inactivity for the active site and account only. Activity is not"
+" reported for each action; an idle timeout or manual lock sends one request "
+"to lock this login on the server. Idle timeout locks the main page and its "
+"managed asset windows even without a lock password. Unlock only on the main "
+"page after server password verification. New logins open normally; "
+"previously locked logins stay locked after restoration. External application"
+" windows are not protected."
+msgstr ""
+"0 desactiva el bloqueo automático (predeterminado). Las entradas del teclado"
+" y ratón del sistema determinan la inactividad solo del sitio y la cuenta "
+"activos. No se informa cada acción; al vencer el plazo o bloquear "
+"manualmente se solicita al servidor que bloquee esta sesión. El plazo "
+"bloquea la página principal y las ventanas de activos administradas, incluso"
+" sin contraseña configurada. Solo se desbloquea desde la página principal "
+"tras verificar la contraseña en el servidor. Un nuevo inicio de sesión entra"
+" normalmente; una sesión bloqueada sigue así al restaurarla. Las ventanas "
+"externas no están protegidas."
+
+msgid "The web session is locked. Unlock it before authorizing a client."
+msgstr "La sesión web está bloqueada. Desbloquéela antes de autorizar un cliente."
+
+msgid "Client is locked. Unlock it on the main page."
+msgstr "El cliente está bloqueado. Desbloquéalo desde la página principal."
+
+msgid ""
+"Default: 15 minutes. 0 disables automatic locking. After the configured "
+"period without system keyboard or mouse input, lock the main page and asset "
+"windows for the current site and account. Unlock on the main page by "
+"verifying the lock password online. Locking also applies if no password is "
+"configured; set it in web personal settings. External application windows "
+"are not protected."
+msgstr ""
+"Valor predeterminado: 15 minutos. 0 desactiva el bloqueo automático. Sin "
+"entradas del teclado o ratón del sistema durante el tiempo configurado, se "
+"bloquean la página principal y las ventanas de activos del sitio y la cuenta"
+" actuales. Desbloquea en la página principal verificando la contraseña en "
+"línea. También se bloquea sin contraseña configurada; establécela en los "
+"ajustes personales Web. Las ventanas externas no están protegidas."
+
+msgid ""
+"{} - Encryption password not set - Please go to Personal Settings → User "
+"authentication → File Encryption to set it."
+msgstr ""
+"{} - Contraseña de cifrado no configurada. Ve a Ajustes personales → "
+"Autenticación de usuario → Cifrado de archivos."
+
+#: rbac/tree.py
+msgid "Audit reports"
+msgstr "Informes de auditoría"
+
+#: rbac/tree.py
+msgid "Legacy reports"
+msgstr "Informes antiguos"
+
+#: rbac/models/menu.py
+msgid "Can view comprehensive audit report"
+msgstr "Puede ver el informe de auditoría integral"
+
+#: rbac/models/menu.py
+msgid "Can view operations activity report"
+msgstr "Puede ver el informe de actividad operativa"
+
+#: rbac/models/menu.py
+msgid "Can view security event report"
+msgstr "Puede ver el informe de eventos de seguridad"
+
+#: rbac/models/menu.py
+msgid "Can view asset and account overview"
+msgstr "Puede ver el resumen de activos y cuentas"
+
+#: rbac/models/menu.py
+msgid "Can view account operations report"
+msgstr "Puede ver el informe de operaciones de cuentas"
+
+msgid "Locked"
+msgstr "Bloqueo"
+
+msgid "Screen lock password"
+msgstr "Contraseña de bloqueo"
+
+msgid "Idle screen lock (minute)"
+msgstr "Bloqueo por inactividad (min)"
+
+msgid "Set a lock password after signing in again."
+msgstr "Vuelve a iniciar sesión para configurar la contraseña de bloqueo."
+
+msgid "The lock password is incorrect."
+msgstr "La contraseña de bloqueo es incorrecta."
+
+msgid ""
+"Configure an identity verification method before changing the lock password."
+msgstr ""
+"Configura un método de verificación de identidad antes de cambiar la "
+"contraseña de bloqueo."
+
+msgid "This verification method is not available."
+msgstr "Este método de verificación no está disponible."
+
+msgid ""
+"Default: 15 minutes. 0 disables automatic locking. Shared by the desktop "
+"client, console and Web terminal. Desktop uses system keyboard/mouse "
+"activity; Web combines activity in tabs on this site. Idle locks even "
+"without a password. Unlock requires online password verification; if unset, "
+"sign out and sign in again to set it. External applications are not "
+"protected."
+msgstr ""
+"Predeterminado: 15 minutos; 0 desactiva el bloqueo automático. Compartido "
+"entre cliente, consola y terminal Web. El cliente usa la actividad del "
+"teclado/ratón del sistema; Web combina las pestañas de este sitio. Se "
+"bloquea incluso sin contraseña. Desbloquear requiere verificarla en línea; "
+"si no existe, cierra sesión y vuelve a entrar para configurarla. Las "
+"ventanas de aplicaciones externas no están protegidas."
+
+msgid ""
+"Too many incorrect screen lock passwords. This session has been signed out."
+msgstr ""
+"Cinco contraseñas de bloqueo incorrectas consecutivas. Se ha cerrado esta "
+"sesión."
+
+msgid ""
+"Default: 15 minutes. 0 disables automatic locking. Uses system "
+"keyboard/mouse activity. Locks the desktop client and its asset windows even"
+" without a lock password. Unlock on the main window with online password "
+"verification. External applications are not protected."
+msgstr ""
+"Por defecto, 15 minutos. 0 desactiva el bloqueo automático. Usa la actividad"
+" del teclado y ratón del sistema. Bloquea el cliente y sus ventanas de "
+"activos incluso sin contraseña. Desbloquea en la ventana principal con "
+"verificación en el servidor. Las aplicaciones externas no están protegidas."
+
+msgid ""
+"Default: 15 minutes. 0 disables automatic locking. Shared by the console and"
+" Web terminal. Uses keyboard/mouse activity across tabs on this site; other "
+"sites and external applications cannot be monitored. Locks the current Web "
+"login even without a lock password. If unset, sign out and sign in again."
+msgstr ""
+"Por defecto, 15 minutos. 0 desactiva el bloqueo automático. La consola y el "
+"terminal Web comparten el ajuste y suman la actividad de las pestañas de "
+"este sitio. No se detecta actividad de otros sitios o aplicaciones. Se "
+"bloquea incluso sin contraseña; en ese caso, cierra sesión y vuelve a "
+"iniciar sesión."
+
+#~ msgid "Ticket already closed"
+#~ msgstr "El ticket ya ha sido cerrado"
+
+msgid "Web session lifetime (second)"
+msgstr "Duración de la sesión Web (segundo)"
+
+msgid "Renew session on request"
+msgstr "Renovar sesión con cada solicitud"
+
+msgid ""
+"SESSION_COOKIE_AGE, in seconds. Change it in Core config.yml and restart "
+"Core. New or renewed sessions use the new duration; stored expiry times are "
+"not immediately rewritten. This is not a fixed maximum since login. Web and "
+"desktop login policies are independent."
+msgstr ""
+"SESSION_COOKIE_AGE, en segundos. Modifica config.yml de Core y reinicia "
+"Core. Las sesiones nuevas o renovadas usan la nueva duración; los "
+"vencimientos guardados no se reescriben inmediatamente. No es un máximo fijo"
+" desde el inicio de sesión. Las políticas Web y del cliente son "
+"independientes."
+
+msgid ""
+"SESSION_SAVE_EVERY_REQUEST. Change it in Core config.yml and restart Core. "
+"When enabled, ordinary requests renew the Web session for the configured "
+"duration. Disabling it does not impose a fixed maximum: writing to the "
+"session can still renew it. Keyboard/mouse inactivity does not sign out the "
+"user; idle screen locking is configured separately."
+msgstr ""
+"SESSION_SAVE_EVERY_REQUEST. Modifica config.yml de Core y reinicia Core. Al "
+"activarlo, las solicitudes normales renuevan la sesión por la duración "
+"configurada. Desactivarlo no impone un máximo fijo: escribir en Session "
+"puede renovarla. La inactividad del teclado o ratón no cierra sesión; el "
+"bloqueo por inactividad se configura aparte."
+
+msgid ""
+"0 means unlimited. Calculated from each login time using the latest setting."
+" Activity and token refresh do not extend it. Settings sync about every 60 "
+"seconds. If a change makes a login overdue, allow up to 10 minutes before "
+"sign-out. Extending the limit during grace cancels sign-out if the login is "
+"within the new limit."
+msgstr ""
+"0 significa sin límite. Se calcula desde cada inicio de sesión con el ajuste"
+" más reciente. La actividad y la renovación del Token no lo amplían. Los "
+"ajustes se sincronizan cada 60 segundos aproximadamente. Si un cambio deja "
+"la sesión vencida, se conceden hasta 10 minutos antes de cerrarla. Ampliar "
+"el límite durante la prórroga cancela el cierre si la sesión queda dentro "
+"del nuevo límite."
+
+msgid "Web idle screen lock (minute)"
+msgstr "Bloqueo Web por inactividad (min)"
+
+msgid "Client idle screen lock (minute)"
+msgstr "Bloqueo del cliente por inactividad (min)"
+
+msgid ""
+"Leave blank to follow the administrator. A personal value must not exceed "
+"the administrator limit."
+msgstr ""
+"Déjalo vacío para seguir al administrador. El valor personal no puede "
+"superar su límite."
+
+#, python-format
+msgid ""
+"The administrator limit is %(minutes)s minutes. Leave blank to follow it."
+msgstr ""
+"El límite del administrador es %(minutes)s minutos. Déjalo vacío para "
+"seguirlo."
+
+msgid ""
+"Global default and maximum. Users who have not customized it follow this "
+"value. Personal values must not exceed it. Lowering the maximum also lowers "
+"larger personal values; raising it keeps customized values."
+msgstr ""
+"Valor global predeterminado y máximo. Los usuarios sin ajuste personal "
+"siguen este valor. Los ajustes personales no pueden superarlo. Reducir el "
+"máximo reduce también los valores personales mayores; aumentarlo conserva "
+"los valores personalizados."
+
+msgid "Choose either setting or clearing the lock password."
+msgstr "No puedes establecer y borrar la contraseña de bloqueo a la vez."
+
+msgid ""
+"When the global value is 0, users may choose 0 to disable locking or a "
+"positive personal timeout."
+msgstr ""
+"Si el valor global es 0, los usuarios pueden elegir 0 para desactivar el "
+"bloqueo o un tiempo personal positivo."
+
+msgid "The administrator requires reauthentication after client exit."
+msgstr "El administrador exige volver a iniciar sesión al salir del cliente."
+
+msgid ""
+"Users may enable it themselves when the administrator does not require it."
+msgstr ""
+"Si el administrador no lo exige, los usuarios pueden activarlo por su "
+"cuenta."
+
+msgid ""
+"SESSION_COOKIE_AGE, in seconds. Change it in Core config.yml and restart "
+"Core. New logins use the new duration. Existing expiry times are not "
+"immediately rewritten. Renewals use the new duration unless the session has "
+"its own saved duration; sign in again to apply the new duration to those "
+"sessions. This is not a fixed maximum since login. Web and desktop login "
+"policies are independent."
+msgstr ""
+"Cambie la duración y la renovación en config.yml de Core y reinicie Core. "
+"Los nuevos inicios usan la configuración nueva; los plazos existentes no se "
+"reescriben en bloque. Una sesión con duración propia puede conservarla al "
+"renovarse; vuelva a iniciar sesión para aplicar la nueva duración. "
+"SESSION_COOKIE_AGE es la duración, en segundos, aplicada al guardar una "
+"sesión. No es un límite fijo desde el inicio original. El vencimiento actual"
+" en la información personal es el plazo guardado en el servidor."
+
+msgid ""
+"Default Web session duration, in seconds, after login or renewal. It is not "
+"a fixed maximum since the first login. Change SESSION_COOKIE_AGE in Core "
+"config.yml and restart Core. Existing sessions may keep their saved "
+"duration; sign in again to apply the new duration."
+msgstr ""
+"Duración predeterminada de la sesión Web después de entrar o renovar, en "
+"segundos. No es un límite fijo desde el primer inicio. Cambia "
+"SESSION_COOKIE_AGE en config.yml de Core y reinicia Core. Las sesiones "
+"existentes pueden conservar su duración anterior; vuelve a entrar para "
+"aplicar la nueva."
+
+msgid ""
+"Enabled: ordinary HTTP requests, including background requests, renew the "
+"session. Disabled: ordinary read-only requests do not renew it, but session "
+"writes such as identity verification still can. Change "
+"SESSION_SAVE_EVERY_REQUEST in Core config.yml and restart Core."
+msgstr ""
+"Activado: las solicitudes HTTP normales renuevan la sesión, incluidas las de"
+" segundo plano. Desactivado: las lecturas normales no renuevan, pero las "
+"escrituras de Session, como verificar la identidad, aún pueden hacerlo. "
+"Cambia SESSION_SAVE_EVERY_REQUEST en config.yml de Core y reinicia Core."
+
+msgid ""
+"Enabled: closing the browser normally requires signing in again. Browser "
+"session restore may keep login cookies; use Sign out to end the login "
+"reliably. This does not set a fixed maximum login duration."
+msgstr ""
+"Si se activa, cerrar el navegador normalmente exige entrar de nuevo. La "
+"restauración del navegador puede conservar cookies; usa Cerrar sesión para "
+"terminar el acceso con certeza. No establece una duración máxima fija de "
+"login."
+
+msgid ""
+"Default duration, in seconds.<br>Each renewal restarts the clock: expiry = "
+"renewal time + duration.<br>Ordinary requests renew it when request renewal "
+"is enabled; session writes such as identity verification can still renew it "
+"when disabled.<br>This is not a fixed maximum from the first "
+"login.<br>Change SESSION_COOKIE_AGE in Core config.yml and restart Core. "
+"Existing sessions may retain their saved duration; sign in again to apply "
+"the new duration."
+msgstr ""
+"Duración predeterminada, en segundos.<br>Cada renovación reinicia el plazo: "
+"vencimiento = hora de renovación + duración.<br>Con renovación activada, las"
+" solicitudes normales renuevan. Desactivada, acciones que escriben en "
+"Session, como verificar la identidad, aún pueden renovar.<br>No es un máximo"
+" fijo desde el primer inicio.<br>Cambia SESSION_COOKIE_AGE en config.yml de "
+"Core y reinicia Core. Las sesiones existentes pueden conservar su duración; "
+"vuelve a entrar para aplicar la nueva."
+
+msgid ""
+"Enabled: most API requests using a valid Web session renew it, including GET"
+" queries and background business polling. Mouse or keyboard activity is not "
+"required.<br>Excluded read-only queries: profile, online status (user-"
+"session), and lock status (session-lock/status).<br>Disabled: ordinary read-"
+"only requests do not renew it, but identity verification and other session "
+"writes still can.<br>Why: the project writes the verification result to "
+"Session; Django saves the modified session and recalculates its relative "
+"expiry by default.<br>Change SESSION_SAVE_EVERY_REQUEST in Core config.yml "
+"and restart Core."
+msgstr ""
+"Activado: la mayoría de las solicitudes API con una sesión Web válida "
+"renuevan, incluidas las consultas GET y el sondeo de negocio en segundo "
+"plano. No se requiere teclado o ratón.<br>Lecturas excluidas: perfil, estado"
+" en línea (user-session) y estado de bloqueo (session-"
+"lock/status).<br>Desactivado: las lecturas normales no renuevan, pero "
+"verificar la identidad y otras escrituras en Session aún pueden "
+"renovar.<br>Motivo: el proyecto guarda el resultado de la verificación en "
+"Session; Django guarda la sesión modificada y recalcula por defecto su "
+"vencimiento relativo.<br>Cambia SESSION_SAVE_EVERY_REQUEST en config.yml de "
+"Core y reinicia Core."
+
+msgid ""
+"Enabled: after quitting the entire browser application, opening it again "
+"normally requires signing in.<br>Closing a tab or window, or minimizing it, "
+"is not the same as quitting the application; the browser may still be "
+"running in the background.<br>Browser session restore may preserve login "
+"cookies. Use the site Sign out action to reliably end the login.<br>This "
+"does not set a fixed maximum login duration."
+msgstr ""
+"Si se activa, salir de toda la aplicación del navegador normalmente exige "
+"entrar de nuevo al abrirla.<br>Cerrar una pestaña o ventana, o minimizar, no"
+" equivale a salir de la aplicación; el navegador puede seguir en segundo "
+"plano.<br>La restauración del navegador puede conservar cookies. Usa Cerrar "
+"sesión en el sitio para finalizar el acceso con certeza.<br>No establece una"
+" duración máxima fija de login."
+
+#: apps/settings/serializers/security.py
+msgid ""
+"Require a new login after exiting and restarting. Minimizing or hiding the "
+"client does not count as exiting."
+msgstr ""
+"Exige iniciar sesión de nuevo al salir y reiniciar. Minimizar u ocultar el "
+"cliente no cuenta como salir."
+
+#: apps/settings/serializers/security.py
+msgid ""
+"0 means unlimited. Counted from login. Sign in again when it expires; "
+"activity does not extend it. A login already overdue after a change gets up "
+"to 10 more minutes."
+msgstr ""
+"0 significa sin límite. Se cuenta desde el inicio de sesión. Al vencer, "
+"vuelva a iniciar sesión; la actividad no lo prolonga. Si el cambio deja una "
+"sesión vencida, se conceden hasta 10 minutos más."
+
+#: apps/settings/serializers/security.py
+msgid ""
+"0 disables automatic locking. Locks after the idle timeout. Switching "
+"accounts does not reset the previous account’s idle time. Enter the lock "
+"password to unlock. External application windows are not protected."
+msgstr ""
+"0 desactiva el bloqueo automático. Se bloquea al superar el tiempo de "
+"inactividad. Cambiar de cuenta no reinicia la inactividad de la cuenta "
+"anterior. Introduzca la contraseña de bloqueo para desbloquear. Las "
+"aplicaciones externas no están protegidas."
+
+#: settings/serializers/feature.py
+msgid "Asset application scope"
+msgstr "Ámbito de solicitud de activos"
+
+#: settings/serializers/feature.py
+msgid "Specifies which assets users can select when requesting access via a ticket.<br><b>All assets:</b> All assets in the ticket's organization, even if the user has no existing permission.<br><b>Permed assets:</b> Assets included in permission rules assigned to the user or their user groups, including inactive, expired and not-yet-effective rules.<br><b>Permed valid assets:</b> Assets included in valid permission rules assigned to the user or their user groups. The rule must be enabled, and the current time must be between its start and end times."
+msgstr "Define qué activos pueden seleccionar los usuarios al solicitar acceso mediante un ticket.<br><b>Todos los activos:</b> permite seleccionar todos los activos de la organización del ticket, aunque el usuario no tenga una autorización previa.<br><b>Activos autorizados:</b> permite seleccionar los activos incluidos en las reglas de autorización asignadas al usuario o a sus grupos, incluidas las reglas desactivadas, caducadas o aún no vigentes.<br><b>Activos con autorización válida:</b> solo permite seleccionar los activos incluidos en reglas válidas asignadas al usuario o a sus grupos. La regla debe estar activada y la hora actual debe estar entre su inicio y su finalización."
+
+#: chat_ai/models.py
+msgid "Chat AI conversation audit"
+msgstr "Auditoría de conversaciones de IA"
+
+#: apps/settings/serializers/security.py
+msgid ""
+"0 disables idle locking. Locks the console and Web terminal after the "
+"specified idle time. Enter the lock password to unlock. With idle locking "
+"enabled, closing all pages also locks this login after 10 seconds. Close-"
+"page sign-out takes priority. Refreshing or reopening within 10 seconds "
+"cancels this. Administrator settings are defaults and limits. Users may "
+"choose stricter settings; otherwise they follow the administrator."
+msgstr ""
+"0 desactiva el bloqueo por inactividad. Bloquea la consola y el terminal Web"
+" tras el tiempo de inactividad indicado. Introduzca la contraseña de bloqueo"
+" para desbloquear. Con el bloqueo por inactividad activado, cerrar todas las"
+" páginas también bloquea esta sesión tras 10 segundos. El cierre de sesión "
+"al cerrar las páginas tiene prioridad. Actualizar o reabrir en 10 segundos "
+"lo cancela. El administrador define valores predeterminados y límites. El "
+"usuario puede elegir opciones más estrictas; en otro caso, sigue al "
+"administrador."
+
+#: apps/settings/serializers/security.py:222
+msgid ""
+"When renewal is disabled, the login expires after this duration, even if the"
+" session is saved or identity is verified again. When renewal is enabled, "
+"each renewal grants this duration again. Changes apply to new logins without"
+" restarting Core."
+msgstr ""
+"Sin renovación, el inicio de sesión caduca tras esta duración, aunque se "
+"guarde la sesión o se verifique de nuevo la identidad. Con renovación, cada "
+"renovación concede de nuevo esta duración. Los cambios se aplican a los "
+"nuevos inicios de sesión sin reiniciar Core."
+
+#: apps/settings/serializers/security.py:230
+msgid ""
+"Requests can extend the session at most once per minute. Background business"
+" requests also count; profile, online-status and lock-status polling do not."
+" Disabled: the expiry time stays fixed. Changes apply to new logins without "
+"restarting Core."
+msgstr ""
+"Las solicitudes renuevan la sesión como máximo una vez por minuto. También "
+"cuentan las solicitudes de negocio en segundo plano, excepto las consultas "
+"del perfil, la presencia y el bloqueo. Al desactivarlo, el vencimiento es "
+"fijo. Los cambios se aplican a los nuevos inicios de sesión sin reiniciar "
+"Core."
+
+#: apps/settings/serializers/security.py:299
+msgid "Log in again after exiting the browser"
+msgstr "Volver a iniciar sesión al salir del navegador"
+
+#: apps/settings/serializers/security.py:299
+msgid ""
+"Require a new login after quitting the browser application. Closing a tab or"
+" window does not count. Browser session restore may preserve the login; use "
+"Sign out to reliably end it. Changes apply to new logins."
+msgstr ""
+"Exigir un nuevo inicio de sesión tras salir de la aplicación del navegador. "
+"Cerrar una pestaña o ventana no cuenta. La restauración del navegador puede "
+"conservar la sesión; ciérrela explícitamente para finalizarla con seguridad."
+" Los cambios se aplican a nuevos inicios de sesión."
+
+msgid "Log in again after exiting the browser or closing all JumpServer pages"
+msgstr ""
+"Volver a iniciar sesión al salir del navegador o cerrar todas las páginas"
+
+msgid ""
+"End this login 10 seconds after all console and Web terminal pages for it "
+"close. Refreshing or reopening a page within 10 seconds cancels sign-out. A "
+"browser crash may prevent the close report; use Sign out to reliably end the"
+" login. Changes apply to new logins."
+msgstr ""
+"Al cerrar todas las páginas de consola y terminal Web de este inicio de "
+"sesión, se cerrará la sesión tras unos 10 segundos. Actualizar o reabrir una"
+" página durante ese plazo cancela el cierre. Un fallo del navegador puede "
+"impedir el aviso; use Cerrar sesión para finalizarla de forma fiable. Los "
+"cambios afectan a nuevos inicios de sesión."
+
+msgid "Session policy"
+msgstr "Política de sesión"
+
+msgid "Log in again when the browser closes"
+msgstr "Volver a iniciar sesión al cerrar el navegador"
+
+#: terminal/tasks.py:42
+#, python-format
+msgid "Checking terminal status records older than %(days)s days."
+msgstr "Comprobando registros de estado de terminales con más de %(days)s días."
+
+#: terminal/tasks.py:47 ops/tasks.py:235
+#, python-format
+msgid "Expired records matched: %(checked)s; deleted: %(deleted)s."
+msgstr "Registros caducados coincidentes: %(checked)s; eliminados: %(deleted)s."
+
+#: terminal/tasks.py:65
+msgid "Checking unfinished sessions; active sessions will be kept."
+msgstr "Comprobando sesiones sin finalizar; se conservarán las sesiones activas."
+
+#: terminal/tasks.py:82
+#, python-format
+msgid "Sessions checked: %(checked)s; marked finished: %(finished)s; skipped because still active: %(active)s; related tasks marked finished: %(tasks)s."
+msgstr "Sesiones comprobadas: %(checked)s; marcadas como finalizadas: %(finished)s; omitidas por seguir activas: %(active)s; tareas relacionadas marcadas como finalizadas: %(tasks)s."
+
+#: terminal/tasks.py:51 ops/tasks.py:239
+msgid "Nothing to clean: no records exceeded the retention period."
+msgstr "No hay nada que limpiar: ningún registro supera el período de retención."
+
+#: terminal/tasks.py:87
+msgid "Nothing to process: no unfinished sessions."
+msgstr "No hay nada que procesar: no hay sesiones sin finalizar."
+
+#: ops/celery/utils.py:38
+#, python-format
+msgid "Checking periodic task: %(name)s."
+msgstr "Comprobando tarea periódica: %(name)s."
+
+#: ops/celery/utils.py:61
+#, python-format
+msgid "Schedule: every %(seconds)s seconds."
+msgstr "Programación: cada %(seconds)s segundos."
+
+#: ops/celery/utils.py:46
+#, python-format
+msgid "Skipped periodic task %(name)s: the scheduling database is unavailable."
+msgstr "Tarea periódica %(name)s omitida: la base de datos de programación no está disponible."
+
+#: ops/celery/utils.py:77
+#, python-format
+msgid "Schedule (cron): %(cron)s; time zone: %(timezone)s."
+msgstr "Programación (cron): %(cron)s; zona horaria: %(timezone)s."
+
+#: ops/celery/utils.py:81
+#, python-format
+msgid "Skipped periodic task %(name)s: no valid interval or cron expression is configured."
+msgstr "Tarea periódica %(name)s omitida: no se ha configurado un intervalo ni una expresión cron válidos."
+
+#: ops/celery/utils.py:66
+#, python-format
+msgid "Skipped periodic task %(name)s: the cron expression must contain five fields."
+msgstr "Tarea periódica %(name)s omitida: la expresión cron debe contener cinco campos."
+
+#: ops/tasks.py:123
+msgid "Checking periodic tasks; tasks still registered in the worker will be kept."
+msgstr "Comprobando tareas periódicas; se conservarán las tareas que siguen registradas en el Worker."
+
+#: ops/tasks.py:144
+#, python-format
+msgid "Periodic tasks checked: %(checked)s; deleted: %(cleaned)s; kept because still registered: %(kept)s; cleanup failures: %(failed)s."
+msgstr "Tareas periódicas comprobadas: %(checked)s; eliminadas: %(cleaned)s; conservadas por seguir registradas: %(kept)s; errores de limpieza: %(failed)s."
+
+#: ops/tasks.py:161
+msgid "Starting periodic task registration."
+msgstr "Iniciando el registro de tareas periódicas."
+
+#: ops/tasks.py:172
+#, python-format
+msgid "Periodic tasks checked: %(checked)s; created: %(created)s; updated: %(updated)s; skipped: %(skipped)s."
+msgstr "Tareas periódicas comprobadas: %(checked)s; creadas: %(created)s; actualizadas: %(updated)s; omitidas: %(skipped)s."
+
+#: ops/tasks.py:203
+#, python-format
+msgid "Checking running jobs; jobs older than %(hours)s hours will be marked failed."
+msgstr "Comprobando trabajos en ejecución; los que superen %(hours)s horas se marcarán como fallidos."
+
+#: ops/tasks.py:208
+#, python-format
+msgid "Jobs checked: %(checked)s; marked failed: %(cleaned)s; skipped because within the time limit: %(skipped)s."
+msgstr "Trabajos comprobados: %(checked)s; marcados como fallidos: %(cleaned)s; omitidos por estar dentro del límite de tiempo: %(skipped)s."
+
+#: ops/tasks.py:229
+#, python-format
+msgid "Checking job execution records older than %(days)s days."
+msgstr "Comprobando registros de ejecución de trabajos con más de %(days)s días."
+
+#: ops/tasks.py:133
+#, python-format
+msgid "Removing periodic task %(name)s: its task is no longer registered."
+msgstr "Eliminando tarea periódica %(name)s: su tarea ya no está registrada."
+
+#: ops/tasks.py:213
+msgid "Nothing to process: no running jobs."
+msgstr "No hay nada que procesar: no hay trabajos en ejecución."
+
+#: ops/tasks.py:143
+#, python-format
+msgid "Periodic task %(name)s still exists after cleanup."
+msgstr "La tarea periódica %(name)s sigue existiendo después de la limpieza."
+
+#: settings/tasks/ldap.py:88
+#, python-format
+msgid "Checking LDAP periodic sync configuration: %(name)s."
+msgstr "Comprobando la configuración de sincronización periódica LDAP: %(name)s."
+
+#: settings/tasks/ldap.py:95
+#, python-format
+msgid "Skipped registration: LDAP periodic sync is disabled; schedules kept disabled: %(count)s."
+msgstr "Registro omitido: la sincronización periódica LDAP está deshabilitada; programaciones que se mantienen deshabilitadas: %(count)s."
+
+#: users/tasks.py:97
+msgid "Checking active local users with unexpired accounts and passwords."
+msgstr "Comprobando usuarios locales activos cuyas cuentas y contraseñas no han caducado."
+
+#: users/tasks.py:113 users/tasks.py:187
+#, python-format
+msgid "Users checked: %(checked)s; reminders queued: %(notified)s; skipped because inactive or expired: %(invalid)s; skipped because outside the reminder window: %(outside)s."
+msgstr "Usuarios comprobados: %(checked)s; recordatorios en cola: %(notified)s; omitidos por inactividad o caducidad: %(invalid)s; omitidos por estar fuera del período de recordatorio: %(outside)s."
+
+#: users/tasks.py:156
+#, python-format
+msgid "Checking active local users expiring within %(first)s days; remind %(first)s days before expiry and daily within %(daily)s days."
+msgstr "Comprobando usuarios locales activos que caducan en %(first)s días; se recuerda %(first)s días antes de la caducidad y a diario durante los últimos %(daily)s días."
+
+#: users/tasks.py:107
+#, python-format
+msgid "Queuing a password expiration reminder for %(user)s: %(days)s days remaining."
+msgstr "Añadiendo a la cola un recordatorio de caducidad de contraseña para %(user)s: quedan %(days)s días."
+
+#: users/tasks.py:119 users/tasks.py:193
+msgid "Nothing to process: no users matched the check criteria."
+msgstr "No hay nada que procesar: ningún usuario cumple los criterios de comprobación."
+
+#: users/tasks.py:181
+#, python-format
+msgid "Queuing an account expiration reminder for %(user)s: %(days)s days remaining."
+msgstr "Añadiendo a la cola un recordatorio de caducidad de cuenta para %(user)s: quedan %(days)s días."
+
+#: accounts/tasks/openbao.py:114
+#, python-format
+msgid "OpenBao tokens checked: 1; rotated: 1; new TTL: %(ttl)s seconds."
+msgstr "Tokens OpenBao comprobados: 1; rotados: 1; nuevo período de validez: %(ttl)s segundos."
+
+#: accounts/tasks/openbao.py:124
+msgid "Checking OpenBao token rotation configuration."
+msgstr "Comprobando la configuración de rotación de tokens OpenBao."
+
+#: accounts/tasks/openbao.py:126
+msgid "Skipped token rotation: the OpenBao vault backend is not enabled."
+msgstr "Rotación de token omitida: el backend de almacén OpenBao no está habilitado."
+
+#: accounts/tasks/openbao.py:130
+msgid "Skipped token rotation: no enabled rotation AppRole is configured."
+msgstr "Rotación de token omitida: no se ha configurado un AppRole de rotación habilitado."
+
+#: accounts/tasks/openbao.py:137
+msgid "Skipped token rotation: another rotation task is running."
+msgstr "Rotación de token omitida: hay otra tarea de rotación en ejecución."
+
+#: accounts/tasks/openbao.py:82
+#, python-format
+msgid "OpenBao tokens checked: 1; rotated: 0; skipped: 1. The token is still valid for %(ttl)s seconds, above the rotation threshold of %(threshold)s seconds."
+msgstr "Tokens OpenBao comprobados: 1; rotados: 0; omitidos: 1. El token sigue siendo válido durante %(ttl)s segundos, por encima del umbral de rotación de %(threshold)s segundos."
+
+#: ops/celery/utils.py
+#, python-format
+msgid "Created periodic task %(name)s; enabled: %(enabled)s."
+msgstr "Tarea periódica %(name)s creada; habilitada: %(enabled)s."
+
+#: ops/celery/utils.py
+#, python-format
+msgid "Updated periodic task %(name)s; enabled: %(enabled)s."
+msgstr "Tarea periódica %(name)s actualizada; habilitada: %(enabled)s."
+
+#: tickets/tasks.py perms/tasks.py tickets/plugins/file_transfer/execution.py
+msgid "The batch limit was reached; remaining records will be checked next time."
+msgstr "Se alcanzó el límite del lote; los registros restantes se comprobarán en la próxima ejecución."
+
+#: perms/tasks.py
+msgid "No reminder was queued; recipients are missing or publication failed."
+msgstr "No se puso ningún recordatorio en cola: faltan destinatarios o falló la publicación."
+
+#: perms/tasks.py
+msgid "No users or administrators are available to receive reminders."
+msgstr "No hay usuarios ni administradores disponibles para recibir recordatorios."
+
+#: perms/tasks.py authentication/tasks.py
+msgid "Notifications queued"
+msgstr "Notificaciones en cola"
+
+#: perms/tasks.py
+msgid "The permission is outside the reminder window."
+msgstr "El permiso está fuera del período de recordatorio."
+
+#: perms/tasks.py
+msgid "Unable to queue a notification."
+msgstr "No se pudo poner una notificación en cola."
+
+#: terminal/tasks.py
+msgid "Alert notifications queued"
+msgstr "Notificaciones de alerta en cola"
+
+#: terminal/tasks.py
+#, python-format
+msgid "Storage check failed: %(name)s (%(type)s)."
+msgstr "Error al comprobar el almacenamiento: %(name)s (%(type)s)."
+
+#: terminal/tasks.py
+msgid "Storage connectivity or credential validation failed."
+msgstr "Falló la conexión al almacenamiento o la validación de credenciales."
+
+#: users/tasks.py
+msgid "Automatic disabling of unused users is not enabled."
+msgstr "La desactivación automática de usuarios sin uso no está habilitada."
+
+#: users/tasks.py
+#, python-format
+msgid "Checking users with no login or API key use for %(days)s days; admin is excluded."
+msgstr "Comprobando usuarios sin inicio de sesión ni uso de claves API durante %(days)s días; se excluye admin."
+
+#: users/tasks.py ops/celery/task_logging.py accounts/tasks/automation.py tickets/plugins/file_transfer/execution.py
+msgid "The record was already handled by another task."
+msgstr "Otro proceso ya ha tratado el registro."
+
+#: users/tasks.py
+msgid "The unused-user threshold is outside the enabled range of 1–998 days."
+msgstr "El umbral de usuarios sin uso está fuera del rango habilitado de 1 a 998 días."
+
+#: users/tasks.py
+msgid "Users disabled"
+msgstr "Usuarios deshabilitados"
+
+#: users/signal_handlers.py
+msgid "Sessions deleted"
+msgstr "Sesiones eliminadas"
+
+#: ops/tasks.py
+msgid "Components with health alerts"
+msgstr "Componentes con alertas de estado"
+
+#: ops/tasks.py
+msgid "No health alerts to send."
+msgstr "No hay alertas de estado que enviar."
+
+#: ops/tasks.py
+msgid "Service performance checks are disabled by configuration."
+msgstr "Las comprobaciones de rendimiento del servicio están deshabilitadas por configuración."
+
+#: ops/tasks.py
+msgid "The component is inactive."
+msgstr "El componente está inactivo."
+
+#: authentication/tasks.py
+msgid "Client login session cleanup"
+msgstr "Limpieza de sesiones de inicio de sesión de clientes"
+
+#: authentication/tasks.py
+msgid "Credential activity records included"
+msgstr "Registros de actividad de credenciales incluidos"
+
+#: authentication/tasks.py
+msgid "No recent credential activity matched this user."
+msgstr "No hay actividad reciente de credenciales que coincida con este usuario."
+
+#: authentication/tasks.py
+msgid "OAuth credential cleanup categories"
+msgstr "Categorías de limpieza de credenciales OAuth"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Expired ID tokens deleted"
+msgstr "Tokens de ID caducados eliminados"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Expired access tokens deleted"
+msgstr "Tokens de acceso caducados eliminados"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Expired grant tokens deleted"
+msgstr "Códigos de autorización caducados eliminados"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Expired refresh tokens deleted"
+msgstr "Tokens de actualización caducados eliminados"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "No expired records in this credential category."
+msgstr "No hay registros caducados en esta categoría de credenciales."
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Orphaned refresh tokens deleted"
+msgstr "Tokens de actualización huérfanos eliminados"
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Refresh-token retention settings require these tokens to be kept."
+msgstr "La configuración de retención de tokens de actualización exige conservar estos tokens."
+
+#: authentication/oauth_cleanup_logging.py
+msgid "Revoked refresh tokens deleted"
+msgstr "Tokens de actualización revocados eliminados"
+
+#: notifications/notifications.py
+#, python-format
+msgid "Channel %(channel)s: matched recipients %(matched)s; recipients with a channel account %(bound)s; unbound %(unbound)s."
+msgstr "Canal %(channel)s: destinatarios coincidentes %(matched)s; con cuenta vinculada %(bound)s; sin cuenta vinculada %(unbound)s."
+
+#: notifications/notifications.py
+msgid "No recipients have an account for this notification channel."
+msgstr "Ningún destinatario tiene una cuenta para este canal de notificación."
+
+#: notifications/notifications.py
+msgid "Notification channel calls completed"
+msgstr "Llamadas a canales de notificación completadas"
+
+#: notifications/notifications.py
+msgid "The notification channel does not support this message."
+msgstr "El canal de notificación no admite este mensaje."
+
+#: notifications/notifications.py
+msgid "The notification channel raised an error."
+msgstr "Se produjo un error en el canal de notificación."
+
+#: authentication/services/client_login_session.py
+msgid "Client sessions revoked"
+msgstr "Sesiones de cliente revocadas"
+
+#: authentication/services/client_login_session.py
+msgid "The client login session is still valid."
+msgstr "La sesión de inicio de sesión del cliente sigue siendo válida."
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Failed %(count)s: %(reason)s"
+msgstr "Fallidos %(count)s: %(reason)s"
+
+#: ops/celery/task_logging.py
+msgid "No matching records to process."
+msgstr "No hay registros coincidentes que procesar."
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Result count — %(name)s: %(count)s."
+msgstr "Resultado — %(name)s: %(count)s."
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Skipped %(count)s: %(reason)s"
+msgstr "Omitidos %(count)s: %(reason)s"
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Task interrupted after %(checked)s checks; changes may have been rolled back. See the task error for details."
+msgstr "La tarea se interrumpió tras %(checked)s comprobaciones; los cambios pueden haberse revertido. Consulte el error de la tarea para obtener más información."
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Task started: %(name)s."
+msgstr "Tarea iniciada: %(name)s."
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Task summary: checked %(checked)s; processed %(processed)s; skipped %(skipped)s; failed %(failed)s."
+msgstr "Resumen: comprobados %(checked)s; procesados %(processed)s; omitidos %(skipped)s; fallidos %(failed)s."
+
+#: accounts/tasks/remove_account.py
+msgid "History cleanup is disabled by the retention limit."
+msgstr "La limpieza del historial está deshabilitada por el límite de retención."
+
+#: accounts/tasks/remove_account.py
+#, python-format
+msgid "Keeping %(count)s history records per account, including the current version."
+msgstr "Se conservan %(count)s registros de historial por cuenta, incluida la versión actual."
+
+#: accounts/tasks/automation.py
+msgid "Another instance of this maintenance task is running."
+msgstr "Hay otra instancia de esta tarea de mantenimiento en ejecución."
+
+#: accounts/tasks/automation.py
+msgid "Records belong to a credential rotation that is still running."
+msgstr "Los registros pertenecen a una rotación de credenciales que sigue en ejecución."
+
+#: accounts/tasks/automation.py xpack/plugins/cloud/tasks.py
+#, python-format
+msgid "Retention period: %(days)s days."
+msgstr "Período de retención: %(days)s días."
+
+#: accounts/tasks/automation.py
+msgid "The latest unsuccessful first-login result must be retained."
+msgstr "Debe conservarse el último resultado fallido del primer inicio de sesión."
+
+#: accounts/tasks/automation.py
+msgid "The owning worker has not replied and the hard timeout has not elapsed."
+msgstr "El Worker responsable no respondió y no se ha agotado el tiempo máximo."
+
+#: accounts/tasks/automation.py
+msgid "The task is still running on a worker."
+msgstr "La tarea sigue ejecutándose en un Worker."
+
+#: accounts/tasks/automation.py
+msgid "The task is still within the startup grace period."
+msgstr "La tarea sigue dentro del período de gracia de inicio."
+
+#: accounts/tasks/automation.py
+msgid "Unable to acquire the task lock."
+msgstr "No se pudo obtener el bloqueo de la tarea."
+
+#: accounts/tasks/automation.py
+msgid "Unable to release the task lock."
+msgstr "No se pudo liberar el bloqueo de la tarea."
+
+#: accounts/tasks/automation.py
+msgid "Waiting for repeated confirmation that the task is missing."
+msgstr "Esperando una nueva confirmación de que la tarea ha desaparecido."
+
+#: accounts/tasks/automation.py
+msgid "Worker status is unavailable; recovery cannot be confirmed."
+msgstr "El estado de los Workers no está disponible; no se puede confirmar si es necesaria la recuperación."
+
+#: accounts/tasks/application_events.py
+msgid "Deliveries marked expired"
+msgstr "Entregas marcadas como caducadas"
+
+#: accounts/tasks/application_events.py tickets/plugins/change_secret/execution.py tickets/plugins/file_transfer/execution.py
+msgid "Executions queued"
+msgstr "Ejecuciones en cola"
+
+#: accounts/tasks/application_events.py tickets/plugins/change_secret/execution.py tickets/plugins/file_transfer/execution.py
+msgid "Unable to queue an execution; it will be retried later."
+msgstr "No se pudo poner una ejecución en cola; se reintentará más adelante."
+
+#: accounts/tasks/credential_preparation.py
+msgid "Unable to check credential rotation readiness."
+msgstr "No se pudo comprobar si la rotación de credenciales está lista."
+
+#: accounts/tasks/credential_preparation.py
+msgid "Waiting for client confirmation or the source-account quiet period."
+msgstr "Esperando la confirmación del cliente o el fin del período de inactividad de la cuenta de origen."
+
+#: tickets/workflow/engine.py
+msgid "The workflow has changed or its approval deadline has not elapsed."
+msgstr "El flujo de trabajo cambió o el plazo de aprobación aún no ha vencido."
+
+#: tickets/plugins/change_secret/execution.py tickets/plugins/file_transfer/execution.py
+msgid "The execution is no longer eligible for dispatch."
+msgstr "La ejecución ya no cumple los requisitos para su distribución."
+
+#: tickets/plugins/file_transfer/execution.py
+msgid "Clean ticket transfer files"
+msgstr "Limpiar archivos de transferencia de tickets"
+
+#: tickets/plugins/file_transfer/execution.py
+msgid "Files belong to a transfer that is still running."
+msgstr "Los archivos pertenecen a una transferencia que sigue en ejecución."
+
+#: tickets/plugins/file_transfer/execution.py
+msgid "Interrupted transfers marked for verification"
+msgstr "Transferencias interrumpidas marcadas para verificación"
+
+#: tickets/plugins/file_transfer/execution.py
+msgid "Maintain ticket file transfers"
+msgstr "Mantener las transferencias de archivos de tickets"
+
+#: tickets/plugins/file_transfer/execution.py
+msgid "Unable to remove a temporary file; it will be retried later."
+msgstr "No se pudo eliminar un archivo temporal; se reintentará más adelante."
+
+#: xpack/plugins/cloud/tasks.py
+msgid "Cleanup is disabled because the retention period is not positive."
+msgstr "La limpieza está deshabilitada porque el período de retención no es positivo."
+
+#: ops/celery/task_logging.py
+#, python-format
+msgid "Reason: %(reason)s"
+msgstr "Motivo: %(reason)s"
+
+#: notifications/notifications.py
+msgid "No notification channels are configured."
+msgstr "No hay canales de notificación configurados."
+
+#: accounts/tasks/application_events.py:46
+#, python-format
+msgid "Unable to dispatch application webhook delivery %(delivery)s."
+msgstr "No se pudo programar la entrega del webhook de aplicación %(delivery)s."
+
+#: accounts/tasks/application_events.py:167 accounts/tasks/application_events.py:170
+msgid "Expire application event deliveries"
+msgstr "Marcar como caducadas las entregas de eventos de aplicación"
+
+#: accounts/tasks/automation.py:139
+msgid "Skipped interrupted account task inspection: no Celery worker replied."
+msgstr "Se omitió la inspección de tareas de cuenta interrumpidas: ningún worker de Celery respondió."
+
+#: accounts/tasks/automation.py:132
+msgid "Unable to inspect active Celery tasks."
+msgstr "No se pudieron inspeccionar las tareas activas de Celery."
+
+#: accounts/tasks/automation.py:169
+#, python-format
+msgid "Unable to confirm interrupted task status: execution=%(execution)s."
+msgstr "No se pudo confirmar el estado de la tarea interrumpida: ejecución=%(execution)s."
+
+#: accounts/tasks/automation.py:180
+#, python-format
+msgid "Unable to clear the interrupted task confirmation marker: execution=%(execution)s."
+msgstr "No se pudo borrar el marcador de confirmación de la tarea interrumpida: ejecución=%(execution)s."
+
+#: accounts/tasks/automation.py:202
+msgid "Unable to acquire the interrupted account task recovery lock."
+msgstr "No se pudo adquirir el bloqueo de recuperación de tareas de cuenta interrumpidas."
+
+#: accounts/tasks/automation.py:218
+msgid "Unable to release the interrupted account task recovery lock."
+msgstr "No se pudo liberar el bloqueo de recuperación de tareas de cuenta interrumpidas."
+
+#: accounts/tasks/credential_preparation.py:12 accounts/tasks/credential_preparation.py:15
+msgid "Check credential rotation readiness"
+msgstr "Comprobar la preparación para la rotación de credenciales"
+
+#: accounts/tasks/credential_preparation.py:33
+#, python-format
+msgid "Unable to check rotation readiness: credential=%(credential)s."
+msgstr "No se pudo comprobar la preparación para la rotación: credencial=%(credential)s."
+
+#: accounts/tasks/openbao.py:28
+msgid "JumpServer must use the OpenBao vault backend."
+msgstr "JumpServer debe utilizar el backend de bóveda OpenBao."
+
+#: accounts/tasks/openbao.py:30
+msgid "OpenBao token rotation requires HTTPS with TLS verification."
+msgstr "La rotación de tokens de OpenBao requiere HTTPS con verificación TLS."
+
+#: accounts/tasks/openbao.py:62
+#, python-format
+msgid "OpenBao token lookup returned HTTP %(status)s."
+msgstr "La consulta del token de OpenBao devolvió HTTP %(status)s."
+
+#: accounts/tasks/openbao.py:70
+msgid "OpenBao address changed. Reconfigure the rotation AppRole."
+msgstr "La dirección de OpenBao ha cambiado. Vuelva a configurar el AppRole de rotación."
+
+#: accounts/tasks/openbao.py:98
+msgid "OpenBao did not issue a distinct token."
+msgstr "OpenBao no emitió un token diferente del anterior."
+
+#: accounts/tasks/openbao.py:102
+msgid "The new OpenBao token must support self lookup and last over seven days."
+msgstr "El nuevo token de OpenBao debe permitir consultarse a sí mismo y tener una validez superior a siete días."
+
+#: accounts/tasks/openbao.py:104
+msgid "The new token failed the JumpServer OpenBao operation check."
+msgstr "El nuevo token no superó la comprobación de operaciones de OpenBao de JumpServer."
+
+#: accounts/tasks/openbao.py:94
+#, python-format
+msgid "OpenBao AppRole login returned HTTP %(status)s."
+msgstr "El inicio de sesión de AppRole de OpenBao devolvió HTTP %(status)s."
+
+#: accounts/tasks/openbao.py:109
+msgid "The configured OpenBao token changed during rotation."
+msgstr "El token de OpenBao configurado cambió durante la rotación."
+
+#: accounts/tasks/openbao.py:120
+msgid "Check and rotate the OpenBao vault token"
+msgstr "Comprobar y renovar el token de la bóveda OpenBao"
+
+#: accounts/tasks/openbao.py:133
+msgid "OpenBao rotation requires encrypted AppRole credentials."
+msgstr "La rotación de OpenBao requiere credenciales de AppRole cifradas."
+
+#: authentication/services/client_login_session.py:411
+msgid "Access tokens deleted"
+msgstr "Tokens de acceso eliminados"
+
+#: authentication/services/client_login_session.py:412
+msgid "Refresh tokens deleted"
+msgstr "Tokens de actualización eliminados"
+
+#: authentication/services/client_login_session.py:419
+msgid "Client login sessions deleted"
+msgstr "Sesiones de inicio de sesión de cliente eliminadas"
+
+#: perms/tasks.py:141
+#, python-format
+msgid "Unable to queue an asset permission expiration reminder: permission=%(permission)s; user=%(user)s."
+msgstr "No se pudo poner en cola el recordatorio de caducidad del permiso de activo: permiso=%(permission)s; usuario=%(user)s."
+
+#: terminal/tasks.py:268
+#, python-brace-format
+msgid "Test failure: {error}"
+msgstr "Error de prueba: {error}"
+
+#: tickets/plugins/change_secret/execution.py:100
+#, python-format
+msgid "Unable to queue password change for ticket %(ticket)s (%(error)s)."
+msgstr "No se pudo poner en cola el cambio de contraseña del ticket %(ticket)s (%(error)s)."
+
+#: tickets/plugins/file_transfer/execution.py:50
+#, python-format
+msgid "Unable to queue ticket transfer %(ticket)s (%(error)s)."
+msgstr "No se pudo poner en cola la transferencia del ticket %(ticket)s (%(error)s)."
+
+#: tickets/plugins/file_transfer/execution.py:249
+#, python-format
+msgid "Unable to purge ticket transfer file %(file)s (%(error)s)."
+msgstr "No se pudo eliminar el archivo de transferencia del ticket %(file)s (%(error)s)."
+
+#: tickets/tasks.py:16 tickets/tasks.py:21
+msgid "Expire overdue ticket approvals"
+msgstr "Procesar aprobaciones de tickets vencidas"
+
+#: tickets/tasks.py:17
+msgid "Check approval deadlines every minute and apply the configured timeout action."
+msgstr "Comprobar cada minuto los plazos de aprobación y aplicar la acción configurada al vencer."
+
+#: tickets/tasks.py:47 tickets/tasks.py:52
+msgid "Dispatch ticket password changes"
+msgstr "Programar cambios de contraseña de tickets"
+
+#: tickets/tasks.py:48
+msgid "Dispatch pending password change executions every minute."
+msgstr "Programar cada minuto las ejecuciones pendientes de cambio de contraseña."
+
+#: accounts/automations/recovery.py:38
+msgid "Invalid interrupted automation runtime path."
+msgstr "La ruta del directorio de ejecución de la automatización interrumpida no es válida."
+
+#: accounts/automations/recovery.py:269
+#, python-format
+msgid "Interrupted account automation finalized: execution=%(execution)s; status=%(status)s; password change records=%(changes)s; password push records=%(pushes)s."
+msgstr "Automatización de cuenta interrumpida finalizada: ejecución=%(execution)s; estado=%(status)s; registros de cambio de contraseña=%(changes)s; registros de envío de contraseña=%(pushes)s."
+
+#: accounts/automations/recovery.py:264
+#, python-format
+msgid "Unable to clean the interrupted automation runtime: execution=%(execution)s."
+msgstr "No se pudo limpiar el directorio de ejecución de la automatización interrumpida: ejecución=%(execution)s."
+
+#: accounts/automations/recovery.py:244
+#, python-format
+msgid "Unable to clear interrupted account task status: execution=%(execution)s; account=%(account)s."
+msgstr "No se pudo borrar el estado de la tarea de cuenta interrumpida: ejecución=%(execution)s; cuenta=%(account)s."
+
+#: accounts/automations/recovery.py:257
+#, python-format
+msgid "Unable to release the interrupted account lock: execution=%(execution)s; account=%(account)s."
+msgstr "No se pudo liberar el bloqueo de la cuenta interrumpida: ejecución=%(execution)s; cuenta=%(account)s."
+
+#: assets/api/asset/asset.py
+msgid "Not accessed for over three months"
+msgstr "Sin acceso desde hace más de tres meses"
+
+#: assets/api/asset/asset.py
+msgid "No valid permission"
+msgstr "Sin autorización válida"

@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
 
+from contextlib import nullcontext
 from types import SimpleNamespace
 
 from django.conf import settings
 from django.core.cache import cache
+from django.db import transaction
 from django.http import HttpResponse
+from django.utils.decorators import method_decorator
+from django.utils.translation import gettext_lazy as _
 from django.views.static import serve
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import generics
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
@@ -26,6 +31,7 @@ from ..utils import get_interface_setting_or_default
 logger = get_logger(__file__)
 
 
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
 class SettingsApi(generics.RetrieveUpdateAPIView):
     permission_classes = (RBACPermission,)
 
@@ -135,8 +141,17 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
     def get_queryset(self):
         return Setting.objects.all()
 
+    def get_category(self):
+        category = self.request.query_params.get('category', 'basic')
+        if category not in self.serializer_class_mapper:
+            raise ValidationError({
+                'category': [_('Invalid settings category.')],
+                'valid_categories': list(self.serializer_class_mapper),
+            })
+        return category
+
     def check_permissions(self, request):
-        category = request.query_params.get('category', 'basic')
+        category = self.get_category()
         perm_required = self.rbac_category_permissions.get(category)
 
         if perm_required == 'settings.view_setting' and \
@@ -148,10 +163,38 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
             self.permission_denied(request)
 
     def get_serializer_class(self):
-        category = self.request.query_params.get('category', 'basic')
-        default = serializers.BasicSettingSerializer
-        cls = self.serializer_class_mapper.get(category, default)
-        return cls
+        return self.serializer_class_mapper[self.get_category()]
+
+    category_parameters = [
+        OpenApiParameter(
+            'category', str, OpenApiParameter.QUERY,
+            enum=list(serializer_class_mapper), default='basic',
+            description='Settings group. Omitted values default to basic; unknown values return 400.',
+        ),
+        OpenApiParameter(
+            'X-Settings-Category', str, OpenApiParameter.HEADER,
+            enum=list(serializer_class_mapper), response=True,
+            description='The settings group used for this request.',
+        ),
+    ]
+
+    @extend_schema(parameters=category_parameters)
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+    @extend_schema(parameters=category_parameters)
+    def put(self, request, *args, **kwargs):
+        return super().put(request, *args, **kwargs)
+
+    @extend_schema(parameters=category_parameters)
+    def patch(self, request, *args, **kwargs):
+        return super().patch(request, *args, **kwargs)
+
+    def finalize_response(self, request, response, *args, **kwargs):
+        response = super().finalize_response(request, response, *args, **kwargs)
+        if 200 <= response.status_code < 300:
+            response['X-Settings-Category'] = self.get_category()
+        return response
 
     def get_fields(self):
         serializer = self.get_serializer_class()()
@@ -168,13 +211,21 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
                 obj[item] = getattr(settings, item)
             else:
                 obj[item] = Config.defaults[item]
+        if 'SESSION_RENEW_ON_REQUEST' in fields:
+            from common.sessions import web_login_policy
+            policy = web_login_policy()
+            obj.update({
+                'SESSION_COOKIE_AGE': policy['duration'],
+                'SESSION_RENEW_ON_REQUEST': policy['renew'],
+                'SESSION_EXPIRE_AT_BROWSER_CLOSE': policy['browser_close'],
+            })
         return obj
 
     def parse_serializer_data(self, serializer):
         data = []
         fields = self.get_fields()
         encrypted_items = [name for name, field in fields.items() if field.write_only]
-        category = self.request.query_params.get('category', '')
+        category = self.get_category()
         for name, value in serializer.validated_data.items():
             encrypted = name in encrypted_items
             if encrypted and value in ['', None]:
@@ -186,12 +237,34 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         return data
 
     def send_signal(self, serializer):
-        category = self.request.query_params.get('category', '')
+        category = self.get_category()
         category_setting_updated.send(sender=self.__class__, category=category, serializer=serializer)
 
     def perform_update(self, serializer):
+        self.validate_ssh_ca_fallback_destination(serializer)
         self.prepare_openbao_mount_change(serializer)
         self.prepare_ssh_ca_config(serializer)
+        from authentication.services.client_login_session import (
+            client_login_policy, client_policy_lock, update_client_session_lifetimes,
+        )
+
+        policy_fields = {
+            'SECURITY_CLIENT_REAUTH_ON_EXIT', 'SECURITY_CLIENT_IDLE_LOCK_TIME',
+            'SECURITY_CLIENT_MAX_SESSION_TIME',
+        }
+        updating_policy = bool(policy_fields.intersection(self.request.data))
+        # Serialize policy writes with client authorization and refresh.
+        # Read the database here: another worker's settings pub/sub may lag behind.
+        with client_policy_lock() if (updating_policy or 'SECURITY_WEB_IDLE_LOCK_TIME' in self.request.data) else nullcontext():
+            with transaction.atomic():
+                old_policy = client_login_policy(use_cache=False) if updating_policy else None
+                self.save_settings(serializer)
+                if updating_policy:
+                    policy = client_login_policy(use_cache=False)
+                    if old_policy['max_session_time'] != policy['max_session_time']:
+                        update_client_session_lifetimes(policy)
+
+    def save_settings(self, serializer):
         post_data_names = list(self.request.data.keys())
         settings_items = self.parse_serializer_data(serializer)
         serializer_data = getattr(serializer, 'data', {})
@@ -202,6 +275,9 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
             changed, setting = Setting.update_or_create(**item)
             if not changed:
                 continue
+            from authentication.services.idle_lock import clamp_idle_lock_preferences
+            if setting.name in ('SECURITY_WEB_IDLE_LOCK_TIME', 'SECURITY_CLIENT_IDLE_LOCK_TIME', 'SECURITY_CLIENT_MAX_SESSION_TIME'):
+                clamp_idle_lock_preferences(setting.name, setting.cleaned_value)
             serializer_data[setting.name] = setting.cleaned_value
 
         setattr(serializer, '_data', serializer_data)
@@ -210,6 +286,25 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         self.send_signal(serializer)
         if self.request.query_params.get('category') == User.Source.ldap.value:
             self.clean_ldap_user_dn_cache()
+
+    def validate_ssh_ca_fallback_destination(self, serializer):
+        if self.get_category() != 'openbao':
+            return
+        if settings.SSH_CA_OPENBAO_ADDR or not settings.SSH_CA_OPENBAO_TOKEN:
+            return
+
+        address_field = 'VAULT_OPENBAO_ADDR'
+        new_address = serializer.validated_data.get(address_field, settings.VAULT_OPENBAO_ADDR)
+        if (new_address or '') == (settings.VAULT_OPENBAO_ADDR or ''):
+            return
+
+        # Protect retained SSH CA tokens even while SSH CA is disabled.
+        raise ValidationError({
+            address_field: _(
+                'Set an explicit OpenBao address in the SSH CA settings before changing '
+                'the Vault address. The stored SSH CA token still uses this address.'
+            )
+        })
 
     def prepare_ssh_ca_config(self, serializer):
         if self.request.query_params.get('category') != 'ssh_ca':

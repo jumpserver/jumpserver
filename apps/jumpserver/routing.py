@@ -5,7 +5,10 @@ from channels.security.websocket import WebsocketDenier
 from django.core.asgi import get_asgi_application
 from django.core.handlers.asgi import ASGIRequest
 from django.conf import settings
+from django.contrib.auth import get_user, get_user_model
 from django.utils.module_loading import import_string
+from django.utils import timezone
+from types import SimpleNamespace
 
 from authentication.backends.drf import (
     SignatureAuthentication,
@@ -16,6 +19,7 @@ from notifications.urls.ws_urls import urlpatterns as notifications_urlpatterns
 from ops.urls.ws_urls import urlpatterns as ops_urlpatterns
 from settings.urls.ws_urls import urlpatterns as setting_urlpatterns
 from terminal.urls.ws_urls import urlpatterns as terminal_urlpatterns
+from accounts.ws_urls import urlpatterns as accounts_urlpatterns
 from common.utils import get_logger
 from .ws_origin import build_allowed_origins, normalize_origin
 import socket
@@ -24,7 +28,8 @@ logger = get_logger(__name__)
 
 __all__ = ['urlpatterns', 'application']
 
-urlpatterns = ops_urlpatterns + \
+urlpatterns = accounts_urlpatterns + \
+              ops_urlpatterns + \
               notifications_urlpatterns + \
               setting_urlpatterns + \
               terminal_urlpatterns
@@ -52,6 +57,9 @@ def get_signature_user(scope):
                 continue
             user, _ = result
             if user:
+                session = getattr(request, 'client_login_session', None)
+                if session is not None:
+                    scope['client_login_session_id'] = session.pk
                 return user
         except Exception:
             logger.debug('WebSocket authentication failed for %s', backend.__class__.__name__)
@@ -94,7 +102,102 @@ class WsSignatureAuthMiddleware:
             return await WebsocketDenier()(scope, receive, send)
         if user:
             scope['user'] = user
+            scope['header_authenticated'] = True
         return await self.app(scope, receive, send)
+
+
+@database_sync_to_async
+def websocket_session_allowed(scope):
+    user = scope.get('user')
+    if user is None or not user.is_authenticated:
+        return True  # The routed consumer retains its own authentication policy.
+    if scope.get('header_authenticated'):
+        # A long-lived connection must not retain an account that has been disabled.
+        current_user = get_user_model().objects.filter(pk=user.pk).first()
+        if current_user is None or not current_user.is_valid:
+            return False
+        scope['user'] = current_user
+        session_id = scope.get('client_login_session_id')
+        if session_id is None:
+            return True
+        from authentication.services.client_login_session import validate_session
+        return validate_session(session_id, allow_locked=False)
+    session = scope.get('session')
+    if session is None or not session.session_key:
+        return False
+    # Reload instead of trusting the identity cached when the socket connected.
+    data = session.load()
+    session._session_cache = data
+    if data.get('_auth_user_id') != str(user.pk):
+        return False
+    # Reuse HTTP authentication: reload the user and verify the current password hash.
+    current_user = get_user(SimpleNamespace(session=session))
+    if not current_user.is_authenticated or not current_user.is_valid or current_user.pk != user.pk:
+        return False
+    scope['user'] = current_user
+    if any(data.get(name) for name in ('auth_mfa_required', 'auth_third_party_required', 'auth_confirm_required')):
+        return False
+    from common.sessions import session_expiry
+    expires_at = session_expiry(session.session_key)
+    if expires_at is not None and timezone.now() >= expires_at:
+        return False
+    return True
+
+
+@database_sync_to_async
+def websocket_screen_locked(scope):
+    if scope.get('header_authenticated'):
+        return False
+    user = scope.get('user')
+    session = scope.get('session')
+    if user is None or not user.is_authenticated or session is None or not session.session_key:
+        return False
+    from common.sessions import policy_locked
+    return policy_locked(session.login_policy)
+
+
+class WsSessionSecurityMiddleware:
+    """Keep locked Web sockets connected, but reject input until unlocked."""
+
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        closed = False
+
+        async def check_session():
+            nonlocal closed
+            if closed:
+                return False
+            allowed = await websocket_session_allowed(scope)
+            if closed:
+                return False
+            if allowed:
+                return True
+            closed = True
+            await send({'type': 'websocket.close', 'code': 1008})
+            return False
+
+        async def receive_checked():
+            while True:
+                event = await receive()
+                if event['type'] != 'websocket.receive':
+                    return event
+                if not await check_session():
+                    return {'type': 'websocket.disconnect', 'code': 1008}
+                if not await websocket_screen_locked(scope):
+                    return event
+                # Do not replay commands entered while locked after unlocking.
+
+        async def send_checked(event):
+            if closed:
+                return
+            if event['type'] in ('websocket.accept', 'websocket.send') and not await check_session():
+                return
+            await send(event)
+
+        if await check_session():
+            return await self.app(scope, receive_checked, send_checked)
 
 
 class SocketContextMiddleware:
@@ -140,7 +243,7 @@ application = ProtocolTypeRouter({
     "websocket": SocketContextMiddleware(
         WsSignatureAuthMiddleware(
             AuthMiddlewareStack(
-                URLRouter(urlpatterns)
+                WsSessionSecurityMiddleware(URLRouter(urlpatterns))
             )
         )
     ),
