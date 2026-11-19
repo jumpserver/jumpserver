@@ -128,7 +128,7 @@ class OperatorLogHandler(metaclass=Singleton):
     def serialized_value(value: (list, tuple)):
         if len(value) == 0:
             return ''
-        if isinstance(value[0], str):
+        if all(isinstance(item, str) for item in value):
             return ','.join(value)
         return json.dumps(value)
 
@@ -139,22 +139,25 @@ class OperatorLogHandler(metaclass=Singleton):
 
         return bool(similar_encrypted_pattern.search(key))
 
-    def __data_processing(self, dict_item, loop=True):
-        encrypt_value = '******'
+    def _mask_sensitive_value(self, value, field_name=''):
+        if isinstance(field_name, str) and self.__similar_check(field_name):
+            return '******'
+        if isinstance(value, dict):
+            return {key: self._mask_sensitive_value(item, key) for key, item in value.items()}
+        if isinstance(value, (list, tuple)):
+            return type(value)(self._mask_sensitive_value(item) for item in value)
+        return value
+
+    def __data_processing(self, dict_item):
         new_data = {}
         for label, item in dict_item.items():
             if not isinstance(item, (dict,)):
                 continue
-            value = item.get('value', '')
-            field_name = item.get('name', '')
+            value = self._mask_sensitive_value(item.get('value', ''), item.get('name', ''))
             if isinstance(value, bool):
                 value = _('Yes') if value else _('No')
             elif isinstance(value, (list, tuple)):
                 value = self.serialized_value(value)
-            elif isinstance(value, dict) and loop:
-                self.__data_processing(value, loop=False)
-            if self.__similar_check(field_name):
-                value = encrypt_value
             new_data[label] = value
         return new_data
 
@@ -199,10 +202,10 @@ class OperatorLogHandler(metaclass=Singleton):
             resource_display = self.get_resource_display(resource)
         if resource_id is None:
             resource_id = getattr(resource, 'pk', '')
-        before, after = self.data_processing(before, after)
         if not force and (before == after):
             # 前后都没变化，没必要生成日志，除非手动强制保存
             return
+        before, after = self.data_processing(before, after)
 
         if org_id is None:
             org_id = self.get_org_id(user, object_name)
