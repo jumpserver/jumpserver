@@ -25,12 +25,19 @@ _type_mapping = {
     'dameng': 'dm',
 }
 
-# 其余协议用的是编译进 DBX 的原生驱动，不需要 agent
-# db2 的驱动在驱动包里，但 DBX 0.6.17 的 deep link 没有 db2 的 scheme，manifest 中暂未开放
+# 按 DBX 的连接类型取 agent，其余类型用的是编译进 DBX 的原生驱动，不需要 agent
+# db2 的驱动在驱动包里，但 DBX 的 deep link 没有 db2 的 scheme，manifest 中暂未开放
 _agent_mapping = {
     'oracle': 'oracle',
-    'dameng': 'dameng',
+    'dm': 'dameng',
     'db2': 'db2',
+    'oceanbase-oracle': 'oceanbase-oracle',
+}
+
+# OceanBase 资产的协议固定是 mysql，租户模式在平台的协议设置里，对应 DBX 两种不同的连接类型
+_oceanbase_type_mapping = {
+    'mysql': 'oceanbase',
+    'oracle': 'oceanbase-oracle',
 }
 
 # DBX 支持的界面语言，取自其 i18n 的 supportedLocales
@@ -114,6 +121,7 @@ class AppletApplication(BaseApplication):
             self.port = self.tinker_forward.port
 
         self.db = self.asset.spec_info.db_name or ''
+        self.oceanbase_tenant_mode = self.get_oceanbase_tenant_mode()
         self.lang = self.get_lang()
         self.app_work_path = self.get_app_work_path()
         self.agents_path = self.get_agents_path()
@@ -137,8 +145,30 @@ class AppletApplication(BaseApplication):
                 return locale
         return ''
 
+    @staticmethod
+    def _value(obj):
+        # 类型字段是 {value, label}，老版本可能直接给字符串
+        return str(getattr(obj, 'value', obj) or '').lower()
+
+    def get_oceanbase_tenant_mode(self):
+        if self.protocol != 'mysql':
+            return ''
+        types = (self._value(getattr(self.platform, 'type', '')), self._value(getattr(self.asset, 'type', '')))
+        if 'oceanbase' not in types:
+            return ''
+        for protocol in getattr(self.platform, 'protocols', None) or []:
+            if getattr(protocol, 'name', '') != 'mysql':
+                continue
+            mode = str(getattr(getattr(protocol, 'setting', None), 'tenant_mode', '') or '').lower()
+            if mode in _oceanbase_type_mapping:
+                return mode
+        # 平台没带租户模式时按 MySQL 租户处理，与 JumpServer 的默认值一致
+        return 'mysql'
+
     @property
     def _type(self):
+        if self.oceanbase_tenant_mode:
+            return _oceanbase_type_mapping[self.oceanbase_tenant_mode]
         return _type_mapping.get(self.protocol, self.protocol)
 
     @staticmethod
@@ -192,7 +222,7 @@ class AppletApplication(BaseApplication):
 
     def init_agent(self):
         # DBX 固定到 %USERPROFILE%\.dbx\agents 找驱动，而每个会话都是独立用户
-        agent = _agent_mapping.get(self.protocol)
+        agent = _agent_mapping.get(self._type)
         if not agent:
             return
 
@@ -277,6 +307,11 @@ class AppletApplication(BaseApplication):
         if with_password:
             params['password'] = self.password
             params['one_time'] = 'true'
+        if self._type == 'oceanbase-oracle':
+            # DBX 只有在连接地址是 oceanbase:// 时才认这个类型，单独的 type 会被当成不支持；
+            # 其余字段仍以上面的显式参数为准
+            host = f'[{self.host}]' if ':' in str(self.host) else self.host
+            params['url'] = f'oceanbase://{host}:{self.port}'
         # DBX 的 sysdba 开关等价于给 agent 传这个选项
         if self.protocol == 'oracle' and self.use_sysdba:
             params['url_params'] = 'AUTH TYPE=SYSDBA'
@@ -502,9 +537,10 @@ class AppletApplication(BaseApplication):
     mask.appendChild(style);
     mask.appendChild(spinner);
   }
-  // popover 打开时 UA 会给一套自己的盒模型，这里全部覆盖掉铺满窗口
+  // popover 打开时 UA 会给一套自己的盒模型，这里全部覆盖掉铺满窗口；
+  // 模态对话框打开时 body 是 pointer-events:none，遮罩要自己接住点击
   mask.style.cssText = 'position:fixed;inset:0;margin:0;padding:0;border:0;width:auto;height:auto;' +
-    'max-width:none;max-height:none;overflow:hidden;z-index:2147483647;display:flex;' +
+    'max-width:none;max-height:none;overflow:hidden;z-index:2147483647;display:flex;pointer-events:auto;' +
     'align-items:center;justify-content:center;background:' + bg;
   // 始终挂在 body 末尾，后插入的节点盖不过去
   document.body.appendChild(mask);
@@ -517,10 +553,21 @@ class AppletApplication(BaseApplication):
     }
   } catch (e) {}
   // 回报窗口中心到底是谁在最上面，遮罩再出问题时日志里能直接看出被什么压住了
-  const hit = document.elementFromPoint(innerWidth / 2, innerHeight / 2);
-  const covered = hit && hit.closest && hit.closest('#' + id)
-    ? 'top'
-    : 'under-' + (hit ? (hit.getAttribute('data-slot') || hit.id || hit.tagName) : 'none');
+  const probe = () => {
+    const hit = document.elementFromPoint(innerWidth / 2, innerHeight / 2);
+    return hit && hit.closest && hit.closest('#' + id)
+      ? 'top'
+      : 'under-' + (hit ? (hit.getAttribute('data-slot') || hit.id || hit.tagName) : 'none');
+  };
+  let covered = probe();
+  if (covered !== 'top' && layer === 'popover') {
+    // 顶层里后打开的元素压在先打开的上面，连接对话框比遮罩晚出现时要把遮罩重新提到最上面
+    try {
+      mask.hidePopover();
+      mask.showPopover();
+      covered = 'raised-' + probe();
+    } catch (e) {}
+  }
   return 'ok:' + layer + ':' + covered;
 })()"""
 
@@ -597,7 +644,7 @@ class AppletApplication(BaseApplication):
         # 先起空窗口，设好语言再打开连接，避免刷新页面丢掉连接对话框
         ret = subprocess.Popen([self.path], shell=False, startupinfo=startupinfo, env=env)
         self.pid = ret.pid
-        log(f'launch: build={applet_build()} pid={self.pid} port={port} protocol={self.protocol}')
+        log(f'launch: build={applet_build()} pid={self.pid} port={port} protocol={self.protocol} type={self._type}')
 
         # 从第一帧起就持续盖住窗口，设语言、刷新、开连接、代填全在遮罩之下
         stop_mask = threading.Event()
