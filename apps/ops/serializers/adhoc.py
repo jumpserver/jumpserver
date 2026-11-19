@@ -12,7 +12,7 @@ from ops.serializers import AdhocVariableSerializer
 
 
 class AdHocSerializer(ScopeSerializerMixin, CommonBulkModelSerializer, WritableNestedModelSerializer):
-    creator = ReadableHiddenField(default=serializers.CurrentUserDefault())
+    creator = ReadableHiddenField(default=serializers.CreateOnlyDefault(serializers.CurrentUserDefault()))
     variable = AdhocVariableSerializer(many=True, required=False, allow_null=True, label=_('Variable'))
 
     class Meta:
