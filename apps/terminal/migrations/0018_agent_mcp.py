@@ -2,6 +2,7 @@
 
 import django.db.models.deletion
 import django.utils.timezone
+import terminal.models.agent
 import uuid
 from django.conf import settings
 from django.db import migrations, models
@@ -116,6 +117,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('refresh_family', models.UUIDField(null=True, unique=True)),
+                ('expires_at', models.DateTimeField(db_index=True, default=terminal.models.agent.agent_oauth_expiry)),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
                 ('application', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.OAUTH2_PROVIDER_APPLICATION_MODEL)),
                 ('grant', models.OneToOneField(null=True, on_delete=django.db.models.deletion.CASCADE, to=getattr(settings, 'OAUTH2_PROVIDER_GRANT_MODEL', 'oauth2_provider.Grant'))),

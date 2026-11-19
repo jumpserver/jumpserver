@@ -9,9 +9,7 @@ from urllib.parse import parse_qs, urlsplit
 
 from django.conf import settings
 from django.core.cache import cache
-from django.db import connection
-from django.db.migrations.executor import MigrationExecutor
-from django.test import RequestFactory, SimpleTestCase, TestCase, TransactionTestCase, override_settings
+from django.test import RequestFactory, SimpleTestCase, TestCase, override_settings
 from django.utils import timezone
 from django.utils.translation import override
 from oauth2_provider.models import (
@@ -779,7 +777,7 @@ class AgentOAuthOrganizationTests(TestCase):
                 request_hash='0' * 64, date_expires=deadline + timedelta(hours=1))
             service.check_session_grant(session)
         with patch('django.utils.timezone.now', return_value=deadline):
-            # A surviving/legacy access token cannot bypass its authorization deadline.
+            # An access token cannot bypass its authorization deadline.
             get_access_token_model().objects.filter(pk=access.pk).update(
                 expires=deadline + timedelta(hours=1)
             )
@@ -860,31 +858,3 @@ class AgentOAuthOrganizationTests(TestCase):
             }
         )
         self.assertEqual(response.status_code, 400)
-
-
-class AgentOAuthExpiryMigrationTests(TransactionTestCase):
-    def test_existing_authorizations_get_one_seven_day_upgrade_window(self):
-        executor = MigrationExecutor(connection)
-        latest = executor.loader.graph.leaf_nodes()
-        previous = [('terminal', '0018_agent_mcp')]
-        user = User(username='agent-expiry-upgrade')
-        User.objects.bulk_create([user])
-        application = get_application_model().objects.create(name='Agent expiry upgrade')
-        try:
-            executor.migrate(previous)
-            binding_model = executor.loader.project_state(previous).apps.get_model(
-                'terminal', 'AgentOAuthBinding'
-            )
-            binding_model.objects.bulk_create([binding_model(
-                user_id=user.pk, application_id=application.pk, refresh_family=uuid.uuid4(),
-            ) for _ in range(2)])
-            before = timezone.now()
-            MigrationExecutor(connection).migrate(latest)
-            deadlines = set(AgentOAuthBinding.objects.filter(application_id=application.pk)
-                            .values_list('expires_at', flat=True))
-            self.assertEqual(len(deadlines), 1)
-            deadline = deadlines.pop()
-            self.assertGreaterEqual(deadline, before + timedelta(days=7))
-            self.assertLessEqual(deadline, timezone.now() + timedelta(days=7))
-        finally:
-            MigrationExecutor(connection).migrate(latest)

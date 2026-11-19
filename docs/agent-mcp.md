@@ -225,8 +225,7 @@ rotation and retries inherit that deadline; access tokens and execution contexts
 cannot outlive it. Expiration blocks refresh, bearer access and new operations,
 including existing asset sessions, without deleting client registrations or
 audit history. Reauthorize from the client to obtain a new seven-day grant;
-this does not revive old refresh families or asset sessions. Migration `0019`
-gives existing authorizations seven days from the upgrade. No new setting is
+this does not revive old refresh families or asset sessions. No new setting is
 required, and the normal browser login and MFA policy still applies.
 
 The personal API is `/api/v1/authentication/user-agent-clients/`: GET lists the
