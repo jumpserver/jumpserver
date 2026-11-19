@@ -7281,6 +7281,9 @@ msgstr "MariaDB"
 msgid "Oracle"
 msgstr "Oracle"
 
+msgid "OceanBase tenant mode"
+msgstr "OceanBase 租戶模式"
+
 #: ops/const.py:76 settings/serializers/feature.py:103
 msgid "Timeout"
 msgstr "超時"

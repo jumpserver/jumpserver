@@ -497,6 +497,16 @@ class RDPFileClientProtocolURLMixin:
             # Core supplies an HTTP backend port for old and new assets alike.
             # The desktop client still connects to Magnus, not the backend port.
             data['connect_options'] = {'clickhouse_http': True}
+        elif (
+            token.protocol == Protocol.mysql and connect_method_name == NativeClient.db_client
+            and asset.type == 'oceanbase'
+        ):
+            # Both tenants connect over the MySQL wire; only the client's SQL
+            # dialect differs. Never infer it from an editable asset name.
+            protocol_settings = asset.platform.protocols.filter(name=Protocol.mysql).values_list('setting', flat=True)
+            mode = (protocol_settings.first() or {}).get('tenant_mode')
+            if mode in ('mysql', 'oracle'):
+                data['connect_options'] = {'oceanbase_tenant_mode': mode}
 
         if connect_method_name == NativeClient.mstsc or connect_method_dict['type'] == 'applet':
             filename, content = self.get_rdp_file_info(token)
