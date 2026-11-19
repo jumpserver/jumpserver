@@ -47,9 +47,6 @@ SESSION_TTL = 7200
 RESULT_TTL = timedelta(minutes=15)
 FINAL_STATES = frozenset(('succeeded', 'failed', 'rejected', 'expired', 'cancelled', 'unknown'))
 ACTION_KINDS = frozenset(ACTION_POLICIES)
-# Protocol scope marker. Sessions always use a real organization;
-# this marker never grants root-organization or administrative permissions.
-ALL_AGENT_ORGANIZATIONS = Organization.ROOT_ID
 
 
 class Conflict(APIException):
@@ -174,13 +171,12 @@ def introspect(node, data):
         ('access_token', 'resource', 'capabilities'),
     )
     token, refresh = agent_token_authority(data['access_token'], data['resource'])
-    org_id = ALL_AGENT_ORGANIZATIONS
     resource = token.resource[0]
     payload = {
         'user_id': str(token.user_id),
         'application_id': token.application_id,
         'client_id': token.application.client_id,
-        'org_id': org_id,
+        'all_organizations': True,
         'token_id': token.pk,
         'family': str(refresh.token_family) if refresh and refresh.token_family else '',
         'node_id': str(node.id),
@@ -190,8 +186,8 @@ def introspect(node, data):
     expires = min(token.expires, timezone.now() + timedelta(seconds=CONTEXT_TTL))
     payload['expires'] = expires.timestamp()
     return {
-        'user_id': payload['user_id'], 'org_id': org_id, 'client_id': payload['client_id'],
-        'all_organizations': True,
+        'user_id': payload['user_id'], 'client_id': payload['client_id'],
+        'all_organizations': payload['all_organizations'],
         'resource': resource, 'scopes': [SCOPE], 'expires_at': expires.isoformat(),
         'context_token': signing.dumps(payload, salt=CONTEXT_SALT),
     }
@@ -205,7 +201,7 @@ def context_identity(node, value):
         if context['node_id'] != str(node.id) or context['expires'] <= timezone.now().timestamp():
             raise PermissionDenied('Execution context expired or belongs to another node')
         user = User.objects.get(pk=context['user_id'])
-        if context['org_id'] != ALL_AGENT_ORGANIZATIONS:
+        if context.get('all_organizations') is not True:
             raise PermissionDenied('Invalid Agent organization scope')
         check_agent_scope(user)
         context['capabilities'] = node_capabilities(context.get('capabilities'))

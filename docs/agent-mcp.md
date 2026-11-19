@@ -175,9 +175,10 @@ Each authorization uses:
 Consent is required on each authorization, without an organization selector.
 Grants cover the signed-in user's currently available organizations,
 excluding global/system organizations. Each request rechecks membership and
-asset, account and protocol permissions; the all-organizations marker grants no
-administrative authority. Connections resolve the actual organization from the
-authorized asset. Clients need not send `X-JMS-ORG`, and a header cannot expand
+asset, account and protocol permissions. Core and Koko express this scope with
+the signed `all_organizations: true` flag; their identity context has no `org_id`.
+The flag grants no administrative authority. Connections resolve the actual
+organization from the authorized asset. Clients need not send `X-JMS-ORG`, and a header cannot expand
 the grant. Agent access tokens are rejected as ordinary Core API bearer credentials.
 
 The `client_id` is a public registration identifier, never an authentication

@@ -493,7 +493,7 @@ class AgentOAuthOrganizationTests(TestCase):
         result = json.loads(response.content)
         principal = self.introspect(result)
         self.assertTrue(principal['all_organizations'])
-        self.assertEqual(principal['org_id'], service.ALL_AGENT_ORGANIZATIONS)
+        self.assertNotIn('org_id', principal)
         with self.assertRaises(ValidationError):
             self.introspect(result, org_id=str(self.unavailable.pk))
         self.remove_membership()
@@ -550,7 +550,7 @@ class AgentOAuthOrganizationTests(TestCase):
         response = self.exchange(code, organization=str(self.first.pk), org_id=str(self.first.pk))
         self.assertEqual(response.status_code, 200, response.content)
         result = json.loads(response.content)
-        self.assertEqual(self.introspect(result)['org_id'], service.ALL_AGENT_ORGANIZATIONS)
+        self.assertTrue(self.introspect(result)['all_organizations'])
         refresh = get_refresh_token_model().objects.get(
             token_checksum=hashlib.sha256(result['refresh_token'].encode()).hexdigest()
         )
@@ -561,7 +561,7 @@ class AgentOAuthOrganizationTests(TestCase):
             })
             self.assertEqual(response.status_code, 200, response.content)
             result = json.loads(response.content)
-            self.assertEqual(self.introspect(result)['org_id'], service.ALL_AGENT_ORGANIZATIONS)
+            self.assertTrue(self.introspect(result)['all_organizations'])
         self.assertEqual(
             AgentOAuthBinding.objects.filter(refresh_family=refresh.token_family).count(), 1
         )
@@ -712,11 +712,11 @@ class AgentOAuthOrganizationTests(TestCase):
 
     def test_access_token_binding_survives_refresh_row_deletion(self):
         result = self.issued()
-        self.assertEqual(self.introspect(result)['org_id'], service.ALL_AGENT_ORGANIZATIONS)
+        self.assertTrue(self.introspect(result)['all_organizations'])
         get_refresh_token_model().objects.filter(
             token_checksum=hashlib.sha256(result['refresh_token'].encode()).hexdigest(),
         ).delete()
-        self.assertEqual(self.introspect(result)['org_id'], service.ALL_AGENT_ORGANIZATIONS)
+        self.assertTrue(self.introspect(result)['all_organizations'])
 
     def test_refresh_without_rotation_and_grace_retry_preserve_all_organizations(self):
         for rotate in (False, True):
@@ -736,10 +736,7 @@ class AgentOAuthOrganizationTests(TestCase):
                 for _ in range(2):
                     response = self.token_request(body)
                     self.assertEqual(response.status_code, 200, response.content)
-                    self.assertEqual(
-                        self.introspect(json.loads(response.content))['org_id'],
-                        service.ALL_AGENT_ORGANIZATIONS,
-                    )
+                    self.assertTrue(self.introspect(json.loads(response.content))['all_organizations'])
 
     def test_registration_metadata_follows_current_configuration(self):
         view = AgentAuthorizationServerView.as_view()
@@ -772,7 +769,7 @@ class AgentOAuthOrganizationTests(TestCase):
         )
         self.assertEqual(response.status_code, 200, response.content)
         result = json.loads(response.content)
-        self.assertEqual(self.introspect(result)['org_id'], service.ALL_AGENT_ORGANIZATIONS)
+        self.assertTrue(self.introspect(result)['all_organizations'])
         get_access_token_model().objects.filter(
             token_checksum=hashlib.sha256(result['access_token'].encode()).hexdigest()
         ).delete()

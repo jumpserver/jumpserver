@@ -415,10 +415,12 @@ class AgentBoundaryTests(TestCase):
             self.assertIsNone(item.user_id)
             self.assertEqual(item.user_display, display)
 
-    def test_introspection_binds_resource_org_and_execution_node(self):
+    def test_introspection_binds_resource_scope_and_execution_node(self):
         result = service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource, 'capabilities': self.capabilities})
         context, user = service.context_identity(self.node, result['context_token'])
-        self.assertEqual(context['org_id'], service.ALL_AGENT_ORGANIZATIONS)
+        self.assertIs(context['all_organizations'], True)
+        self.assertNotIn('org_id', context)
+        self.assertNotIn('org_id', result)
         self.assertEqual(user.id, self.user.id)
         with self.assertRaises(PermissionDenied):
             service.context_identity(self.other_node, result['context_token'])
@@ -431,7 +433,11 @@ class AgentBoundaryTests(TestCase):
                 service.session_capability(self.session),
                 check=False,
             )
-        invalid_context = {**context, 'org_id': str(self.org.pk)}
+        for scope in (None, False, 1, 'true'):
+            with self.subTest(scope=scope), self.assertRaises(PermissionDenied):
+                invalid_context = {**context, 'all_organizations': scope}
+                service.context_identity(self.node, signing.dumps(invalid_context, salt=service.CONTEXT_SALT))
+        invalid_context = {key: value for key, value in context.items() if key != 'all_organizations'}
         with self.assertRaises(PermissionDenied):
             service.context_identity(self.node, signing.dumps(invalid_context, salt=service.CONTEXT_SALT))
         AgentOAuthBinding.objects.filter(user=self.user).update(user=self.auditor)
