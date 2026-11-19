@@ -1,5 +1,6 @@
 """Stable authorization effects, independent of Koko tool names and drivers."""
 import re
+from types import MappingProxyType
 from typing import NamedTuple
 
 from rest_framework.exceptions import ValidationError
@@ -8,8 +9,10 @@ from perms.const import ActionChoices
 from terminal.const import AgentActionKind
 
 
-EXECUTION_MODES = frozenset(('shell', 'process', 'pipeline', 'database', 'files'))
-FILE_FIELDS = (
+_COMMAND_MODES = frozenset(('shell', 'process', 'pipeline', 'database'))
+_FILE_MODES = frozenset(('files',))
+_EXECUTION_MODES = _COMMAND_MODES | _FILE_MODES
+_FILE_FIELDS = (
     'path',
     'destination',
     'size',
@@ -27,18 +30,16 @@ class ActionPolicy(NamedTuple):
     permission: int
 
 
-COMMAND_MODES = frozenset(('shell', 'process', 'pipeline', 'database'))
-FILE_MODES = frozenset(('files',))
-ACTION_POLICIES = {
+ACTION_POLICIES = MappingProxyType({
     AgentActionKind.execute_command: ActionPolicy(
-        COMMAND_MODES,
+        _COMMAND_MODES,
         ('command', 'prepared_command', 'cwd', 'env', 'timeout_seconds'),
         ActionChoices.connect,
     ),
-    AgentActionKind.open_terminal: ActionPolicy(COMMAND_MODES, ('timeout_seconds',), ActionChoices.connect),
-    AgentActionKind.file_list: ActionPolicy(FILE_MODES, FILE_FIELDS + ('cursor',), ActionChoices.connect),
+    AgentActionKind.open_terminal: ActionPolicy(_COMMAND_MODES, ('timeout_seconds',), ActionChoices.connect),
+    AgentActionKind.file_list: ActionPolicy(_FILE_MODES, _FILE_FIELDS + ('cursor',), ActionChoices.connect),
     **{
-        kind: ActionPolicy(FILE_MODES, FILE_FIELDS, permission)
+        kind: ActionPolicy(_FILE_MODES, _FILE_FIELDS, permission)
         for kind, permission in (
             (AgentActionKind.file_stat, ActionChoices.connect),
             (AgentActionKind.file_read, ActionChoices.download),
@@ -50,7 +51,7 @@ ACTION_POLICIES = {
             (AgentActionKind.file_rename, ActionChoices.upload | ActionChoices.delete),
         )
     },
-}
+})
 
 
 def allowed_actions(mode, permissions):
@@ -76,7 +77,7 @@ def node_capabilities(value):
             not isinstance(protocol, str)
             or not re.fullmatch(r'[a-z0-9][a-z0-9_.+-]{0,15}', protocol)
             or not isinstance(mode, str)
-            or mode not in EXECUTION_MODES
+            or mode not in _EXECUTION_MODES
         ):
             raise ValidationError('Invalid Agent protocol capability')
     return {'version': 1, 'protocols': dict(protocols)}
@@ -88,6 +89,6 @@ def context_protocols(context):
 
 def execution_mode(requested):
     mode = requested.get('execution_mode')
-    if not isinstance(mode, str) or mode not in EXECUTION_MODES:
+    if not isinstance(mode, str) or mode not in _EXECUTION_MODES:
         raise ValidationError('Unsupported Agent execution mode')
     return mode
