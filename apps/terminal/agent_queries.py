@@ -28,6 +28,9 @@ def scoped_queryset(node, context, user, model):
         access = get_access_token_model().objects.filter(
             pk=OuterRef(path + 'oauth_token_id'), user_id=OuterRef(path + 'user_id'),
             application_id=OuterRef(path + 'application_id'), expires__gt=timezone.now(),
+            agentoauthbinding__user_id=OuterRef(path + 'user_id'),
+            agentoauthbinding__application_id=OuterRef(path + 'application_id'),
+            agentoauthbinding__expires_at__gt=timezone.now(),
         )
         queryset = queryset.filter(
             (Q(**{path + 'oauth_family__isnull': False}) & Exists(refresh))

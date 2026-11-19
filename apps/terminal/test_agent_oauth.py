@@ -4,11 +4,14 @@ import hashlib
 import json
 import uuid
 from datetime import timedelta
+from unittest.mock import patch
 from urllib.parse import parse_qs, urlsplit
 
 from django.conf import settings
 from django.core.cache import cache
-from django.test import RequestFactory, SimpleTestCase, TestCase, override_settings
+from django.db import connection
+from django.db.migrations.executor import MigrationExecutor
+from django.test import RequestFactory, SimpleTestCase, TestCase, TransactionTestCase, override_settings
 from django.utils import timezone
 from django.utils.translation import override
 from oauth2_provider.models import (
@@ -731,12 +734,85 @@ class AgentOAuthOrganizationTests(TestCase):
                 ),
             ):
                 original = self.issued()
+                family = get_refresh_token_model().objects.get(
+                    token_checksum=hashlib.sha256(original['refresh_token'].encode()).hexdigest()
+                ).token_family
+                deadline = AgentOAuthBinding.objects.get(refresh_family=family).expires_at
                 body = {'grant_type': 'refresh_token', 'refresh_token': original['refresh_token'],
                         'client_id': self.app.client_id, 'organization': str(self.first.pk)}
                 for _ in range(2):
                     response = self.token_request(body)
                     self.assertEqual(response.status_code, 200, response.content)
-                    self.assertTrue(self.introspect(json.loads(response.content))['all_organizations'])
+                    result = json.loads(response.content)
+                    self.assertTrue(self.introspect(result)['all_organizations'])
+                    self.assertEqual(
+                        AgentOAuthBinding.objects.get(refresh_family=family).expires_at, deadline
+                    )
+                    self.assertEqual(AgentOAuthBinding.objects.get(
+                        access_token__token_checksum=hashlib.sha256(result['access_token'].encode()).hexdigest()
+                    ).expires_at, deadline)
+
+    def test_seven_day_authorization_deadline_survives_refresh_and_reauthorization(self):
+        now = timezone.now()
+        deadline = now + timedelta(days=7)
+        with patch('django.utils.timezone.now', return_value=now):
+            result = self.issued()
+        family = get_refresh_token_model().objects.get(
+            token_checksum=hashlib.sha256(result['refresh_token'].encode()).hexdigest()
+        ).token_family
+        self.assertEqual(AgentOAuthBinding.objects.get(refresh_family=family).expires_at, deadline)
+        with patch('django.utils.timezone.now', return_value=deadline - timedelta(seconds=30)):
+            response = self.token_request({'grant_type': 'refresh_token',
+                'refresh_token': result['refresh_token'], 'client_id': self.app.client_id})
+            self.assertEqual(response.status_code, 200, response.content)
+            result = json.loads(response.content)
+            self.assertEqual(result['expires_in'], 30)
+            access = get_access_token_model().objects.get(
+                token_checksum=hashlib.sha256(result['access_token'].encode()).hexdigest()
+            )
+            self.assertEqual(access.expires, deadline)
+            principal = self.introspect(result)
+            self.assertEqual(principal['expires_at'], deadline.isoformat())
+            session = AgentSession.objects.create(user=self.user, application=self.app,
+                terminal=self.node, org_id=self.first.pk, resource=self.resource,
+                oauth_token=access, oauth_family=family, idempotency_key='expires-with-grant',
+                request_hash='0' * 64, date_expires=deadline + timedelta(hours=1))
+            service.check_session_grant(session)
+        with patch('django.utils.timezone.now', return_value=deadline):
+            # A surviving/legacy access token cannot bypass its authorization deadline.
+            get_access_token_model().objects.filter(pk=access.pk).update(
+                expires=deadline + timedelta(hours=1)
+            )
+            with self.assertRaises(PermissionDenied):
+                self.introspect(result)
+            with self.assertRaises(PermissionDenied):
+                service.context_identity(self.node, principal['context_token'])
+            with self.assertRaises(PermissionDenied):
+                service.check_session_grant(session)
+            request = {'grant_type': 'refresh_token', 'refresh_token': result['refresh_token'],
+                       'client_id': self.app.client_id}
+            response = self.token_request(request)
+            self.assertEqual(json.loads(response.content)['error'], 'invalid_grant')
+            fresh = self.issued()
+            self.assertEqual(self.token_request(request).status_code, 400)
+            with self.assertRaises(PermissionDenied):
+                service.check_session_grant(session)
+            from terminal.agent_queries import query
+            self.assertEqual(query(self.node, 'sessions/list', {
+                'context_token': self.introspect(fresh)['context_token']
+            })['results'], [])
+            self.assertTrue(AgentSession.objects.filter(pk=session.pk).exists())
+            self.assertTrue(AgentApplication.objects.filter(application=self.app).exists())
+
+    def test_authorization_deadline_also_applies_without_a_refresh_token(self):
+        result = self.issued()
+        get_refresh_token_model().objects.filter(application=self.app).delete()
+        principal = self.introspect(result)
+        AgentOAuthBinding.objects.filter(application=self.app).update(expires_at=timezone.now())
+        with self.assertRaises(PermissionDenied):
+            self.introspect(result)
+        with self.assertRaises(PermissionDenied):
+            service.context_identity(self.node, principal['context_token'])
 
     def test_registration_metadata_follows_current_configuration(self):
         view = AgentAuthorizationServerView.as_view()
@@ -784,3 +860,31 @@ class AgentOAuthOrganizationTests(TestCase):
             }
         )
         self.assertEqual(response.status_code, 400)
+
+
+class AgentOAuthExpiryMigrationTests(TransactionTestCase):
+    def test_existing_authorizations_get_one_seven_day_upgrade_window(self):
+        executor = MigrationExecutor(connection)
+        latest = executor.loader.graph.leaf_nodes()
+        previous = [('terminal', '0018_agent_mcp')]
+        user = User(username='agent-expiry-upgrade')
+        User.objects.bulk_create([user])
+        application = get_application_model().objects.create(name='Agent expiry upgrade')
+        try:
+            executor.migrate(previous)
+            binding_model = executor.loader.project_state(previous).apps.get_model(
+                'terminal', 'AgentOAuthBinding'
+            )
+            binding_model.objects.bulk_create([binding_model(
+                user_id=user.pk, application_id=application.pk, refresh_family=uuid.uuid4(),
+            ) for _ in range(2)])
+            before = timezone.now()
+            MigrationExecutor(connection).migrate(latest)
+            deadlines = set(AgentOAuthBinding.objects.filter(application_id=application.pk)
+                            .values_list('expires_at', flat=True))
+            self.assertEqual(len(deadlines), 1)
+            deadline = deadlines.pop()
+            self.assertGreaterEqual(deadline, before + timedelta(days=7))
+            self.assertLessEqual(deadline, timezone.now() + timedelta(days=7))
+        finally:
+            MigrationExecutor(connection).migrate(latest)

@@ -158,14 +158,15 @@ def agent_token_authority(raw, resource):
     if not registration or registration.resource != resource or token.resource != [resource]:
         raise PermissionDenied('Token is not issued for this MCP resource', code='invalid_token')
     refresh = get_refresh_token_model().objects.filter(access_token=token).first()
-    if not token_authorization_binding(token, refresh):
-        raise PermissionDenied('OAuth authorization has no subject binding')
+    binding = token_authorization_binding(token, refresh)
+    if not binding or binding.expires_at <= timezone.now():
+        raise PermissionDenied('OAuth authorization expired or has no subject binding')
     if has_other_agent_authorizations(token.user_id, token.application_id):
         raise PermissionDenied('OAuth authorization conflicts with another user')
     check_agent_scope(token.user)
     if refresh and refresh.revoked is not None:
         raise PermissionDenied('OAuth authorization revoked')
-    return token, refresh
+    return token, refresh, binding.expires_at
 
 
 def introspect(node, data):
@@ -174,7 +175,7 @@ def introspect(node, data):
         ('access_token', 'resource', 'capabilities'),
         ('access_token', 'resource', 'capabilities'),
     )
-    token, refresh = agent_token_authority(data['access_token'], data['resource'])
+    token, refresh, authorization_expires = agent_token_authority(data['access_token'], data['resource'])
     resource = token.resource[0]
     payload = {
         'user_id': str(token.user_id),
@@ -187,7 +188,7 @@ def introspect(node, data):
         'resource': resource,
         'capabilities': node_capabilities(data['capabilities']),
     }
-    expires = min(token.expires, timezone.now() + timedelta(seconds=CONTEXT_TTL))
+    expires = min(token.expires, authorization_expires, timezone.now() + timedelta(seconds=CONTEXT_TTL))
     payload['expires'] = expires.timestamp()
     return {
         'user_id': payload['user_id'], 'client_id': payload['client_id'],
@@ -240,6 +241,8 @@ def authority_exists(user_id, application_id, token_id, family):
         ).exists()
     return get_access_token_model().objects.filter(
         pk=token_id, user_id=user_id, application_id=application_id, expires__gt=timezone.now(),
+        agentoauthbinding__user_id=user_id, agentoauthbinding__application_id=application_id,
+        agentoauthbinding__expires_at__gt=timezone.now(),
     ).exists()
 
 

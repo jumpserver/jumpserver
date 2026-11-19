@@ -115,7 +115,7 @@ class UserAgentClientTests(TestCase):
                 client = response.data['results'][0]
                 self.assertEqual(
                     set(client),
-                    {'id', 'name', 'client_id', 'status'},
+                    {'id', 'name', 'client_id', 'status', 'expires_at'},
                 )
                 self.assertEqual(client['status'], 'active')
                 self.assertNotIn(access.token, str(response.data))
@@ -126,6 +126,18 @@ class UserAgentClientTests(TestCase):
         self.assertEqual(self.request('options', user=self.user).status_code, 200)
         for method in ('get', 'options'):
             self.assertIn(self.request(method).status_code, (401, 403))
+
+    def test_absolute_authorization_deadline_controls_personal_status(self):
+        self.authorize(self.user)
+        deadline = timezone.now() + timedelta(minutes=1)
+        AgentOAuthBinding.objects.filter(application=self.application).update(expires_at=deadline)
+        row = self.request(user=self.user).data['results'][0]
+        self.assertEqual((row['status'], row['expires_at']), ('active', deadline.isoformat()))
+        deadline = timezone.now() - timedelta(seconds=1)
+        AgentOAuthBinding.objects.filter(application=self.application).update(expires_at=deadline)
+        row = self.request(user=self.user).data['results'][0]
+        self.assertEqual((row['status'], row['expires_at']), ('expired', deadline.isoformat()))
+        self.assertTrue(AgentApplication.objects.filter(pk=self.registration.pk).exists())
 
     def test_authorization_status_is_independent_of_organization_membership(self):
         access, refresh = self.authorize(self.user)

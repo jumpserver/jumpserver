@@ -1,4 +1,5 @@
 """OAuth policy for explicitly registered, public Agent clients."""
+import math
 from urllib.parse import urlsplit
 
 from django.contrib.auth import get_user_model
@@ -144,7 +145,7 @@ class AgentOAuth2Validator(ClientOAuth2Validator):
         if has_other_agent_authorizations(request.user.pk, request.client.pk):
             return False
         binding = self.authorization_binding(request)
-        if not binding:
+        if not binding or binding.expires_at <= timezone.now():
             return False
         try:
             check_agent_scope(request.user)
@@ -180,6 +181,13 @@ class AgentOAuth2Validator(ClientOAuth2Validator):
         result = super()._save_bearer_token(token, request, *args, **kwargs)
         if binding:
             access = self._load_access_token(token['access_token'])
+            expires = min(access.expires, binding.expires_at)
+            if expires <= timezone.now():
+                raise InvalidGrantError(description='Agent authorization expired. Authorize again.', request=request)
+            if access.expires != expires:
+                access.expires = expires
+                access.save(update_fields=['expires'])
+            token['expires_in'] = max(0, math.ceil((expires - timezone.now()).total_seconds()))
             refresh = get_refresh_token_model().objects.filter(access_token=access).first()
             # Keep each access token bound even if its refresh row is deleted;
             # keep the family independently when old access tokens are cleaned.
@@ -190,6 +198,7 @@ class AgentOAuth2Validator(ClientOAuth2Validator):
                 saved, _ = AgentOAuthBinding.objects.get_or_create(
                     **subject, defaults={
                         'user': request.user, 'application': request.client,
+                        'expires_at': binding.expires_at,
                     },
                 )
                 if saved.user_id != request.user.pk or saved.application_id != request.client.pk:

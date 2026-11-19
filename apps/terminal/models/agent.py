@@ -1,11 +1,16 @@
 """Durable identity, ownership and evidence for external Agent operations."""
 import uuid
+from datetime import timedelta
 
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
 from orgs.mixins.models import OrgModelMixin
+
+
+def agent_oauth_expiry():
+    return timezone.now() + timedelta(days=7)
 
 
 class AgentApplication(models.Model):
@@ -28,6 +33,7 @@ class AgentOAuthBinding(models.Model):
         'oauth2_provider.AccessToken', null=True, on_delete=models.CASCADE,
     )
     refresh_family = models.UUIDField(null=True, unique=True)
+    expires_at = models.DateTimeField(default=agent_oauth_expiry, db_index=True)
 
     class Meta:
         constraints = [

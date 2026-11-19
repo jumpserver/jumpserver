@@ -45,14 +45,21 @@ def record_client_operation(request, operation, client, result):
 class UserAgentClientSerializer(serializers.ModelSerializer):
     client_id = serializers.CharField(read_only=True, label=_('Client ID'))
     status = serializers.SerializerMethodField(label=_('Status'))
+    expires_at = serializers.SerializerMethodField(label=_('Expiration date'))
 
     class Meta:
         model = get_application_model()
-        fields = ('id', 'name', 'client_id', 'status')
+        fields = ('id', 'name', 'client_id', 'status', 'expires_at')
         read_only_fields = fields
 
     def get_status(self, obj):
         return 'active' if any(binding.is_live for binding in obj.user_bindings) else 'expired'
+
+    def get_expires_at(self, obj):
+        deadline = max((binding.expires_at for binding in obj.user_bindings if binding.is_live), default=None)
+        if deadline is None:
+            deadline = max((binding.expires_at for binding in obj.user_bindings), default=None)
+        return deadline.isoformat() if deadline else None
 
 
 class UserAgentClientPagination(LimitOffsetPagination):

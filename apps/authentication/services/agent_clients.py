@@ -25,9 +25,13 @@ MAX_USER_AGENT_CLIENTS = 10
 
 
 def active_agent_refresh_tokens():
+    authorization = AgentOAuthBinding.objects.filter(
+        user_id=OuterRef('user_id'), application_id=OuterRef('application_id'),
+        refresh_family=OuterRef('token_family'), expires_at__gt=timezone.now(),
+    )
     tokens = get_refresh_token_model().objects.filter(
         revoked__isnull=True, access_token__isnull=False
-    )
+    ).filter(Exists(authorization))
     lifetime = refresh_token_expire_timedelta()
     if lifetime:
         tokens = tokens.filter(access_token__expires__gt=timezone.now() - lifetime)
@@ -44,17 +48,19 @@ def agent_oauth_bindings():
     return AgentOAuthBinding.objects.annotate(has_refresh=Exists(refresh)).annotate(
         is_live=Case(
             When(
-                Q(has_refresh=True)
-                | Q(
-                    grant__expires__gt=now,
-                    grant__user_id=F('user_id'),
-                    grant__application_id=F('application_id'),
-                )
-                | Q(
-                    access_token__expires__gt=now,
-                    access_token__user_id=F('user_id'),
-                    access_token__application_id=F('application_id'),
-                    access_token__refresh_token__revoked__isnull=True,
+                Q(expires_at__gt=now) & (
+                    Q(has_refresh=True)
+                    | Q(
+                        grant__expires__gt=now,
+                        grant__user_id=F('user_id'),
+                        grant__application_id=F('application_id'),
+                    )
+                    | Q(
+                        access_token__expires__gt=now,
+                        access_token__user_id=F('user_id'),
+                        access_token__application_id=F('application_id'),
+                        access_token__refresh_token__revoked__isnull=True,
+                    )
                 ),
                 then=Value(True),
             ),

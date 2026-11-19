@@ -220,8 +220,18 @@ client does not consume another slot. Clients with expired
 bindings still occupy their personal list slot until revoked or reused by a
 new user after the previous authorization has ended.
 
+Each browser authorization has a fixed seven-day deadline. Refresh token
+rotation and retries inherit that deadline; access tokens and execution contexts
+cannot outlive it. Expiration blocks refresh, bearer access and new operations,
+including existing asset sessions, without deleting client registrations or
+audit history. Reauthorize from the client to obtain a new seven-day grant;
+this does not revive old refresh families or asset sessions. Migration `0019`
+gives existing authorizations seven days from the upgrade. No new setting is
+required, and the normal browser login and MFA policy still applies.
+
 The personal API is `/api/v1/authentication/user-agent-clients/`: GET lists the
-current user's clients; POST `{id}/revoke/` revokes that user's authorization in
+current user's clients with `expires_at` (the latest usable authorization's
+deadline, or latest deadline when expired); POST `{id}/revoke/` revokes that user's authorization in
 all organizations. The list reports authorization validity, including usable
 refresh tokens, independently of organization membership. It does not return
 organization display fields. Execution and audit queries retain their
