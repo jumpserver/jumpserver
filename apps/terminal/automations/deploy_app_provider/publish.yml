@@ -55,7 +55,7 @@
 
             - name: Transfer uploaded application image
               ansible.builtin.copy:
-                src: '{{ playbook_dir }}/../offline/{{ app_image_resource.file | basename }}'
+                src: '{{ playbook_dir }}/offline/{{ app_image_resource.file | basename }}'
                 dest: '{{ image_import.path }}/image.archive'
                 mode: '0600'
 

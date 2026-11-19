@@ -169,6 +169,7 @@ class DeployAppProviderManager:
         return access_key.get_full_value()
 
     def generate_playbook(self):
+        project_dir = os.path.join(self.run_dir, 'project')
         template = 'publish.yml' if self.deployment.publication_id else 'playbook.yml'
         with open(os.path.join(CURRENT_DIR, template)) as f:
             plays = yaml.safe_load(f)
@@ -177,7 +178,7 @@ class DeployAppProviderManager:
             app = self.deployment.publication.app
             variables = {
                 'APP_IMAGE': app.image_name,
-                'APP_IMAGE_RESOURCES': stage_image_archives(app, self.run_dir),
+                'APP_IMAGE_RESOURCES': stage_image_archives(app, project_dir),
             }
         else:
             options = self.provider.deploy_options
@@ -187,7 +188,7 @@ class DeployAppProviderManager:
                 'CORE_HOST': core_host.rstrip('/'),
                 'PANDA_IMAGE': options.get('PANDA_IMAGE') or default_panda_image(),
             }
-            resources = stage_resources(self.run_dir, variables['PANDA_IMAGE'])
+            resources = stage_resources(project_dir, variables['PANDA_IMAGE'])
             variables['PANDA_RESOURCE'] = resources['panda']
             variables['DOCKER_RESOURCE'] = resources['docker']
             variables['PANDA_ACCESS_KEY'] = self.get_access_key()
@@ -195,7 +196,7 @@ class DeployAppProviderManager:
         for play in plays:
             play['vars'].update(variables)
 
-        path = os.path.join(self.run_dir, 'playbook', 'main.yml')
+        path = os.path.join(project_dir, 'main.yml')
         os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, 'w') as f:
             os.chmod(path, 0o600)
