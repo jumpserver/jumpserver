@@ -1,7 +1,7 @@
 name: dbx
 display_name: "{{ 'DBX' | trans }}"
 comment: "{{ 'Lightweight cross-platform database client, connection management, SQL editing, data grids and schema tools in one product.' | trans }}"
-version: 0.2.2
+version: 0.2.3
 exec_type: python
 author: JumpServer Team
 type: general
