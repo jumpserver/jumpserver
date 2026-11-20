@@ -887,6 +887,11 @@ class Config(dict):
         # Suggestion api
         'SUGGESTION_LIMIT': 10,
 
+        'MCP_ENABLED': False,
+        'MCP_DCR_ENABLED': False,
+        'MCP_PUBLIC_URL': '',
+        'MCP_DCR_MAX_CLIENTS': 0,
+        'MCP_DCR_REGISTRATIONS_PER_MINUTE': 30,
         'VENDOR': 'JumpServer',
 
         # JDMC

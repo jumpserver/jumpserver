@@ -1,6 +1,7 @@
 from django.test import SimpleTestCase
 from django.utils.translation import gettext, override
 
+from orgs.models import Organization
 from ops.models import CeleryTask
 from ops.celery import app
 from tickets.models import Workflow, WorkflowVersion, WorkflowNode
@@ -12,6 +13,7 @@ from tickets.workflow.errors import WorkflowConfigurationError, WorkflowConflict
 class TicketTranslationTests(SimpleTestCase):
     def test_generated_workflow_name_is_localized_without_changing_its_identity(self):
         workflow = Workflow(name='Apply for asset', type='apply_asset', created_by='System')
+        workflow.org = Organization.root()
         with override('zh'):
             self.assertEqual(workflow.display_name, '申请资产')
             self.assertEqual(str(workflow), '申请资产')

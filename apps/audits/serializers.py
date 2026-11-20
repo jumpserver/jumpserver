@@ -12,6 +12,7 @@ from ops.celery import app
 from ops.serializers.job import JobExecutionSerializer, JobSerializer
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from terminal.models import Session
+from terminal.const import LoginFrom
 from users.models import User
 from . import models
 from .const import (
@@ -100,6 +101,11 @@ class JobsAuditSerializer(JobSerializer):
 
 class FTPLogSerializer(serializers.ModelSerializer):
     operate = LabeledChoiceField(choices=OperateChoices.choices, label=_("Operate"))
+    login_from = serializers.SerializerMethodField(label=_('Source'))
+
+    def get_login_from(self, obj):
+        source = self.context.get('ftp_sources', {}).get(obj.pk)
+        return {'value': source or '', 'label': dict(LoginFrom.choices).get(source, _('Unknown'))}
 
     class Meta:
         model = models.FTPLog
@@ -107,7 +113,7 @@ class FTPLogSerializer(serializers.ModelSerializer):
         fields_small = fields_mini + [
             "user", "remote_addr", "asset", "account",
             "org_id", "operate", "filename", "date_start",
-            "is_success", "has_file", "session"
+            "is_success", "has_file", "session", "login_from"
         ]
         fields = fields_small
 

@@ -75,7 +75,7 @@ class OracleSysdbaOptionsTests(SimpleTestCase):
             'asset': asset, 'account': 'sys', 'protocol': 'oracle',
             'connect_method': 'db_client', 'connect_options': {'use_sysdba': False},
         })
-        with patch('authentication.api.connection_token.get_request_ip_or_data', return_value='127.0.0.1'):
+        with patch('authentication.services.connection_token.get_request_ip_or_data', return_value='127.0.0.1'):
             view.validate_serializer(serializer)
             self.assertIs(serializer.validated_data['connect_options']['use_sysdba'], True)
             token = SimpleNamespace(
