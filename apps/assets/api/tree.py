@@ -1,5 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 
+from urllib.parse import urlsplit
+
 from django.db.models import Q
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -269,6 +271,9 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
         data = [*nodes, *assets]
         if node_paginator is not None:
             next_link = node_paginator.get_next_link()
+            if next_link:
+                # Keep the browser on its current origin behind a TLS proxy.
+                next_link = urlsplit(next_link)._replace(scheme='', netloc='').geturl()
             response = {
                 'results': data,
                 'node_pagination': {
