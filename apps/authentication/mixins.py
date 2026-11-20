@@ -676,7 +676,6 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, AuthFaceMixin, MFA
         # pre check
         username, password, public_key, ip, auto_login = self.get_auth_data(valid_data)
         self._check_is_block(username)
-        self._check_only_allow_exists_user_auth(username)
 
         # check auth
         user = self._check_auth_user_is_valid(username, password, public_key)

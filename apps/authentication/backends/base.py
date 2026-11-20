@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
 
@@ -33,6 +34,11 @@ class JMSBaseAuthBackend:
 
     # allow user to authenticate
     def username_allow_authenticate(self, username):
+        if settings.ONLY_ALLOW_EXIST_USER_AUTH and username:
+            try:
+                User.objects.get_by_natural_key(username)
+            except User.DoesNotExist:
+                return False
         return self.allow_authenticate(username=username)
 
     def user_allow_authenticate(self, user):

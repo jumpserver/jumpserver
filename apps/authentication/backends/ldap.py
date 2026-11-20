@@ -54,9 +54,15 @@ class LDAPBaseBackend(LDAPBackend):
         try:
             user = model.objects.get(**{lookup: query_value})
         except model.DoesNotExist:
+            if settings.ONLY_ALLOW_EXIST_USER_AUTH or self.is_user_login_only_in_users:
+                raise LDAPUser.AuthenticationFailed(
+                    'user ({}) is not in the user list'.format(query_value)
+                )
             user = model(**{query_field: query_value})
             built = True
         else:
+            if not self.user_allow_authenticate(user):
+                raise LDAPUser.AuthenticationFailed('User source does not allow LDAP authentication')
             built = False
 
         return user, built
@@ -112,12 +118,6 @@ class LDAPBaseBackend(LDAPBackend):
         if not password:
             error = 'Password is None'
             return False, error
-        if self.is_user_login_only_in_users:
-            user_model = self.get_user_model()
-            exist = user_model.objects.filter(username=username).exists()
-            if not exist:
-                error = 'user ({}) is not in the user list'.format(username)
-                return False, error
         return True, ''
 
 
@@ -125,6 +125,10 @@ class LDAPAuthorizationBackend(JMSBaseAuthBackend, LDAPBaseBackend):
     """
     Override this class to override _LDAPUser to LDAPUser
     """
+
+    def username_allow_authenticate(self, username):
+        # Check existence and source in get_or_build_user using the directory's username.
+        return True
 
     @staticmethod
     def is_enabled():
@@ -140,6 +144,10 @@ class LDAPHAAuthorizationBackend(JMSBaseAuthBackend, LDAPBaseBackend):
     Override this class to override _LDAPUser to LDAPUser
     """
     settings_prefix = "AUTH_LDAP_HA_"
+
+    def username_allow_authenticate(self, username):
+        # Check existence and source in get_or_build_user using the directory's username.
+        return True
 
     @staticmethod
     def is_enabled():
