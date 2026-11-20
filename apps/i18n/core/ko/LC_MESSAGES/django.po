@@ -6987,7 +6987,7 @@ msgstr ""
 
 #: common/tasks.py:107
 msgid "Upload account backup to external storage"
-msgstr "외부 저장소에 세션 녹화 업로드"
+msgstr "외부 저장소에 계정 백업 업로드"
 
 #: common/tasks.py:109
 msgid ""
@@ -7043,15 +7043,15 @@ msgstr "특수 문자를 포함할 수 없습니다"
 
 #: common/validators.py:42
 msgid "Should not contains special characters"
-msgstr "휴대폰 번호 형식이 올바르지 않습니다"
+msgstr "특수 문자를 포함할 수 없습니다"
 
 #: common/validators.py:47
 msgid "The mobile phone number format is incorrect"
-msgstr "코드를 찾을 수 없습니다"
+msgstr "휴대폰 번호 형식이 올바르지 않습니다"
 
 #: common/views/msg.py:18
 msgid "Not found the code"
-msgstr "제공된 메시지 코드가 유효하지 않거나 만료되었습니다"
+msgstr "코드를 찾을 수 없습니다"
 
 #: common/views/msg.py:22
 msgid "The message code provided is invalid or has expired"
@@ -7068,18 +7068,15 @@ msgstr "귀하의 계정이 성공적으로 생성되었습니다"
 
 #: jumpserver/conf.py:582
 msgid "Your account has been created successfully"
-msgstr "JumpServer 오픈소스 방화벽"
+msgstr "귀하의 계정이 성공적으로 생성되었습니다"
 
 #: jumpserver/context_processor.py:16
 msgid "JumpServer - An open-source PAM"
-msgstr "Flower 서비스가 사용 불가능합니다, 확인하십시오"
+msgstr "JumpServer - 오픈 소스 PAM"
 
 #: jumpserver/views/celery_flower.py:22
 msgid "<h1>Flower service unavailable, check it</h1>"
-msgstr ""
-"<div>Luna는 독립적으로 배포된 프로그램으로, luna와 koko를 배포해야 합니다. </"
-"div><div>이 페이지를 보았다면, nginx가 수신하고 있는 포트에 접근하고 있지 않"
-"음을 의미합니다. 행운을 기원합니다</div>"
+msgstr "<h1>Flower 서비스를 사용할 수 없습니다. 확인하십시오.</h1>"
 
 #: jumpserver/views/other.py:28
 msgid ""
@@ -7102,11 +7099,14 @@ msgid ""
 "<div>Koko is a separately deployed program, you need to deploy Koko, "
 "configure nginx for url distribution,</div> </div>If you see this page, "
 "prove that you are not accessing the nginx listening port. Good luck.</div>"
-msgstr "태그 관리"
+msgstr ""
+"<div>KoKo는 별도로 배포되는 프로그램입니다. KoKo를 배포하고 URL 분배를 위해 "
+"nginx를 설정해야 합니다.</div><div>이 페이지가 표시되면 nginx 수신 포트로 접속"
+"하지 않은 것입니다. 행운을 빕니다.</div>"
 
 #: labels/apps.py:8
 msgid "App Labels"
-msgstr "색상"
+msgstr "태그 관리"
 
 #: labels/models.py:15
 msgid "Color"
