@@ -890,6 +890,7 @@ class LDAPTestUtil(object):
         from authentication.backends.ldap import LDAPUser
         ldap_user = LDAPUser(self.backend, username=username.strip())
         ldap_user._authenticate_user_dn(password)
+        self.backend.get_or_build_user(username, ldap_user)
 
     def _test_login(self, username, password):
         self._test_before_login_check(username, password)
