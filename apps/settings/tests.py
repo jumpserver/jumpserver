@@ -5,14 +5,18 @@ from unittest.mock import PropertyMock, patch
 from django.conf import settings
 from channels.testing import WebsocketCommunicator
 from django.contrib.auth.models import AnonymousUser
-from django.test import SimpleTestCase, override_settings
+from django.test import SimpleTestCase, TestCase, override_settings
+from django.db import transaction
 from django.urls import path
 from drf_spectacular.generators import SchemaGenerator
-from rest_framework.test import APIRequestFactory
+from rest_framework.test import APIClient, APIRequestFactory
 
+from common.utils.crypto.rsa_aes import AESCrypto, RsaAesCryptoSuite, gen_key_pair as rsa_gen_key_pair
+from common.utils.crypto.session import ENCRYPTED_SEPARATOR
 from jumpserver.conf import Config
 from jumpserver.rewriting.smtp import EmailBackend
 from settings.api.ldap import LDAPUserListApi
+from settings.models import Setting
 from settings.serializers.feature import ChatAISettingSerializer
 from settings.serializers.cleaning import CleaningSerializer
 from settings.serializers.msg import EmailSettingSerializer
@@ -367,3 +371,77 @@ class LDAPWebsocketPermissionTest(SimpleTestCase):
                         self.assertEqual(test_util.call_args.kwargs['category'], category)
                     finally:
                         await socket.disconnect()
+
+
+class EncryptedLDAPBindPasswordUpdateTestCase(TestCase):
+    """PATCH /api/v1/settings/setting/?category=ldap through the full middleware stack."""
+    url = '/api/v1/settings/setting/?category=ldap'
+    existing_password = 'existing-bind-password'
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.private_key, cls.public_key = rsa_gen_key_pair()
+        _, cls.other_public_key = rsa_gen_key_pair()
+
+    def setUp(self):
+        self.admin = User.objects.create_superuser(
+            username='ldap-settings-admin', password='password',
+            name='LDAP settings admin', email='ldap-settings-admin@example.com',
+        )
+        Setting.update_or_create(
+            name='AUTH_LDAP_BIND_PASSWORD', value=self.existing_password,
+            encrypted=True, category='ldap',
+        )
+
+    @staticmethod
+    def browser_envelope(public_key, password):
+        # What lina's encryptPassword() sends: RSA(aes key) ::encrypted:: AES(password)
+        aes_key = 'k3yk3yk3y01'
+        key_cipher = RsaAesCryptoSuite(None).encrypt_with_key_pair(aes_key, public_key)
+        return f'{key_cipher}{ENCRYPTED_SEPARATOR}{AESCrypto(aes_key).encrypt(password)}'
+
+    def browser_client(self):
+        client = APIClient()
+        client.force_login(self.admin)
+        session = client.session
+        session[settings.SESSION_RSA_PRIVATE_KEY_NAME] = self.private_key
+        session.save()
+        return client
+
+    def stored_password(self):
+        return Setting.objects.get(name='AUTH_LDAP_BIND_PASSWORD').cleaned_value
+
+    def patch(self, client, password):
+        response = client.patch(self.url, {'AUTH_LDAP_BIND_PASSWORD': password}, format='json')
+        # DRF marks the open atomic block for rollback on an error response
+        # (ATOMIC_REQUESTS). SettingsApi is non-atomic, so in production that
+        # block does not exist; here it is the TestCase's own, so clear the flag
+        # to be able to read the stored value back.
+        transaction.set_rollback(False)
+        return response
+
+    def test_browser_update_is_decrypted(self):
+        envelope = self.browser_envelope(self.public_key, 'new-bind-password')
+        response = self.patch(self.browser_client(), envelope)
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(self.stored_password(), 'new-bind-password')
+
+    def test_undecryptable_browser_update_is_rejected_and_keeps_bind_password(self):
+        # A tab still holding the public key of an older session
+        envelope = self.browser_envelope(self.other_public_key, 'new-bind-password')
+        response = self.patch(self.browser_client(), envelope)
+        self.assertEqual(response.status_code, 400, response.content)
+        self.assertIn('AUTH_LDAP_BIND_PASSWORD', response.json())
+        self.assertEqual(self.stored_password(), self.existing_password)
+
+    def test_plaintext_api_update_without_session_key_is_saved_unchanged(self):
+        envelope_shaped = self.browser_envelope(self.public_key, 'x')
+        legacy_shaped = envelope_shaped.replace(ENCRYPTED_SEPARATOR, ':')
+        for password in ('plain-password', 'a::encrypted::b', legacy_shaped, envelope_shaped):
+            client = APIClient()
+            client.force_authenticate(self.admin)
+            with self.subTest(password=password[:20]):
+                response = self.patch(client, password)
+                self.assertEqual(response.status_code, 200, response.content)
+                self.assertEqual(self.stored_password(), password)
