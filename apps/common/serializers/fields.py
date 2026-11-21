@@ -9,6 +9,7 @@ from rest_framework.fields import empty
 
 from common.db.fields import TreeChoices, JSONManyToManyField as ModelJSONManyToManyField
 from common.utils import decrypt_session_password, is_uuid
+from common.utils.crypto.session import SessionDecryptError
 
 __all__ = [
     "ReadableHiddenField",
@@ -43,6 +44,12 @@ class ReadableHiddenField(serializers.HiddenField):
 
 
 class EncryptedField(serializers.CharField):
+    default_error_messages = {
+        "decrypt_failed": _(
+            "This field could not be decrypted, please refresh the page and try again"
+        ),
+    }
+
     def __init__(self, write_only=None, **kwargs):
         if write_only is None:
             write_only = True
@@ -51,7 +58,10 @@ class EncryptedField(serializers.CharField):
 
     def to_internal_value(self, value):
         value = super().to_internal_value(value)
-        return decrypt_session_password(value)
+        try:
+            return decrypt_session_password(value, strict=True)
+        except SessionDecryptError:
+            self.fail("decrypt_failed")
 
 
 class LabeledChoiceField(serializers.ChoiceField):
