@@ -1,3 +1,4 @@
+import secrets
 import ssl
 from types import SimpleNamespace
 from unittest.mock import PropertyMock, patch
@@ -11,7 +12,8 @@ from django.urls import path
 from drf_spectacular.generators import SchemaGenerator
 from rest_framework.test import APIClient, APIRequestFactory
 
-from common.utils.crypto.rsa_aes import AESCrypto, RsaAesCryptoSuite, gen_key_pair as rsa_gen_key_pair
+from common.utils.crypto.rsa_aes import AESCrypto, RsaAesCryptoSuite
+from common.utils.crypto.rsa_aes import gen_key_pair as rsa_gen_key_pair
 from common.utils.crypto.session import ENCRYPTED_SEPARATOR
 from jumpserver.conf import Config
 from jumpserver.rewriting.smtp import EmailBackend
@@ -375,8 +377,9 @@ class LDAPWebsocketPermissionTest(SimpleTestCase):
 
 class EncryptedLDAPBindPasswordUpdateTestCase(TestCase):
     """PATCH /api/v1/settings/setting/?category=ldap through the full middleware stack."""
+
     url = '/api/v1/settings/setting/?category=ldap'
-    existing_password = 'existing-bind-password'
+    existing_password = secrets.token_urlsafe(16)
 
     @classmethod
     def setUpClass(cls):
@@ -386,7 +389,7 @@ class EncryptedLDAPBindPasswordUpdateTestCase(TestCase):
 
     def setUp(self):
         self.admin = User.objects.create_superuser(
-            username='ldap-settings-admin', password='password',
+            username='ldap-settings-admin', password=secrets.token_urlsafe(16),
             name='LDAP settings admin', email='ldap-settings-admin@example.com',
         )
         Setting.update_or_create(
