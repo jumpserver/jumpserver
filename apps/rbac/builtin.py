@@ -142,6 +142,15 @@ class BuiltinRole:
     system_component = PredefineRole(
         '4', gettext_noop('SystemComponent'), Scope.system, app_exclude_perms, 'exclude'
     )
+    system_jdmc = PredefineRole(
+        '8', gettext_noop('SystemJDMC'), Scope.system,
+        _view_root_perms + (
+            ('users', 'user', 'view', 'user'),
+            ('audits', 'usersession', 'view', 'usersession'),
+            ('terminal', 'endpoint', 'view,add,change', 'endpoint'),
+            ('terminal', 'endpointrule', 'view,add', 'endpointrule'),
+        )
+    )
     system_user = PredefineRole(
         '3', gettext_noop('SystemUser'), Scope.system, system_user_perms
     )

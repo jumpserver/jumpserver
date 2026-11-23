@@ -892,6 +892,10 @@ class Config(dict):
         # JDMC
         'JDMC_ENABLED': True,
         'JDMC_SOCK_PATH': '',
+        'JDMC_HTTPS_URL': '',
+        'JDMC_HTTPS_CA_FILE': '',
+        'JDMC_CORE_NODE_NAME': '',
+        'JDMC_CORE_ENROLLMENT_SECRET_FILE': '',
         'SMALL_LOGO_MODE': os.environ.get('SMALL_LOGO_MODE', False),
 
 

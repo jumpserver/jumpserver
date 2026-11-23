@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 
 from common.api import JMSGenericViewSet
 from common.const.http import GET, PATCH, POST
-from common.permissions import IsValidUser, OnlySuperUser
+from common.permissions import IsJDMCNode, IsValidUser, OnlySuperUser
 from common.utils.http import is_true
 from ..serializers import (
     SiteMessageSerializer, SiteMessageIdsSerializer,
@@ -59,7 +59,7 @@ class SiteMessageViewSet(ListModelMixin, RetrieveModelMixin, JMSGenericViewSet):
         SiteMessageUtil.mark_msgs_as_read(user.id)
         return Response({'detail': 'ok'})
 
-    @action(methods=[POST], detail=False, permission_classes=[OnlySuperUser,])
+    @action(methods=[POST], detail=False, permission_classes=[OnlySuperUser | IsJDMCNode])
     def send(self, request, **kwargs):
         s = self.get_serializer(data=request.data)
         s.is_valid(raise_exception=True)
@@ -69,8 +69,11 @@ class SiteMessageViewSet(ListModelMixin, RetrieveModelMixin, JMSGenericViewSet):
         else:
             return Response({'detail': 'error'})
 
-    @action(methods=[PATCH], detail=True, permission_classes=[OnlySuperUser,])
+    @action(methods=[PATCH], detail=True, permission_classes=[OnlySuperUser | IsJDMCNode])
     def revoke(self, request, **kwargs):
-        msg = get_object_or_404(MessageContent, id=kwargs['pk'])
+        messages = MessageContent.objects.all()
+        if not request.user.is_superuser:
+            messages = messages.filter(sender=request.user)
+        msg = get_object_or_404(messages, id=kwargs['pk'])
         msg.revoke_msg()
         return Response({'detail': 'ok'})

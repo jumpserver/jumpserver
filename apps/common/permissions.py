@@ -34,6 +34,21 @@ class IsServiceAccount(IsValidUser):
             and request.user.is_service_account
 
 
+class IsJDMCNode(IsServiceAccount):
+    def has_permission(self, request, view):
+        from authentication.backends.drf import SignatureAuthentication
+        from rbac.models import Role, RoleBinding
+        from users.models import JDMCNodeBinding
+
+        if (not settings.JDMC_ENABLED or not settings.JDMC_CORE_NODE_NAME
+                or not isinstance(request.successful_authenticator, SignatureAuthentication)
+                or not super().has_permission(request, view)
+                or request.user.username != settings.JDMC_CORE_NODE_NAME):
+            return False
+        return (JDMCNodeBinding.objects.filter(name=settings.JDMC_CORE_NODE_NAME, user=request.user).exists()
+                and RoleBinding.objects_raw.filter(user=request.user, role_id=Role.BuiltinRole.system_jdmc.id).exists())
+
+
 class WithBootstrapToken(permissions.BasePermission):
     def check_can_register(self):
         enabled = settings.SECURITY_SERVICE_ACCOUNT_REGISTRATION

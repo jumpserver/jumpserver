@@ -6,5 +6,6 @@ from .preference import *
 from .profile import *
 from .relation import *
 from .service import *
+from .jdmc import JDMCNodeEnrollmentApi
 from .tree import *
 from .user import *

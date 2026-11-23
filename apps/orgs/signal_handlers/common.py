@@ -101,6 +101,12 @@ def on_user_created_set_default_org(sender, instance, created, **kwargs):
         return
     if not created:
         return
+    if instance.is_service_account and instance.username == settings.JDMC_CORE_NODE_NAME:
+        from users.models import JDMCNodeBinding
+        # Dedicated node accounts already have a system role. Default org
+        # membership would also grant the generic SystemComponent privileges.
+        if JDMCNodeBinding.objects.filter(user=instance).exists():
+            return
     if instance.orgs.count() > 0:
         return
     default_org = Organization.default()

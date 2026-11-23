@@ -554,6 +554,9 @@ class ServiceAccountSerializer(serializers.ModelSerializer):
         return "{}{}".format(name, User.service_account_email_suffix)
 
     def validate_name(self, name):
+        if (settings.JDMC_ENABLED and settings.JDMC_CORE_ENROLLMENT_SECRET_FILE
+                and name.casefold() == settings.JDMC_CORE_NODE_NAME.casefold()):
+            raise serializers.ValidationError(_("name not unique"), code="unique")
         email = self.get_email()
         username = self.get_username()
         if self.instance:

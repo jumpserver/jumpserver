@@ -19,6 +19,7 @@ router.register(r'service-account-registrations', api.ServiceAccountRegistration
 router.register(r'connection-token', auth_api.ConnectionTokenViewSet, 'connection-token')
 
 urlpatterns = [
+    path('jdmc-node-enrollment/', api.JDMCNodeEnrollmentApi.as_view(), name='jdmc-node-enrollment'),
     path('users-groups/tree/', api.UserGroupTreeApi.as_view(), name='users-groups-tree'),
     path('profile/', api.UserProfileApi.as_view(), name='user-profile'),
     path('profile/lock-password/', api.UserLockPasswordApi.as_view(), name='user-lock-password'),
