@@ -88,6 +88,26 @@ class LoginReviewReasonTests(TestCase):
             self.assertIn('reason', response.context['form'].errors)
             self.assertFalse(Ticket.objects.exists())
 
+    def test_multiline_reason_uses_browser_length(self):
+        normalized = 'x' * 2046 + '\n' + 'y' * 2046 + '\nzz'
+        for newline in ('\n', '\r\n', '\r'):
+            with self.subTest(newline=repr(newline)):
+                self.client = Client()
+                self.authenticate()
+                self.client.get(self.guard)
+                ticket_id = self.client.session['auth_ticket_id']
+                reason = normalized.replace('\n', newline)
+                response = self.client.post(self.wait, {'reason': reason + 'x'})
+                self.assertEqual(response.status_code, 200)
+                error = response.context['form'].errors.as_data()['reason'][0]
+                self.assertEqual(error.code, 'max_length')
+                self.assertEqual(error.params['show_value'], 4097)
+                self.assertFalse(Ticket.objects.filter(pk=ticket_id).exists())
+
+                response = self.client.post(self.wait, {'reason': reason})
+                self.assertRedirects(response, self.guard, fetch_redirect_response=False)
+                self.assertEqual(Ticket.objects.get(pk=ticket_id).comment, normalized)
+
     def test_submission_requires_current_authentication_and_csrf(self):
         self.client.get(self.guard)
         csrf_client = Client(enforce_csrf_checks=True)
