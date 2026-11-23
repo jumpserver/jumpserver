@@ -18896,3 +18896,16 @@ msgstr "超過3個月未存取"
 #: assets/api/asset/asset.py
 msgid "No valid permission"
 msgstr "無有效授權"
+
+msgid "Application reason"
+msgstr "申請原因"
+
+msgid "Application reason (optional)"
+msgstr "申請原因（選填）"
+
+msgid "Submit for approval"
+msgstr "提交覆核"
+
+msgid ""
+"Login approval is required. You can provide a reason before submitting."
+msgstr "本次登入需要覆核，可填寫申請原因後提交。"

@@ -21158,3 +21158,16 @@ msgstr "超过3个月未访问"
 #: assets/api/asset/asset.py
 msgid "No valid permission"
 msgstr "无有效授权"
+
+msgid "Application reason"
+msgstr "申请原因"
+
+msgid "Application reason (optional)"
+msgstr "申请原因（选填）"
+
+msgid "Submit for approval"
+msgstr "提交复核"
+
+msgid ""
+"Login approval is required. You can provide a reason before submitting."
+msgstr "本次登录需要复核，可填写申请原因后提交。"

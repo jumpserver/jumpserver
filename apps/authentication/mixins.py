@@ -512,7 +512,7 @@ class AuthACLMixin:
             return
         raise ValueError(error_message)
 
-    def check_user_login_confirm_if_need(self, user):
+    def check_user_login_confirm_if_need(self, user, *, create_ticket=True, reason=''):
         if not self.request.session.get("auth_confirm_required"):
             return
         acl_id = self.request.session.get('auth_acl_id')
@@ -529,14 +529,18 @@ class AuthACLMixin:
             # 如果用户在审核人列表中，则不需要审核，直接通过
             # 避免管理员admin创建一条针对所有用户的复核规则导致admin自己也无法登录了
             return
-        self.get_ticket_or_create(acl, user)
+        self.get_ticket_or_create(acl, user, create_ticket=create_ticket, reason=reason)
         self.check_user_login_confirm()
 
-    def get_ticket_or_create(self, acl, user):
+    def get_ticket_or_create(self, acl, user, *, create_ticket=True, reason=''):
         ticket = self.get_ticket()
         if not ticket or ticket.is_state(ticket.State.closed):
-            ticket = acl.create_confirm_ticket(self.request, user)
-            self.request.session['auth_ticket_id'] = str(ticket.id)
+            if ticket or not self.request.session.get('auth_ticket_id'):
+                self.request.session['auth_ticket_id'] = str(uuid.uuid4())
+            ticket_id = self.request.session['auth_ticket_id']
+            if not create_ticket:
+                raise errors.LoginConfirmWaitError(ticket_id)
+            ticket = acl.create_confirm_ticket(self.request, user, reason=reason, ticket_id=ticket_id)
         return ticket
 
     def check_user_login_confirm(self):

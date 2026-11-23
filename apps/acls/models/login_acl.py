@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
@@ -29,7 +31,7 @@ class LoginACL(UserBaseACL):
         return self.reviewers.filter(id=user.id).exists()
     
     @transaction.atomic
-    def create_confirm_ticket(self, request, user):
+    def create_confirm_ticket(self, request, user, *, reason='', ticket_id=None):
         from tickets import const
         from tickets.models import Ticket
         from orgs.models import Organization
@@ -43,13 +45,16 @@ class LoginACL(UserBaseACL):
             'applicant': user,
             'org_id': Organization.ROOT_ID,
             'type': const.TicketType.login_confirm,
+            'comment': reason,
             'request_data': {
                 'apply_login_ip': login_ip,
                 'apply_login_city': str(login_city),
                 'apply_login_datetime': login_datetime.isoformat(),
             },
         }
-        ticket = Ticket.objects.create(**data)
-        assignees = self.reviewers.all()
-        ticket.open_by_system(assignees, workflow=self.workflow)
+        # The browser reserves an ID before submission so retries cannot open another workflow.
+        ticket, created = Ticket.all().get_or_create(id=ticket_id or uuid4(), defaults=data)
+        if created:
+            assignees = self.reviewers.all()
+            ticket.open_by_system(assignees, workflow=self.workflow)
         return ticket
