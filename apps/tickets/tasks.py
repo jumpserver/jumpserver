@@ -88,3 +88,13 @@ def maintain_ticket_file_transfers():
 def cleanup_ticket_transfer_files():
     from tickets.plugins.file_transfer.execution import cleanup
     return cleanup()
+
+
+@shared_task(
+    verbose_name=_('Clean ticket attachments'),
+    description=_('Delete expired ticket attachments every hour, regardless of ticket status.'),
+)
+@register_as_period_task(interval=3600)
+def cleanup_ticket_attachments():
+    from tickets.attachments import cleanup_attachments
+    return cleanup_attachments()

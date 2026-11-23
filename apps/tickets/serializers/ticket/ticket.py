@@ -120,6 +120,17 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
     result = serializers.SerializerMethodField()
     source_ticket = serializers.SerializerMethodField()
     reapply_action = serializers.SerializerMethodField()
+    attachments = serializers.SerializerMethodField()
+
+    def get_attachments(self, obj):
+        view = self.context.get('view')
+        if view and view.action not in ('retrieve', 'open'):
+            return []
+        return [{
+            'id': str(record.pk), 'name': record.name, 'size': record.size,
+            'content_type': record.content_type, 'expires_at': record.expires_at,
+            'expired': record.expired,
+        } for record in obj.attachments.all()]
 
     def get_reapply_action(self, obj):
         view = self.context.get('view')
@@ -189,7 +200,8 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
             'serial_num', 'process_map', 'approval_step', 'type',
             'state', 'applicant', 'status', 'origin', 'date_created',
             'date_updated', 'org_name', 'rel_snapshot', 'workflow_instance', 'my_tasks',
-            'request_data', 'request_items', 'execution_mode', 'result', 'source_ticket', 'reapply_action', 'login_asset_connections'
+            'request_data', 'request_items', 'execution_mode', 'result', 'source_ticket', 'reapply_action', 'login_asset_connections',
+            'attachments',
         ]
         fields = fields_small + fields_m2m + read_only_fields
         extra_kwargs = {}
@@ -284,6 +296,14 @@ class TicketApplySerializer(TicketSerializer):
     workflow_id = serializers.UUIDField(required=True, write_only=True, label=_('Workflow'))
     org_id = serializers.CharField(required=True, max_length=36, label=_("Organization"))
     applicant = serializers.UUIDField(required=False, source='applicant_id')
+    attachments = serializers.ListField(
+        child=serializers.FileField(max_length=255), max_length=5,
+        required=False, write_only=True, label=_('Attachments'),
+    )
+
+    def validate_attachments(self, files):
+        from tickets.attachments import validate_attachments
+        return validate_attachments(files)
 
     class Meta(TicketSerializer.Meta):
         fields = TicketSerializer.Meta.fields + ['workflow_id']

@@ -21159,6 +21159,40 @@ msgstr "超过3个月未访问"
 msgid "No valid permission"
 msgstr "无有效授权"
 
+msgid "Attachments"
+msgstr "附件"
+
+msgid "Attachment retention days"
+msgstr "附件保留天数"
+
+msgid ""
+"Days to retain attachments from ticket submission, regardless of ticket "
+"status. Changes apply to existing attachments; deleted files cannot be "
+"recovered."
+msgstr "从工单提交时起计算附件保留天数，与工单状态无关。修改后适用于现有附件，已删除的文件无法恢复。"
+
+msgid "Supported attachments: JPG, PNG, PDF, Word and Excel."
+msgstr "附件支持 JPG、PNG、PDF、Word 和 Excel 文件。"
+
+msgid "Each attachment must be non-empty and no larger than 10 MB."
+msgstr "附件不能为空，且单个不能超过 10 MB。"
+
+msgid "Invalid attachment image."
+msgstr "附件图片无效。"
+
+msgid "This attachment has expired."
+msgstr "附件已过期。"
+
+msgid "This attachment is no longer available."
+msgstr "附件已不可用。"
+
+msgid "Clean ticket attachments"
+msgstr "清理工单附件"
+
+msgid ""
+"Delete expired ticket attachments every hour, regardless of ticket status."
+msgstr "每小时清理过期工单附件，与工单状态无关。"
+
 msgid "Application reason"
 msgstr "申请原因"
 

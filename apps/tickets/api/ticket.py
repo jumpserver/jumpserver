@@ -15,6 +15,7 @@ from rest_framework.renderers import JSONRenderer
 from audits.handler import create_or_update_operate_log
 from common.api import CommonApiMixin, ReportExportMixin
 from common.const.http import POST, PUT, PATCH
+from common.drf.throttling import FileTransferThrottle
 from orgs.utils import current_org, tmp_to_root_org, tmp_to_org
 from rbac.permissions import RBACPermission
 from tickets import filters
@@ -49,6 +50,7 @@ class TicketViewSet(ReportExportMixin, CommonApiMixin, viewsets.ModelViewSet):
     rbac_perms = {
         'open': 'tickets.view_ticket',
         'retrieve': 'tickets.view_ticket | audits.view_ticketaudit',
+        'attachment': 'tickets.view_ticket | audits.view_ticketaudit',
     }
 
     def get_serializer_class(self):
@@ -125,7 +127,7 @@ class TicketViewSet(ReportExportMixin, CommonApiMixin, viewsets.ModelViewSet):
         raise MethodNotAllowed(self.action)
 
     def get_queryset(self):
-        can_audit = self.action == 'retrieve' and self.request.user.has_perm('audits.view_ticketaudit')
+        can_audit = self.action in ('retrieve', 'attachment') and self.request.user.has_perm('audits.view_ticketaudit')
         audit_org_id = None if current_org.is_root() else str(current_org.id)
         with tmp_to_root_org():
             queryset = self.model.get_user_related_tickets(self.request.user)
@@ -138,11 +140,38 @@ class TicketViewSet(ReportExportMixin, CommonApiMixin, viewsets.ModelViewSet):
                 )
         return queryset
 
-    @transaction.atomic
     def perform_create(self, serializer):
-        instance = serializer.save()
-        instance.save(update_fields=['applicant'])
-        instance.open()
+        from tickets.attachments import save_attachment
+        from tickets.models import TicketAttachment
+        uploads = serializer.validated_data.pop('attachments', [])
+        records = []
+        try:
+            with transaction.atomic():
+                instance = serializer.save()
+                instance.save(update_fields=['applicant'])
+                instance.open()
+                with tmp_to_org(instance.org_id):
+                    for upload in uploads:
+                        record = TicketAttachment(ticket=instance, name=upload.name, content_type=upload.content_type,
+                                                  org_id=instance.org_id)
+                        records.append(record)
+                        save_attachment(record, upload)
+        except BaseException:
+            # Database rollback does not remove files written to shared storage.
+            for record in records:
+                record.path.unlink(missing_ok=True)
+            raise
+
+    @action(detail=True, methods=['get'], url_path=r'attachments/(?P<attachment_id>[^/.]+)',
+            permission_classes=[RBACPermission], throttle_classes=[FileTransferThrottle])
+    def attachment(self, request, *args, **kwargs):
+        from rest_framework.serializers import UUIDField
+        from tickets.attachments import attachment_response
+        ticket = self.get_object()
+        file_id = UUIDField().run_validation(kwargs['attachment_id'])
+        with tmp_to_org(ticket.org_id):
+            record = get_object_or_404(ticket.attachments, pk=file_id, org_id=ticket.org_id)
+        return attachment_response(record)
 
     @action(detail=False, methods=[POST], permission_classes=[RBACPermission, ])
     def open(self, request, *args, **kwargs):
