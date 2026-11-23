@@ -15,6 +15,7 @@ from common.db import fields, models as jms_models
 from common.utils import (
     user_date_expired_default, get_logger, lazyproperty, text_hmac_sha256
 )
+from common.utils.phone import normalize_phone_number
 from labels.mixins import LabeledMixin
 from orgs.utils import current_org
 from ._auth import AuthMixin, MFAMixin
@@ -36,7 +37,20 @@ __all__ = [
 ]
 
 
-class UserManager(_UserManager):
+class UserQuerySet(models.QuerySet):
+    def bulk_create(self, objs, *args, **kwargs):
+        objs = list(objs)
+        for obj in objs:
+            obj.phone = normalize_phone_number(obj.phone)
+        return super().bulk_create(objs, *args, **kwargs)
+
+    def update(self, **kwargs):
+        if 'phone' in kwargs:
+            kwargs['phone'] = normalize_phone_number(kwargs['phone'])
+        return super().update(**kwargs)
+
+
+class UserManager(_UserManager.from_queryset(UserQuerySet)):
     def get_by_natural_key(self, username_or_mail):
         email_lookup = text_hmac_sha256(username_or_mail)
         q = (models.Q(username=username_or_mail) | models.Q(email_lookup=email_lookup))
@@ -252,12 +266,17 @@ class User(
                 email = self.username
             self.email = email
 
-    def save(self, *args, **kwargs):
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         self.set_required_attr_if_need()
+        if update_fields is None or 'phone' in update_fields:
+            self.phone = normalize_phone_number(self.phone)
         if self.username == "admin":
             self.role = "Admin"
             self.is_active = True
-        return super().save(*args, **kwargs)
+        return super().save(
+            force_insert=force_insert, force_update=force_update,
+            using=using, update_fields=update_fields,
+        )
 
     def is_member_of(self, user_group):
         if user_group in self.groups.all():

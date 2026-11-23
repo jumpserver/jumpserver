@@ -9,6 +9,7 @@ from rest_framework.fields import empty
 
 from common.db.fields import TreeChoices, JSONManyToManyField as ModelJSONManyToManyField
 from common.utils import decrypt_session_password, is_uuid
+from common.utils.phone import normalize_phone_number
 
 __all__ = [
     "ReadableHiddenField",
@@ -404,19 +405,15 @@ class PhoneField(serializers.CharField):
                 data = '+{}{}'.format(code, phone)
             else:
                 data = phone
-        if data:
-            try:
-                phone = phonenumbers.parse(data, 'CN')
-                data = '+{}{}'.format(phone.country_code, phone.national_number)
-            except phonenumbers.NumberParseException:
-                data = '+86{}'.format(data)
-
-        return super().to_internal_value(data)
+        return normalize_phone_number(super().to_internal_value(data))
 
     def to_representation(self, value):
         try:
             phone = phonenumbers.parse(value, 'CN')
-            value = {'code': '+%s' % phone.country_code, 'phone': str(phone.national_number)}
+            value = {
+                'code': '+%s' % phone.country_code,
+                'phone': phonenumbers.national_significant_number(phone),
+            }
         except phonenumbers.NumberParseException:
             value = {'code': '+86', 'phone': value}
         return value

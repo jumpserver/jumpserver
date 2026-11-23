@@ -16,6 +16,7 @@ from common.utils import get_ip_city, get_request_ip
 from common.utils import get_logger, get_object_or_none
 from common.utils import static_or_direct
 from common.utils.http import is_true
+from common.utils.phone import normalize_phone_number
 from users.models import User
 from .notifications import DifferentCityLoginMessage
 
@@ -101,7 +102,11 @@ def build_absolute_uri_for_oidc(request, path=None):
 def check_user_property_is_correct(username, **properties):
     user = get_object_or_none(User, username=username)
     for attr, value in properties.items():
-        if getattr(user, attr, None) != value:
+        stored_value = getattr(user, attr, None)
+        if attr == 'phone':
+            stored_value = normalize_phone_number(stored_value)
+            value = normalize_phone_number(value)
+        if stored_value != value:
             user = None
             break
     return user
