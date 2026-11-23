@@ -87,15 +87,22 @@ class UserPhoneTests(TestCase):
     @patch('users.signal_handlers.bind_user_to_org_role', return_value=[])
     def test_oauth2_creation_and_resync_keep_canonical_phone(self, bind_roles):
         backend = object.__new__(OAuth2Backend)
-        userinfo = {'login': 'oauth-phone', 'mobile': '13800138000'}
-        user, created = backend.get_or_create_user_from_userinfo(None, userinfo)
-        self.assertTrue(created)
-        self.assertEqual(user.phone, '+8613800138000')
-        user.refresh_from_db()
-        self.assertEqual(user.phone, '+8613800138000')
+        cases = (
+            ('13800138000', '13900139000'),
+            (13800138000, 13900139000),
+        )
+        for index, (phone, updated_phone) in enumerate(cases):
+            with self.subTest(phone=phone):
+                userinfo = {'login': f'oauth-phone-{index}', 'mobile': phone}
+                user, created = backend.get_or_create_user_from_userinfo(None, userinfo)
+                self.assertTrue(created)
+                self.assertEqual(user.phone, '+8613800138000')
+                user.refresh_from_db()
+                self.assertEqual(user.phone, '+8613800138000')
 
-        user, created = backend.get_or_create_user_from_userinfo(None, userinfo)
-        self.assertFalse(created)
-        self.assertEqual(user.phone, '+8613800138000')
-        user.refresh_from_db()
-        self.assertEqual(user.phone, '+8613800138000')
+                userinfo['mobile'] = updated_phone
+                user, created = backend.get_or_create_user_from_userinfo(None, userinfo)
+                self.assertFalse(created)
+                self.assertEqual(user.phone, '+8613900139000')
+                user.refresh_from_db()
+                self.assertEqual(user.phone, '+8613900139000')
