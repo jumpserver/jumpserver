@@ -12,12 +12,14 @@ from common.permissions import IsValidUser
 from authentication.permissions import IsValidUserOrConnectionToken
 from common.utils import get_object_or_none
 from orgs.utils import tmp_to_root_org
+from rbac.permissions import RBACPermission
 from users.notifications import (
     ResetPasswordMsg, ResetPasswordSuccessMsg, ResetSSHKeyMsg,
 )
 from .mixins import UserQuerysetMixin
 from .. import serializers
 from ..models import User
+from ..permissions import CanManageUser
 
 __all__ = [
     'UserResetPasswordApi', 'UserResetPKApi',
@@ -30,6 +32,7 @@ __all__ = [
 class UserResetPasswordApi(UserQuerysetMixin, generics.UpdateAPIView):
     queryset = User.objects.all()
     serializer_class = serializers.UserSerializer
+    permission_classes = [RBACPermission, CanManageUser]
 
     def perform_update(self, serializer):
         user = self.get_object()
@@ -38,6 +41,7 @@ class UserResetPasswordApi(UserQuerysetMixin, generics.UpdateAPIView):
 
 class UserResetPKApi(UserQuerysetMixin, generics.UpdateAPIView):
     serializer_class = serializers.UserSerializer
+    permission_classes = [RBACPermission, CanManageUser]
 
     def perform_update(self, serializer):
         user = self.get_object()

@@ -229,7 +229,7 @@ class UserSerializer(
                 + fields_write_only
                 + [
                     "email", "wechat", "phone", "mfa_level", "allowed_mfa_types",
-                    "source", *fields_xpack,
+                    "source", "is_superuser", *fields_xpack,
                     "created_by", "updated_by", "comment",  # 通用字段
                     "ukey_sn",  # UKey SN号
                 ]
@@ -239,7 +239,7 @@ class UserSerializer(
             "date_updated", "date_api_key_last_used",
         ]
         fields_bool = [
-            "is_superuser", "is_org_admin", "is_service_account",
+            "is_org_admin", "is_service_account",
             "is_valid", "is_expired", "is_active",  # 布尔字段
             "is_otp_secret_key_bound", "can_public_key_auth", "can_ukey_auth",
             "mfa_enabled", "need_update_password", "is_face_code_set",

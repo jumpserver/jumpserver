@@ -32,7 +32,7 @@ from users.utils import (
 )
 from .. import mixins, errors
 from ..const import RSA_PRIVATE_KEY, RSA_PUBLIC_KEY, USER_LOGIN_GUARD_VIEW_REDIRECT_FIELD
-from ..forms import get_user_login_form_cls
+from ..forms import get_user_login_form_cls, LoginConfirmReasonForm
 from ..utils import get_auth_methods
 
 __all__ = [
@@ -291,7 +291,7 @@ class UserLoginGuardView(mixins.AuthMixin, RedirectView):
             user = self.get_user_from_session()
             self.check_user_mfa_if_need(user)
             review_required = self.request.session.get('auth_confirm_required')
-            self.check_user_login_confirm_if_need(user)
+            self.check_user_login_confirm_if_need(user, create_ticket=False)
         except (errors.CredentialError, errors.SessionEmptyError) as e:
             return self.format_redirect_url(self.login_url)
         except errors.MFARequiredError:
@@ -341,21 +341,56 @@ class UserLoginGuardView(mixins.AuthMixin, RedirectView):
         return response
 
 
-class UserLoginWaitConfirmView(TemplateView):
+@method_decorator(never_cache, name='dispatch')
+@method_decorator(csrf_protect, name='dispatch')
+class UserLoginWaitConfirmView(mixins.AuthMixin, FormView):
     template_name = 'authentication/login_wait_confirm.html'
+    form_class = LoginConfirmReasonForm
+
+    def get_success_url(self):
+        query = self.request.GET.urlencode()
+        url = reverse('authentication:login-guard')
+        return '{}?{}'.format(url, query) if query else url
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            self.user = self.get_user_from_session()
+            self.check_user_mfa_if_need(self.user)
+            self.check_user_login_confirm_if_need(self.user, create_ticket=False)
+        except (errors.CredentialError, errors.SessionEmptyError):
+            return redirect('authentication:login')
+        except errors.MFARequiredError:
+            return redirect('authentication:login-mfa')
+        except errors.MFAUnsetError as exc:
+            return redirect(exc.url)
+        except errors.LoginConfirmBaseError:
+            return super().dispatch(request, *args, **kwargs)
+        return redirect(self.get_success_url())
+
+    def form_valid(self, form):
+        try:
+            self.check_user_login_confirm_if_need(self.user, reason=form.cleaned_data['reason'])
+        except errors.LoginConfirmBaseError:
+            pass
+        except WorkflowConfigurationError as exc:
+            logger.warning('Unable to start login approval for user %s: %s', self.user.pk, exc)
+            message = _('The login approval workflow is misconfigured. Unable to log in. Please contact your administrator.')
+            auth_logout(self.request)
+            self.send_auth_signal(success=False, username=self.user.username, reason=message)
+            return redirect(FlashMessageUtil.gen_message_url({
+                'title': _('Login confirm'), 'error': message,
+                'redirect_url': reverse('authentication:login') + '?admin=1',
+                'confirm_button': _('Login'), 'auto_redirect': False,
+            }))
+        return redirect(self.get_success_url())
 
     def get_context_data(self, **kwargs):
-        from tickets.models import Ticket
         from tickets.const import TICKET_DETAIL_URL
-        ticket_id = self.request.session.get("auth_ticket_id")
-        if not ticket_id:
-            ticket = None
-        else:
-            ticket = Ticket.all().filter(pk=ticket_id).first()
+        ticket = self.get_ticket()
         context = super().get_context_data(**kwargs)
         if ticket:
             timestamp_created = datetime.datetime.timestamp(ticket.date_created)
-            ticket_detail_url = TICKET_DETAIL_URL.format(id=ticket_id, type=ticket.type)
+            ticket_detail_url = TICKET_DETAIL_URL.format(id=ticket.id, type=ticket.type)
             assignees_display = ', '.join([str(assignee) for assignee in ticket.current_assignees])
             msg = format_html(
                 _("""Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>
@@ -364,11 +399,13 @@ class UserLoginWaitConfirmView(TemplateView):
         else:
             timestamp_created = 0
             ticket_detail_url = ''
-            msg = _("No ticket found")
+            msg = _('Login approval is required. You can provide a reason before submitting.')
         context.update({
+            "title": _('Login confirm'),
             "msg": msg,
             "timestamp": timestamp_created,
-            "ticket_detail_url": ticket_detail_url
+            "ticket_detail_url": ticket_detail_url,
+            "ticket": ticket,
         })
         return context
 

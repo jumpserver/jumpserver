@@ -3,6 +3,7 @@
 from captcha.fields import CaptchaField, CaptchaTextInput
 from django import forms
 from django.conf import settings
+from django.utils.text import normalize_newlines
 from django.utils.translation import gettext_lazy as _
 
 from common.utils import get_logger, decrypt_session_password
@@ -46,6 +47,19 @@ class UserLoginForm(forms.Form):
                 self.error_messages['inactive'],
                 code='inactive',
             )
+
+
+class LoginConfirmReasonField(forms.CharField):
+    def to_python(self, value):
+        # Browsers submit CRLF, but textarea length counts each newline once.
+        return normalize_newlines(super().to_python(value))
+
+
+class LoginConfirmReasonForm(forms.Form):
+    reason = LoginConfirmReasonField(
+        label=_('Application reason (optional)'), required=False, max_length=4096,
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'maxlength': 4096}),
+    )
 
 
 class UserCheckOtpCodeForm(forms.Form):

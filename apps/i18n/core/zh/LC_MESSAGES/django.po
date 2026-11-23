@@ -21192,3 +21192,16 @@ msgstr "清理工单附件"
 msgid ""
 "Delete expired ticket attachments every hour, regardless of ticket status."
 msgstr "每小时清理过期工单附件，与工单状态无关。"
+
+msgid "Application reason"
+msgstr "申请原因"
+
+msgid "Application reason (optional)"
+msgstr "申请原因（选填）"
+
+msgid "Submit for approval"
+msgstr "提交复核"
+
+msgid ""
+"Login approval is required. You can provide a reason before submitting."
+msgstr "本次登录需要复核，可填写申请原因后提交。"
