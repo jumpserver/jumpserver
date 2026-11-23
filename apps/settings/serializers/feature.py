@@ -358,6 +358,12 @@ class ChatAISettingSerializer(serializers.Serializer):
 class TicketSettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('Ticket')
 
+    TICKET_ATTACHMENT_RETENTION_DAYS = serializers.IntegerField(
+        min_value=1, max_value=3650, required=False, label=_('Attachment retention days'),
+        help_text=_('Days to retain attachments from ticket submission, regardless of ticket status. '
+                    'Changes apply to existing attachments; deleted files cannot be recovered.'),
+    )
+
     TICKETS_ENABLED = serializers.BooleanField(required=False, default=True, label=_("Ticket"))
     TICKETS_DIRECT_APPROVE = serializers.BooleanField(
         required=False, default=False, label=_("Approval without login"),
