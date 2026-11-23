@@ -26,7 +26,7 @@ from ..exceptions import UnableToDeleteAllUsers
 from ..filters import UserFilter
 from ..models import User
 from ..notifications import ResetMFAMsg
-from ..permissions import UserObjectPermission
+from ..permissions import CanManageUser, UserObjectPermission
 from ..serializers import (
     UserSerializer, MiniUserSerializer, InviteSerializer, UserRetrieveSerializer
 )
@@ -181,7 +181,7 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
     def perform_bulk_destroy(self, objects):
         for obj in objects:
             self.check_object_permissions(self.request, obj)
-            self.perform_destroy(obj)
+        super().perform_bulk_destroy(objects)
 
     @action(methods=['post'], detail=False)
     def invite(self, request):
@@ -245,6 +245,7 @@ class UserChangePasswordApi(UserQuerysetMixin, generics.UpdateAPIView):
     # the response before it reaches the model.
     chat_ai_safe_sensitive_actions = ('PUT', 'PATCH')
     serializer_class = serializers.ChangeUserPasswordSerializer
+    permission_classes = [RBACPermission, CanManageUser]
 
     def perform_update(self, serializer):
         user = self.get_object()
@@ -265,7 +266,9 @@ class UserUnblockPKApi(UserQuerysetMixin, generics.UpdateAPIView):
 class UserResetMFAApi(UserQuerysetMixin, generics.GenericAPIView):
     serializer_class = serializers.ResetOTPSerializer
     http_method_names = ['post', 'options']
-    permission_classes = [IsValidUser, RBACPermission, UserConfirmation.require(ConfirmType.MFA)]
+    permission_classes = [
+        IsValidUser, RBACPermission, UserConfirmation.require(ConfirmType.MFA), CanManageUser,
+    ]
     rbac_perms = {'POST': 'users.change_user'}
 
     @extend_schema(
@@ -300,9 +303,6 @@ class UserResetMFAApi(UserQuerysetMixin, generics.GenericAPIView):
         if user == request.user:
             msg = _("Could not reset self otp, use profile reset instead")
             return Response({"error": msg}, status=400)
-
-        if user.is_superuser and not request.user.is_superuser:
-            raise PermissionDenied()
 
         backends = user.active_mfa_backends_mapper
         for backend in backends.values():

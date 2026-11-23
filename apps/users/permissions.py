@@ -10,13 +10,18 @@ class IsAuthPasswdTimeValid(permissions.IsAuthenticated):
             and is_auth_password_time_valid(request.session)
 
 
-class UserObjectPermission(permissions.IsAuthenticated):
+class CanManageUser(permissions.IsAuthenticated):
 
     def has_object_permission(self, request, view, obj):
-        if view.action not in ['update', 'partial_update', 'destroy']:
-            return True
+        return request.user.is_superuser or not obj.is_superuser
 
-        if not request.user.is_superuser and obj.is_superuser:
-            return False
 
+class UserObjectPermission(CanManageUser):
+
+    def has_object_permission(self, request, view, obj):
+        if view.action in (
+            'update', 'partial_update', 'bulk_update', 'partial_bulk_update',
+            'destroy', 'bulk_destroy',
+        ):
+            return super().has_object_permission(request, view, obj)
         return True

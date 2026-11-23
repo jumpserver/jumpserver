@@ -186,6 +186,7 @@ only_system_permissions = (
     ('terminal', 'applethost', '*', '*'),
     ('terminal', 'appletpublication', '*', '*'),
     ('terminal', 'applethostdeployment', '*', '*'),
+    ('terminal', 'virtualapp', 'add,change,delete', 'virtualapp'),
     ('acls', 'loginacl', '*', '*'),
     ('acls', 'connectmethodacl', '*', '*')
 )
