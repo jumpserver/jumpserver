@@ -186,7 +186,7 @@ class RoleMixin:
     source: str
     _org_roles = None
     _system_roles = None
-    PERM_CACHE_KEY = "USER_PERMS_ROLES_{}_{}"
+    PERM_CACHE_KEY = "USER_PERMS_ROLES_V2_{}_{}"
     PERM_ORG_KEY = "USER_PERMS_ORG_{}"
     _is_superuser = None
     _update_superuser = False
