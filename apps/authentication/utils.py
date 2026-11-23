@@ -53,20 +53,23 @@ def check_different_city_login_if_need(user, request):
     if is_private:
         return
     usernames = [user.username, f"{user.name}({user.username})"]
-    login_logs = UserLoginLog.objects.filter(
-        username__in=usernames, status=True,
-    ).exclude(city__in=city_white)
-    last_login = login_logs.only('city').first()
+    last_login = UserLoginLog.objects.exclude(
+        city__in=city_white
+    ).filter(username__in=usernames, status=True).only('city').first()
     if last_login is None:
         return
 
     city = get_ip_city(ip)
     if city == last_login.city:
         return
-    if login_logs.filter(
+
+    last_cities = UserLoginLog.objects.filter(
         datetime__gte=timezone.now() - timedelta(days=7),
-        city=city,
-    ).exists():
+        username__in=usernames,
+        status=True
+    ).exclude(city__in=city_white).values_list('city', flat=True).distinct()
+
+    if city in last_cities:
         return
 
     DifferentCityLoginMessage(user, ip, city).publish_async()
