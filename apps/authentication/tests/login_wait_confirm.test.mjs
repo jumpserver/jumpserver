@@ -10,12 +10,12 @@ const script = template.match(/<script>([\s\S]*?)<\/script>/)[1]
 
 function page() {
   const handlers = new Map(), requests = [], elements = new Map(), timers = new Set()
-  let timerId = 0, reloads = 0
+  let timerId = 0, reloads = 0, ready
   function $(selector) {
     if (!elements.has(selector)) {
       const element = {
         visible: true, classes: new Set(), attributes: {},
-        ready() { return this },
+        ready(callback) { ready = callback; return this },
         on(event, target, callback) { handlers.set(target, callback); return this },
         show() { this.visible = true; return this },
         hide() { this.visible = false; return this },
@@ -40,8 +40,17 @@ function page() {
   context.interval = context.setInterval()
   context.checkInterval = context.setInterval()
   return { context, requests, $, window, initialLocation, timers,
-    click: selector => handlers.get(selector)(), reloads: () => reloads }
+    click: selector => handlers.get(selector)(), reloads: () => reloads, ready: () => ready() }
 }
+
+test('the reason form does not poll or register cancellation before submission', () => {
+  const p = page()
+  p.context.timestamp = '0'
+  p.ready()
+  assert.deepEqual(p.requests, [])
+  assert.equal(p.window.onbeforeunload, undefined)
+  assert.equal(p.window.onunload, undefined)
+})
 
 test('Return waits for cancellation and ignores late approval polls and repeated clicks', () => {
   const p = page()

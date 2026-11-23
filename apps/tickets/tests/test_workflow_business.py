@@ -260,7 +260,7 @@ class WorkflowBusinessTests(TestCase):
         from django.conf import settings
         from django.contrib.auth import SESSION_KEY
         from django.urls import reverse
-        from authentication.views.login import UserLoginGuardView
+        from authentication.views.login import UserLoginWaitConfirmView
 
         with tmp_to_root_org():
             # Represent an invalid login workflow published before resolver validation.
@@ -281,8 +281,10 @@ class WorkflowBusinessTests(TestCase):
                                 'auth_backend': settings.AUTH_BACKEND_MODEL, 'auth_confirm_required': '1',
                                 'auth_acl_id': str(acl.pk)})
                 session.save()
-                with patch.object(UserLoginGuardView, 'send_auth_signal') as signal:
-                    response = self.client.get(reverse('authentication:login-guard'))
+                self.assertRedirects(self.client.get(reverse('authentication:login-guard')),
+                                     reverse('authentication:login-wait-confirm'), fetch_redirect_response=False)
+                with patch.object(UserLoginWaitConfirmView, 'send_auth_signal') as signal:
+                    response = self.client.post(reverse('authentication:login-wait-confirm'), {'reason': ''})
                 self.assertEqual(response.status_code, 302)
                 self.assertTrue(response.url.startswith(reverse('common:flash-message') + '?code='))
                 self.assertFalse(signal.call_args.kwargs['success'])

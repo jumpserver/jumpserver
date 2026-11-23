@@ -48,6 +48,13 @@ class UserLoginForm(forms.Form):
             )
 
 
+class LoginConfirmReasonForm(forms.Form):
+    reason = forms.CharField(
+        label=_('Application reason (optional)'), required=False, max_length=4096,
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'maxlength': 4096}),
+    )
+
+
 class UserCheckOtpCodeForm(forms.Form):
     code = forms.CharField(label=_('MFA Code'), max_length=128, required=False)
     mfa_type = forms.CharField(label=_('MFA type'), max_length=128)

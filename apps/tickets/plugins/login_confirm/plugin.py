@@ -23,4 +23,5 @@ class Plugin(TicketPlugin):
             {'name': 'apply_login_ip', 'label': str(_('Login IP')), 'value': requested.get('ip', data.get('apply_login_ip'))},
             {'name': 'apply_login_city', 'label': str(_('Login city')), 'value': requested.get('city', data.get('apply_login_city'))},
             {'name': 'apply_login_datetime', 'label': str(_('Login Date')), 'value': requested.get('datetime', data.get('apply_login_datetime'))},
+            {'name': 'reason', 'label': str(_('Application reason')), 'value': ticket.comment or '-'},
         ]

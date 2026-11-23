@@ -108,7 +108,7 @@ class SSOViewSet(AuthMixin, JMSGenericViewSet):
             self._check_is_block(username, True)
             self._check_only_allow_exists_user_auth(username)
             self._check_login_acl(user, ip)
-            self.check_user_login_confirm_if_need(user)
+            self.check_user_login_confirm_if_need(user, create_ticket=False)
 
             self.request.session['auth_backend'] = settings.AUTH_BACKEND_SSO
             login(self.request, user, settings.AUTH_BACKEND_SSO)
@@ -116,7 +116,10 @@ class SSOViewSet(AuthMixin, JMSGenericViewSet):
 
             LoginIpBlockUtil(ip).clean_block_if_need()
             LoginBlockUtil(username, ip).clean_failed_count()
-        except (ACLError, LoginConfirmBaseError):  # 无需记录日志
+        except LoginConfirmBaseError:
+            self.mark_password_ok(user, auth_backend=settings.AUTH_BACKEND_SSO)
+            next_url = reverse('authentication:login-guard') + '?' + urlencode({NEXT_URL: next_url})
+        except ACLError:  # 无需记录日志
             pass
         except (AuthFailedError, SSOAuthKeyTTLError) as e:
             error_msg = e.msg

@@ -60,6 +60,25 @@
                 <div class="alert alert-success info-messages">
                     {{ msg }}
                 </div>
+                {% if not ticket %}
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="text-danger" role="alert">{{ form.non_field_errors }}</div>
+                    <div class="form-group{% if form.reason.errors %} has-error{% endif %}">
+                        <label for="{{ form.reason.id_for_label }}">{{ form.reason.label }}</label>
+                        {{ form.reason }}
+                        <div class="text-danger" role="alert">{{ form.reason.errors }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <button type="submit" class="btn btn-primary btn-block">{% trans 'Submit for approval' %}</button>
+                        </div>
+                        <div class="col-xs-6">
+                            <a class="btn btn-default btn-block" href="{% url 'authentication:logout' %}">{% trans 'Cancel' %}</a>
+                        </div>
+                    </div>
+                </form>
+                {% else %}
                 <div class="alert alert-danger error-messages" role="alert" style="display: none"></div>
                 <div class="progress progress-bar-default progress-striped active">
                     <div aria-valuemax="3600" aria-valuemin="0" aria-valuenow="43" role="progressbar"
@@ -83,6 +102,7 @@
                         </a>
                     </div>
                 </div>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -195,6 +215,7 @@
     }
 
     $(document).ready(function () {
+        if (!Number(timestamp)) return;
         interval = setInterval(handleProgressBar, 1000);
         checkInterval = setInterval(doRequestAuth, 5000);
         doRequestAuth();
