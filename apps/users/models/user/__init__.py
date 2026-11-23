@@ -15,6 +15,7 @@ from common.db import fields, models as jms_models
 from common.utils import (
     user_date_expired_default, get_logger, lazyproperty, text_hmac_sha256
 )
+from common.utils.phone import normalize_phone_number
 from labels.mixins import LabeledMixin
 from orgs.utils import current_org
 from ._auth import AuthMixin, MFAMixin
@@ -57,7 +58,7 @@ def _email_update_fields(fields):
 
 
 class UserQuerySet(models.QuerySet):
-    """Keep the email lookup in sync for writes that skip User.save()."""
+    """Normalize user writes and maintain the email lookup when bypassing User.save()."""
 
     def bulk_create(self, objs, batch_size=None, ignore_conflicts=False,
                     update_conflicts=False, update_fields=None, unique_fields=None):
@@ -71,6 +72,8 @@ class UserQuerySet(models.QuerySet):
         )
 
     def update(self, **kwargs):
+        if 'phone' in kwargs:
+            kwargs['phone'] = normalize_phone_number(kwargs['phone'])
         if 'email' in kwargs:
             kwargs['email_lookup'] = _email_lookup(kwargs['email'])
         elif 'email_lookup' in kwargs:
@@ -294,6 +297,8 @@ class User(
     def prepare_for_save(self, update_fields=None):
         if not self.name:
             self.name = self.username
+        if update_fields is None or 'phone' in update_fields:
+            self.phone = normalize_phone_number(self.phone)
         if update_fields is not None and 'email' not in update_fields:
             return
         if not self.email or "@" not in self.email:
