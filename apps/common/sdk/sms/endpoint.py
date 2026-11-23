@@ -7,6 +7,7 @@ from django.utils.translation import gettext_lazy as _
 
 from common.exceptions import JMSException
 from common.utils import get_logger
+from common.utils.phone import normalize_phone_number
 from .base import BaseSMSClient
 
 logger = get_logger(__name__)
@@ -36,7 +37,7 @@ class SMS:
 
     def send_sms(self, phone_numbers: list, sign_name: str, template_code: str, template_param: dict, **kwargs):
         return self.client.send_sms(
-            phone_numbers=phone_numbers,
+            phone_numbers=[normalize_phone_number(number) for number in phone_numbers],
             sign_name=sign_name,
             template_code=template_code,
             template_param=template_param,

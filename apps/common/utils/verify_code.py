@@ -8,6 +8,7 @@ from common.sdk.sms.endpoint import SMS
 from common.sdk.sms.exceptions import CodeError, CodeExpired, CodeSendTooFrequently
 from common.tasks import send_mail_async
 from common.utils import get_logger
+from common.utils.phone import normalize_phone_number
 from common.utils.random import random_string
 
 logger = get_logger(__file__)
@@ -31,6 +32,8 @@ class SendAndVerifyCodeUtil(object):
             self, target, code=None, key=None, backend='email',
             user_info=None, timeout=None, **kwargs
     ):
+        if backend == 'sms':
+            target = normalize_phone_number(target)
         self.code = code
         self.target = target
         self.user_info = user_info
