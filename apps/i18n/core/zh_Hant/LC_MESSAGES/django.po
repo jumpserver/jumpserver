@@ -15461,6 +15461,10 @@ msgstr "執行 uninstall_applet 時必須指定遠程應用"
 msgid "Built-in browser"
 msgstr "內置瀏覽器"
 
+#: terminal/const.py:92
+msgid "Database workbench"
+msgstr "資料庫工作檯"
+
 #: terminal/models/applet/applet.py:115
 #: terminal/models/virtualapp/virtualapp.py:80
 msgid "Missing name in manifest.yml"
