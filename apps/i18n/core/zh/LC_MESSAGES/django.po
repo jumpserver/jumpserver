@@ -15470,6 +15470,10 @@ msgstr "执行 uninstall_applet 时必须指定远程应用"
 msgid "Built-in browser"
 msgstr "内置浏览器"
 
+#: terminal/const.py:92
+msgid "Database workbench"
+msgstr "数据库工作台"
+
 #: terminal/models/applet/applet.py:115
 #: terminal/models/virtualapp/virtualapp.py:80
 msgid "Missing name in manifest.yml"
