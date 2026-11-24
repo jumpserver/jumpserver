@@ -70,6 +70,8 @@ class SessionConnectionRouteAuditTests(SimpleTestCase):
         self.assertNotIn('password', content)
 
     def test_legacy_and_invalid_reasons_keep_original_content(self):
+        with translation.override('en'):
+            expected = translation.gettext('Connect to asset %s success') % self.session.asset
         reasons = (
             None, '', 'old component reason', '{invalid json', 'null', '[]', '123',
             'true', '"direct"', '{"route": "unknown", "password": "SECRET"}',
@@ -78,7 +80,7 @@ class SessionConnectionRouteAuditTests(SimpleTestCase):
         )
         for reason in reasons:
             with self.subTest(reason=str(reason)[:80]):
-                self.assertEqual(self.render(reason), 'Connect to asset isolated-mongo success')
+                self.assertEqual(self.render(reason), expected)
 
     def test_gateway_names_remain_single_line_and_preserve_unicode(self):
         reason = json.dumps({

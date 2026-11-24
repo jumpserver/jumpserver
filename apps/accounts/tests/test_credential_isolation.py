@@ -1,19 +1,9 @@
-
 from accounts.api.account.credential import CredentialClientViewSet
-from accounts.clients.python.jms_pam.common.exception import JumpServerPAMSDKException
 from accounts.credential_client.manager import CredentialClientManager
 from accounts.models import CredentialClientStatus
 from accounts.tests.base import CredentialTestCase
 from rest_framework.exceptions import ValidationError
 from rest_framework.test import force_authenticate
-
-
-def http_error(code, status=403):
-    return JumpServerPAMSDKException(
-        code, 'request failed', status_code=status, detail='DO_NOT_LOG_SECRET',
-    )
-
-
 
 
 class ConfirmationIsolationTests(CredentialTestCase):
