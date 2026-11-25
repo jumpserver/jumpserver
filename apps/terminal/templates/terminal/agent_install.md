@@ -1,7 +1,9 @@
 # Connect JumpServer to your agent
 
-Use the exact MCP URL supplied in the user's message. This guide is public and
-contains no instance configuration, account information or credentials. Reading
+Use the exact MCP URL supplied in the user's message. To copy both the guide URL
+and the MCP URL, open **Personal Settings > Agent / MCP > Connection Guide** in
+JumpServer and select **Copy for agent**. This guide is public and contains
+no instance configuration, account information or credentials. Reading
 it does not authorize asset operations. Configure only the client the user is
 currently using, on the machine where that client runs. Preserve other clients
 and JumpServer system settings.
@@ -44,6 +46,26 @@ what is missing and stop. Do not switch to another client, invent commands or
 build a replacement OAuth client. MCP asset tools operate on remote assets;
 do not use them to fetch this guide or run local setup commands.
 
+## Check an HTTPS deployment
+
+From the machine running the agent, check OAuth discovery at the public
+JumpServer site served by docker-web. Replace `https://jumpserver.example:8443`
+with the site's external HTTPS address, including the port users connect to.
+
+```sh
+curl -q -sS -w '\nHTTP %{http_code}\n' 'https://jumpserver.example:8443/.well-known/oauth-authorization-server'
+```
+
+Expect HTTP `200` and a JSON document whose `issuer` is the public site origin.
+An initial unauthenticated request to the separate MCP URL normally returns
+`401`. If discovery returns `404`, ask the administrator to check that the
+deployed docker-web image includes the OAuth discovery route.
+
+If curl reports a certificate error, add `-k` (`--insecure`) to this
+unauthenticated check to skip certificate verification for that request only.
+Browser authorization and MCP requests require the client and browser to trust
+the certificate served for the public hostname.
+
 ## Verified client instructions
 
 Codex and DSH have been tested. Other clients use the common workflow above;
@@ -75,15 +97,14 @@ Follow only the instructions for the client currently being configured.
 
 1. Use the existing `dsh-plugin-jumpserver` installation in the active DSH
    profile. Keep its fixed JumpServer name and single-connection configuration.
-2. If missing, inspect `dsh plugin --help` and install the official plugin release
-   package from https://github.com/LeeEirc/dsh-plugin-jumpserver/releases using
-   the active profile's supported plugin command. Verify the package against its
-   release SHA256SUMS. The package must contain `lib/cli.js`; if a release with
-   this entry point is unavailable, stop and report that prerequisite.
+2. To install the plugin, download `dsh-plugin-jumpserver-<version>.tgz` and
+   `SHA256SUMS` from the same [official release](https://github.com/jumpserver/dsh-plugin-jumpserver/releases/latest).
+   Verify the package against `SHA256SUMS`. Select the verified package in DSH
+   plugin management, or use `dsh plugin --profile <profile> add <package-path>`
+   with the active profile and local package path. Reload that profile.
 3. Run `jumpserver-mcp setup --url` followed by the exact MCP URL as one quoted
    argument. If the binary is not on PATH, run `node` with the installed plugin's
-   `lib/cli.js` path and the same arguments. Do not use `npx` to fetch a similarly
-   named package: this plugin is distributed through GitHub Releases, not npm.
+   `lib/cli.js` path and the same arguments.
 4. The command uses the plugin's existing state at `$DSH_HOME/jumpserver.json`
    (otherwise `~/.dsh/jumpserver.json`). If the running plugin has a custom
    `statePath`, pass that same path using `--state-path`; do not create a second
