@@ -78,7 +78,7 @@ to this tab. The MCP page uses
 | `MCP_PUBLIC_URL` | The exact external HTTP or HTTPS MCP URL; Core is the sole configuration source. A nonempty value must have a path, with no credentials, trailing slash, query or fragment |
 | `MCP_DCR_ENABLED` | Defaults to `false`; allows controlled automatic client registration while MCP access is enabled. The preference can remain saved while MCP is disabled |
 | `MCP_DCR_REGISTRATIONS_PER_MINUTE` | Defaults to `30`; deployment-wide limit on anonymous registration attempts per fixed minute window, shared through Redis |
-| `SITE_URL` | The existing **Basic settings > Site URL**, set to the Core address reachable by client browsers. Its HTTP or HTTPS origin, including any port, is used for Agent OAuth and is sent to Koko as `MCP_AUTHORIZATION_SERVER`; a site path is not part of the origin |
+| `SITE_URL` | In **Basic settings > Site URL**, enter the public address users open in their browsers to reach JumpServer. Agent OAuth uses its scheme, hostname and port as the authorization server origin. |
 
 The DCR registration rate is configured through `MCP_DCR_REGISTRATIONS_PER_MINUTE`
 in `config.yml` or environment variables and takes effect after Core restarts.
@@ -114,8 +114,16 @@ their defaults and configuration keys. Accepted operations wait for execution
 slots, while query, cancellation and disconnect calls have reserved capacity.
 Agent OAuth metadata and Koko use the same Site URL origin; the internal
 component `CORE_HOST` and incoming Host header do not select that origin.
-TLS belongs to docker-web/Nginx; it may forward HTTP to Core and Koko. Clients
-must support the deployment's external protocol.
+
+Deploy a docker-web image that includes the OAuth discovery route
+at `/.well-known/oauth-authorization-server`. For a site served by docker-web
+at `https://jumpserver.example:8443`, use that address for `SITE_URL`. If the
+public MCP path is `/koko/mcp`, set `MCP_PUBLIC_URL` to
+`https://jumpserver.example:8443/koko/mcp`. Mount the hostname's full
+certificate chain and matching private key in docker-web at
+`/etc/nginx/cert/server.crt` and `/etc/nginx/cert/server.key` when using the
+default certificate filenames. For a private CA, configure trust on the client
+host and in the user's browser.
 
 MCP and file streaming use Koko's ordinary Web terminal `ClientIP()` policy,
 without a separate proxy setting. In production, docker-web sanitizes forwarding
@@ -127,7 +135,7 @@ execution requests for the shared connection policy and audit.
 
 Development clients may connect directly to Koko's HTTP port `5000`. Set
 `MCP_PUBLIC_URL` to the client-reachable Koko URL ending in `/koko/mcp`, and set
-Core's Site URL to its client-reachable login and authorization address.
+`SITE_URL` to the JumpServer login address reachable by the user's browser.
 No forwarding headers means the TCP peer IP is used. Keep direct access within
 trusted development networks: the shared policy also parses supplied forwarding
 headers. No proxy or development-mode switch is required.
@@ -141,10 +149,10 @@ rollout or a one-minute guarantee during outages.
 
 ## Client registration and authorization
 
-The public authorization-server metadata is at
-`/.well-known/oauth-authorization-server`. Proxies route it and the existing
-`/core/auth/oauth2-provider/` endpoints to Core. Koko's protected-resource metadata
-identifies the Core authorization server. Discovery responses are not cached.
+The `authorization_servers` field in the MCP resource metadata advertises the
+public site origin. Clients request `/.well-known/oauth-authorization-server`
+on that origin to discover the authorization and token endpoints. Discovery
+responses are not cached.
 
 Core advertises `registration_endpoint` only when MCP and DCR are enabled. Registration
 creates a public authorization-code client with no client secret and binds it to
