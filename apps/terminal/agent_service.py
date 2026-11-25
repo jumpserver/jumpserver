@@ -13,8 +13,6 @@ from types import SimpleNamespace
 from django.core import signing
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
-from django.db.models import CharField
-from django.db.models.functions import Cast
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
@@ -125,9 +123,11 @@ def check_agent_scope(user):
 
 
 def authorized_agent_org_ids(user):
-    return available_agent_organizations(user).annotate(
-        agent_org_id=Cast('id', CharField()),
-    ).values('agent_org_id')
+    # SQL UUID casts omit hyphens on MySQL; org_id stores the canonical form.
+    return [
+        str(org_id)
+        for org_id in available_agent_organizations(user).values_list('id', flat=True)
+    ]
 
 
 def token_authorization_binding(token, refresh=None):

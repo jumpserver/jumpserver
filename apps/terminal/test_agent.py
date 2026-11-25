@@ -880,6 +880,13 @@ class AgentBoundaryTests(TestCase):
             service.authority_exists(self.user.id, self.app.id, issued.id, refresh.token_family)
         )
 
+    def test_organization_scope_matches_stored_session_org_id(self):
+        self.assertTrue(
+            AgentSession.objects.filter(
+                pk=self.session.pk, org_id__in=service.authorized_agent_org_ids(self.user),
+            ).exists()
+        )
+
     def test_all_organizations_discovery_pagination_execution_and_membership_revocation(self):
         from accounts.models import Account
         from assets.models import Asset, Platform
