@@ -13,6 +13,15 @@ def agent_oauth_expiry():
     return timezone.now() + timedelta(days=7)
 
 
+def cascade_oauth_binding(collector, field, sub_objs, using):
+    # Delete bindings before their subject: nulling the FK violates the CHECK
+    # constraint on backends that cannot defer foreign key constraint checks.
+    collector.collect(
+        sub_objs, source=field.remote_field.model, source_attr=field.name,
+        nullable=False, fail_on_restricted=False,
+    )
+
+
 class AgentApplication(models.Model):
     application = models.OneToOneField(
         'oauth2_provider.Application', on_delete=models.CASCADE, related_name='agent_registration',
@@ -27,10 +36,10 @@ class AgentOAuthBinding(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     application = models.ForeignKey('oauth2_provider.Application', on_delete=models.CASCADE)
     grant = models.OneToOneField(
-        'oauth2_provider.Grant', null=True, on_delete=models.CASCADE,
+        'oauth2_provider.Grant', null=True, on_delete=cascade_oauth_binding,
     )
     access_token = models.OneToOneField(
-        'oauth2_provider.AccessToken', null=True, on_delete=models.CASCADE,
+        'oauth2_provider.AccessToken', null=True, on_delete=cascade_oauth_binding,
     )
     refresh_family = models.UUIDField(null=True, unique=True)
     expires_at = models.DateTimeField(default=agent_oauth_expiry, db_index=True)

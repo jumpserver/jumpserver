@@ -3,6 +3,7 @@ from datetime import timedelta
 from unittest.mock import ANY, patch
 
 from django.conf import settings
+from django.db import connection, transaction
 from django.test import SimpleTestCase, TestCase
 from django.urls import Resolver404, resolve
 from django.utils import timezone
@@ -110,6 +111,32 @@ class AgentOAuthBindingCleanupTests(TestCase):
         AgentApplication.objects.create(
             application=cls.application, resource='https://jumpserver.example/koko/mcp'
         )
+
+    def test_subject_deletion_preserves_binding_constraint(self):
+        expires = timezone.now() + timedelta(minutes=5)
+        subjects = {
+            'grant': get_grant_model().objects.create(
+                user=self.user, application=self.application, code=uuid.uuid4().hex,
+                expires=expires,
+            ),
+            'access_token': get_access_token_model().objects.create(
+                user=self.user, application=self.application, token=uuid.uuid4().hex,
+                expires=expires,
+            ),
+        }
+        family = AgentOAuthBinding.objects.create(
+            user=self.user, application=self.application, refresh_family=uuid.uuid4(),
+        )
+        for field, subject in subjects.items():
+            with self.subTest(subject=field), transaction.atomic():
+                binding = AgentOAuthBinding.objects.create(
+                    user=self.user, application=self.application, **{field: subject},
+                )
+                # Exercise the MySQL/MariaDB deletion path on every test backend.
+                with patch.object(connection.features, 'can_defer_constraint_checks', False):
+                    type(subject).objects.filter(pk=subject.pk).delete()
+                self.assertFalse(AgentOAuthBinding.objects.filter(pk=binding.pk).exists())
+        self.assertTrue(AgentOAuthBinding.objects.filter(pk=family.pk).exists())
 
     def access_binding(self, seconds, *, refresh=False, revoked=False):
         access = get_access_token_model().objects.create(
