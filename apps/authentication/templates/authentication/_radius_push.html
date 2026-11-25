@@ -10,7 +10,7 @@
      data-cancelled="{% trans 'Push request cancelled.' %}"
      data-rate-limited="{% trans 'Wait before sending another push notification.' %}"
      data-failed="{% trans 'Could not verify the push request. Try again.' %}">
-    <p id="radius-push-status" role="status" aria-live="polite"></p>
+    <output id="radius-push-status" class="block m-b-xs" aria-live="polite"></output>
     <button id="radius-push-send" type="button" class="btn btn-primary block full-width m-b">
         {% trans 'Send push' %}
     </button>

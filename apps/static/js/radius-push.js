@@ -105,7 +105,7 @@ $(function () {
         select.value = radiusType
         selectChange(radiusType, true)
         status.textContent = panel.dataset.pending
-        poll()
+        void poll()
     }
     render()
 })
