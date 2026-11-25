@@ -1,7 +1,7 @@
 # coding: utf-8
 #
 
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from rest_framework import serializers
 
 from common.serializers.fields import EncryptedField
@@ -22,5 +22,17 @@ class RadiusSettingSerializer(serializers.Serializer):
     OTP_IN_RADIUS = serializers.BooleanField(
         required=False, label=_('OTP in RADIUS'),
         help_text=_('* Using OTP in RADIUS means users can employ RADIUS as a method for MFA')
+    )
+    RADIUS_MFA_MODE = serializers.ChoiceField(
+        choices=(
+            ('code', pgettext_lazy('RADIUS MFA mode', 'Code')),
+            ('push', pgettext_lazy('RADIUS MFA mode', 'Push')),
+        ),
+        required=False,
+        label=_('Web login MFA mode'),
+        help_text=_('Use Push with a RADIUS server that waits for mobile approval.'),
+    )
+    RADIUS_PUSH_TIMEOUT = serializers.IntegerField(
+        required=False, min_value=5, max_value=120, label=_('Push timeout (seconds)'),
     )
     RADIUS_ORG_IDS = OrgListField()

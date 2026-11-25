@@ -31,8 +31,9 @@ from users.utils import (
     redirect_user_first_login_or_index
 )
 from .. import mixins, errors
-from ..const import RSA_PRIVATE_KEY, RSA_PUBLIC_KEY, USER_LOGIN_GUARD_VIEW_REDIRECT_FIELD
+from ..const import MFAType, RSA_PRIVATE_KEY, RSA_PUBLIC_KEY, USER_LOGIN_GUARD_VIEW_REDIRECT_FIELD
 from ..forms import get_user_login_form_cls, LoginConfirmReasonForm
+from ..mfa.radius import radius_push_enabled
 from ..utils import get_auth_methods
 
 __all__ = [
@@ -133,6 +134,7 @@ class UserLoginContextMixin:
             'current_lang': self.get_current_lang(),
             'forgot_password_url': self.get_forgot_password_url(),
             'extra_fields_count': self.get_extra_fields_count(context),
+            'radius_push_enabled': radius_push_enabled(),
             **self.get_user_mfa_context(self.request.user)
         })
         return context
@@ -216,6 +218,8 @@ class UserLoginView(mixins.AuthMixin, UserLoginContextMixin, FormView):
         # https://docs.djangoproject.com/en/3.1/topics/http/sessions/#setting-test-cookies
         self.request.session.delete_test_cookie()
 
+        if radius_push_enabled() and form.cleaned_data.get('mfa_type') == MFAType.Radius:
+            form.cleaned_data['code'] = ''
         try:
             self.check_user_auth(form.cleaned_data)
         except errors.AuthFailedError as e:

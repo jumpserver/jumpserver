@@ -13,7 +13,7 @@
             <p class="red-fonts">{{ form.code.errors.as_text }}</p>
         {% endif %}
         <div class="form-group">
-            {% include '_mfa_login_field.html' %}
+            {% include '_mfa_login_field.html' with radius_push_controls=True %}
         </div>
         <button id='submit_button' type="submit" class="btn btn-primary block full-width m-b">
             {% trans 'Next' %}
@@ -27,4 +27,7 @@
             margin-top: 15px;
         }
     </style>
+    {% if radius_push_enabled %}
+        <script src="{% static 'js/radius-push.js' %}" defer></script>
+    {% endif %}
 {% endblock %}
