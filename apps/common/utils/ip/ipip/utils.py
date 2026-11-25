@@ -29,5 +29,5 @@ def get_ip_city_by_ipip(ip):
     except ValueError:
         return None
     if not info:
-        raise None
+        return None
     return {'city': info.city_name, 'country': info.country_name}
