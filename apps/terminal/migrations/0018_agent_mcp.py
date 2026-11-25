@@ -120,8 +120,8 @@ class Migration(migrations.Migration):
                 ('expires_at', models.DateTimeField(db_index=True, default=terminal.models.agent.agent_oauth_expiry)),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
                 ('application', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.OAUTH2_PROVIDER_APPLICATION_MODEL)),
-                ('grant', models.OneToOneField(null=True, on_delete=django.db.models.deletion.CASCADE, to=getattr(settings, 'OAUTH2_PROVIDER_GRANT_MODEL', 'oauth2_provider.Grant'))),
-                ('access_token', models.OneToOneField(null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.OAUTH2_PROVIDER_ACCESS_TOKEN_MODEL)),
+                ('grant', models.OneToOneField(null=True, on_delete=terminal.models.agent.cascade_oauth_binding, to=getattr(settings, 'OAUTH2_PROVIDER_GRANT_MODEL', 'oauth2_provider.Grant'))),
+                ('access_token', models.OneToOneField(null=True, on_delete=terminal.models.agent.cascade_oauth_binding, to=settings.OAUTH2_PROVIDER_ACCESS_TOKEN_MODEL)),
             ],
             options={'constraints': [models.CheckConstraint(
                 condition=(
