@@ -51,7 +51,7 @@ class DirectoryTypes(BaseType):
                 'choices': ['ssh']
             },
             cls.WINDOWS_AD: {
-                'choices': ['rdp', 'ssh', 'vnc', 'winrm']
+                'choices': ['rdp', 'ssh', 'vnc', 'winrm', 'ldap']
             },
         }
 

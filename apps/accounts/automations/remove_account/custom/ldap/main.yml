@@ -1,0 +1,26 @@
+- hosts: custom
+  gather_facts: no
+  vars:
+    ansible_connection: local
+    ansible_python_interpreter: "{{ local_python_interpreter }}"
+    ansible_become: false
+
+  tasks:
+    - name: Remove AD account (ldap3)
+      ad_ldap_account:
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        login_user: "{{ jms_account.username }}"
+        login_password: "{{ jms_account.secret }}"
+        security: "{{ jms_asset.ldap_security | default('ldaps') }}"
+        allow_invalid_cert: "{{ jms_asset.ldap_allow_invalid_cert | default(False) }}"
+        # A gateway tunnel replaces the address; keep validating the asset's own.
+        tls_server_name: >-
+          {{ jms_asset.ldap_tls_server_name | default('', true)
+             or jms_asset.origin_address }}
+        ca_cert: "{{ jms_asset.ldap_ca_cert | default('') }}"
+        domain_name: "{{ jms_asset.spec_info.domain_name | default('') }}"
+        name: "{{ account.username }}"
+        state: absent
+        disable_only: "{{ params.disable_only | default(False) }}"
+        search_base: "{{ params.search_base | default('') }}"

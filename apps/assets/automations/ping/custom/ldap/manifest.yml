@@ -1,0 +1,21 @@
+id: ping_by_ldap
+name: "{{ 'Ping by ldap3' | trans }}"
+category:
+  - ds
+type:
+  - windows_ad
+method: ping
+protocol: ldap
+priority: 50
+
+i18n:
+  Ping by ldap3:
+    zh: '使用 LDAPS/StartTLS 协议测试域控可连接性'
+    ja: 'LDAPS/StartTLS プロトコルでドメイン コントローラーへの接続をテスト'
+    en: 'Test domain controller connectivity over LDAPS/StartTLS'
+    es: Comprobar la conectividad del controlador de dominio mediante LDAPS/StartTLS
+    ko: LDAPS/StartTLS 프로토콜로 도메인 컨트롤러 연결 테스트
+    pt-br: Testar a conectividade do controlador de domínio via LDAPS/StartTLS
+    ru: Проверить подключение к контроллеру домена через LDAPS/StartTLS
+    vi: Kiểm tra kết nối bộ điều khiển miền qua LDAPS/StartTLS
+    zh-hant: 使用 LDAPS/StartTLS 協定測試網域控制站可連線性

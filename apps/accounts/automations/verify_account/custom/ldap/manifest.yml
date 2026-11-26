@@ -1,0 +1,21 @@
+id: verify_account_by_ldap
+name: "{{ 'LDAP account verify' | trans }}"
+category:
+  - ds
+type:
+  - windows_ad
+method: verify_account
+protocol: ldap
+priority: 50
+
+i18n:
+  LDAP account verify:
+    zh: '使用 LDAPS/StartTLS 协议绑定验证 AD 域账号'
+    ja: 'LDAPS/StartTLS プロトコルのバインドで AD ドメインアカウントを検証'
+    en: 'Verify AD domain account with an LDAPS/StartTLS bind'
+    es: Verificar la cuenta de dominio AD con un enlace LDAPS/StartTLS
+    ko: LDAPS/StartTLS 바인드로 AD 도메인 계정 확인
+    pt-br: Verificar a conta de domínio AD com um bind LDAPS/StartTLS
+    ru: Проверить доменную учетную запись AD привязкой LDAPS/StartTLS
+    vi: Xác minh tài khoản miền AD bằng liên kết LDAPS/StartTLS
+    zh-hant: 使用 LDAPS/StartTLS 協定繫結驗證 AD 網域帳號

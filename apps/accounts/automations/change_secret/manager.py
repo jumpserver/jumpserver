@@ -31,21 +31,50 @@ class ChangeSecretManager(BaseChangeSecretPushManager):
         record = self.get_or_create_record(asset, account, h['name'])
         new_secret, private_key_path = self.handle_ssh_secret(account.secret_type, record.new_secret, path_dir)
         h = self.gen_inventory(h, account, new_secret, private_key_path, asset, path_dir)
+        error = self.get_old_secret_required_error(asset, h)
+        if error:
+            if not record.old_secret:
+                raise ValueError(error)
+            h['account']['old_secret'] = escape_jinja2_syntax(
+                record.old_secret
+            )
+        if (
+                self.get_change_secret_method_id(asset) == 'change_secret_by_ldap'
+                and self.is_retried_record(asset, account)
+        ):
+            # Only a retried record's secret may already have been applied by an
+            # earlier attempt; a new record's secret has never been sent to AD.
+            h['account']['change_started_at'] = int(record.date_created.timestamp())
+        return h, record
+
+    def is_retried_record(self, asset, account):
+        return f'{asset.id}-{account.id}' in self.record_map
+
+    @staticmethod
+    def get_change_secret_method_id(asset):
+        return getattr(asset.platform.automation, 'change_secret_method', None)
+
+    @staticmethod
+    def get_old_secret_required_error(asset, h):
         if (
                 asset.platform.type == 'oracle'
                 and h['jms_asset'].get(
                     'oracle_change_secret_with_old_password', False
                 )
         ):
-            if not record.old_secret:
-                raise ValueError(_(
-                    'The currently managed password is required when Oracle '
-                    'password changes use the REPLACE clause'
-                ))
-            h['account']['old_secret'] = escape_jinja2_syntax(
-                record.old_secret
+            return _(
+                'The currently managed password is required when Oracle '
+                'password changes use the REPLACE clause'
             )
-        return h, record
+        if (
+                ChangeSecretManager.get_change_secret_method_id(asset) == 'change_secret_by_ldap'
+                and (h.get('params') or {}).get('use_current_password')
+        ):
+            return _(
+                'The currently managed password is required when AD '
+                'passwords are changed with the current password'
+            )
+        return None
 
     def get_or_create_record(self, asset, account, name):
         asset_account_id = f'{asset.id}-{account.id}'
