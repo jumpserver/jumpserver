@@ -163,13 +163,17 @@ class TicketViewSet(ReportExportMixin, CommonApiMixin, viewsets.ModelViewSet):
             raise
 
     @action(detail=True, methods=['get'], url_path=r'attachments/(?P<attachment_id>[^/.]+)',
-            permission_classes=[RBACPermission], throttle_classes=[FileTransferThrottle])
+            permission_classes=[RBACPermission])
     def attachment(self, request, *args, **kwargs):
         from rest_framework.serializers import UUIDField
         from tickets.attachments import attachment_response
         ticket = self.get_object()
         file_id = UUIDField().run_validation(kwargs['attachment_id'])
         with tmp_to_org(ticket.org_id):
+            if ticket.applicant_id == request.user.pk or not ticket.has_current_assignee(request.user):
+                throttle = FileTransferThrottle()
+                if not throttle.allow_request(request, self):
+                    self.throttled(request, throttle.wait())
             record = get_object_or_404(ticket.attachments, pk=file_id, org_id=ticket.org_id)
         return attachment_response(record)
 
