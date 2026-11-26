@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import requests
 
-# 私有token页面上目前不允许创建，只能后台生成，见 https://docs.jumpserver.org/zh/master/dev/rest_api/
+# 私有token页面上目前不允许创建，只能后台生成，见 https://docs.fit2cloud.com/jumpserver/dev/rest_api/
 private_token = '10659d70a223235b8f76d45a3023eca1147488d7'
 
 
