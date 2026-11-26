@@ -151,6 +151,24 @@ class TicketAttachmentTests(TestCase):
         other_ticket, _ = self.created()
         self.assertEqual(self.download(other_ticket, record).status_code, 404)
 
+    def test_only_current_approver_can_download_with_exhausted_file_quota(self):
+        from common.drf.throttling import FileTransferThrottle
+
+        ticket, record = self.created()
+        ticket.cc_users.add(self.bob)
+        with patch.object(FileTransferThrottle, 'allow_request', return_value=False) as check_quota, \
+                patch.object(FileTransferThrottle, 'wait', return_value=60):
+            response = self.download(ticket, record, self.alice)
+            self.assertEqual(response.status_code, 200)
+            response.close()
+            check_quota.assert_not_called()
+            for user in (self.applicant, self.bob):
+                response = self.download(ticket, record, user)
+                self.assertEqual(response.status_code, 429)
+                self.assertEqual(response['Retry-After'], '60')
+            ticket.reject(self.alice)
+            self.assertEqual(self.download(ticket, record, self.alice).status_code, 429)
+
     def test_audit_access_is_scoped_to_the_audited_organization(self):
         ticket, record = self.created()
         role = Role.objects.create(name='Attachment auditor', scope='org')
