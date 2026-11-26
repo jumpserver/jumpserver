@@ -129,7 +129,7 @@ class Protocol(ChoicesMixin, models.TextChoices):
                     },
                     'success_prompt': {
                         'type': 'str',
-                        'default': 'success|成功|#|>|\$',
+                        'default': 'success|成功|#|>|\\$',
                         'label': _('Success prompt'),
                         'help_text': _('We will consider login success when we see this prompt')
                     }
