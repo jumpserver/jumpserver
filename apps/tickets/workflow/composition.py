@@ -4,9 +4,9 @@ from hashlib import sha256
 from django.db import transaction
 
 from orgs.utils import tmp_to_org
-from tickets.models import Workflow
+from tickets.models import Workflow, WorkflowVersion
 from .definition import validate_definition
-from .errors import WorkflowConfigurationError
+from .errors import WorkflowConfigurationError, WorkflowConflict
 from .publication import publish_workflow
 
 
@@ -49,7 +49,12 @@ def compose_workflows(workflows, org_id, ticket_type, *, acl_reviewers=None):
     if len(workflows) == 1:
         workflow, reviewers = entries[0]
         return workflow, {key: reviewers for key in workflow.active_version.acl_reviewer_keys}
-    versions = [workflow.active_version for workflow in workflows]
+    # The source links are stored in JSON. Serialize their creation with workflow deletion.
+    version_ids = [workflow.active_version_id for workflow in workflows]
+    locked = WorkflowVersion.objects.select_for_update().order_by('pk').in_bulk(version_ids)
+    if any(pk not in locked for pk in version_ids):
+        raise WorkflowConflict()
+    versions = [locked[pk] for pk in version_ids]
     definition = chain_definitions(version.as_definition() for version in versions)
     bindings = {
         f'p{index}_{offset}': reviewers
