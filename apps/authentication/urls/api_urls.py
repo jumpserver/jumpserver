@@ -28,6 +28,7 @@ router.register('access-tokens', api.AccessTokenViewSet, 'access-token')
 router.register('user-agent-clients', api.UserAgentClientViewSet, 'user-agent-client')
 
 urlpatterns = [
+    path('security-overview/', api.SecurityOverviewApi.as_view(), name='security-overview'),
     path('web-session/status/', WebSessionStatusView.as_view(), name='web-session-status'),
     path('session-lock/lock/', WebSessionLockView.as_view(), name='web-session-lock'),
     path('session-lock/unlock/', WebSessionUnlockView.as_view(), name='web-session-unlock'),
