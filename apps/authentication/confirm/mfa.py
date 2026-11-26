@@ -12,7 +12,9 @@ class ConfirmMFA(BaseConfirm):
     display_name = ConfirmType.MFA.name
 
     def check(self):
-        return self.user.active_mfa_backends and self.user.mfa_enabled
+        return self.user.mfa_enabled and any(
+            not backend.web_login_only for backend in self.user.active_mfa_backends
+        )
 
     @property
     def content(self):
@@ -22,13 +24,13 @@ class ConfirmMFA(BaseConfirm):
             'disabled': not bool(backend.is_active()),
             'display_name': backend.display_name,
             'placeholder': backend.placeholder,
-        } for backend in backends]
+        } for backend in backends if not backend.web_login_only]
 
     def authenticate(self, secret_key, mfa_type):
         if not mfa_type:
             raise ValidationError({'mfa_type': _("This field is required for MFA confirmation.")})
         mfa_backend = self.user.get_active_mfa_backend_by_type(mfa_type)
-        if mfa_backend is None:
+        if mfa_backend is None or mfa_backend.web_login_only:
             raise ValidationError({'mfa_type': _('This verification method is not available.')})
         if mfa_backend.has_code and not secret_key:
             raise ValidationError({'secret_key': _("This field is required for code-based MFA confirmation.")})

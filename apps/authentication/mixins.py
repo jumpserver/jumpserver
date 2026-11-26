@@ -335,9 +335,15 @@ class MFAMixin:
         }
         return FlashMessageUtil.gen_message_url(message_data)
 
-    def _check_if_no_active_mfa(self, user):
-        active_mfa_mapper = user.active_mfa_backends_mapper
-        if not active_mfa_mapper:
+    @staticmethod
+    def _active_mfa_names(user, include_web_login_only):
+        return tuple(
+            name for name, backend in user.active_mfa_backends_mapper.items()
+            if include_web_login_only or not backend.web_login_only
+        )
+
+    def _check_if_no_active_mfa(self, user, *, include_web_login_only=True):
+        if not self._active_mfa_names(user, include_web_login_only):
             raise errors.MFAUnsetError(self._get_mfa_bind_url(user), user, self.request)
 
     def _check_login_page_mfa_if_need(self, user):
@@ -355,7 +361,7 @@ class MFAMixin:
             return
         self._do_check_user_mfa(code, mfa_type, user=user)
 
-    def check_user_mfa_if_need(self, user):
+    def check_user_mfa_if_need(self, user, *, include_web_login_only=True):
         # 扫码登录的认证方式会执行该函数检查 mfa，跳转登录认证方式则通过ThirdPartyLoginMiddleware中间件检验 mfa
         if not settings.SECURITY_MFA_AUTH_ENABLED_FOR_THIRD_PARTY and \
                 self.request.session.get('auth_backend') in AUTHENTICATION_BACKENDS_THIRD_PARTY:
@@ -366,8 +372,8 @@ class MFAMixin:
         if not user.mfa_enabled:
             return
 
-        active_mfa_names = user.active_mfa_backends_mapper.keys()
-        raise errors.MFARequiredError(mfa_types=tuple(active_mfa_names))
+        active_mfa_names = self._active_mfa_names(user, include_web_login_only)
+        raise errors.MFARequiredError(mfa_types=active_mfa_names)
 
     def mark_mfa_ok(self, mfa_type, user):
         self.request.session['auth_mfa'] = 1

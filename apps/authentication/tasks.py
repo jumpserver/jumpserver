@@ -24,6 +24,12 @@ from users.models import User
 logger = logging.getLogger(__name__)
 
 
+@shared_task(ignore_result=True, time_limit=130)
+def authenticate_radius_push(key, attempt_id):
+    from authentication.services.radius_push import RadiusPushAttempt
+    RadiusPushAttempt(key).run(attempt_id)
+
+
 def _recent(value, start):
     return value if value and value >= start else None
 

@@ -19165,3 +19165,48 @@ msgstr "Нет обращений более трёх месяцев"
 #: assets/api/asset/asset.py
 msgid "No valid permission"
 msgstr "Нет действующих разрешений"
+
+msgid "RADIUS Push"
+msgstr "RADIUS Push"
+
+msgid "For web login, also allow RADIUS Push in the system MFA policy."
+msgstr "Для веб-входа также разрешите RADIUS Push в системной политике MFA."
+
+msgid "Push trigger"
+msgstr "Значение для отправки push"
+
+msgid "The value your RADIUS provider expects to trigger a push. Leave blank for an empty password."
+msgstr "Значение, которое RADIUS-сервер ожидает для отправки push. Оставьте поле пустым для пустого пароля."
+
+msgid "The RADIUS push trigger must be at most 128 bytes."
+msgstr "Значение для отправки RADIUS Push должно занимать не более 128 байт."
+
+msgid "Push timeout (seconds)"
+msgstr "Время ожидания push (секунды)"
+
+msgid "Send push"
+msgstr "Отправить push"
+
+msgid "Approve the sign-in request in your app."
+msgstr "Подтвердите вход в приложении."
+
+msgid "The RADIUS server rejected the request."
+msgstr "RADIUS-сервер отклонил запрос."
+
+msgid "The push request timed out. Try again."
+msgstr "Время ожидания подтверждения истекло. Попробуйте ещё раз."
+
+msgid "Push request cancelled."
+msgstr "Запрос подтверждения отменён."
+
+msgid "Wait before sending another push notification."
+msgstr "Подождите немного перед повторной отправкой push."
+
+msgid "Could not verify the push request. Try again."
+msgstr "Не удалось проверить подтверждение push. Попробуйте ещё раз."
+
+msgid "Use Send push to verify your sign-in."
+msgstr "Нажмите «Отправить push», чтобы подтвердить вход."
+
+msgid "Continue to send a push notification."
+msgstr "Продолжите вход, чтобы отправить push."

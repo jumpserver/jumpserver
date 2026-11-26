@@ -4,6 +4,8 @@ import traceback
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from pyrad.client import Timeout
+from pyrad.packet import AccessAccept, AccessReject
 from radiusauth.backends import RADIUSBackend, RADIUSRealmBackend
 
 from authentication.backends.base import JMSBaseAuthBackend
@@ -53,6 +55,21 @@ class RadiusBaseBackend(CreateUserMixin, JMSBaseAuthBackend):
 class RadiusBackend(RadiusBaseBackend, RADIUSBackend):
     def authenticate(self, request, username='', password=''):
         return super().authenticate(request, username=username, password=password)
+
+    def authenticate_push(self, username, trigger, timeout):
+        client = self._get_client(self._get_server_from_settings())
+        client.retries = 1
+        client.timeout = timeout
+        # A NUL yields one protected PAP block for an empty password.
+        password = trigger or '\0'
+        packet = self._get_auth_packet(username, password, client)
+        packet['User-Name'] = username
+        packet['User-Password'] = packet.PwCrypt(password)
+        try:
+            reply = client.SendPacket(packet)
+        except Timeout:
+            return 'timed_out'
+        return {AccessAccept: 'approved', AccessReject: 'rejected'}.get(reply.code, 'failed')
 
 
 class RadiusRealmBackend(RadiusBaseBackend, RADIUSRealmBackend):

@@ -17,6 +17,7 @@ urlpatterns = [
     # login
     path('login/', non_atomic_requests(views.UserLoginView.as_view()), name='login'),
     path('login/mfa/', views.UserLoginMFAView.as_view(), name='login-mfa'),
+    path('login/mfa/radius-push/', views.UserLoginRadiusPushView.as_view(), name='login-radius-push'),
     path('login/wait-confirm/', views.UserLoginWaitConfirmView.as_view(), name='login-wait-confirm'),
     path('login/mfa/face/capture/', views.UserLoginMFAFaceView.as_view(), name='login-face-capture'),
     path('login/guard/', views.UserLoginGuardView.as_view(), name='login-guard'),

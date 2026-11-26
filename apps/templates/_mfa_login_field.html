@@ -19,7 +19,13 @@
             {% if backend.challenge_required %}challenge-required{% endif %}"
          style="display: none"
     >
-        {% if backend.name == 'otp' and not backend.is_active %}
+        {% if backend.name == 'radius_push' %}
+        {% if radius_push_controls %}
+            {% include 'authentication/_radius_push.html' %}
+        {% else %}
+            <small class="text-muted">{% trans 'Continue to send a push notification.' %}</small>
+        {% endif %}
+        {% elif backend.name == 'otp' and not backend.is_active %}
         <small class="text-muted">{% trans 'Enable OTP' %}</small>
         {% elif backend.has_code %}
         <input type="text" class="form-control input-style"
