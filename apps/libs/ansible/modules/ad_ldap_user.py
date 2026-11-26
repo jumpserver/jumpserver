@@ -210,7 +210,7 @@ def change_password(module, client):
             search_base=params['search_base'],
         )
         if module.check_mode:
-            return user_dn, False
+            return user_dn, False, None
 
         try:
             client.set_password(
@@ -223,11 +223,17 @@ def change_password(module, client):
                 params['change_started_at'],
             ):
                 raise
+        unlock_error = None
         if params['unlock'] and params['mode'] == 'reset':
-            client.unlock(conn, user_dn)
+            # The password is already changed here. A failed unlock must not
+            # report "nothing changed", or the old secret would stay managed.
+            try:
+                client.unlock(conn, user_dn)
+            except ADLdapError as error:
+                unlock_error = error
     finally:
         client.unbind(conn)
-    return user_dn, True
+    return user_dn, True, unlock_error
 
 
 def main():
@@ -246,12 +252,20 @@ def main():
     }
     try:
         client = ADLdapClient.from_params(params)
-        user_dn, changed = change_password(module, client)
+        user_dn, changed, unlock_error = change_password(module, client)
     except ADLdapError as error:
         result.update(reason_code=error.reason_code, msg=str(error))
         module.fail_json(**result)
 
     result.update(user_dn=user_dn, changed=changed, change_succeeded=changed)
+    if unlock_error is not None:
+        # Keep the change so the manager stores the new secret, and report the
+        # unlock failure through the unverified status.
+        result.update(
+            auth_status='unknown', reason_code='UNLOCK_FAILED', sync_candidate=True,
+            msg='Password changed, but unlocking the account failed: %s' % unlock_error,
+        )
+        module.exit_json(**result)
     if module.check_mode or not params['verify']:
         module.exit_json(**result)
 

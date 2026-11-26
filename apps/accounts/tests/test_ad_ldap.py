@@ -1,4 +1,6 @@
 import ssl
+from collections import defaultdict
+from contextlib import ExitStack, nullcontext
 from types import SimpleNamespace
 from unittest import mock
 
@@ -12,6 +14,9 @@ from ldap3.core.results import (
 )
 
 from accounts.automations.change_secret.manager import ChangeSecretManager
+from accounts.const import ChangeSecretRecordStatusChoice
+from accounts.models import Account
+from assets.models import Asset
 from assets.const import Protocol
 from assets.const.ds import DirectoryTypes
 from libs.ansible.modules import ad_ldap_user
@@ -94,10 +99,11 @@ class ADLdapHelperTests(SimpleTestCase):
 
 
 class FakeConnection:
-    def __init__(self, response=None, result=None, modify_results=None):
+    def __init__(self, response=None, result=None, modify_results=None, unlock_result=None):
         self.response = response or []
         self.result = result or {'result': RESULT_SUCCESS}
         self.modify_results = list(modify_results or [])
+        self.unlock_result = unlock_result
         self.modify_calls = []
         self.unlocked = []
         self.extend = SimpleNamespace(microsoft=SimpleNamespace(
@@ -116,7 +122,11 @@ class FakeConnection:
 
     def unlock_account(self, user_dn):
         self.unlocked.append(user_dn)
-        return True
+        if self.unlock_result is None:
+            return True
+        # Like ldap3: the operation result is returned when the modify fails.
+        self.result = self.unlock_result
+        return self.unlock_result
 
 
 class ADLdapClientTests(SimpleTestCase):
@@ -201,11 +211,93 @@ class ADLdapUserModuleTests(SimpleTestCase):
     def test_reset_changes_password_and_unlocks(self):
         conn = FakeConnection(response=[{'type': 'searchResEntry', 'dn': 'CN=Alice'}])
         client = self.make_client(conn)
-        dn, changed = ad_ldap_user.change_password(self.make_module(unlock=True), client)
-        self.assertEqual((dn, changed), ('CN=Alice', True))
+        dn, changed, unlock_error = ad_ldap_user.change_password(self.make_module(unlock=True), client)
+        self.assertEqual((dn, changed, unlock_error), ('CN=Alice', True, None))
         self.assertEqual(conn.modify_calls[0][:3], ('CN=Alice', 'New-Secret-1', None))
         self.assertEqual(conn.unlocked, ['CN=Alice'])
         client.unbind.assert_called_once_with(conn)
+
+    UNLOCK_DENIED = {'result': RESULT_INSUFFICIENT_ACCESS_RIGHTS, 'description': 'insufficientAccessRights',
+                     'message': '00000005: SecErr: DSID-031A11CF, problem 4003 (INSUFF_ACCESS_RIGHTS)'}
+
+    def run_main(self, client, **params):
+        """Run the module's main() and return ('exit' or 'fail', result)."""
+        class Finished(Exception):
+            pass
+
+        def finish(kind):
+            def call(**result):
+                raise Finished(kind, result)
+            return call
+
+        module = self.make_module(verify=True, **params)
+        module.exit_json, module.fail_json = finish('exit'), finish('fail')
+        with mock.patch.object(ad_ldap_user, 'AnsibleModule', return_value=module), \
+                mock.patch.object(ad_ldap.ADLdapClient, 'from_params', return_value=client):
+            with self.assertRaises(Finished) as ctx:
+                ad_ldap_user.main()
+        return ctx.exception.args
+
+    def test_unlock_failure_keeps_the_password_change(self):
+        # The service account may reset the password but not write lockoutTime.
+        conn = FakeConnection(response=[{'type': 'searchResEntry', 'dn': 'CN=Alice'}],
+                              unlock_result=self.UNLOCK_DENIED)
+        client = self.make_client(conn)
+        dn, changed, unlock_error = ad_ldap_user.change_password(self.make_module(unlock=True), client)
+        self.assertEqual((dn, changed), ('CN=Alice', True))
+        self.assertEqual(unlock_error.reason_code, 'UNLOCK_FAILED')
+        self.assertEqual(conn.modify_calls[0][:2], ('CN=Alice', 'New-Secret-1'))
+        client.unbind.assert_called_once_with(conn)
+
+        kind, result = self.run_main(self.make_client(FakeConnection(
+            response=[{'type': 'searchResEntry', 'dn': 'CN=Alice'}], unlock_result=self.UNLOCK_DENIED,
+        )), unlock=True)
+        self.assertEqual(kind, 'exit')
+        self.assertTrue(result['changed'])
+        self.assertTrue(result['change_succeeded'])
+        self.assertTrue(result['sync_candidate'])
+        self.assertEqual((result['auth_status'], result['reason_code']), ('unknown', 'UNLOCK_FAILED'))
+        self.assertIn('insufficientAccessRights', result['msg'])
+
+    def test_failed_password_change_still_reports_no_change(self):
+        denied = {'result': RESULT_INSUFFICIENT_ACCESS_RIGHTS, 'message': '00000005: SecErr'}
+        kind, result = self.run_main(self.make_client(self.rejected_conn(denied)), unlock=True)
+        self.assertEqual(kind, 'fail')
+        self.assertFalse(result['changed'])
+        self.assertFalse(result['change_succeeded'])
+        self.assertNotIn('sync_candidate', result)
+
+    def test_manager_stores_new_secret_when_only_unlock_failed(self):
+        _, module_result = self.run_main(self.make_client(FakeConnection(
+            response=[{'type': 'searchResEntry', 'dn': 'CN=Alice'}], unlock_result=self.UNLOCK_DENIED,
+        )), unlock=True)
+
+        account = Account(name='alice', username='alice', asset=Asset(name='dc01'))
+        account.secret = 'Old-Secret'
+        account.save = mock.Mock()
+        record = SimpleNamespace(account=account, asset=account.asset, new_secret='New-Secret-1',
+                                 id='record-id', status='pending', error='')
+        manager = object.__new__(ChangeSecretManager)
+        manager.execution = SimpleNamespace(snapshot={})
+        manager.name_record_mapper = {'host': record}
+        manager.summary = defaultdict(int)
+        manager.result = defaultdict(list)
+        manager.save_record = mock.Mock()
+        manager.clear_account_queue_status = mock.Mock()
+        manager.print_final_host_result = mock.Mock()
+        base = 'accounts.automations.base.manager.'
+        with ExitStack() as stack:
+            stack.enter_context(mock.patch(base + 'safe_atomic_db_connection', return_value=nullcontext()))
+            stack.enter_context(mock.patch(base + 'transaction.atomic', return_value=nullcontext()))
+            stack.enter_context(mock.patch('assets.automations.base.manager.BasePlaybookManager.on_host_success'))
+            # The shape the runner callback passes: the host's ok tasks.
+            manager.on_host_success('host', {'Change AD password (ldap3)': {'res': module_result}})
+
+        self.assertEqual(account.secret, 'New-Secret-1')
+        self.assertIn('secret', account.save.call_args.kwargs['update_fields'])
+        self.assertEqual(record.status, ChangeSecretRecordStatusChoice.unverified.value)
+        self.assertIn('UNLOCK_FAILED', str(record.error))
+        self.assertEqual(manager.summary['unverified_accounts'], 1)
 
     def test_change_mode_requires_and_sends_old_password(self):
         conn = FakeConnection(response=[{'type': 'searchResEntry', 'dn': 'CN=Alice'}])
@@ -224,9 +316,9 @@ class ADLdapUserModuleTests(SimpleTestCase):
     def test_retry_is_accepted_only_when_new_password_works(self):
         rejected = {'result': 19, 'message': '0000052D: Constraint violation'}
         client = self.make_client(self.rejected_conn(rejected))
-        _, changed = ad_ldap_user.change_password(
+        changed = ad_ldap_user.change_password(
             self.make_module(enforce_password_history=True), client
-        )
+        )[1]
         self.assertTrue(changed)
         client.check_password.assert_called_once_with('CN=Alice', 'New-Secret-1')
 
