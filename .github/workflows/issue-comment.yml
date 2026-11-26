@@ -31,6 +31,8 @@ jobs:
       contents: read
       # gh issue edit swaps the two triage labels.
       issues: write
+      # Members also comment on pull requests, and labelling one needs this scope.
+      pull-requests: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
