@@ -2,7 +2,6 @@
 #
 from django.utils.translation import gettext
 from django.db import transaction
-from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
 from rest_framework import viewsets
@@ -128,17 +127,7 @@ class TicketViewSet(ReportExportMixin, CommonApiMixin, viewsets.ModelViewSet):
 
     def get_queryset(self):
         can_audit = self.action in ('retrieve', 'attachment') and self.request.user.has_perm('audits.view_ticketaudit')
-        audit_org_id = None if current_org.is_root() else str(current_org.id)
-        with tmp_to_root_org():
-            queryset = self.model.get_user_related_tickets(self.request.user)
-            if can_audit:
-                if audit_org_id is None:
-                    return self.model.objects.all()
-                # Auditing one organization must not hide the user's own tickets elsewhere.
-                return self.model.objects.filter(
-                    Q(org_id=audit_org_id) | Q(pk__in=queryset.values('pk')),
-                )
-        return queryset
+        return self.model.get_viewable_tickets(self.request.user, can_audit)
 
     def perform_create(self, serializer):
         from tickets.attachments import save_attachment

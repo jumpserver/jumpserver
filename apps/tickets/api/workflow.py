@@ -1,11 +1,14 @@
-from django.utils.translation import gettext
+from django.db import transaction
 from django.db.models import Q
-from rest_framework import mixins, status, viewsets
+from django.db.models.deletion import ProtectedError
+from django.utils.translation import gettext
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError, PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from common.exceptions import ReferencedByOthers
 from orgs.models import Organization
 from orgs.utils import current_org, tmp_to_root_org
 from rbac.permissions import RBACPermission
@@ -18,12 +21,13 @@ from tickets.serializers.workflow import (
 from tickets.workflow.approvers import available_users, excluded_approver_ids
 from tickets.workflow.engine import WorkflowEngine
 from tickets.workflow.publication import publish_workflow
+from tickets.workflow.references import combined_workflow_ids, visible_workflow_references
 from tickets.plugins import get_ticket_plugin
 
 __all__ = ['WorkflowViewSet', 'WorkflowInstanceViewSet', 'ApprovalTaskViewSet']
 
 
-class WorkflowViewSet(mixins.CreateModelMixin, mixins.UpdateModelMixin, viewsets.ReadOnlyModelViewSet):
+class WorkflowViewSet(viewsets.ModelViewSet):
     page_default_limit = 50
     page_max_limit = 200
     serializer_class = WorkflowSerializer
@@ -31,14 +35,46 @@ class WorkflowViewSet(mixins.CreateModelMixin, mixins.UpdateModelMixin, viewsets
     perm_model = Workflow
     filterset_fields = ['type', 'enabled']
     search_fields = ['name']
-    rbac_perms = {'publish': 'tickets.change_workflow', 'versions': 'tickets.view_workflow'}
+    rbac_perms = {'publish': 'tickets.change_workflow', 'versions': 'tickets.view_workflow',
+                  'references': 'tickets.view_workflow'}
 
     def get_queryset(self):
         # The root organization may manage global and organization definitions.
         queryset = Workflow.objects.all()
-        if not current_org.is_root() and self.action in ('list', 'retrieve', 'versions', 'update', 'partial_update'):
+        if self.action == 'destroy':
+            return queryset.filter(is_system=False).select_for_update()
+        if not current_org.is_root() and self.action in ('list', 'retrieve', 'versions', 'references', 'update', 'partial_update'):
             queryset = Workflow.get_org_related_flows(current_org.id)
         return queryset.select_related('active_version').filter(is_system=False)
+
+    @transaction.atomic
+    def destroy(self, request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)
+
+    def perform_destroy(self, workflow):
+        versions = workflow.versions.select_for_update().order_by('pk')
+        version_ids = {str(pk) for pk in versions.values_list('pk', flat=True)}
+        if combined_workflow_ids(workflow, version_ids):
+            raise ReferencedByOthers(gettext('Approval history uses this workflow. Disable it to stop new requests.'))
+        if workflow.active_version_id:
+            workflow.active_version = None
+            workflow.save(update_fields=['active_version'])
+        try:
+            workflow.delete()
+        except ProtectedError as exc:
+            references = sorted({str(obj._meta.verbose_name) for obj in exc.protected_objects})
+            raise ReferencedByOthers(gettext(
+                'This workflow is in use ({references}). Review the linked records.'
+            ).format(references=', '.join(references))) from exc
+
+    @action(detail=True, methods=['get'])
+    def references(self, request, **kwargs):
+        rows = visible_workflow_references(self.get_object(), request.user)
+        page = self.paginate_queryset(rows)
+        for row in page:
+            org = Organization.get_instance(row['record_org'])
+            row['org_name'] = str(org.name) if org else row['record_org']
+        return self.get_paginated_response(page)
 
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated], url_path='options')
     def options_list(self, request, **kwargs):

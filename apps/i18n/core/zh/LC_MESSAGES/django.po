@@ -17517,6 +17517,13 @@ msgstr "审批流程"
 msgid "Workflow version"
 msgstr "流程版本"
 
+msgid "Approval history uses this workflow. Disable it to stop new requests."
+msgstr "审批历史正在使用此流程。如需停止新申请，可停用此流程。"
+
+#, python-brace-format
+msgid "This workflow is in use ({references}). Review the linked records."
+msgstr "此流程已被引用（{references}）。请查看关联记录。"
+
 msgid "Workflow instance"
 msgstr "流程实例"
 

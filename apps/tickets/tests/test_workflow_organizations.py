@@ -5,13 +5,15 @@ from django.test import TestCase
 from django.utils.translation import override
 from rest_framework.test import force_authenticate
 
+from acls.models import CommandFilterACL, LoginACL, LoginAssetACL
 from orgs.models import Organization
 from orgs.utils import tmp_to_org, tmp_to_root_org
 from tickets.api.workflow import WorkflowViewSet
-from tickets.models import Ticket, Workflow
+from tickets.models import Ticket, Workflow, WorkflowVersion
 from tickets.tests import test_workflow as fixtures
+from tickets.workflow.composition import compose_workflows
 from tickets.workflow.publication import publish_workflow
-from tickets.workflow.errors import WorkflowConfigurationError
+from tickets.workflow.errors import WorkflowConfigurationError, WorkflowConflict
 from users.models import User
 
 
@@ -113,6 +115,106 @@ class WorkflowOrganizationTests(TestCase):
         }, method='patch')
         self.assertEqual(response.status_code, 409, response.data)
         self.assertFalse(Workflow.objects.filter(type='general').exists())
+
+    def test_delete_unused_workflow_and_all_its_versions(self):
+        draft = Workflow.objects.create(type='general', name='Draft')
+        self.assertEqual(self.request('destroy', draft, method='delete').status_code, 204)
+        shared = self.global_workflow()
+        self.assertEqual(self.request('destroy', shared, method='delete').status_code, 404)
+        with tmp_to_root_org():
+            self.assertEqual(self.request('destroy', shared, method='delete').status_code, 204)
+            self.assertFalse(Workflow.objects.filter(pk__in=[draft.pk, shared.pk]).exists())
+            self.assertFalse(WorkflowVersion.objects.filter(workflow_id=shared.pk).exists())
+
+    def test_delete_preserves_acl_reference_until_removed(self):
+        workflow = Workflow.objects.create(type='login_asset_confirm', name='ACL approval')
+        version = publish_workflow(workflow, fixtures.approval_definition([self.alice]))
+        acl = LoginAssetACL.objects.create(name='Review assets', workflow=workflow)
+        response = self.request('destroy', workflow, method='delete')
+        self.assertEqual(response.data['code'], 'referenced_by_others')
+        self.assertIn(str(acl._meta.verbose_name), response.data['detail'])
+        workflow.refresh_from_db()
+        self.assertEqual(workflow.active_version_id, version.pk)
+        acl.workflow = None
+        acl.save(update_fields=['workflow'])
+        self.assertEqual(self.request('destroy', workflow, method='delete').status_code, 204)
+
+    def test_references_identify_each_rule_and_paginate_without_other_workflows(self):
+        shared = self.global_workflow()
+        with tmp_to_root_org():
+            login = LoginACL.objects.create(name='User login rule', workflow=shared)
+            with tmp_to_org(self.org):
+                asset = LoginAssetACL.objects.create(name='Asset login rule', workflow=shared)
+                command = CommandFilterACL.objects.create(name='Command rule', workflow=shared)
+                LoginAssetACL.objects.create(name='Unrelated rule')
+            with patch.object(User, 'has_perm', return_value=True):
+                first = self.request('references', shared, {'limit': 2})
+                second = self.request('references', shared, {'limit': 2, 'offset': 2})
+            self.assertEqual(first.data['count'], 3)
+            rows = list(first.data['results']) + list(second.data['results'])
+            self.assertEqual({(r['record_name'], str(r['id']), r['record_org']) for r in rows}, {
+                (login.name, str(login.pk), Organization.ROOT_ID),
+                (asset.name, str(asset.pk), str(self.org.pk)),
+                (command.name, str(command.pk), str(self.org.pk)),
+            })
+        with tmp_to_org(self.other_org), patch.object(User, 'has_perm', return_value=False):
+            self.assertEqual(self.request('references', shared).data['count'], 0)
+
+    def test_references_resolve_combined_history_and_enforce_ticket_visibility(self):
+        workflow = Workflow.objects.create(type='login_asset_confirm', name='Source')
+        version = publish_workflow(workflow, fixtures.approval_definition([self.alice]))
+        combined = Workflow.objects.create(type=workflow.type, name='Combined', is_system=True,
+                                           migration_notes={'source_versions': [str(version.pk)]})
+        mine = Ticket.objects.create(workflow=combined, title='My linked ticket', org_id=self.org.pk,
+                                     serial_num='202612345', applicant=self.alice)
+        private = Ticket.objects.create(workflow=workflow, title='Private ticket', org_id=self.org.pk,
+                                        applicant=self.bob)
+        with patch.object(User, 'has_perm', side_effect=lambda perm: perm == 'tickets.view_ticket'):
+            data = self.request('references', workflow).data
+        self.assertEqual({r['record_name'] for r in data['results']}, {mine.title, combined.name})
+        row = next(r for r in data['results'] if r['kind'] == 'ticket')
+        self.assertEqual((row['record_number'], row['ticket_type']), (mine.serial_num, mine.type))
+        with patch.object(User, 'has_perm', return_value=True):
+            rows = self.request('references', workflow).data['results']
+        self.assertEqual({r['record_name'] for r in rows}, {mine.title, private.title, combined.name})
+
+    def test_delete_preserves_workflow_used_by_an_older_ticket(self):
+        shared = self.global_workflow()
+        ticket = Ticket.objects.create(type='general', title='Existing approval', applicant=self.applicant,
+                                       org_id=self.org.pk)
+        instance = self.engine.start(ticket, shared, {})
+        with tmp_to_root_org():
+            latest = publish_workflow(shared, shared.active_version.as_definition())
+            response = self.request('destroy', shared, method='delete')
+            self.assertEqual(response.data['code'], 'referenced_by_others')
+            shared.refresh_from_db()
+            self.assertEqual(shared.active_version_id, latest.pk)
+            instance.refresh_from_db()
+            self.assertEqual(instance.version.workflow_id, shared.pk)
+            with patch.object(User, 'has_perm', return_value=True):
+                rows = self.request('references', shared).data['results']
+            self.assertEqual([str(row['id']) for row in rows], [str(ticket.pk)])
+
+    def test_delete_preserves_combined_workflow_source(self):
+        source = Workflow.objects.create(type='login_asset_confirm', name='Source')
+        version = publish_workflow(source, fixtures.approval_definition([self.alice]))
+        with tmp_to_org(self.other_org):
+            Workflow.objects.create(type=source.type, name='Combined', is_system=True,
+                                    migration_notes={'source_versions': [str(version.pk)]})
+        response = self.request('destroy', source, method='delete')
+        self.assertEqual(response.data['code'], 'referenced_by_others')
+        self.assertTrue(source.versions.filter(pk=version.pk).exists())
+
+    def test_combination_cannot_attach_a_concurrently_deleted_source(self):
+        workflows = []
+        for name in ('First', 'Second'):
+            source = Workflow.objects.create(type='login_asset_confirm', name=name)
+            publish_workflow(source, fixtures.approval_definition([self.alice]))
+            source.refresh_from_db()
+            workflows.append(source)
+        self.assertEqual(self.request('destroy', source, method='delete').status_code, 204)
+        with self.assertRaises(WorkflowConflict):
+            compose_workflows(workflows, self.org.pk, source.type)
 
     def test_copy_with_invalid_local_cc_rolls_back_the_override(self):
         inherited = self.global_workflow()

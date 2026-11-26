@@ -15,7 +15,7 @@ from common.utils import reverse, get_logger
 from common.utils.lock import DistributedLock
 from common.utils.timezone import as_current_tz
 from orgs.models import Organization
-from orgs.utils import tmp_to_org
+from orgs.utils import current_org, tmp_to_org, tmp_to_root_org
 from tickets.const import (
     TicketType, TicketStatus, TicketState, TicketOrigin,
     TicketLevel, StepState, StepStatus
@@ -352,6 +352,20 @@ class Ticket(StatusMixin, JMSBaseModel):
             Q(beneficiaries__user=user)
         )
         return cls.objects.filter(queries).distinct()
+
+    @classmethod
+    def get_viewable_tickets(cls, user, can_audit):
+        audit_org_id = None if current_org.is_root() else str(current_org.id)
+        with tmp_to_root_org():
+            queryset = cls.get_user_related_tickets(user)
+            if can_audit:
+                if audit_org_id is None:
+                    return cls.objects.all()
+                # Auditing one organization must not hide the user's own tickets elsewhere.
+                return cls.objects.filter(
+                    Q(org_id=audit_org_id) | Q(pk__in=queryset.values('pk')),
+                )
+        return queryset
 
     def get_current_ticket_flow_approve(self):
         return self.flow.rules.filter(level=self.approval_step).first()

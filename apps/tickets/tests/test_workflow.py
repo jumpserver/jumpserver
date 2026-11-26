@@ -813,7 +813,7 @@ class WorkflowTests(TestCase):
             content_type__app_label='tickets',
         ).values_list('codename', flat=True))
         self.assertEqual(permissions, {
-            'add_workflow', 'change_workflow', 'view_workflow', 'view_workflowinstance',
+            'add_workflow', 'change_workflow', 'delete_workflow', 'view_workflow', 'view_workflowinstance',
             'apply_assetforothers',
         })
 

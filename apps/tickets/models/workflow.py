@@ -28,7 +28,7 @@ class Workflow(JMSOrgBaseModel):
 
     class Meta:
         verbose_name = _('Approval workflow')
-        default_permissions = ('add', 'change', 'view')
+        default_permissions = ('add', 'change', 'delete', 'view')
         permissions = [('apply_assetforothers', _('Apply for asset access on behalf of another user'))]
         ordering = ['name', 'id']
         constraints = [
@@ -165,7 +165,7 @@ class DefinitionModel(JMSBaseModel):
 
 
 class WorkflowVersion(DefinitionModel):
-    workflow = models.ForeignKey(Workflow, on_delete=models.PROTECT, related_name='versions')
+    workflow = models.ForeignKey(Workflow, on_delete=models.CASCADE, related_name='versions')
     number = models.PositiveIntegerField()
     published_at = models.DateTimeField(null=True, editable=False)
 
