@@ -15,6 +15,7 @@ class MenuPermission(models.Model):
             ('view_console', _('Can view console view')),
             ('view_pam', _('Can view pam view')),
             ('view_audit', _('Can view audit view')),
+            ('view_usercredential', _('Can view user credentials')),
             ('view_workbench', _('Can view workbench view')),
             ('view_webterminal', _('Can view web terminal')),
             ('view_filemanager', _('Can view file manager')),

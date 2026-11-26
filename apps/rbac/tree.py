@@ -138,6 +138,7 @@ special_pid_mapper = {
     'ops.jobexecution': 'operation_center',
     "rbac.view_console": "view_console",
     "rbac.view_audit": "view_audit",
+    "rbac.view_usercredential": "view_audit",
     "report_node": "view_audit",
     "rbac.view_pam": "view_pam",
     'audits.usersession': 'view_audit',

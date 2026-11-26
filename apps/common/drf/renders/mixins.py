@@ -40,9 +40,9 @@ class LogMixin(object):
         return {**extra, **base}
 
     @staticmethod
-    def get_resource_display(params):
+    def get_resource_display(params, non_filter_params=()):
         spm_filter = params.pop("spm", None)
-        if not params and not spm_filter:
+        if not spm_filter and not (params.keys() - non_filter_params):
             display_message = gettext_noop("Export all")
         elif spm_filter:
             display_message = gettext_noop("Export only selected items")
@@ -58,7 +58,7 @@ class LogMixin(object):
             return
 
         params = self._clean_params(request.query_params)
-        resource_display = self.get_resource_display(params)
+        resource_display = self.get_resource_display(params, getattr(view, 'export_non_filter_params', ()))
         after = self._build_after(params, data)
         if hasattr(view, 'get_activity_detail_msg'):
             activity_detail = view.get_activity_detail_msg()

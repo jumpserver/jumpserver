@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 #
 from importlib import import_module
-from datetime import datetime, timedelta, timezone as datetime_timezone
+from datetime import datetime, timezone as datetime_timezone
 
 from django.conf import settings
-from django.db.models import F, Value, CharField, Q, BooleanField, Case, DateTimeField, Exists, OuterRef, When
-from django.db.models.functions import Cast, Coalesce
+from django.db.models import F, Value, CharField, Q, BooleanField, Case, DateTimeField, When
+from django.db.models.functions import Cast
 from django.http import HttpResponse, FileResponse, Http404, JsonResponse
-from django.utils import timezone
 from django.utils.translation import gettext
 from django.utils.encoding import escape_uri_path
 from django_celery_beat.models import PeriodicTask
@@ -447,26 +446,12 @@ class UserSessionViewSet(CommonApiMixin, viewsets.ModelViewSet):
         return queryset
 
     def get_client_queryset(self):
-        from authentication.models import ClientLoginSession
-        from authentication.services.client_login_session import client_applications
-        from oauth2_provider.models import get_refresh_token_model
+        from authentication.services.client_login_session import online_device_client_sessions
 
-        now = timezone.now()
-        live_refresh = get_refresh_token_model().objects.filter(
-            application_id=OuterRef('application_id'), token_family=OuterRef('token_family'),
-            revoked__isnull=True, access_token__isnull=False,
-        )
-        queryset = ClientLoginSession.objects.filter(
-            application__in=client_applications(), revoked_at__isnull=True,
-        ).annotate(
-            date_created=F('authenticated_at'), date_expired=Coalesce('policy_expires_at', 'expires_at'),
-            has_live_refresh=Exists(live_refresh),
-            # Existing token last-used writes are batched for up to a minute.
-            # Three minutes covers that delay and the client's one-minute sync.
-            is_active=Exists(live_refresh.filter(access_token__updated__gte=now - timedelta(minutes=3))),
-            city=Value('', CharField()), type=Value('C', CharField()),
+        queryset = online_device_client_sessions().annotate(
+            date_created=F('authenticated_at'), city=Value('', CharField()), type=Value('C', CharField()),
             backend=Value('OAuth2', CharField()), key=Value('', CharField()),
-        ).filter(has_live_refresh=True).filter(Q(date_expired__isnull=True) | Q(date_expired__gt=now))
+        )
         if not current_org.is_root():
             queryset = queryset.filter(user_id__in=self.org_user_ids)
         return queryset
