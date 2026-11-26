@@ -4,6 +4,11 @@ on:
 
 name: Check recent handle issues
 
+permissions:
+  contents: read
+  # The alert action lists the open issues with GITHUB_TOKEN.
+  issues: read
+
 jobs:
   check-recent-issues-not-handle:
     runs-on: ubuntu-latest

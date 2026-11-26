@@ -5,6 +5,9 @@ on:
     # 每天凌晨3点运行
     - cron: '0 3 * * *'
 
+permissions:
+  contents: read
+
 jobs:
   mirror:
     runs-on: ubuntu-latest
