@@ -8,10 +8,6 @@ from ..const import MFAType
 mfa_failed_msg = _("Radius verify code invalid")
 
 
-def radius_push_enabled():
-    return settings.AUTH_RADIUS and settings.OTP_IN_RADIUS and settings.RADIUS_MFA_MODE == 'push'
-
-
 class MFARadius(BaseMFA):
     name = MFAType.Radius.value
     display_name = MFAType.Radius.name

@@ -19,7 +19,7 @@
             {% if backend.challenge_required %}challenge-required{% endif %}"
          style="display: none"
     >
-        {% if backend.name == 'otp_radius' and radius_push_enabled %}
+        {% if backend.name == 'radius_push' %}
         {% if radius_push_controls %}
             {% include 'authentication/_radius_push.html' %}
         {% else %}

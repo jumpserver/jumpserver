@@ -9,6 +9,7 @@ class BaseMFA(abc.ABC):
     placeholder = _('Please input security code')
     skip_cache_check = False
     has_code = True
+    web_login_only = False
 
     def __init__(self, user):
         """

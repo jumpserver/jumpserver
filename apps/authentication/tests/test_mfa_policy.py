@@ -80,7 +80,31 @@ class MFAPolicyTest(SimpleTestCase):
 
         field = PrivateSettingSerializer().fields['MFA_METHODS_STATUS']
         data = field.to_representation(get_mfa_method_status())
-        self.assertEqual(len(data), 7)
+        self.assertEqual(len(data), len(MFAType.choices))
         for method in data:
             for key in ('visible', 'enabled', 'allowed'):
                 self.assertIsInstance(method[key], bool)
+
+    @override_settings(
+        AUTH_RADIUS=True, OTP_IN_RADIUS=True, RADIUS_PUSH_ENABLED=True,
+        SECURITY_MFA_METHODS=['otp_radius', 'radius_push'],
+        MFA_BACKENDS=['authentication.mfa.radius.MFARadius', 'authentication.mfa.radius_push.MFARadiusPush'],
+    )
+    def test_radius_code_and_push_are_independent_policy_choices(self):
+        from users.models import User
+
+        user = SimpleNamespace(allowed_mfa_types=[])
+
+        def enabled():
+            return {backend.name for backend in User.get_user_mfa_backends(user)}
+
+        self.assertEqual(enabled(), {'otp_radius', 'radius_push'})
+        with override_settings(RADIUS_PUSH_ENABLED=False):
+            self.assertEqual(enabled(), {'otp_radius'})
+        with override_settings(OTP_IN_RADIUS=False):
+            self.assertEqual(enabled(), {'radius_push'})
+        user.allowed_mfa_types = ['otp_radius']
+        self.assertEqual(enabled(), {'otp_radius'})
+        user.allowed_mfa_types = ['radius_push']
+        with override_settings(SECURITY_MFA_METHODS=['otp_radius']):
+            self.assertEqual(enabled(), set())

@@ -5,6 +5,7 @@ from .feishu import *
 from .lark import *
 from .login import *
 from .mfa import *
+from .radius_push import *
 from .slack import *
 from .wecom import *
 from .agreement import *

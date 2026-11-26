@@ -429,7 +429,8 @@ class Config(dict):
         'RADIUS_ATTRIBUTES': {},
         'RADIUS_ENCRYPT_PASSWORD': True,
         'OTP_IN_RADIUS': False,
-        'RADIUS_MFA_MODE': 'code',
+        'RADIUS_PUSH_ENABLED': False,
+        'RADIUS_PUSH_TRIGGER': '',
         'RADIUS_PUSH_TIMEOUT': 75,
         'RADIUS_ORG_IDS': [DEFAULT_ID],
 

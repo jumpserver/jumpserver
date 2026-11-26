@@ -19166,19 +19166,20 @@ msgstr "Нет обращений более трёх месяцев"
 msgid "No valid permission"
 msgstr "Нет действующих разрешений"
 
-msgctxt "RADIUS MFA mode"
-msgid "Code"
-msgstr "Код"
+msgid "RADIUS Push"
+msgstr "RADIUS Push"
 
-msgctxt "RADIUS MFA mode"
-msgid "Push"
-msgstr "Push"
+msgid "For web login, also allow RADIUS Push in the system MFA policy."
+msgstr "Для веб-входа также разрешите RADIUS Push в системной политике MFA."
 
-msgid "Web login MFA mode"
-msgstr "Режим MFA для веб-входа"
+msgid "Push trigger"
+msgstr "Значение для отправки push"
 
-msgid "Use Push with a RADIUS server that waits for mobile approval."
-msgstr "Используйте Push с RADIUS-сервером, который ждёт подтверждения в мобильном приложении."
+msgid "The value your RADIUS provider expects to trigger a push. Leave blank for an empty password."
+msgstr "Значение, которое RADIUS-сервер ожидает для отправки push. Оставьте поле пустым для пустого пароля."
+
+msgid "The RADIUS push trigger must be at most 128 bytes."
+msgstr "Значение для отправки RADIUS Push должно занимать не более 128 байт."
 
 msgid "Push timeout (seconds)"
 msgstr "Время ожидания push (секунды)"

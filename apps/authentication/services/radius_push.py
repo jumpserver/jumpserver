@@ -8,9 +8,7 @@ from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.utils.crypto import salted_hmac
 
-from authentication.backends.radius import RadiusBackend
-from authentication.const import MFAType
-from authentication.mfa.radius import radius_push_enabled
+from authentication.mfa.radius_push import MFARadiusPush
 from common.utils.lock import DistributedLock
 from users.utils import MFABlockUtils
 
@@ -77,15 +75,31 @@ class RadiusPushAttempt:
     def cancel(self, attempt_id=None):
         return self.transition(attempt_id, ACTIVE_STATUSES, 'cancelled')
 
+    def enqueue(self, user, ip, expires_at):
+        from authentication.tasks import authenticate_radius_push
+
+        attempt, created = self.start(user, ip, expires_at)
+        if not attempt:
+            return {'status': 'rate_limited'}
+        if created:
+            try:
+                authenticate_radius_push.apply_async(
+                    args=(self.key, attempt['id']),
+                    expires=int(settings.RADIUS_PUSH_TIMEOUT), retry=False,
+                )
+            except Exception:
+                logger.exception('Could not queue RADIUS push request')
+                self.transition(attempt['id'], {'queued'}, 'failed')
+                return {'status': 'failed'}
+        return attempt
+
     def run(self, attempt_id):
         attempt = self.transition(attempt_id, {'queued'}, 'pending')
         if not attempt:
             return
         user = get_user_model().objects.filter(pk=attempt['user_id']).first()
-        if not user_can_use_radius_push(user):
-            self.transition(attempt_id, {'pending'}, 'failed')
-            return
-        if MFABlockUtils(user.username, attempt['ip']).is_block():
+        backend = MFARadiusPush.for_user(user)
+        if backend is None or MFABlockUtils(user.username, attempt['ip']).is_block():
             self.transition(attempt_id, {'pending'}, 'failed')
             return
         remaining = attempt['deadline'] - time.time()
@@ -93,7 +107,7 @@ class RadiusPushAttempt:
         if remaining <= 0 or not current or current['status'] != 'pending':
             return
         try:
-            status = RadiusBackend().authenticate_push(user.username, remaining)
+            status = backend.send_push(remaining)
         except Exception:
             logger.exception('RADIUS push request failed')
             status = 'failed'
@@ -104,11 +118,3 @@ class RadiusPushAttempt:
             self._save(current, status)
             if status == 'rejected':
                 MFABlockUtils(user.username, attempt['ip']).incr_failed_count()
-
-
-def user_can_use_radius_push(user):
-    return bool(
-        radius_push_enabled()
-        and user and user.is_valid and user.mfa_enabled
-        and user.get_active_mfa_backend_by_type(MFAType.Radius.value)
-    )

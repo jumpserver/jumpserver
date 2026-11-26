@@ -56,14 +56,15 @@ class RadiusBackend(RadiusBaseBackend, RADIUSBackend):
     def authenticate(self, request, username='', password=''):
         return super().authenticate(request, username=username, password=password)
 
-    def authenticate_push(self, username, timeout):
+    def authenticate_push(self, username, trigger, timeout):
         client = self._get_client(self._get_server_from_settings())
         client.retries = 1
         client.timeout = timeout
-        # A NUL yields one protected PAP block and decodes to an empty password.
-        packet = self._get_auth_packet(username, '\0', client)
+        # A NUL yields one protected PAP block for an empty password.
+        password = trigger or '\0'
+        packet = self._get_auth_packet(username, password, client)
         packet['User-Name'] = username
-        packet['User-Password'] = packet.PwCrypt('\0')
+        packet['User-Password'] = packet.PwCrypt(password)
         try:
             reply = client.SendPacket(packet)
         except Timeout:

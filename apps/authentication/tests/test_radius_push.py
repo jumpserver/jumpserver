@@ -2,7 +2,7 @@ import json
 import time
 from contextlib import nullcontext
 from types import SimpleNamespace
-from unittest.mock import Mock, patch
+from unittest.mock import ANY, Mock, patch
 
 from django.core.cache import cache
 from django.template.loader import render_to_string
@@ -13,8 +13,11 @@ from pyrad.packet import AccessAccept, AccessChallenge, AccessReject
 from authentication.backends.radius import RadiusBackend
 from authentication.const import MFAType
 from authentication.mfa.radius import MFARadius
+from authentication.mfa.radius_push import MFARadiusPush
+from authentication.mixins import MFAMixin
 from authentication.services.radius_push import RadiusPushAttempt, SEND_INTERVAL
-from authentication.views.mfa import UserLoginRadiusPushView
+from authentication.views.radius_push import UserLoginRadiusPushView
+from settings.serializers.auth.radius import RadiusSettingSerializer
 
 
 class LoginSession(dict):
@@ -23,8 +26,9 @@ class LoginSession(dict):
 
 @override_settings(
     AUTH_RADIUS=True,
-    OTP_IN_RADIUS=True,
-    RADIUS_MFA_MODE='push',
+    OTP_IN_RADIUS=False,
+    RADIUS_PUSH_ENABLED=True,
+    RADIUS_PUSH_TRIGGER='',
     RADIUS_PUSH_TIMEOUT=75,
     CACHES={'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'}},
 )
@@ -34,8 +38,9 @@ class RadiusPushTest(SimpleTestCase):
         self.addCleanup(cache.clear)
         self.user = SimpleNamespace(
             pk='user-1', username='test-user', is_valid=True, mfa_enabled=True,
-            get_active_mfa_backend_by_type=Mock(return_value=object()),
         )
+        self.push_backend = MFARadiusPush(self.user)
+        self.user.get_active_mfa_backend_by_type = Mock(return_value=self.push_backend)
         self.session = LoginSession(
             auth_password=1, auth_password_expired_at=time.time() + 120, user_id=self.user.pk,
         )
@@ -65,6 +70,7 @@ class RadiusPushTest(SimpleTestCase):
                 patch.object(UserLoginRadiusPushView, 'check_mfa_is_block'):
             return UserLoginRadiusPushView.as_view()(request)
 
+    @override_settings(RADIUS_PUSH_TRIGGER='push')
     @patch.object(RadiusBackend, 'authenticate_push', return_value='rejected')
     def test_duplicates_send_and_count_one_rejection(self, authenticate):
         attempt_id = self.start()
@@ -75,7 +81,7 @@ class RadiusPushTest(SimpleTestCase):
         self.assertEqual(existing['id'], attempt_id)
         self.attempt.run(attempt_id)
         self.attempt.run(attempt_id)
-        authenticate.assert_called_once()
+        authenticate.assert_called_once_with('test-user', 'push', ANY)
         self.blocks.incr_failed_count.assert_called_once_with()
         self.assertEqual(self.attempt.get(attempt_id)['status'], 'rejected')
         self.assertTrue(cache.get(f'radius-push-send:{self.user.pk}'))
@@ -84,7 +90,7 @@ class RadiusPushTest(SimpleTestCase):
     def test_cancel_discards_approval_and_keeps_cooldown(self, authenticate):
         attempt_id = self.start()
 
-        def finish_after_cancel(username, timeout):
+        def finish_after_cancel(username, trigger, timeout):
             self.attempt.cancel(attempt_id)
             return 'approved'
 
@@ -104,6 +110,15 @@ class RadiusPushTest(SimpleTestCase):
         self.attempt.run(attempt_id)
         self.assertEqual(self.attempt.get(attempt_id)['status'], 'timed_out')
         self.blocks.incr_failed_count.assert_not_called()
+
+    @patch.object(RadiusBackend, 'authenticate_push')
+    def test_worker_rechecks_user_policy(self, authenticate):
+        attempt_id = self.start()
+        self.user.get_active_mfa_backend_by_type.return_value = None
+        self.attempt.run(attempt_id)
+        authenticate.assert_not_called()
+        self.assertEqual(self.attempt.get(attempt_id)['status'], 'failed')
+        self.assertEqual(self.request('start', csrf=False).status_code, 403)
 
     def test_attempt_is_bound_to_session_and_primary_authentication(self):
         attempt_id = self.start()
@@ -138,17 +153,48 @@ class RadiusPushTest(SimpleTestCase):
         with patch('authentication.mixins.MFABlockUtils'):
             response = self.request('complete', attempt_id, csrf=False)
         self.assertEqual(json.loads(response.content)['status'], 'complete')
-        self.assertEqual(self.session['auth_mfa_type'], MFAType.Radius.value)
+        self.assertEqual(self.session['auth_mfa_type'], MFAType.RadiusPush.value)
         self.assertEqual(self.attempt.get(attempt_id)['status'], 'consumed')
 
-    def test_login_form_displays_push_controls_only_in_push_mode(self):
-        context = {'mfa_backends': [MFARadius(self.user)], 'radius_push_controls': True}
-        code = render_to_string('_mfa_login_field.html', context)
-        push = render_to_string('_mfa_login_field.html', {**context, 'radius_push_enabled': True})
-        self.assertIn('class="form-control input-style"', code)
-        self.assertNotIn('id="radius-push"', code)
-        self.assertNotIn('class="form-control input-style"', push)
-        self.assertIn(f'data-type="{MFAType.Radius.value}"', push)
+    def test_login_form_displays_code_and_push_as_independent_methods(self):
+        context = {
+            'mfa_backends': [MFARadius(self.user), self.push_backend],
+            'radius_push_controls': True,
+        }
+        rendered = render_to_string('_mfa_login_field.html', context)
+        self.assertIn('value="otp_radius"', rendered)
+        self.assertIn('class="form-control input-style"', rendered)
+        self.assertIn(f'data-type="{MFAType.RadiusPush.value}"', rendered)
+
+    def test_token_login_does_not_offer_web_only_method(self):
+        code = MFARadius(self.user)
+        self.user.active_mfa_backends_mapper = {code.name: code, self.push_backend.name: self.push_backend}
+        self.assertEqual(MFAMixin._active_mfa_names(self.user, False), (code.name,))
+        self.assertEqual(MFAMixin._active_mfa_names(self.user, True), (code.name, self.push_backend.name))
+
+    def test_push_cannot_be_submitted_as_a_code(self):
+        self.assertFalse(self.push_backend.check_code('push')[0])
+
+    @override_settings(OTP_IN_RADIUS=True)
+    @patch.object(RadiusBackend, 'authenticate')
+    def test_radius_code_uses_the_existing_verifier(self, authenticate):
+        self.user.is_authenticated = True
+        self.assertTrue(MFARadius(self.user).check_code('123456')[0])
+        authenticate.assert_called_once_with(None, username=self.user.username, password='123456')
+
+
+class RadiusPushSettingsTest(SimpleTestCase):
+    def test_trigger_preserves_whitespace_and_accepts_empty_password(self):
+        for value in ('', ' push ', 'push'):
+            with self.subTest(value=value):
+                serializer = RadiusSettingSerializer(data={'RADIUS_PUSH_TRIGGER': value}, partial=True)
+                self.assertTrue(serializer.is_valid(), serializer.errors)
+                self.assertEqual(serializer.validated_data['RADIUS_PUSH_TRIGGER'], value)
+
+    def test_trigger_rejects_more_than_128_utf8_bytes(self):
+        serializer = RadiusSettingSerializer(data={'RADIUS_PUSH_TRIGGER': 'я' * 65}, partial=True)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('RADIUS_PUSH_TRIGGER', serializer.errors)
 
 
 @override_settings(RADIUS_SERVER='localhost', RADIUS_PORT=1812, RADIUS_SECRET='test secret', RADIUS_ATTRIBUTES={})
@@ -156,7 +202,7 @@ class RadiusPushTransportTest(SimpleTestCase):
     @patch('pyrad.client.Client.SendPacket')
     def test_sends_one_rfc_compliant_empty_pap_password(self, send):
         send.return_value.code = AccessAccept
-        self.assertEqual(RadiusBackend().authenticate_push('test-user', 70), 'approved')
+        self.assertEqual(RadiusBackend().authenticate_push('test-user', '', 70), 'approved')
         packet = send.call_args.args[0]
         self.assertEqual(packet['User-Name'], ['test-user'])
         password = packet[2][0]
@@ -164,14 +210,21 @@ class RadiusPushTransportTest(SimpleTestCase):
         self.assertEqual(packet.PwDecrypt(password), '')
         send.assert_called_once()
 
+    @patch('pyrad.client.Client.SendPacket')
+    def test_sends_configured_trigger_as_pap_password(self, send):
+        send.return_value.code = AccessAccept
+        self.assertEqual(RadiusBackend().authenticate_push('test-user', 'push', 70), 'approved')
+        packet = send.call_args.args[0]
+        self.assertEqual(packet.PwDecrypt(packet[2][0]), 'push')
+
     @patch('pyrad.client.Client.SendPacket', autospec=True)
     def test_distinguishes_rejection_challenge_and_timeout(self, send):
         backend = RadiusBackend()
         for reply, result in [(AccessReject, 'rejected'), (AccessChallenge, 'failed')]:
             with self.subTest(reply=reply):
                 send.return_value.code = reply
-                self.assertEqual(backend.authenticate_push('test-user', 70), result)
+                self.assertEqual(backend.authenticate_push('test-user', '', 70), result)
                 client = send.call_args.args[0]
                 self.assertEqual((client.retries, client.timeout), (1, 70))
         send.side_effect = Timeout
-        self.assertEqual(backend.authenticate_push('test-user', 70), 'timed_out')
+        self.assertEqual(backend.authenticate_push('test-user', '', 70), 'timed_out')
