@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db.models import Count, F, Q
 from django.shortcuts import get_object_or_404
 from django.utils.crypto import salted_hmac
@@ -15,10 +14,10 @@ from rest_framework.response import Response
 
 from authentication.backends.passkey.models import Passkey
 from authentication.models import AccessKey, PrivateToken, SSHKey
+from common.auth.cache import valid_uuid
 from common.drf.filters import IDSpmFilterBackend, SearchFilter
 from common.drf.renders import CSVFileRenderer, ExcelFileRenderer
 from common.permissions import IsValidUser
-from common.utils import is_uuid
 from rbac.permissions import RBACPermission
 from users.models import User
 
@@ -40,6 +39,35 @@ DETAIL_FIELDS = {
 class UserCredentialPagination(LimitOffsetPagination):
     default_limit = 15
     max_limit = 100
+
+
+class CredentialCountSerializer(serializers.Serializer):
+    enabled = serializers.IntegerField(read_only=True)
+    total = serializers.IntegerField(read_only=True)
+
+
+class UserCredentialOverviewSerializer(serializers.Serializer):
+    id = serializers.UUIDField(read_only=True)
+    name = serializers.CharField(label=_('Name'), read_only=True)
+    username = serializers.CharField(label=_('Username'), read_only=True)
+    is_active = serializers.BooleanField(read_only=True)
+    ssh_keys = CredentialCountSerializer(read_only=True)
+    access_keys = CredentialCountSerializer(read_only=True)
+    passkeys = CredentialCountSerializer(read_only=True)
+    private_token = serializers.BooleanField(read_only=True)
+
+
+class UserCredentialDetailSerializer(serializers.Serializer):
+    """Only the two timestamps are shared by every credential type."""
+    id = serializers.CharField(required=False)
+    identifier = serializers.CharField(required=False)
+    name = serializers.CharField(required=False)
+    platform = serializers.CharField(required=False, allow_blank=True)
+    is_active = serializers.BooleanField(required=False)
+    exists = serializers.BooleanField(required=False)
+    # Leave encoding to the renderer so JSON dates stay in the historical ISO form.
+    date_created = serializers.DateTimeField(format=None, allow_null=True, read_only=True)
+    date_last_used = serializers.DateTimeField(format=None, allow_null=True, read_only=True)
 
 
 def count_fields(source, label):
@@ -88,30 +116,44 @@ class UserCredentialBaseApi(ListAPIView):
         return response
 
 
+def selection_ids(resource_ids):
+    if not isinstance(resource_ids, (list, tuple)):
+        return []
+    return [item for item in resource_ids if valid_uuid(item)]
+
+
 class UserCredentialOverviewApi(UserCredentialBaseApi):
     search_fields = ('name', 'username')
     filter_backends = (SearchFilter, IDSpmFilterBackend)
     renderer_classes = (JSONRenderer, UserCredentialCSVRenderer, ExcelFileRenderer)
-    serializer_class = UserCredentialExportSerializer
+    serializer_class = UserCredentialOverviewSerializer
     export_non_filter_params = ('oid', 'limit', 'offset', 'template')
 
+    def get_serializer_class(self):
+        renderer = getattr(getattr(self, 'request', None), 'accepted_renderer', None)
+        if getattr(renderer, 'format', None) in ('csv', 'xlsx'):
+            return UserCredentialExportSerializer
+        return super().get_serializer_class()
+
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return User.objects.none()
         # Keep zero-credential and disabled users in the selected organization.
         return User.get_org_users().order_by('username', 'id').values(
             'id', 'name', 'username', 'is_active',
         )
 
     def filter_queryset(self, queryset):
-        params = self.request.query_params
-        if 'spm' in params and not is_uuid(params['spm']):
+        spm = self.request.query_params.get('spm')
+        if spm is not None and not valid_uuid(spm):
             return queryset.none()
-        try:
-            return super().filter_queryset(queryset)
-        except (DjangoValidationError, TypeError, ValueError):
-            # A cached selection from another list can contain non-user IDs.
-            if 'spm' not in params and 'exclude_spm' not in params:
-                raise
-            return queryset.none()
+        return super().filter_queryset(queryset)
+
+    def filter_spm_queryset(self, resource_ids, queryset):
+        return queryset.filter(id__in=selection_ids(resource_ids))
+
+    def exclude_spm_queryset(self, resource_ids, queryset):
+        return queryset.exclude(id__in=selection_ids(resource_ids))
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
@@ -136,13 +178,18 @@ class UserCredentialOverviewApi(UserCredentialBaseApi):
                 count = by_user.get(user['id'], {})
                 user[kind] = {'enabled': count.get('enabled', 0), 'total': count.get('total', 0)}
 
+        data = self.get_serializer(users, many=True).data
         if export:
-            return Response(self.get_serializer(users, many=True).data)
-        return self.get_paginated_response(users)
+            return Response(data)
+        return self.get_paginated_response(data)
 
 
 class UserCredentialDetailApi(UserCredentialBaseApi):
+    serializer_class = UserCredentialDetailSerializer
+
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return SSHKey.objects.none()
         kind = self.kwargs['credential_type']
         model = CREDENTIAL_MODELS.get(kind)
         if model is None:
@@ -171,4 +218,4 @@ class UserCredentialDetailApi(UserCredentialBaseApi):
             # Keep stable, masked identifiers for the existing credential details.
             row['id'] = salted_hmac('audits.user_credentials', raw_id).hexdigest()
             row['identifier'] = f'{raw_id[:8]}…{raw_id[-4:]}'
-        return self.get_paginated_response(rows)
+        return self.get_paginated_response(self.get_serializer(rows, many=True).data)

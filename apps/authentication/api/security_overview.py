@@ -36,7 +36,8 @@ def get_login_session_summary(request):
     keys = UserSession.objects.filter(user=request.user).order_by().values_list('key', flat=True).distinct()
     web_sessions = session_login_policies(list(keys))
     client = getattr(request, 'client_login_session', None)
-    clients = online_device_client_sessions().filter(user=request.user, is_active=True).aggregate(
+    # An idle client can still be signed in.
+    clients = online_device_client_sessions().filter(user=request.user).aggregate(
         total=Count('pk'), current=Count('pk', filter=Q(pk=client.pk if client else None)),
     )
     total = len(web_sessions) + clients['total']
@@ -72,8 +73,8 @@ class SecurityOverviewApi(APIView):
         data = {
             'generated_at': now,
             'login_sessions': get_login_session_summary(request),
-            'asset_sessions': {'count': Session.objects.filter(
-                user_id=str(user.pk), org_id__in=org_ids, is_finished=False,
+            'asset_sessions': {'count': Session.get_active_sessions().filter(
+                user_id=str(user.pk), org_id__in=org_ids,
             ).count()},
             'access_keys': access_keys,
             'temp_tokens': temp_tokens,
