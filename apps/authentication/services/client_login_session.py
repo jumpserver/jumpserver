@@ -152,6 +152,25 @@ def client_applications():
     )
 
 
+def online_device_client_sessions():
+    from django.db.models import Exists, OuterRef, Q
+    from django.db.models.functions import Coalesce
+
+    now = timezone.now()
+    live_refresh = get_refresh_token_model().objects.filter(
+        application_id=OuterRef('application_id'), token_family=OuterRef('token_family'),
+        revoked__isnull=True, access_token__isnull=False,
+    )
+    return ClientLoginSession.objects.filter(
+        application__in=client_applications(), revoked_at__isnull=True,
+    ).annotate(
+        date_expired=Coalesce('policy_expires_at', 'expires_at'),
+        has_live_refresh=Exists(live_refresh),
+        # Last-use writes are batched; allow time for both the write and the client's next sync.
+        is_active=Exists(live_refresh.filter(access_token__updated__gte=now - timedelta(minutes=3))),
+    ).filter(has_live_refresh=True).filter(Q(date_expired__isnull=True) | Q(date_expired__gt=now))
+
+
 def is_client_application(application):
     return bool(application is not None
                 and application.name == settings.OAUTH2_PROVIDER_JUMPSERVER_CLIENT_NAME

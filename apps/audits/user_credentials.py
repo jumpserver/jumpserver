@@ -1,16 +1,24 @@
+from django.conf import settings
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db.models import Count, F, Q
 from django.shortcuts import get_object_or_404
 from django.utils.crypto import salted_hmac
-from rest_framework.exceptions import NotFound
+from django.utils.text import format_lazy
+from django.utils.translation import gettext_lazy as _
+from rest_framework import serializers
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.generics import ListAPIView
 from rest_framework.metadata import SimpleMetadata
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.renderers import JSONRenderer
+from rest_framework.response import Response
 
 from authentication.backends.passkey.models import Passkey
 from authentication.models import AccessKey, PrivateToken, SSHKey
-from common.drf.filters import SearchFilter
+from common.drf.filters import IDSpmFilterBackend, SearchFilter
+from common.drf.renders import CSVFileRenderer, ExcelFileRenderer
 from common.permissions import IsValidUser
+from common.utils import is_uuid
 from rbac.permissions import RBACPermission
 from users.models import User
 
@@ -34,6 +42,36 @@ class UserCredentialPagination(LimitOffsetPagination):
     max_limit = 100
 
 
+def count_fields(source, label):
+    return [
+        serializers.IntegerField(source=f'{source}.{key}', label=format_lazy('{} ({})', label, title), read_only=True)
+        for key, title in (('enabled', _('Enabled')), ('total', _('Total')))
+    ]
+
+
+class UserCredentialExportSerializer(serializers.Serializer):
+    name = serializers.CharField(label=_('Name'), read_only=True)
+    username = serializers.CharField(label=_('Username'), read_only=True)
+    is_active = serializers.BooleanField(label=format_lazy('{} ({})', _('User'), _('Enabled')), read_only=True)
+    ssh_enabled, ssh_total = count_fields('ssh_keys', _('SSH key'))
+    access_enabled, access_total = count_fields('access_keys', _('Access key'))
+    webauthn_enabled, webauthn_total = count_fields('passkeys', _('Passkey'))
+    has_private_credential = serializers.BooleanField(source='private_token', label=_('Private token'), read_only=True)
+
+    class Meta:
+        model = User
+
+
+class UserCredentialCSVRenderer(CSVFileRenderer):
+    escape_chars = (*CSVFileRenderer.escape_chars, '+', '-')
+
+    def render_value(self, field, value):
+        # The shared CSV writer quotes leading zeroes in text identifiers. Keep counts numeric.
+        if isinstance(field, serializers.IntegerField):
+            return value
+        return super().render_value(field, value)
+
+
 class UserCredentialBaseApi(ListAPIView):
     permission_classes = (IsValidUser, RBACPermission)
     rbac_perms = {'*': 'rbac.view_usercredential'}
@@ -52,7 +90,10 @@ class UserCredentialBaseApi(ListAPIView):
 
 class UserCredentialOverviewApi(UserCredentialBaseApi):
     search_fields = ('name', 'username')
-    filter_backends = (SearchFilter,)
+    filter_backends = (SearchFilter, IDSpmFilterBackend)
+    renderer_classes = (JSONRenderer, UserCredentialCSVRenderer, ExcelFileRenderer)
+    serializer_class = UserCredentialExportSerializer
+    export_non_filter_params = ('oid', 'limit', 'offset', 'template')
 
     def get_queryset(self):
         # Keep zero-credential and disabled users in the selected organization.
@@ -60,11 +101,26 @@ class UserCredentialOverviewApi(UserCredentialBaseApi):
             'id', 'name', 'username', 'is_active',
         )
 
+    def filter_queryset(self, queryset):
+        params = self.request.query_params
+        if 'spm' in params and not is_uuid(params['spm']):
+            return queryset.none()
+        try:
+            return super().filter_queryset(queryset)
+        except (DjangoValidationError, TypeError, ValueError):
+            # A cached selection from another list can contain non-user IDs.
+            if 'spm' not in params and 'exclude_spm' not in params:
+                raise
+            return queryset.none()
+
     def list(self, request, *args, **kwargs):
-        users = self.paginate_queryset(self.filter_queryset(self.get_queryset()))
+        queryset = self.filter_queryset(self.get_queryset())
+        export = request.accepted_renderer.format in ('csv', 'xlsx')
+        if export and request.query_params.get('template', 'export') != 'export':
+            raise ValidationError({'detail': _('Invalid template')})
+        users = list(queryset[:settings.MAX_LIMIT_PER_PAGE]) if export else self.paginate_queryset(queryset)
         user_ids = [user['id'] for user in users]
         for kind, model in CREDENTIAL_MODELS.items():
-            # One query per type, bounded to users on this page in the selected org.
             credentials = model.objects.filter(user_id__in=user_ids).order_by()
             if kind == 'private_token':
                 # Read existing one-to-one records; user.private_token would create one.
@@ -79,6 +135,9 @@ class UserCredentialOverviewApi(UserCredentialBaseApi):
             for user in users:
                 count = by_user.get(user['id'], {})
                 user[kind] = {'enabled': count.get('enabled', 0), 'total': count.get('total', 0)}
+
+        if export:
+            return Response(self.get_serializer(users, many=True).data)
         return self.get_paginated_response(users)
 
 
