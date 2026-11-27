@@ -16,7 +16,9 @@
 
 </div>
 
-<br/>
+<p align="center">
+  <img src="assets/jumpserver-showcase.gif" alt="JumpServer" width="100%" />
+</p>
 
 ## O que é o JumpServer?
 

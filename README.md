@@ -16,7 +16,9 @@
 
 </div>
 
-<br/>
+<p align="center">
+  <img src="readmes/assets/jumpserver-showcase.gif" alt="JumpServer product tour" width="100%" />
+</p>
 
 ## What is JumpServer?
 
@@ -43,12 +45,51 @@ Open `https://<jumpserver-host>/` in your browser, replacing `<jumpserver-host>`
 - Username: `admin`
 - Password: `ChangeMe`
 
-## Screenshots
+## Features
+
+### 🔐 Privileged Account Management
+
+Discover, push, back up and rotate privileged accounts, and spot risky ones such as weak, leaked or long-unchanged passwords — all from one dashboard.
 
 <p align="center">
-  <img src="readmes/assets/screenshot-01.png" alt="JumpServer PAM dashboard" title="JumpServer PAM dashboard" width="49%" />
-  <img src="readmes/assets/screenshot-02.png" alt="JumpServer asset management" title="JumpServer asset management" width="49%" />
+  <img src="readmes/assets/screenshot-01.png" alt="JumpServer PAM dashboard" title="JumpServer PAM dashboard" width="100%" />
 </p>
+
+### 🗂️ Unified Asset Management
+
+Manage hosts, network devices, databases, cloud, web and directory services in one asset tree, with fine-grained authorization policies and ACLs.
+
+<p align="center">
+  <img src="readmes/assets/screenshot-02.png" alt="JumpServer asset management" title="JumpServer asset management" width="100%" />
+</p>
+
+### 🖥️ Access Anything from the Browser
+
+Pick an asset and an account, then connect over SSH, SFTP, RDP, VNC, databases or web apps. Windows desktops and RemoteApps run right in the browser.
+
+<p align="center">
+  <img src="readmes/assets/screenshot-06.png" alt="JumpServer remote desktop session" title="JumpServer remote desktop session" width="100%" />
+</p>
+
+### 🤖 AI-Powered Operations
+
+Press <kbd>⌘</kbd> <kbd>K</kbd> in the terminal to describe a task in plain language, or let the AI assistant search assets, connect sessions and run terminal tasks for you.
+
+<p align="center">
+  <img src="readmes/assets/screenshot-05.png" alt="JumpServer AI assistant" title="JumpServer AI assistant" width="100%" />
+</p>
+
+### ⌨️ Native SSH Experience with KoKo
+
+Use any SSH client to reach JumpServer. Browse authorized assets in a TUI and switch between multiple sessions without leaving your terminal.
+
+<p align="center">
+  <img src="readmes/assets/screenshot-08.png" alt="KoKo TUI multi-session manager" title="KoKo TUI multi-session manager" width="100%" />
+</p>
+
+<details>
+<summary><b>More screenshots</b></summary>
+<br/>
 
 <p align="center">
   <img src="readmes/assets/screenshot-03.png" alt="JumpServer SSH connection dialog" title="JumpServer SSH connection dialog" width="49%" />
@@ -56,19 +97,15 @@ Open `https://<jumpserver-host>/` in your browser, replacing `<jumpserver-host>`
 </p>
 
 <p align="center">
-  <img src="readmes/assets/screenshot-05.png" alt="JumpServer AI assistant" title="JumpServer AI assistant" width="49%" />
-  <img src="readmes/assets/screenshot-06.png" alt="JumpServer remote desktop session" title="JumpServer remote desktop session" width="49%" />
+  <img src="readmes/assets/screenshot-07.png" alt="KoKo TUI asset browser" title="KoKo TUI asset browser" width="49%" />
+  <img src="readmes/assets/screenshot-10.png" alt="KoKo classic text-mode asset list" title="KoKo classic text-mode asset list" width="49%" />
 </p>
 
 <p align="center">
-  <img src="readmes/assets/screenshot-07.png" alt="KoKo TUI asset browser with searchable authorized assets" title="KoKo TUI asset browser with searchable authorized assets" width="49%" />
-  <img src="readmes/assets/screenshot-08.png" alt="KoKo TUI multi-session manager for switching between active SSH sessions" title="KoKo TUI multi-session manager for switching between active SSH sessions" width="49%" />
+  <img src="readmes/assets/screenshot-09.png" alt="KoKo classic text-mode home screen" title="KoKo classic text-mode home screen" width="49%" />
 </p>
 
-<p align="center">
-  <img src="readmes/assets/screenshot-09.png" alt="KoKo classic text-mode home screen with connection shortcuts" title="KoKo classic text-mode home screen with connection shortcuts" width="49%" />
-  <img src="readmes/assets/screenshot-10.png" alt="KoKo classic text-mode asset list with authorized SSH targets" title="KoKo classic text-mode asset list with authorized SSH targets" width="49%" />
-</p>
+</details>
 
 ## Components
 

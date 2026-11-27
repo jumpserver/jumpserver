@@ -16,7 +16,9 @@
 
 </div>
 
-<br/>
+<p align="center">
+  <img src="assets/jumpserver-showcase.gif" alt="JumpServer 产品导览" width="100%" />
+</p>
 
 ## 什么是 JumpServer？
 
@@ -43,12 +45,51 @@ curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quic
 - 用户名: `admin`
 - 密码: `ChangeMe`
 
-## 截图
+## 功能特性
+
+### 🔐 特权账号管理
+
+统一发现、推送、备份和改密特权账号，并识别弱密码、泄露密码、长期未改密等风险账号，一个仪表盘全部掌握。
 
 <p align="center">
-  <img src="assets/screenshot-01.png" alt="JumpServer 特权访问管理仪表盘" title="JumpServer 特权访问管理仪表盘" width="49%" />
-  <img src="assets/screenshot-02.png" alt="JumpServer 资产管理" title="JumpServer 资产管理" width="49%" />
+  <img src="assets/screenshot-01.png" alt="JumpServer 特权访问管理仪表盘" title="JumpServer 特权访问管理仪表盘" width="100%" />
 </p>
+
+### 🗂️ 统一资产管理
+
+在一棵资产树中管理主机、网络设备、数据库、云服务、Web 和目录服务，配合细粒度的授权策略和 ACL。
+
+<p align="center">
+  <img src="assets/screenshot-02.png" alt="JumpServer 资产管理" title="JumpServer 资产管理" width="100%" />
+</p>
+
+### 🖥️ 浏览器即可访问一切
+
+选择资产和账号即可通过 SSH、SFTP、RDP、VNC、数据库或 Web 应用连接，Windows 桌面和 RemoteApp 直接在浏览器中运行。
+
+<p align="center">
+  <img src="assets/screenshot-06.png" alt="JumpServer 远程桌面会话" title="JumpServer 远程桌面会话" width="100%" />
+</p>
+
+### 🤖 AI 赋能运维
+
+在终端中按 <kbd>⌘</kbd> <kbd>K</kbd> 用自然语言描述任务，或让 AI 助手帮你搜索资产、连接会话、执行终端任务。
+
+<p align="center">
+  <img src="assets/screenshot-05.png" alt="JumpServer AI 助手" title="JumpServer AI 助手" width="100%" />
+</p>
+
+### ⌨️ KoKo 原生 SSH 体验
+
+使用任意 SSH 客户端接入 JumpServer，在 TUI 中浏览已授权资产，并在多个会话之间快速切换，无需离开终端。
+
+<p align="center">
+  <img src="assets/screenshot-08.png" alt="KoKo TUI 多会话管理" title="KoKo TUI 多会话管理" width="100%" />
+</p>
+
+<details>
+<summary><b>更多截图</b></summary>
+<br/>
 
 <p align="center">
   <img src="assets/screenshot-03.png" alt="JumpServer SSH 连接对话框" title="JumpServer SSH 连接对话框" width="49%" />
@@ -56,19 +97,15 @@ curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quic
 </p>
 
 <p align="center">
-  <img src="assets/screenshot-05.png" alt="JumpServer AI 助手" title="JumpServer AI 助手" width="49%" />
-  <img src="assets/screenshot-06.png" alt="JumpServer 远程桌面会话" title="JumpServer 远程桌面会话" width="49%" />
+  <img src="assets/screenshot-07.png" alt="KoKo TUI 资产浏览" title="KoKo TUI 资产浏览" width="49%" />
+  <img src="assets/screenshot-10.png" alt="KoKo 经典文本模式资产列表" title="KoKo 经典文本模式资产列表" width="49%" />
 </p>
 
 <p align="center">
-  <img src="assets/screenshot-07.png" alt="KoKo TUI asset browser with searchable authorized assets" title="KoKo TUI asset browser with searchable authorized assets" width="49%" />
-  <img src="assets/screenshot-08.png" alt="KoKo TUI multi-session manager for switching between active SSH sessions" title="KoKo TUI multi-session manager for switching between active SSH sessions" width="49%" />
+  <img src="assets/screenshot-09.png" alt="KoKo 经典文本模式首页" title="KoKo 经典文本模式首页" width="49%" />
 </p>
 
-<p align="center">
-  <img src="assets/screenshot-09.png" alt="KoKo classic text-mode home screen with connection shortcuts" title="KoKo classic text-mode home screen with connection shortcuts" width="49%" />
-  <img src="assets/screenshot-10.png" alt="KoKo classic text-mode asset list with authorized SSH targets" title="KoKo classic text-mode asset list with authorized SSH targets" width="49%" />
-</p>
+</details>
 
 ## 组件
 
