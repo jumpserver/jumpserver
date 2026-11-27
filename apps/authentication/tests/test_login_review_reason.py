@@ -10,11 +10,13 @@ from django.urls import reverse
 from acls.models import LoginACL
 from authentication.mixins import AuthMixin
 from authentication.models import SSOToken
+from orgs.models import Organization
 from orgs.utils import tmp_to_org, tmp_to_root_org
-from tickets.models import Ticket, WorkflowInstance
+from tickets.models import Ticket, Workflow, WorkflowInstance
 from tickets.plugins.login_confirm.plugin import Plugin
 from tickets.tests import test_workflow as fixtures
 from tickets.workflow.engine import WorkflowEngine
+from tickets.workflow.publication import publish_workflow
 
 
 class LoginReviewReasonTests(TestCase):
@@ -123,6 +125,30 @@ class LoginReviewReasonTests(TestCase):
         self.assertRedirects(self.client.post(self.wait, {'reason': 'Expired'}),
                              reverse('authentication:login'), fetch_redirect_response=False)
         self.assertFalse(Ticket.objects.exists())
+
+    def test_poll_reports_only_the_current_approval_deadline_and_action(self):
+        definition = fixtures.approval_definition([self.alice], levels=3)
+        definition['nodes'][1]['config'].update(timeout=60, timeout_action='reject')
+        definition['nodes'][2]['config'].update(timeout=120, timeout_action='expire')
+        workflow = Workflow.objects.create(
+            name='Timed login review', type='login_confirm', org_id=Organization.ROOT_ID, enabled=True,
+        )
+        publish_workflow(workflow, definition)
+        self.acl.workflow = workflow
+        self.acl.save(update_fields=['workflow'])
+        self.client.post(self.wait, {'reason': ''})
+        ticket = Ticket.objects.get(pk=self.client.session['auth_ticket_id'])
+        url = reverse('api-auth:login-confirm-ticket-status')
+        for action in ('reject', 'expire', None):
+            task = ticket.approval_tasks.get(state='pending')
+            data = self.client.get(url).json()['data']
+            if action:
+                self.assertEqual(data['deadline'], task.node_instance.deadline.isoformat().replace('+00:00', 'Z'))
+                self.assertEqual(data['timeout_action'], action)
+            else:
+                self.assertNotIn('deadline', data)
+                self.assertNotIn('timeout_action', data)
+            WorkflowEngine().approve(task, self.alice)
 
     def test_approval_completes_login_and_preserves_next_url(self):
         self.client.get(self.guard)

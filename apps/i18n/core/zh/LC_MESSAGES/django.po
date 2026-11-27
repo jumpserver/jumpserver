@@ -21262,3 +21262,15 @@ msgstr "用于校验服务器证书的 PEM 格式 CA 证书，留空时使用系
 #: accounts/automations/change_secret/manager.py:66
 msgid "The currently managed password is required when AD passwords are changed with the current password"
 msgstr "使用原密码修改 AD 密码时，必须提供当前托管的密码"
+
+#: authentication/templates/authentication/login_wait_confirm.html
+msgid "Approval deadline"
+msgstr "审批截止时间"
+
+#: authentication/templates/authentication/login_wait_confirm.html
+msgid "If approval times out, your login request will be rejected."
+msgstr "超时未审批，本次登录申请将被自动拒绝。"
+
+#: authentication/templates/authentication/login_wait_confirm.html
+msgid "If approval times out, your login request will expire."
+msgstr "超时未审批，本次登录申请将过期。"

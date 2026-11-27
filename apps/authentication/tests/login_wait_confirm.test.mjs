@@ -32,12 +32,11 @@ function page() {
   const window = { location: { reload() { reloads++ } } }
   const initialLocation = window.location
   const context = vm.createContext({
-    $, document: {}, window, requestApi: options => requests.push(options),
+    $, document: { documentElement: { lang: 'en' } }, window, requestApi: options => requests.push(options),
     setInterval() { const id = ++timerId; timers.add(id); return id },
     clearInterval(id) { timers.delete(id) }
   })
   vm.runInContext(script, context)
-  context.interval = context.setInterval()
   context.checkInterval = context.setInterval()
   return { context, requests, $, window, initialLocation, timers,
     click: selector => handlers.get(selector)(), reloads: () => reloads, ready: () => ready() }
@@ -45,7 +44,7 @@ function page() {
 
 test('the reason form does not poll or register cancellation before submission', () => {
   const p = page()
-  p.context.timestamp = '0'
+  p.context.waitingForReview = false
   p.ready()
   assert.deepEqual(p.requests, [])
   assert.equal(p.window.onbeforeunload, undefined)
@@ -111,4 +110,21 @@ test('the waiting applicant sees the rejection status and optional reason as pla
     p.requests[1].success({ error: 'login_confirm_error', msg: 'Not found' })
     assert.equal(p.$('.error-messages').message, reason ? 'Rejected\n' + reason : 'Rejected')
   }
+})
+
+test('polling updates the current deadline and clears it when the next node has no timeout', () => {
+  const p = page()
+  const deadline = '2026-11-26T03:19:14Z'
+  for (const action of ['reject', 'expire']) {
+    p.context.doRequestAuth()
+    p.requests.at(-1).success({ error: 'login_confirm_wait', data: { deadline, timeout_action: action } })
+    assert.equal(p.$('.deadline-notice time').attributes.datetime, deadline)
+    assert.equal(p.$('.timeout-action').message,
+      action === 'reject' ? 'If approval times out, your login request will be rejected.'
+        : 'If approval times out, your login request will expire.')
+    assert.equal(p.$('.deadline-notice').visible, true)
+  }
+  p.context.doRequestAuth()
+  p.requests.at(-1).success({ error: 'login_confirm_wait', data: {} })
+  assert.equal(p.$('.deadline-notice').visible, false)
 })
