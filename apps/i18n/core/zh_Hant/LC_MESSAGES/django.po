@@ -6111,6 +6111,11 @@ msgid ""
 "security issues"
 msgstr "如果這次公鑰更新不是由你發起的，那麼你的帳號可能存在安全問題"
 
+#: authentication/templates/authentication/agent_authorize.html:7
+#: authentication/templates/authentication/agent_authorize.html:14
+msgid "Authorize"
+msgstr "授權"
+
 #: authentication/templates/authentication/auth_fail_flash_message_standalone.html:28
 #: templates/flash_message_standalone.html:28
 msgid "Cancel"
