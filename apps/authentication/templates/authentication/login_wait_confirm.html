@@ -1,7 +1,8 @@
 {% load i18n %}
 {% load static %}
 <!DOCTYPE html>
-<html>
+{% get_current_language as page_language %}
+<html lang="{{ page_language }}">
 
 <head>
     <meta charset="utf-8">
@@ -85,10 +86,13 @@
                 </form>
                 {% else %}
                 <div class="alert alert-danger error-messages" role="alert" style="display: none"></div>
+                <div class="alert alert-warning deadline-notice" role="status" style="display: none">
+                    <strong>{% trans 'Approval deadline' %} <time></time></strong>
+                    <div class="timeout-action"></div>
+                </div>
                 <div class="progress progress-bar-default progress-striped active">
-                    <div aria-valuemax="3600" aria-valuemin="0" aria-valuenow="43" role="progressbar"
-                         class="progress-bar">
-                    </div>
+                    <div class="progress-bar" role="progressbar" aria-label="{% trans 'Login confirm' %}"
+                         aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
                 </div>
                 <div class="row">
                     <div class="col-sm-3">
@@ -124,9 +128,8 @@
 <script>
     var errorMsgRef = $(".error-messages");
     var infoMsgRef = $(".info-messages");
-    var timestamp = '{{ timestamp }}';
-    var progressBarRef = $(".progress-bar");
-    var interval, checkInterval;
+    var waitingForReview = '{{ ticket|yesno:"1,0" }}' === '1';
+    var checkInterval;
     var authCompleted = false;
     var cancelling = false;
     var url = "{% url 'api-auth:login-confirm-ticket-status' %}";
@@ -144,16 +147,16 @@
                 if (authCompleted) return;
                 if (!data.error && data.msg === 'ok') {
                     authCompleted = true;
-                    clearInterval(interval);
                     clearInterval(checkInterval);
                     cancelCloseConfirm();
                     window.location = successUrl;
-                } else if (data.error !== "login_confirm_wait") {
+                } else if (data.error === "login_confirm_wait") {
+                    showDeadline(data.data);
+                } else {
                     authCompleted = true;
                     infoMsgRef.hide();
                     errorMsgRef.show();
-                    progressBarRef.addClass('progress-bar-danger');
-                    clearInterval(interval);
+                    $(".progress, .deadline-notice").hide();
                     clearInterval(checkInterval);
                     cancelTicket();
                     $(".copy-btn").attr('disabled', 'disabled');
@@ -180,15 +183,24 @@
         })
     }
 
-    function handleProgressBar() {
-        var now = new Date().getTime() / 1000;
-        var offset = now - timestamp;
-        var percent = offset / 3600 * 100;
-        if (percent > 100) {
-            percent = 100
+    function showDeadline(node) {
+        var bar = $(".progress-bar");
+        if (!node || !node.deadline) {
+            bar.css("width", "100%").removeAttr("aria-valuenow");
+            $(".deadline-notice").hide();
+            return;
         }
-        progressBarRef.css("width", percent + '%');
-        progressBarRef.attr('aria-valuenow', offset);
+        var deadline = new Date(node.deadline);
+        if (node.timeout > 0) {
+            var remaining = (deadline.getTime() - Date.now()) / 1000;
+            var percent = Math.round(Math.max(0, Math.min(1, 1 - remaining / node.timeout)) * 100);
+            bar.css("width", percent + "%").attr("aria-valuenow", percent);
+        }
+        $(".deadline-notice time").attr("datetime", node.deadline).text(deadline.toLocaleString(document.documentElement.lang));
+        $(".timeout-action").text(node.timeout_action === 'reject'
+            ? "{% trans 'If approval times out, your login request will be rejected.' %}"
+            : "{% trans 'If approval times out, your login request will expire.' %}");
+        $(".deadline-notice").show();
     }
 
     function cancelTicket(success, error) {
@@ -218,8 +230,7 @@
     }
 
     $(document).ready(function () {
-        if (!Number(timestamp)) return;
-        interval = setInterval(handleProgressBar, 1000);
+        if (!waitingForReview) return;
         checkInterval = setInterval(doRequestAuth, 5000);
         doRequestAuth();
         initClipboard();
@@ -233,7 +244,6 @@
         cancelling = true;
         // Ignore in-flight polls after the user decides to leave.
         authCompleted = true;
-        clearInterval(interval);
         clearInterval(checkInterval);
         $(".btn-return, .btn-refresh").addClass('disabled').attr('aria-disabled', 'true');
         errorMsgRef.hide();

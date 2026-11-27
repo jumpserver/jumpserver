@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 
 from common.utils import get_logger
 from orgs.utils import tmp_to_org
+from tickets.models import WorkflowNodeInstance
 from tickets.workflow.errors import WorkflowConflict
 from .. import errors, mixins
 
@@ -37,6 +38,17 @@ class TicketStatusApi(mixins.AuthMixin, APIView):
             auth_logout(request)
             request.session['auth_ticket_id'] = auth_ticket_id
             return Response(e.as_data(), status=200)
+        except errors.LoginConfirmWaitError as e:
+            data = e.as_data()
+            node = WorkflowNodeInstance.objects.filter(
+                instance__ticket_id=e.ticket_id, state='running', deadline__isnull=False,
+                node__type='approval',
+            ).values('deadline', 'node__config').first()
+            if node:
+                config = node['node__config']
+                data['data'].update(deadline=node['deadline'], timeout=config['timeout'],
+                                    timeout_action=config['timeout_action'])
+            return Response(data)
         except errors.NeedMoreInfoError as e:
             return Response(e.as_data(), status=200)
 

@@ -3,7 +3,6 @@
 
 from __future__ import unicode_literals
 
-import datetime
 import os
 from typing import Callable
 from urllib.parse import urlparse, urlsplit, urlunsplit, urlencode
@@ -389,7 +388,6 @@ class UserLoginWaitConfirmView(mixins.AuthMixin, FormView):
         ticket = self.get_ticket()
         context = super().get_context_data(**kwargs)
         if ticket:
-            timestamp_created = datetime.datetime.timestamp(ticket.date_created)
             ticket_detail_url = TICKET_DETAIL_URL.format(id=ticket.id, type=ticket.type)
             assignees_display = ', '.join([str(assignee) for assignee in ticket.current_assignees])
             msg = format_html(
@@ -397,13 +395,11 @@ class UserLoginWaitConfirmView(mixins.AuthMixin, FormView):
                   Don't close this page"""), assignees_display
             )
         else:
-            timestamp_created = 0
             ticket_detail_url = ''
             msg = _('Login approval is required. You can provide a reason before submitting.')
         context.update({
             "title": _('Login confirm'),
             "msg": msg,
-            "timestamp": timestamp_created,
             "ticket_detail_url": ticket_detail_url,
             "ticket": ticket,
         })
