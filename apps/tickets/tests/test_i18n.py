@@ -58,6 +58,21 @@ class TicketTranslationTests(SimpleTestCase):
             workflow.created_by = 'Administrator'
             self.assertEqual(workflow.node_display_name(node), 'Approval 2')
 
+    def test_default_end_node_name_in_user_created_workflows(self):
+        workflow = Workflow(type='apply_asset', created_by='Administrator')
+        with override('zh'):
+            for key, kind, name, expected in [
+                ('end', 'end', 'end', '结束'),
+                ('end', 'end', 'End', 'End'),
+                ('end', 'end', 'Archive request', 'Archive request'),
+                ('archive', 'end', 'end', 'end'),
+                ('review', 'approval', 'end', 'end'),
+            ]:
+                with self.subTest(key=key, kind=kind, name=name):
+                    node = WorkflowNode(key=key, type=kind, name=name)
+                    self.assertEqual(workflow.node_display_name(node), expected)
+                    self.assertEqual(node.name, name)
+
     def test_acl_review_label_preserves_custom_node_names(self):
         for kind in ['login_confirm', 'login_asset_confirm', 'command_confirm']:
             workflow = Workflow(name=f'ACL {kind} 1234', type=kind, is_system=True)
