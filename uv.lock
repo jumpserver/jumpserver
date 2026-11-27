@@ -1455,14 +1455,14 @@ wheels = [
 
 [[package]]
 name = "djangorestframework"
-version = "3.17.2"
+version = "3.18.2"
 source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
 dependencies = [
     { name = "django" },
 ]
-sdist = { url = "https://mirrors.aliyun.com/pypi/packages/3b/35/c96055e700fdff25da3a7b7756cfd1d4dc54f38b9bc6d6c5e19e3a0fdc20/djangorestframework-3.17.2.tar.gz", hash = "sha256:89ed713b6dc83e1539f214b7d10808ae19bb8511004beba886225da6d5c9dafa" }
+sdist = { url = "https://mirrors.aliyun.com/pypi/packages/3f/8b/2f048189610d58b29ae947f46d9c7d19c20ba427568eac906d6a2277d391/djangorestframework-3.18.2.tar.gz", hash = "sha256:8249bad7715eb37274ce5820fc5d9fd786b7579806589565f52a71c02b35f54b" }
 wheels = [
-    { url = "https://mirrors.aliyun.com/pypi/packages/a2/46/c14108e400b208c394325eb63fbae06c81341b6447fa1a6f9da718b17fe7/djangorestframework-3.17.2-py3-none-any.whl", hash = "sha256:cb0546a7415d5b46c04e0f4fe0a54b2109f4fdd5e83ca773c8c6183a6493d042" },
+    { url = "https://mirrors.aliyun.com/pypi/packages/fa/9e/81e5bfbba54f7396233df979befde49e6e13c94c2df21b94555684dddd3e/djangorestframework-3.18.2-py3-none-any.whl", hash = "sha256:a92d6a4e128a2550bd2fe2e02008a9e47fe52c180e130bb438f5ba70ee933a3f" },
 ]
 
 [[package]]
@@ -2575,7 +2575,7 @@ requires-dist = [
     { name = "django-simple-captcha", specifier = "==0.5.18" },
     { name = "django-simple-history", specifier = "==3.6.0" },
     { name = "django-timezone-field", specifier = "==7.1" },
-    { name = "djangorestframework", specifier = "==3.17.2" },
+    { name = "djangorestframework", specifier = "==3.18.2" },
     { name = "djangorestframework-bulk", specifier = "==0.2.1" },
     { name = "docutils", specifier = "==0.20.1" },
     { name = "drf-nested-routers", specifier = "==0.93.4" },
