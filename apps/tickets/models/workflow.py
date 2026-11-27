@@ -61,6 +61,8 @@ class Workflow(JMSOrgBaseModel):
         return self.name
 
     def node_display_name(self, node):
+        if node.type == 'end' and node.key == 'end' and node.name == 'end':
+            return _('End')
         if self.is_system and node.type == 'approval' and node.name == 'Review':
             if self.name.startswith(f'ACL {self.type} ') and node.key == 'review':
                 return _('Review')
