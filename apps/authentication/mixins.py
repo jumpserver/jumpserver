@@ -557,7 +557,11 @@ class AuthACLMixin:
             ticket_id = ticket.id
             status = ticket.get_state_display()
             username = ticket.applicant.username
-            raise errors.LoginConfirmOtherError(ticket_id, status, username)
+            rejection_reason = None
+            if ticket.is_state(ticket.State.rejected):
+                rejected_tasks = ticket.approval_tasks.filter(state='rejected')
+                rejection_reason = rejected_tasks.values_list('comment', flat=True).first()
+            raise errors.LoginConfirmOtherError(ticket_id, status, username, rejection_reason)
 
     def get_ticket(self):
         from tickets.models import Ticket
