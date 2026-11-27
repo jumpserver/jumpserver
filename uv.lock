@@ -2610,7 +2610,7 @@ requires-dist = [
     { name = "lxml", specifier = "==6.1.0" },
     { name = "markdownify", specifier = ">=1.2.3" },
     { name = "markupsafe", specifier = "==2.1.3" },
-    { name = "mistune", specifier = "==2.0.3" },
+    { name = "mistune", specifier = "==3.3.4" },
     { name = "msrestazure", specifier = "==0.6.4" },
     { name = "mysqlclient", specifier = "==2.2.4" },
     { name = "netifaces", specifier = ">=0.11.0" },
@@ -2914,11 +2914,11 @@ wheels = [
 
 [[package]]
 name = "mistune"
-version = "2.0.3"
+version = "3.3.4"
 source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
-sdist = { url = "https://mirrors.aliyun.com/pypi/packages/26/83/2d67393cbb535b9ed7a7e42e944c255380f32835be6bcd86840f2c6f5b00/mistune-2.0.3.tar.gz", hash = "sha256:d7605b46b6156b53b7d52a465202b29a6f00f4ea4130ad5d25e9d5547d6b7e50" }
+sdist = { url = "https://mirrors.aliyun.com/pypi/packages/7b/92/328a294a6de83bacb95bed01f04e0eaff4e3616ee359fc821a5dfc539b02/mistune-3.3.4.tar.gz", hash = "sha256:58b5c96d6fcb61190dfe5fae498d2b2065f99cf61e9649418fd54cf1ada86dfe" }
 wheels = [
-    { url = "https://mirrors.aliyun.com/pypi/packages/37/7f/3cfa697f14943e7ffd9a1d864ac857ebe269813228dc00ebbf28ed6cea43/mistune-2.0.3-py2.py3-none-any.whl", hash = "sha256:e3964140c0775535fba50bd616fe180920044a64bc21850253267b07bff89924" },
+    { url = "https://mirrors.aliyun.com/pypi/packages/77/e4/288365afae98953bc01de09f686f40d8ee84578135aa7767d5d4e60b5278/mistune-3.3.4-py3-none-any.whl", hash = "sha256:ee015381e955e370962968befe1d729ab60fafb6a715ac6751763fbce38c8d4a" },
 ]
 
 [[package]]
