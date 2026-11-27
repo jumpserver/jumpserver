@@ -9,7 +9,7 @@ from uuid import uuid4
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from django.utils.translation import gettext, gettext_lazy as _
+from django.utils.translation import gettext
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -93,7 +93,7 @@ def issue_applet_ticket(token):
     applet = check_connection(token)
     host = applet.select_host(token.user, token.asset)
     if host is None:
-        raise PermissionDenied(_(
+        raise PermissionDenied(gettext(
             'No compatible Applet host is available. Upgrade and redeploy '
             'an applet host with Tinker %(minimum)s or later.'
         ) % {'minimum': TINKER_MIN_VERSION})

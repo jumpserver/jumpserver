@@ -318,6 +318,14 @@ class RDPLoginAuthorizationTests(SimpleTestCase):
         self.assertNotIn('remoteapplicationcmdline:s', options)
         self.applet.select_host.assert_called_once_with(self.user, self.token.asset)
 
+    def test_applet_option_denies_when_no_compatible_host_is_available(self):
+        self.applet.select_host.return_value = None
+        with self.assertRaisesMessage(
+            PermissionDenied, 'No compatible Applet host is available'
+        ):
+            self.applet_option()
+        self.cache.add.assert_not_called()
+
     def test_applet_option_does_not_add_transport_security_setting(self):
         self.host.platform.protocols[0].setting.pop('security')
         response = self.applet_option()
