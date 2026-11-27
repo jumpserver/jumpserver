@@ -18959,3 +18959,15 @@ msgstr "用於驗證伺服器憑證的 PEM 格式 CA 憑證，留空時使用系
 #: accounts/automations/change_secret/manager.py:66
 msgid "The currently managed password is required when AD passwords are changed with the current password"
 msgstr "使用原密碼修改 AD 密碼時，必須提供目前託管的密碼"
+
+#: settings/serializers/mcp.py:46
+msgid "This field is required when MCP access is enabled."
+msgstr "啟用 MCP 時，此欄位為必填項。"
+
+#: common/validators.py:52
+msgid "Enter the exact HTTP or HTTPS MCP URL without credentials, a trailing slash, query or fragment."
+msgstr "請輸入完整的 HTTP 或 HTTPS MCP 位址，不含身分憑證、結尾斜線、查詢參數或片段。"
+
+#: settings/serializers/mcp.py:59
+msgid "Configure a valid HTTP or HTTPS Site URL in Basic settings first."
+msgstr "請先在基本設定中設定有效的 HTTP 或 HTTPS 網站位址。"
