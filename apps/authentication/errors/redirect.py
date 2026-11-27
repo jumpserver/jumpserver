@@ -69,14 +69,17 @@ class LoginConfirmWaitError(LoginConfirmBaseError):
 class LoginConfirmOtherError(LoginConfirmBaseError):
     error = 'login_confirm_error'
 
-    def __init__(self, ticket_id, status, username):
+    def __init__(self, ticket_id, status, username, rejection_reason=None):
         self.username = username
+        self.rejection_reason = rejection_reason
         msg = const.login_confirm_error_msg.format(status=status)
         super().__init__(ticket_id=ticket_id, msg=msg)
 
     def as_data(self):
         ret = super().as_data()
         ret['data']['username'] = self.username
+        if self.rejection_reason:
+            ret['data']['rejection_reason'] = self.rejection_reason
         return ret
 
 

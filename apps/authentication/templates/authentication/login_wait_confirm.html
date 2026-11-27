@@ -31,6 +31,11 @@
             margin: 20px 0 0 0;
         }
 
+        .error-messages {
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
         body {
             box-sizing: border-box;
             min-height: 100%;
@@ -117,7 +122,6 @@
 {% include '_foot_js.html' %}
 <script src="{% static "js/plugins/clipboard/clipboard.min.js" %}"></script>
 <script>
-    var errorMsgShow = false;
     var errorMsgRef = $(".error-messages");
     var infoMsgRef = $(".info-messages");
     var timestamp = '{{ timestamp }}';
@@ -145,17 +149,16 @@
                     cancelCloseConfirm();
                     window.location = successUrl;
                 } else if (data.error !== "login_confirm_wait") {
-                    if (!errorMsgShow) {
-                        infoMsgRef.hide();
-                        errorMsgRef.show();
-                        progressBarRef.addClass('progress-bar-danger');
-                        errorMsgShow = true;
-                    }
+                    authCompleted = true;
+                    infoMsgRef.hide();
+                    errorMsgRef.show();
+                    progressBarRef.addClass('progress-bar-danger');
                     clearInterval(interval);
                     clearInterval(checkInterval);
                     cancelTicket();
                     $(".copy-btn").attr('disabled', 'disabled');
-                    errorMsgRef.html(data.msg)
+                    var reason = data.data && data.data.rejection_reason;
+                    errorMsgRef.text(reason ? data.msg + '\n' + reason : data.msg);
                 }
             },
             error: function (text, data) {

@@ -151,6 +151,20 @@ class LoginReviewReasonTests(TestCase):
         token.refresh_from_db()
         self.assertTrue(token.expired)
 
+    def test_rejection_only_returns_the_current_tickets_reviewer_comment(self):
+        for comment in ('请补充 <变更单号>\n再申请登录。', ''):
+            with self.subTest(comment=comment):
+                self.client = Client()
+                self.authenticate()
+                self.client.post(self.wait, {'reason': 'Applicant reason'})
+                ticket = Ticket.objects.get(pk=self.client.session['auth_ticket_id'])
+                task = ticket.approval_tasks.get(state='pending')
+                WorkflowEngine().reject(task, self.alice, comment=comment)
+                status = self.client.get(reverse('api-auth:login-confirm-ticket-status')).json()
+                self.assertEqual(status['error'], 'login_confirm_error')
+                self.assertEqual(status['data'].get('rejection_reason', ''), comment)
+                self.assertNotIn(SESSION_KEY, self.client.session)
+
     def test_api_callers_can_still_create_review_without_a_reason(self):
         from authentication import errors
         from django.test import RequestFactory

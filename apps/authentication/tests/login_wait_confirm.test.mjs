@@ -101,3 +101,14 @@ test('ordinary polling and manual refresh retain the previous login behavior', (
   assert.equal(refreshing.reloads(), 1)
   assert.equal(refreshing.requests.length, 0)
 })
+
+test('the waiting applicant sees the rejection status and optional reason as plain text', () => {
+  for (const reason of ['请补充 <变更单号>\n再申请登录。', '']) {
+    const p = page()
+    p.context.doRequestAuth()
+    p.context.doRequestAuth()
+    p.requests[0].success({ error: 'login_confirm_error', msg: 'Rejected', data: { rejection_reason: reason } })
+    p.requests[1].success({ error: 'login_confirm_error', msg: 'Not found' })
+    assert.equal(p.$('.error-messages').message, reason ? 'Rejected\n' + reason : 'Rejected')
+  }
+})
