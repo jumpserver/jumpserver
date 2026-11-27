@@ -64,6 +64,7 @@ class AgentInstallGuideTests(SimpleTestCase):
         self.assertEqual(view(RequestFactory().post(url)).status_code, 405)
 
 
+@override_settings(MCP_ENABLED=True)
 class AgentOAuthOrganizationTests(TestCase):
     @classmethod
     def setUpTestData(cls):

@@ -23,7 +23,7 @@ from oauth2_provider.models import (
     get_access_token_model,
     get_refresh_token_model,
 )
-from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.exceptions import APIException, PermissionDenied, ValidationError
 
 from authentication.backends.oauth2_provider.agent import AgentOAuth2Validator
 from common.sessions.cache import SessionStore
@@ -42,6 +42,7 @@ from terminal.models import (
 from users.models import User
 
 
+@override_settings(MCP_ENABLED=True)
 class AgentActionLockTests(TransactionTestCase):
     def test_polling_does_not_lock_the_parent_session(self):
         from django.db import connection
@@ -119,6 +120,7 @@ class AgentRequestContractTests(SimpleTestCase):
         self.assertEqual(response.data['code'], 'result_expired')
 
 
+@override_settings(MCP_ENABLED=True)
 class AgentBoundaryTests(TestCase):
     capabilities = {'version': 1, 'protocols': {'ssh': 'shell', 'sftp': 'files'}}
 
@@ -444,6 +446,48 @@ class AgentBoundaryTests(TestCase):
         AgentOAuthBinding.objects.filter(user=self.user).update(user=self.auditor)
         with self.assertRaises(PermissionDenied):
             service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource, 'capabilities': self.capabilities})
+
+    def test_mcp_disable_blocks_existing_clients_and_preserves_audit(self):
+        from terminal.api.agent import AgentComponentAPI
+
+        self.native_session()
+        AgentAction.objects.create(
+            session=self.session, user=self.user, application=self.app, kind='connect_asset',
+            idempotency_key='connected', request_hash='2' * 64, status='succeeded',
+        )
+        body = {'access_token': self.token.token, 'resource': self.resource,
+                'capabilities': self.capabilities}
+        principal = service.introspect(self.node, body)
+        context = {'context_token': principal['context_token']}
+        action = {**context, 'session_id': str(self.session.id), 'kind': 'execute_command',
+                  'idempotency_key': 'before-disable', 'request': {'command': 'pwd'}}
+        accepted = service.create_action(self.node, action)
+        with self.settings(MCP_ENABLED=False):
+            for name, operation in (
+                ('introspect', lambda: service.introspect(self.node, body)),
+                ('assets', lambda: AgentComponentAPI.assets(self.node, context)),
+                ('action', lambda: service.create_action(self.node, {**action, 'idempotency_key': 'disabled'})),
+            ):
+                with self.subTest(operation=name):
+                    with self.assertRaises(APIException) as raised:
+                        operation()
+                    self.assertEqual(raised.exception.status_code, 503)
+                    self.assertEqual(raised.exception.get_codes(), 'mcp_disabled')
+            capability = service.session_capability(self.session)
+            claimed = AgentComponentAPI(operation='claim').action_operation(
+                self.node, accepted['id'], {'session_token': capability},
+            )
+            self.assertTrue(claimed['claimed'])
+            result = AgentComponentAPI(operation='events').action_operation(
+                self.node, accepted['id'], {
+                    'session_token': capability,
+                    'event_id': str(uuid.uuid4()), 'sequence': 1,
+                    'state': 'succeeded', 'payload': {'exit_code': 0},
+                },
+            )
+            self.assertEqual(result['status'], 'succeeded')
+        self.assertEqual(service.introspect(self.node, body)['user_id'], str(self.user.pk))
+        self.assertEqual(service.context_identity(self.node, context['context_token'])[1], self.user)
 
     def test_node_capabilities_are_validated_and_bound_to_the_context(self):
         body = {'access_token': self.token.token, 'resource': self.resource, 'capabilities': self.capabilities}

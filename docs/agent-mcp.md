@@ -74,7 +74,7 @@ to this tab. The MCP page uses
 
 | Core setting | Meaning |
 | --- | --- |
-| `MCP_ENABLED` | Defaults to `false`; controls MCP access on Koko through the component configuration. Disabling stops new MCP requests after Koko synchronizes, while accepted operations and audit delivery finish |
+| `MCP_ENABLED` | Defaults to `false`; Core rejects token introspection and requests using a context token while disabled, including requests from existing clients. Koko also stops HTTP ingress after synchronizing its component configuration. Accepted operations and audit delivery finish; re-enabling preserves valid client authorizations |
 | `MCP_PUBLIC_URL` | The exact external HTTP or HTTPS MCP URL; Core is the sole configuration source. A nonempty value must have a path, with no credentials, trailing slash, query or fragment |
 | `MCP_DCR_ENABLED` | Defaults to `false`; allows controlled automatic client registration while MCP access is enabled. The preference can remain saved while MCP is disabled |
 | `MCP_DCR_REGISTRATIONS_PER_MINUTE` | Defaults to `30`; deployment-wide limit on anonymous registration attempts per fixed minute window, shared through Redis |

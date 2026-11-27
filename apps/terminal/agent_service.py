@@ -10,6 +10,7 @@ import uuid
 from datetime import timedelta
 from types import SimpleNamespace
 
+from django.conf import settings
 from django.core import signing
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
@@ -59,6 +60,17 @@ class ResultExpired(APIException):
     status_code = 410
     default_code = 'result_expired'
     default_detail = 'Operation result has expired. Do not repeat the operation.'
+
+
+class MCPDisabled(APIException):
+    status_code = 503
+    default_code = 'mcp_disabled'
+    default_detail = 'MCP access is disabled.'
+
+
+def check_mcp_enabled():
+    if not settings.MCP_ENABLED:
+        raise MCPDisabled()
 
 
 def canonical(value):
@@ -169,6 +181,7 @@ def agent_token_authority(raw, resource):
 
 
 def introspect(node, data):
+    check_mcp_enabled()
     require_keys(
         data,
         ('access_token', 'resource', 'capabilities'),
@@ -198,6 +211,9 @@ def introspect(node, data):
 
 
 def context_identity(node, value):
+    # Recheck contexts issued before disabling, without blocking accepted work
+    # or evidence delivery authorized by a component's session capability.
+    check_mcp_enabled()
     try:
         context = signing.loads(
             text_field(value, 'context_token', 8192), salt=CONTEXT_SALT, max_age=CONTEXT_TTL
