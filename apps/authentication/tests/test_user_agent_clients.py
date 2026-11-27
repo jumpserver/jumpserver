@@ -127,6 +127,25 @@ class UserAgentClientTests(TestCase):
         for method in ('get', 'options'):
             self.assertIn(self.request(method).status_code, (401, 403))
 
+    def test_list_filters_id_without_losing_search_or_user_scope(self):
+        self.authorize(self.user)
+        self.authorize(self.user, self.other_application)
+        for query, expected in (
+            (f'id={self.application.pk}', [self.application.pk]),
+            ('id=0', []),
+            (f'id={self.application.pk}&search=personal-agent-client', [self.application.pk]),
+            (f'id={self.other_application.pk}&search=personal-agent-client', []),
+        ):
+            with self.subTest(query=query):
+                response = self.request(user=self.user, path=f'{self.url}?{query}')
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual([row['id'] for row in response.data['results']], expected)
+        path = f'{self.url}?id={self.application.pk}'
+        self.assertEqual(self.request(user=self.other, path=path).data['count'], 0)
+        self.assertEqual(
+            self.request(user=self.user, path=f'{self.url}?id=invalid').status_code, 400
+        )
+
     def test_absolute_authorization_deadline_controls_personal_status(self):
         self.authorize(self.user)
         deadline = timezone.now() + timedelta(minutes=1)

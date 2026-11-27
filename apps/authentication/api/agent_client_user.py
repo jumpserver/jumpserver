@@ -14,7 +14,7 @@ from rest_framework.viewsets import GenericViewSet
 from audits.const import ActionChoices
 from audits.handler import create_or_update_operate_log
 from authentication.services.agent_clients import agent_oauth_bindings, revoke_user_agent_client
-from common.drf.filters import SearchFilter
+from common.drf.filters import LookupFilterBackend, SearchFilter
 from common.permissions import IsValidUser
 from common.utils import get_request_ip
 from orgs.models import Organization
@@ -71,7 +71,8 @@ class UserAgentClientViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, G
     serializer_class = UserAgentClientSerializer
     permission_classes = [IsValidUser]
     http_method_names = ['get', 'head', 'options', 'post']
-    filter_backends = [SearchFilter]
+    filter_backends = [LookupFilterBackend, SearchFilter]
+    filterset_fields = ('id',)
     search_fields = ('name', 'client_id')
     pagination_class = UserAgentClientPagination
 
