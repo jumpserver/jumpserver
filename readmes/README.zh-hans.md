@@ -47,7 +47,7 @@ curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quic
 
 ## 功能特性
 
-### 🔐 特权账号管理
+### 特权账号管理
 
 统一发现、推送、备份和改密特权账号，并识别弱密码、泄露密码、长期未改密等风险账号，一个仪表盘全部掌握。
 
@@ -55,7 +55,7 @@ curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quic
   <img src="assets/screenshot-01.png" alt="JumpServer 特权访问管理仪表盘" title="JumpServer 特权访问管理仪表盘" width="100%" />
 </p>
 
-### 🗂️ 统一资产管理
+### 统一资产管理
 
 在一棵资产树中管理主机、网络设备、数据库、云服务、Web 和目录服务，配合细粒度的授权策略和 ACL。
 
@@ -63,7 +63,7 @@ curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quic
   <img src="assets/screenshot-02.png" alt="JumpServer 资产管理" title="JumpServer 资产管理" width="100%" />
 </p>
 
-### 🖥️ 浏览器即可访问一切
+### 浏览器即可访问一切
 
 选择资产和账号即可通过 SSH、SFTP、RDP、VNC、数据库或 Web 应用连接，Windows 桌面和 RemoteApp 直接在浏览器中运行。
 
@@ -71,7 +71,7 @@ curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quic
   <img src="assets/screenshot-06.png" alt="JumpServer 远程桌面会话" title="JumpServer 远程桌面会话" width="100%" />
 </p>
 
-### 🤖 AI 赋能运维
+### AI 赋能运维
 
 在终端中按 <kbd>⌘</kbd> <kbd>K</kbd> 用自然语言描述任务，或让 AI 助手帮你搜索资产、连接会话、执行终端任务。
 
@@ -79,7 +79,7 @@ curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quic
   <img src="assets/screenshot-05.png" alt="JumpServer AI 助手" title="JumpServer AI 助手" width="100%" />
 </p>
 
-### ⌨️ KoKo 原生 SSH 体验
+### KoKo 原生 SSH 体验
 
 使用任意 SSH 客户端接入 JumpServer，在 TUI 中浏览已授权资产，并在多个会话之间快速切换，无需离开终端。
 

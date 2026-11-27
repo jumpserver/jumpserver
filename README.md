@@ -47,7 +47,7 @@ Open `https://<jumpserver-host>/` in your browser, replacing `<jumpserver-host>`
 
 ## Features
 
-### 🔐 Privileged Account Management
+### Privileged Account Management
 
 Discover, push, back up and rotate privileged accounts, and spot risky ones such as weak, leaked or long-unchanged passwords — all from one dashboard.
 
@@ -55,7 +55,7 @@ Discover, push, back up and rotate privileged accounts, and spot risky ones such
   <img src="readmes/assets/screenshot-01.png" alt="JumpServer PAM dashboard" title="JumpServer PAM dashboard" width="100%" />
 </p>
 
-### 🗂️ Unified Asset Management
+### Unified Asset Management
 
 Manage hosts, network devices, databases, cloud, web and directory services in one asset tree, with fine-grained authorization policies and ACLs.
 
@@ -63,7 +63,7 @@ Manage hosts, network devices, databases, cloud, web and directory services in o
   <img src="readmes/assets/screenshot-02.png" alt="JumpServer asset management" title="JumpServer asset management" width="100%" />
 </p>
 
-### 🖥️ Access Anything from the Browser
+### Access Anything from the Browser
 
 Pick an asset and an account, then connect over SSH, SFTP, RDP, VNC, databases or web apps. Windows desktops and RemoteApps run right in the browser.
 
@@ -71,7 +71,7 @@ Pick an asset and an account, then connect over SSH, SFTP, RDP, VNC, databases o
   <img src="readmes/assets/screenshot-06.png" alt="JumpServer remote desktop session" title="JumpServer remote desktop session" width="100%" />
 </p>
 
-### 🤖 AI-Powered Operations
+### AI-Powered Operations
 
 Press <kbd>⌘</kbd> <kbd>K</kbd> in the terminal to describe a task in plain language, or let the AI assistant search assets, connect sessions and run terminal tasks for you.
 
@@ -79,7 +79,7 @@ Press <kbd>⌘</kbd> <kbd>K</kbd> in the terminal to describe a task in plain la
   <img src="readmes/assets/screenshot-05.png" alt="JumpServer AI assistant" title="JumpServer AI assistant" width="100%" />
 </p>
 
-### ⌨️ Native SSH Experience with KoKo
+### Native SSH Experience with KoKo
 
 Use any SSH client to reach JumpServer. Browse authorized assets in a TUI and switch between multiple sessions without leaving your terminal.
 
