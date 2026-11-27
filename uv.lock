@@ -507,7 +507,7 @@ wheels = [
 
 [[package]]
 name = "azure-identity"
-version = "1.16.0"
+version = "1.16.1"
 source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
 dependencies = [
     { name = "azure-core" },
@@ -515,9 +515,9 @@ dependencies = [
     { name = "msal" },
     { name = "msal-extensions" },
 ]
-sdist = { url = "https://mirrors.aliyun.com/pypi/packages/cd/f1/25cba0d1f4ba1f9b9c799c4755400a3e577adcb1470cf5760fcd730b88e1/azure-identity-1.16.0.tar.gz", hash = "sha256:6ff1d667cdcd81da1ceab42f80a0be63ca846629f518a922f7317a7e3c844e1b" }
+sdist = { url = "https://mirrors.aliyun.com/pypi/packages/bb/1c/bd704075e555046e24b069157ca25c81aedb4199c3e0b35acba9243a6ca6/azure-identity-1.16.1.tar.gz", hash = "sha256:6d93f04468f240d59246d8afde3091494a5040d4f141cad0f49fc0c399d0d91e" }
 wheels = [
-    { url = "https://mirrors.aliyun.com/pypi/packages/0d/89/2ab156cfa44367e1449e87ff3be393732677b55ed35719cdc8c2f5dfc170/azure_identity-1.16.0-py3-none-any.whl", hash = "sha256:722fdb60b8fdd55fa44dc378b8072f4b419b56a5e54c0de391f644949f3a826f" },
+    { url = "https://mirrors.aliyun.com/pypi/packages/ef/c5/ca55106564d2044ab90614381368b3756690fb7e3ab04552e17f308e4e4f/azure_identity-1.16.1-py3-none-any.whl", hash = "sha256:8fb07c25642cd4ac422559a8b50d3e77f73dcc2bbfaba419d06d6c9d7cff6726" },
 ]
 
 [[package]]
@@ -2542,7 +2542,7 @@ requires-dist = [
     { name = "ansible-core", url = "https://github.com/jumpserver-dev/ansible/archive/refs/tags/v2.16.18.6.zip" },
     { name = "ansible-runner", url = "https://github.com/jumpserver-dev/ansible-runner/archive/refs/tags/v2.4.0.2.zip" },
     { name = "asn1crypto", specifier = "==1.5.1" },
-    { name = "azure-identity", specifier = "==1.16.0" },
+    { name = "azure-identity", specifier = "==1.16.1" },
     { name = "azure-keyvault-secrets", specifier = "==4.9.0" },
     { name = "azure-storage-blob", specifier = "==12.17.0" },
     { name = "bcrypt", specifier = "==4.0.1" },
