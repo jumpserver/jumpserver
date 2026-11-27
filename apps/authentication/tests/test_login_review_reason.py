@@ -144,6 +144,7 @@ class LoginReviewReasonTests(TestCase):
             data = self.client.get(url).json()['data']
             if action:
                 self.assertEqual(data['deadline'], task.node_instance.deadline.isoformat().replace('+00:00', 'Z'))
+                self.assertEqual(data['timeout'], task.node_instance.node.config['timeout'])
                 self.assertEqual(data['timeout_action'], action)
             else:
                 self.assertNotIn('deadline', data)

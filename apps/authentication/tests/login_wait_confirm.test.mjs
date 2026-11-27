@@ -19,6 +19,7 @@ function page() {
         on(event, target, callback) { handlers.set(target, callback); return this },
         show() { this.visible = true; return this },
         hide() { this.visible = false; return this },
+        css(key, value) { this[key] = value; return this },
         text(value) { this.message = value; return this },
         addClass(value) { this.classes.add(value); return this },
         removeClass(value) { this.classes.delete(value); return this },
@@ -115,9 +116,11 @@ test('the waiting applicant sees the rejection status and optional reason as pla
 test('polling updates the current deadline and clears it when the next node has no timeout', () => {
   const p = page()
   const deadline = '2026-11-26T03:19:14Z'
+  p.context.Date = class extends Date { static now() { return Date.parse(deadline) - 30000 } }
   for (const action of ['reject', 'expire']) {
     p.context.doRequestAuth()
-    p.requests.at(-1).success({ error: 'login_confirm_wait', data: { deadline, timeout_action: action } })
+    p.requests.at(-1).success({ error: 'login_confirm_wait', data: { deadline, timeout: 60, timeout_action: action } })
+    assert.equal(p.$('.progress-bar').attributes['aria-valuenow'], 50)
     assert.equal(p.$('.deadline-notice time').attributes.datetime, deadline)
     assert.equal(p.$('.timeout-action').message,
       action === 'reject' ? 'If approval times out, your login request will be rejected.'
@@ -126,5 +129,6 @@ test('polling updates the current deadline and clears it when the next node has 
   }
   p.context.doRequestAuth()
   p.requests.at(-1).success({ error: 'login_confirm_wait', data: {} })
+  assert.equal(p.$('.progress-bar').attributes['aria-valuenow'], undefined)
   assert.equal(p.$('.deadline-notice').visible, false)
 })

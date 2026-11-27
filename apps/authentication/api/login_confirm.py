@@ -45,7 +45,9 @@ class TicketStatusApi(mixins.AuthMixin, APIView):
                 node__type='approval',
             ).values('deadline', 'node__config').first()
             if node:
-                data['data'].update(deadline=node['deadline'], timeout_action=node['node__config']['timeout_action'])
+                config = node['node__config']
+                data['data'].update(deadline=node['deadline'], timeout=config['timeout'],
+                                    timeout_action=config['timeout_action'])
             return Response(data)
         except errors.NeedMoreInfoError as e:
             return Response(e.as_data(), status=200)

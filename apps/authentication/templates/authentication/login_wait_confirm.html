@@ -90,6 +90,10 @@
                     <strong>{% trans 'Approval deadline' %} <time></time></strong>
                     <div class="timeout-action"></div>
                 </div>
+                <div class="progress progress-bar-default progress-striped active">
+                    <div class="progress-bar" role="progressbar" aria-label="{% trans 'Login confirm' %}"
+                         aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+                </div>
                 <div class="row">
                     <div class="col-sm-3">
                         <a class="btn btn-primary btn-sm block btn-refresh">
@@ -152,7 +156,7 @@
                     authCompleted = true;
                     infoMsgRef.hide();
                     errorMsgRef.show();
-                    $(".deadline-notice").hide();
+                    $(".progress, .deadline-notice").hide();
                     clearInterval(checkInterval);
                     cancelTicket();
                     $(".copy-btn").attr('disabled', 'disabled');
@@ -180,11 +184,18 @@
     }
 
     function showDeadline(node) {
+        var bar = $(".progress-bar");
         if (!node || !node.deadline) {
+            bar.css("width", "100%").removeAttr("aria-valuenow");
             $(".deadline-notice").hide();
             return;
         }
         var deadline = new Date(node.deadline);
+        if (node.timeout > 0) {
+            var remaining = (deadline.getTime() - Date.now()) / 1000;
+            var percent = Math.round(Math.max(0, Math.min(1, 1 - remaining / node.timeout)) * 100);
+            bar.css("width", percent + "%").attr("aria-valuenow", percent);
+        }
         $(".deadline-notice time").attr("datetime", node.deadline).text(deadline.toLocaleString(document.documentElement.lang));
         $(".timeout-action").text(node.timeout_action === 'reject'
             ? "{% trans 'If approval times out, your login request will be rejected.' %}"
