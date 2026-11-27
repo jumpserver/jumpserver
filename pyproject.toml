@@ -129,7 +129,7 @@ dependencies = [
     'distro==1.9.0',
     'elasticsearch7==7.17.13',
     'elasticsearch8==8.13.2',
-    'azure-identity==1.16.0',
+    'azure-identity==1.16.1',
     'azure-keyvault-secrets==4.9.0',
     "psycopg2-binary==2.9.12",
     'pycountry>=024.6.1',
