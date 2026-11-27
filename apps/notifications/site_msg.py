@@ -79,16 +79,18 @@ class SiteMessageUtil:
         return msgs
     
     @classmethod
+    @transaction.atomic
     def create_site_msgs_for_user_if_need(cls, user_id):
         '''
         创建用户未读的且需要展示的消息
         广播消息时只为在线用户创建，未登录的用户不创建消息，等用户登录后在这里按需创建
         只创建用户没有的、最近24小时内的、需要广播的消息
         '''
-        contents = MessageContent.objects.filter(
+        # Serialize delivery with revocation so a login cannot recreate a withdrawn message.
+        contents = MessageContent.objects.select_for_update().filter(
             is_broadcast=True,
             date_created__gt=local_now() - timedelta(hours=24)
-        ).exclude(display_mode=MessageContent.DisplayMode.default)
+        ).exclude(display_mode=MessageContent.DisplayMode.default).exclude(messages__user_id=user_id).order_by('pk')
         content_ids = set(contents.values_list('id', flat=True))
         has_content_ids = SiteMessage.objects.filter(
             user_id=user_id, content_id__in=content_ids

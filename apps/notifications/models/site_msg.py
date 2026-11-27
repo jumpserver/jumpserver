@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 
 from common.db.models import JMSBaseModel
 from ..const import SiteMessageDisplayMode
@@ -58,9 +58,10 @@ class MessageContent(JMSBaseModel):
             'date_created': str(self.date_created),
             'sender': str(self.sender) if self.sender else ''
         }
-    
+
+    @transaction.atomic
     def revoke_msg(self):
-        if not self.is_broadcast:
-            return
-        self.is_broadcast = False
-        self.save()
+        if self.is_broadcast:
+            self.is_broadcast = False
+            self.save(update_fields=['is_broadcast', 'date_updated'])
+        self.messages.all().delete()
