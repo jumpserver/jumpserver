@@ -21279,3 +21279,15 @@ msgstr "超时未审批，本次登录申请将被自动拒绝。"
 #: authentication/templates/authentication/login_wait_confirm.html
 msgid "If approval times out, your login request will expire."
 msgstr "超时未审批，本次登录申请将过期。"
+
+#: settings/serializers/mcp.py:46
+msgid "This field is required when MCP access is enabled."
+msgstr "启用 MCP 时，此字段为必填项。"
+
+#: common/validators.py:52
+msgid "Enter the exact HTTP or HTTPS MCP URL without credentials, a trailing slash, query or fragment."
+msgstr "请输入完整的 HTTP 或 HTTPS MCP 地址，不含身份凭据、末尾斜线、查询参数或片段。"
+
+#: settings/serializers/mcp.py:59
+msgid "Configure a valid HTTP or HTTPS Site URL in Basic settings first."
+msgstr "请先在基本设置中配置有效的 HTTP 或 HTTPS 网站地址。"
